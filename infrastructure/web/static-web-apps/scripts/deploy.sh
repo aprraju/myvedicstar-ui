@@ -144,8 +144,10 @@ swa_deploy() {
   # The token is passed through the environment, never on the command line. stdin is closed so the CLI can never wait
   # for an interactive answer on a CI runner. Output is kept (outside the staged folder) to classify failures; only the
   # most verbose level prints the deployment service's reason for a failure (the token itself is always <hidden>).
-  (cd "$STAGE" && SWA_CLI_DEPLOYMENT_TOKEN="$TOKEN" npx --yes "@azure/static-web-apps-cli@${SWA_CLI_VERSION}" deploy \
-    --app-location . --output-location . --swa-config-location . --env production --no-use-keychain --verbose=silly) \
+  # Runs from the current directory with the staged folder as an absolute path: the upload client refuses to run from
+  # inside the folder it uploads ("Current directory cannot be identical to or contained within artifact folders").
+  SWA_CLI_DEPLOYMENT_TOKEN="$TOKEN" npx --yes "@azure/static-web-apps-cli@${SWA_CLI_VERSION}" deploy "$STAGE" \
+    --swa-config-location "$STAGE" --env production --no-use-keychain --verbose=silly \
     < /dev/null 2>&1 | tee "$DEPLOY_LOG"
   return "${PIPESTATUS[0]}"
 }
