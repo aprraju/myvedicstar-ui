@@ -16,7 +16,7 @@ export type ApiErrorKind =
   | 'cancelled'
   | 'unknown';
 
-export interface ApiErrorInit {
+interface ApiErrorInit {
   kind: ApiErrorKind;
   status?: number | undefined;
   correlationId?: string | undefined;
@@ -56,7 +56,7 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
-export function kindFromStatus(status: number): ApiErrorKind {
+function kindFromStatus(status: number): ApiErrorKind {
   if (status === 400 || status === 422) return 'validation';
   if (status === 401) return 'authentication';
   if (status === 403) return 'authorization';
@@ -68,7 +68,7 @@ export function kindFromStatus(status: number): ApiErrorKind {
 }
 
 /** Parses `Retry-After` (seconds or HTTP date) into milliseconds; undefined when absent or invalid. */
-export function parseRetryAfter(value: string | null, now: number = Date.now()): number | undefined {
+function parseRetryAfter(value: string | null, now: number = Date.now()): number | undefined {
   if (!value) return undefined;
   const seconds = Number(value);
   if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;

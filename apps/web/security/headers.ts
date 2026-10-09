@@ -1,11 +1,12 @@
 /**
  * Single source of truth for the web app's security headers. Used by:
- * - `vite preview` (so E2E tests run under the production policy and fail on CSP violations),
- * - `npm run security:headers` (prints the headers for the CDN / Front Door rule set at deploy time).
+ * - the dev server and `vite preview` (so E2E tests run under the production policy and fail on CSP violations),
+ * - deployment, which writes them into each environment's staticwebapp.config.json
+ *   (infrastructure/web/static-web-apps/scripts/static-web-app-config.ts).
  * See docs/security/content-security-policy.md.
  */
 
-export interface CspOptions {
+interface CspOptions {
   /** Origins the SPA calls: the backend API origin, plus the identity authority and telemetry endpoint when enabled. */
   connectSrc: readonly string[];
   /**
@@ -62,9 +63,4 @@ export function buildSecurityHeaders(options: CspOptions & { hsts?: boolean }): 
       ? {}
       : { 'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload' }),
   };
-}
-
-/** Origin of a URL, e.g. `https://api.example.com/v1` → `https://api.example.com`. */
-export function originOf(url: string): string {
-  return new URL(url).origin;
 }

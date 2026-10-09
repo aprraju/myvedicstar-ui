@@ -127,6 +127,12 @@ describe('protected routes', () => {
     expect(screen.getByText(/Sign-in is not available yet/)).toBeInTheDocument();
   });
 
+  it('show a clearly labelled "coming soon" page for Settings to signed-in users', async () => {
+    renderRoute('/settings', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByText('This part of My Vedic Star is coming soon.')).toBeInTheDocument();
+  });
+
   it('no longer serve login or register pages', async () => {
     renderRoute('/login');
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeInTheDocument();

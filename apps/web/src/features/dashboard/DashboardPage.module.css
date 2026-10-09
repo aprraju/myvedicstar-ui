@@ -13,7 +13,7 @@
   background-color: #0f2237;
   background-image:
     linear-gradient(90deg, rgb(15 34 55 / 0.78), rgb(15 34 55 / 0.2)),
-    url('../../themes/myvedicstar-default/assets/images/dashboard.jpg');
+    url('../../assets/images/dashboard.jpg');
   background-size: cover;
   background-position: center;
   color: #fff;

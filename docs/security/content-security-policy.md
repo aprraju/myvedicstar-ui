@@ -22,10 +22,11 @@ frame-ancestors 'none';
 upgrade-insecure-requests
 ```
 
-Print the exact headers for an environment from its runtime config:
+Each deployment generates the exact headers for its environment (`connect-src` from that environment's runtime
+config) into `staticwebapp.config.json`; preview them without deploying:
 
 ```bash
-npm run security:headers -w @myvedicstar/web -- ../../infrastructure/web/config/config.production.example.json
+npm run web:deploy -- --environment production --env-file infrastructure/web/static-web-apps/environments/production.env --dry-run
 ```
 
 ## Required external origins
@@ -66,15 +67,14 @@ nonce. Neither adds `'unsafe-inline'` or `'unsafe-eval'`.
 
 ## Where to apply the headers
 
-Azure Storage static websites **cannot set custom response headers**. Do not fall back to a `<meta>` CSP as the primary
-control: `frame-ancestors`, `report-to` and `sandbox` are ignored in meta tags.
+Headers must come from the host, never from a `<meta>` CSP: `frame-ancestors`, `report-to` and `sandbox` are ignored
+in meta tags.
 
-| Hosting                                                           | Where                                                                                                                                            |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Azure Storage static website + **Azure Front Door** (recommended) | Front Door Rule Set → "Modify response header" actions for every header                                                                          |
-| Azure Static Web Apps (primary)                                   | `staticwebapp.config.json` → `globalHeaders`, generated per environment by `infrastructure/web/static-web-apps/scripts/static-web-app-config.ts` |
-| Other CDN / reverse proxy                                         | Edge response-header rules                                                                                                                       |
-| Local preview / E2E                                               | `vite preview` (`preview.headers` in `vite.config.ts`)                                                                                           |
+| Hosting                            | Where                                                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Azure Static Web Apps (production) | `staticwebapp.config.json` → `globalHeaders`, generated per environment by `infrastructure/web/static-web-apps/scripts/static-web-app-config.ts` |
+| Other CDN / reverse proxy          | Edge response-header rules                                                                                                                       |
+| Local preview / E2E                | `vite preview` (`preview.headers` in `vite.config.ts`)                                                                                           |
 
 ## Reporting (recommended)
 

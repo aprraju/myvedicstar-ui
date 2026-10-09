@@ -13,8 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "e2e": "playwright test",
-    "e2e:install": "playwright install --with-deps chromium",
-    "security:headers": "tsx security/print-headers.ts"
+    "e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "@hookform/resolvers": "5.9.1",

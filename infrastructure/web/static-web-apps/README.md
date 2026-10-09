@@ -27,8 +27,7 @@ startup the app loads `/config.json`, validates it (`packages/config`) and expos
 | Deploy permission | Custom role **MyVedicStar Static Web App Deployer** on the Static Web App only                    |
 
 The Static Web App, APIM, App Insights and Entra registrations are owned by `myvedicstar-infra` (Terraform). This
-pipeline only deploys content. `bicep/` and `scripts/provision.sh` are for creating a new environment outside that
-Terraform; do not run them against production.
+pipeline only deploys content; infrastructure changes belong in that repository.
 
 ## Settings
 

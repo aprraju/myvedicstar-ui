@@ -21,6 +21,7 @@
   },
   "featureFlags": {},
   "telemetry": {
-    "enabled": false
+    "enabled": false,
+    "console": true
   }
 }

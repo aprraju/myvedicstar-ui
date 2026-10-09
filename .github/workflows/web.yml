@@ -11,6 +11,7 @@ on:
         'package-lock.json',
         'tsconfig.base.json',
         'eslint.config.js',
+        'knip.json',
         '.github/workflows/web.yml',
         '.github/workflows/web-deploy.yml',
         'infrastructure/web/**',
@@ -25,6 +26,7 @@ on:
         'package-lock.json',
         'tsconfig.base.json',
         'eslint.config.js',
+        'knip.json',
         '.github/workflows/web.yml',
         '.github/workflows/web-deploy.yml',
         'infrastructure/web/**',
@@ -53,6 +55,8 @@ jobs:
         run: npm run format:check
       - name: Lint
         run: npm run lint
+      - name: Unused files, exports and dependencies (knip)
+        run: npm run lint:unused
       - name: Type check (shared packages + web + deployment scripts)
         run: |
           npm run typecheck --workspace=packages

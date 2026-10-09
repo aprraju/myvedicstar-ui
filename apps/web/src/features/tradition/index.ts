@@ -1,2 +1,2 @@
 export { TraditionSelector } from './TraditionSelector';
-export { TraditionStateProvider, useTradition, useTraditions } from './TraditionStateProvider';
+export { TraditionStateProvider, useTradition } from './TraditionStateProvider';

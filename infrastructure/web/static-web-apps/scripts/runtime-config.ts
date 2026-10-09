@@ -10,10 +10,10 @@
 import { defaultApiEndpoints } from '@myvedicstar/api-client';
 import { type AppConfig, featureFlagNames, parseAppConfig } from '@myvedicstar/config';
 
-export type Env = Readonly<Record<string, string | undefined>>;
+type Env = Readonly<Record<string, string | undefined>>;
 
 /** Every variable the renderer understands. */
-export const RUNTIME_CONFIG_VARIABLES = {
+const RUNTIME_CONFIG_VARIABLES = {
   MVS_ENVIRONMENT: 'development | test | production (also uat, staging)',
   MVS_SITE_URL: 'Public origin of this environment, e.g. https://www.example.com (default for redirect URIs)',
   MVS_API_BASE_URL: 'Backend base URL including the version prefix, e.g. https://api.example.com/api/v1',
@@ -37,9 +37,9 @@ export const RUNTIME_CONFIG_VARIABLES = {
   MVS_APPINSIGHTS_CONNECTION_STRING: 'Optional Application Insights connection string (public by design)',
 } as const;
 
-export type RuntimeConfigVariable = keyof typeof RUNTIME_CONFIG_VARIABLES;
+type RuntimeConfigVariable = keyof typeof RUNTIME_CONFIG_VARIABLES;
 
-export type RenderResult =
+type RenderResult =
   | { ok: true; raw: Record<string, unknown>; config: AppConfig; siteUrl: string }
   | { ok: false; issues: string[] };
 

@@ -5,7 +5,7 @@ import { type DocumentId, documents } from './documents';
 import { MarkdownDocument, parseMarkdown } from './markdown';
 
 /** A content page rendered from its Markdown file (About Us, How It Works, Privacy Policy, Terms of Use, …). */
-export function DocumentPage({ id }: Readonly<{ id: DocumentId }>) {
+function DocumentPage({ id }: Readonly<{ id: DocumentId }>) {
   const blocks = useMemo(() => parseMarkdown(documents[id]), [id]);
   const titleId = `document-${id}`;
   return (

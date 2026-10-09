@@ -309,3 +309,28 @@ describe('unparsable URLs', () => {
     }
   });
 });
+
+describe('telemetry.console (local diagnostics)', () => {
+  it('defaults to off and is allowed in developer environments', () => {
+    const fallback = parseAppConfig(valid);
+    expect(fallback.ok && fallback.config.telemetry.console).toBe(false);
+    for (const environment of ['local', 'development', 'test']) {
+      const result = parseAppConfig({
+        environment,
+        apiBaseUrl: 'http://localhost:5275/api/v1',
+        telemetry: { console: true },
+      });
+      expect(result.ok && result.config.telemetry.console).toBe(true);
+    }
+  });
+
+  it.each(['uat', 'staging', 'production'])('is rejected in %s', (environment) => {
+    const result = parseAppConfig({
+      environment,
+      apiBaseUrl: 'https://api.example',
+      telemetry: { console: true },
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues.join('\n')).toMatch(/telemetry\.console/);
+  });
+});

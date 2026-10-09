@@ -5,7 +5,7 @@ import { Fragment, type ReactNode } from 'react';
  * `#`–`###` headings, paragraphs, `-` bullet lists, `**bold**` and `*italic*`. Everything is rendered as React text
  * nodes — never as HTML — so it is safe and Content-Security-Policy friendly.
  */
-export type MarkdownBlock =
+type MarkdownBlock =
   | { type: 'heading'; level: 1 | 2 | 3; text: string }
   | { type: 'paragraph'; text: string }
   | { type: 'list'; items: string[] };
@@ -45,7 +45,7 @@ export function parseMarkdown(source: string): MarkdownBlock[] {
 }
 
 /** `**bold**` and `*italic*` → <strong>/<em>; everything else stays plain text. */
-export function renderInline(text: string): ReactNode {
+function renderInline(text: string): ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).filter(Boolean);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) return <strong key={i}>{part.slice(2, -2)}</strong>;

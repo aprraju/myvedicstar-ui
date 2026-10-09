@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useUpcomingFestivals } from './useUpcomingFestivals';
 
 /** The backend accepts up to 90 days; one cached request serves the day card, calendar tiles and day panel. */
-export const FESTIVAL_WINDOW_DAYS = 90;
+const FESTIVAL_WINDOW_DAYS = 90;
 
 export interface FestivalsByDate {
   /** Festivals per local date, in the backend's order. */

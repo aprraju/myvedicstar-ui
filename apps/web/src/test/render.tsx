@@ -58,7 +58,7 @@ export function fakeGeolocation(
   return provider;
 }
 
-export interface RenderOptions {
+interface RenderOptions {
   auth?: AuthClient;
   config?: AppConfig;
   geolocation?: GeolocationProvider;

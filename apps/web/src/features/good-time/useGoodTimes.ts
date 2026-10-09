@@ -15,10 +15,10 @@ import { useLocationState } from '../location';
 import { useTradition } from '../tradition';
 
 /** Pause after the last change before requesting, so rapid repeated selections send one request. */
-export const SELECTION_SETTLE_MS = 200;
+const SELECTION_SETTLE_MS = 200;
 
 /** What the user asked for: a date (location's today when omitted), an activity and, for Other, a description. */
-export interface GoodTimeSelection {
+interface GoodTimeSelection {
   date?: string | undefined;
   activity: string;
   otherText?: string | undefined;

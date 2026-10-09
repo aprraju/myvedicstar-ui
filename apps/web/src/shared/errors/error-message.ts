@@ -1,7 +1,7 @@
 import { isApiError } from '@myvedicstar/api-client';
 import type { MessageKey } from '@myvedicstar/localization';
 
-export interface UserFacingError {
+interface UserFacingError {
   /** Friendly, localized message key — never raw server text. */
   messageKey: MessageKey;
   /** Support reference (correlation ID) users can quote; contains no sensitive data. */

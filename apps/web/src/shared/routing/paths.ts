@@ -29,7 +29,7 @@ export const routes = {
 
 export const DEFAULT_AUTHENTICATED_PATH = routes.dashboard;
 
-export type SignInErrorReason = 'cancelled' | 'network' | 'failed';
+type SignInErrorReason = 'cancelled' | 'network' | 'failed';
 export const SIGN_IN_ERROR_PARAM = 'signin_error';
 
 export const paths = {

@@ -22,7 +22,7 @@
       color-mix(in srgb, var(--color-background) 82%, transparent) 45%,
       color-mix(in srgb, var(--color-background) 30%, transparent) 100%
     ),
-    url('../../themes/myvedicstar-default/assets/images/home.jpg');
+    url('../../assets/images/home.jpg');
   background-size: cover;
   background-position: 62% center;
   box-shadow: var(--shadow-low);
@@ -42,7 +42,7 @@
         color-mix(in srgb, var(--color-background) 82%, transparent) 40%,
         color-mix(in srgb, var(--color-background) 10%, transparent) 67%
       ),
-      url('../../themes/myvedicstar-default/assets/images/home.jpg');
+      url('../../assets/images/home.jpg');
     background-position: center;
   }
 }

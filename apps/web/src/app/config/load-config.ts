@@ -1,6 +1,6 @@
 import { type AppConfig, parseAppConfig } from '@myvedicstar/config';
 
-export const RUNTIME_CONFIG_PATH = '/config.json';
+const RUNTIME_CONFIG_PATH = '/config.json';
 
 export class ConfigLoadError extends Error {
   constructor(readonly issues: readonly string[]) {

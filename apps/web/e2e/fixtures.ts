@@ -19,7 +19,7 @@ import { buildPanchangMonth } from '../../../packages/testing/src/month';
 // Playwright loads specs as native ESM, where JSON needs import attributes; read the shared fixtures with require.
 const require = createRequire(import.meta.url);
 const fixture = <T>(name: string): T => require(`../../../packages/testing/src/fixtures/${name}.json`) as T;
-export const fixtures = {
+const fixtures = {
   austinDay: fixture<PanchangResponse>('panchang-austin-telugu-2026-09-29'),
   hyderabadDay: fixture<PanchangResponse>('panchang-hyderabad-all-2026-09-29'),
   austin: fixture<ResolvedLocation>('location-austin'),
@@ -38,7 +38,7 @@ export const fixtures = {
 };
 
 /** Must match public/config.json (the local runtime config shipped in the preview build). */
-export const API_ORIGIN = 'http://localhost:5275';
+const API_ORIGIN = 'http://localhost:5275';
 
 /** 10:00 in Austin on the fixture date: inside Durmuhurtham, before the first good window. */
 export const FIXED_NOW = new Date('2026-09-29T10:00:00-05:00');

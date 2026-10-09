@@ -120,7 +120,7 @@ Logout  ──►  local session cleared, then Entra end-session endpoint  ─�
   shown). `registerParams` defaults to OIDC `prompt=create` (sign-up page).
 - App registration redirect URIs: `https://<web origin>/auth/callback` (SPA platform) and
   `myvedicstar://auth/callback` (mobile/public client).
-- CSP: add the authority origin to `connect-src` (discovery and token endpoints) — `npm run security:headers` does it.
+- CSP: add the authority origin to `connect-src` (discovery and token endpoints) — deployment does it automatically (`externalOrigins()` in `packages/config`).
 
 ## Return path safety
 

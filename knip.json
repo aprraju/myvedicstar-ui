@@ -1,0 +1,12 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["infrastructure/web/static-web-apps/scripts/{render,smoke-test,validate-build}.ts"],
+      "project": ["infrastructure/web/static-web-apps/scripts/**/*.ts"],
+      "ignoreDependencies": ["@myvedicstar/api-client", "@myvedicstar/config"]
+    },
+    "apps/*": {},
+    "packages/*": {}
+  }
+}

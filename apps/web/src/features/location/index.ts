@@ -1,5 +1,4 @@
 export {
-  browserGeolocation,
   GeolocationError,
   type GeolocationErrorKind,
   type GeolocationProvider,
@@ -7,4 +6,4 @@ export {
 } from './geolocation';
 export { LocationDialog, LocationPermissionMessage } from './LocationDialog';
 export { LocationSelector } from './LocationSelector';
-export { type DetectError, LocationStateProvider, useLocationState } from './LocationStateProvider';
+export { LocationStateProvider, useLocationState } from './LocationStateProvider';

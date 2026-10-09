@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { useTranslation } from '../i18n/I18nProvider';
 import styles from './Button.module.css';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost';
   /** Shows a busy state and blocks repeat activation (prevents duplicate submissions). */
   loading?: boolean;

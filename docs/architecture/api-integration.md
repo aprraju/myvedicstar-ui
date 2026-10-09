@@ -31,8 +31,9 @@ UI component → feature hook (useQuery) → ApiClient endpoint → HttpTranspor
 
 Location query parameters follow the OpenAPI names: `place`, `latitude`, `longitude`, `timeZone`.
 
-Environment configs: `apps/web/public/config.json` (local), `infrastructure/web/config/config.development.json`
-(served by `npm run web:dev`), `infrastructure/web/config/config.production.example.json`.
+Environment configs: `apps/web/public/config.json` (local, `npm run dev:local -w @myvedicstar/web`),
+`infrastructure/web/config/config.development.json` (served by `npm run web:dev`), and production
+`infrastructure/web/static-web-apps/environments/production.env` (rendered into `/config.json` at deploy time).
 
 ## Endpoints (`@myvedicstar/api-client` → backend `api/v1`)
 

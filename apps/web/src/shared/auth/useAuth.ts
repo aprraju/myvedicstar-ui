@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 import { useServices } from '../services/ServicesContext';
 import type { AuthClient, AuthUser, SignInRequest } from './auth-client';
 
-export interface UseAuthResult {
+interface UseAuthResult {
   enabled: boolean;
   /** True while a stored session is being restored; do not redirect yet. */
   loading: boolean;

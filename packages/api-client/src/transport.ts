@@ -172,7 +172,7 @@ export function createHttpTransport(options: HttpTransportOptions): HttpTranspor
   return { request };
 }
 
-export function buildUrl(baseUrl: string, path: string, query?: Record<string, QueryValue>): string {
+function buildUrl(baseUrl: string, path: string, query?: Record<string, QueryValue>): string {
   const search = new URLSearchParams();
   for (const [key, value] of Object.entries(query ?? {})) {
     if (value !== undefined && value !== null && value !== '') search.append(key, String(value));

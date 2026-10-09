@@ -1,7 +1,7 @@
 /**
  * Semantic design tokens shared by web (as CSS custom properties, see `css/tokens.css`) and React Native (as values).
  *
- * Direction: the "myvedicstar-default" theme (apps/web/src/themes/myvedicstar-default) — warm ivory foundation, deep
+ * Direction: the "myvedicstar-default" theme (design reference kit: docs/design/myvedicstar-default-theme) — warm ivory foundation, deep
  * navy text, bronze/gold actions, green favorable, coral/red caution and blue informational states. Status is never conveyed by color alone; components pair these colors with an icon and a text label.
  * Every text/background pair is checked for WCAG 2.2 AA contrast in `tokens.test.ts`.
  */

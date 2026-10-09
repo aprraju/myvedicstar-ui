@@ -197,6 +197,8 @@ const telemetrySchema = z.object({
     .optional(),
   /** Fraction of sessions sampled, 0–1. */
   sampleRate: z.number().min(0).max(1).default(1),
+  /** Also log every telemetry item to the browser console (local diagnostics; not allowed in secure environments). */
+  console: z.boolean().default(false),
 });
 
 export const appConfigSchema = z
@@ -211,7 +213,7 @@ export const appConfigSchema = z
     featureFlags: featureFlagsSchema.default(
       Object.fromEntries(featureFlagNames.map((f) => [f, false])) as Record<FeatureFlag, boolean>,
     ),
-    telemetry: telemetrySchema.default({ enabled: false, sampleRate: 1 }),
+    telemetry: telemetrySchema.default({ enabled: false, sampleRate: 1, console: false }),
   })
   .strict()
   .superRefine((config, ctx) => {
@@ -245,6 +247,13 @@ export const appConfigSchema = z
           });
         }
       }
+    }
+    if (config.telemetry.console && !developerEnvironment) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['telemetry', 'console'],
+        message: 'Console telemetry is only allowed in local, development and test environments.',
+      });
     }
     if (config.auth.mode === 'mock' && config.environment !== 'local' && config.environment !== 'test') {
       ctx.addIssue({

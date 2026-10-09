@@ -118,7 +118,6 @@ npm run check            # all of the above + tests
 - Web → **Azure Static Web Apps** (production; deployed by GitHub Actions on every push to `main`, one artifact):
   [infrastructure/web/static-web-apps/README.md](infrastructure/web/static-web-apps/README.md).
   `npm run web:deploy -- --environment production --env-file infrastructure/web/static-web-apps/environments/production.env`, `npm run web:validate-build`.
-  Alternative host (Storage + Front Door): [docs/deployment/web-static-hosting.md](docs/deployment/web-static-hosting.md).
 - Android / iOS → EAS Build and Submit: [android](docs/deployment/android.md), [iOS](docs/deployment/ios.md).
 - CI: `.github/workflows/web.yml` and `.github/workflows/mobile.yml` (path-filtered, independent).
 
@@ -149,7 +148,7 @@ packages/
   localization/   message catalogs and translator
   testing/        API fixtures (dev only)
   validation/     user-input validation
-docs/             architecture · security · ux · deployment
+docs/             architecture · security · ux · deployment · design (reference theme kit, not shipped)
 infrastructure/   web deployment: static-web-apps/ (Bicep, deploy scripts, environment templates), dev configs
 .github/workflows web and mobile pipelines
 ```

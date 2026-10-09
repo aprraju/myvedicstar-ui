@@ -1,6 +1,6 @@
 import { ApiError } from '@myvedicstar/api-client';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { scenarios } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
@@ -70,6 +70,19 @@ describe('telemetry from runtime configuration', () => {
     await expect.poll(() => bodies.length).toBe(1);
     expect(JSON.stringify(bodies)).toContain('auth.signInFailed');
     expect(JSON.stringify(bodies)).toContain('"environment":"test"');
+  });
+
+  it('logs telemetry to the console only when the configuration asks for it', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const quiet = createServices(createTestConfig(), { auth: createDisabledAuthClient() });
+    quiet.telemetry.trackMetric('quiet', 1);
+    expect(warn).not.toHaveBeenCalled();
+
+    const verbose = createServices(createTestConfig({ telemetry: { console: true } }), {
+      auth: createDisabledAuthClient(),
+    });
+    verbose.telemetry.trackMetric('verbose', 1);
+    expect(warn).toHaveBeenCalledWith('[telemetry:metric]', 'verbose', expect.anything());
   });
 
   it('reports errors that escape React', () => {

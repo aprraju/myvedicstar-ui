@@ -27,18 +27,18 @@ export interface AppServices {
   queryClient: QueryClient;
 }
 
-export interface ServiceOverrides {
+interface ServiceOverrides {
   auth?: AuthClient;
   sinks?: readonly TelemetrySink[];
   fetchImpl?: typeof fetch;
 }
 
 /**
- * Telemetry destinations for the environment: the console locally, Application Insights when the runtime config enables
- * it with a connection string, otherwise none.
+ * Telemetry destinations from runtime configuration: the browser console when `telemetry.console` is set (local
+ * diagnostics), Application Insights when telemetry is enabled with a connection string, otherwise none.
  */
 function telemetrySinks(config: AppConfig): TelemetrySink[] {
-  const sinks: TelemetrySink[] = config.environment === 'local' ? [consoleSink] : [];
+  const sinks: TelemetrySink[] = config.telemetry.console ? [consoleSink] : [];
   const insights = applicationInsightsSettings(config);
   if (insights) {
     const sink = createApplicationInsightsSink({
