@@ -1,0 +1,260 @@
+/* "Preview card" of the myvedicstar-default theme. */
+.card {
+  container-type: inline-size;
+  padding: var(--space-lg);
+  border: 1px solid color-mix(in srgb, var(--color-auspicious) 20%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  box-shadow: var(--shadow-high);
+}
+
+.content,
+.state {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.state {
+  justify-items: start;
+  color: var(--color-primary);
+}
+
+.stateTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.dateBlock {
+  display: grid;
+  gap: var(--space-xxs);
+  justify-items: center;
+  text-align: center;
+}
+
+.date {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.festivals {
+  display: flex;
+  justify-content: center;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.meta span + span::before {
+  content: '•';
+  margin-inline-end: var(--space-sm);
+}
+
+/* Status card: tinted panel with the tone icon in a disc. */
+/* --tone / --tone-surface come from the global [data-status-tone] map (styles/global.css). */
+.tone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--tone) 18%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: linear-gradient(110deg, var(--color-auspicious-surface) 0, var(--tone-surface) 55%);
+}
+
+.toneIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 14%, var(--tone-surface));
+  color: var(--tone);
+}
+
+.toneText {
+  display: grid;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+}
+
+.headline {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--tone);
+}
+
+.description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  max-inline-size: var(--readable-max-width);
+}
+
+.tone .description {
+  color: var(--color-text-primary);
+}
+
+.facts {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+@container (min-width: 26rem) {
+  .facts {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Mini cards: icon disc + small label + bold value. */
+.fact {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.fact[data-kind='favorable'] {
+  --kind: var(--color-favorable);
+  --kind-surface: var(--color-favorable-surface);
+}
+
+.fact[data-kind='warning'] {
+  --kind: var(--color-warning);
+  --kind-surface: var(--color-warning-surface);
+}
+
+.fact[data-kind='caution'] {
+  --kind: var(--color-caution);
+  --kind-surface: var(--color-caution-surface);
+}
+
+.factLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.factLabel svg {
+  box-sizing: content-box;
+  flex: none;
+  padding: var(--space-sm);
+  border-radius: 50%;
+  background: var(--kind-surface);
+  color: var(--kind);
+}
+
+.factValue {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+}
+
+.conflict {
+  display: block;
+  margin-block-start: var(--space-xs);
+  color: var(--color-warning);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.factNote {
+  display: block;
+  margin-block-start: var(--space-xs);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-secondary);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* Wide bronze call to action. */
+.cta {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-block-size: var(--touch-target-comfortable);
+  padding-inline: var(--space-xl);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-primary) 88%, black),
+    color-mix(in srgb, var(--color-primary) 94%, white),
+    color-mix(in srgb, var(--color-primary) 85%, black)
+  );
+  color: var(--color-on-primary);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  box-shadow: var(--shadow-low);
+}
+
+.cta:hover {
+  background: color-mix(in srgb, var(--color-primary) 85%, black);
+}
+
+.footnote {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.refreshing {
+  color: var(--color-info);
+}
+
+/* Narrow cards (phones): tighter padding and a smaller status disc. */
+@container (max-width: 24rem) {
+  .content {
+    gap: var(--space-sm);
+  }
+
+  .tone {
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .toneIcon {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+  }
+
+  .toneIcon svg {
+    inline-size: 1.375rem;
+    block-size: 1.375rem;
+  }
+
+  .headline {
+    font-size: var(--font-size-md);
+  }
+
+  .fact {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+@media (max-width: 599px) {
+  .card {
+    padding: var(--space-md);
+  }
+}

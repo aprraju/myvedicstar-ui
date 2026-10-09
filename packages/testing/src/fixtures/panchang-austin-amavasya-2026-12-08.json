@@ -1,0 +1,528 @@
+{
+  "location": {
+    "latitude": 30.27,
+    "longitude": -97.74,
+    "timeZone": "America/Chicago",
+    "source": "Place",
+    "place": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "countryCode": "US",
+      "displayName": "Austin, Texas, United States"
+    }
+  },
+  "tradition": {
+    "key": "telugu",
+    "name": "Telugu",
+    "description": "Varjyam, Durmuhurtham, Rahu Kalam, Yamagandam, Gulika and Amrita Kalam.",
+    "display": ["Varjyam", "DurMuhurtam", "RahuKalam", "Yamagandam", "GulikaKalam", "AmritKalam"]
+  },
+  "calculationMethod": "drik",
+  "calculationVersion": "1.1.0",
+  "localToday": "2026-09-29",
+  "localTodayDisplay": "09/29/2026",
+  "displayFormat": {
+    "datePattern": "MM/dd/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "US",
+    "example": "12/08/2026 07:15:14 CST"
+  },
+  "generatedAt": "2026-09-29T17:25:20.0740333+00:00",
+  "language": "en",
+  "glossary": {
+    "periods": {
+      "RahuKalam": {
+        "name": "Rahu Kalam",
+        "meaning": "A daily period associated with Rahu that is traditionally considered unfavorable for beginning important or auspicious activities. Its timing is calculated using the local sunrise, sunset, and weekday.",
+        "description": "A traditionally unfavorable period for important new beginnings.",
+        "message": "Avoid important new beginnings",
+        "icon": null
+      },
+      "Yamagandam": {
+        "name": "Yamagandam",
+        "meaning": "A daily period associated with Yama that is traditionally considered unfavorable for beginning auspicious activities. It is calculated from the local sunrise, sunset, and weekday.",
+        "description": "A period traditionally avoided when starting important or auspicious activities.",
+        "message": "Avoid auspicious new activities",
+        "icon": null
+      },
+      "DurMuhurtam": {
+        "name": "Durmuhurtham",
+        "meaning": "A period of the day considered unfavorable when selecting an auspicious Muhurta. Depending on the weekday, there may be more than one Dur Muhurtam period.",
+        "description": "An unfavorable Muhurta traditionally avoided for important beginnings.",
+        "message": "Unfavorable Muhurta",
+        "icon": null
+      },
+      "GulikaKalam": {
+        "name": "Gulika Kalam",
+        "meaning": "A daily period associated with Gulika and traditionally linked with Saturn. It is generally treated with caution when choosing an auspicious starting time.",
+        "description": "A period traditionally treated with caution for auspicious new beginnings.",
+        "message": "Use caution for auspicious beginnings",
+        "icon": null
+      },
+      "Varjyam": {
+        "name": "Varjyam",
+        "meaning": "A Nakshatra-based period traditionally considered unsuitable for auspicious beginnings. Unlike Rahu Kalam, its timing is derived from the day's Nakshatra and may occur during the day or night.",
+        "description": "A Nakshatra-based period traditionally considered unfavorable for auspicious beginnings.",
+        "message": "Nakshatra-based unfavorable period",
+        "icon": null
+      },
+      "AmritKalam": {
+        "name": "Amrita Kalam",
+        "meaning": "A highly auspicious period derived from Nakshatra-based calculations and traditionally associated with favorable energy and positive beginnings.",
+        "description": "A highly auspicious period considered favorable for important and positive activities.",
+        "message": "Auspicious period for positive activities",
+        "icon": null
+      }
+    },
+    "elements": {
+      "tithi": {
+        "name": "Tithi",
+        "meaning": "The lunar day. Each Tithi corresponds to 12° of separation between the Moon and the Sun, giving 30 Tithis in a lunar month: 15 in the waxing (Shukla) fortnight and 15 in the waning (Krishna) fortnight. A Tithi can begin at any time of day and lasts roughly 19 to 26 hours.",
+        "description": "The lunar day, based on the angle between the Moon and the Sun.",
+        "message": null,
+        "icon": null
+      },
+      "nakshatra": {
+        "name": "Nakshatra",
+        "meaning": "One of the 27 lunar mansions, each spanning 13°20′ of the sidereal zodiac. The day's Nakshatra is the one the Moon is passing through; it changes about once a day.",
+        "description": "The lunar mansion the Moon is passing through.",
+        "message": null,
+        "icon": null
+      },
+      "yoga": {
+        "name": "Yoga",
+        "meaning": "One of 27 combinations obtained by adding the sidereal longitudes of the Sun and the Moon and dividing by 13°20′. Each Yoga is traditionally associated with a favorable or unfavorable quality.",
+        "description": "A daily combination of the Sun's and the Moon's positions.",
+        "message": null,
+        "icon": null
+      },
+      "karana": {
+        "name": "Karana",
+        "meaning": "Half of a Tithi, corresponding to 6° of Moon–Sun separation. There are 11 Karanas: 7 that repeat through the lunar month and 4 fixed ones. Vishti (Bhadra) is traditionally avoided for auspicious activities.",
+        "description": "Half of a lunar day.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "terms": {
+      "sunrise": {
+        "name": "Sunrise",
+        "meaning": "The moment the upper edge of the Sun appears on the horizon at the location, allowing for atmospheric refraction. The Panchang day begins at sunrise, and Rahu Kalam, the Muhurtas and other periods are measured from it.",
+        "description": "The start of the Panchang day at this location.",
+        "message": null,
+        "icon": null
+      },
+      "sunset": {
+        "name": "Sunset",
+        "meaning": "The moment the upper edge of the Sun disappears below the horizon at the location. Daytime periods such as Rahu Kalam divide the time between sunrise and sunset.",
+        "description": "The end of daytime at this location.",
+        "message": null,
+        "icon": null
+      },
+      "vara": {
+        "name": "Vara",
+        "meaning": "The weekday. In the Panchang a weekday runs from one sunrise to the next, and several daily periods, including Rahu Kalam, Yamagandam and Gulika Kalam, depend on it.",
+        "description": "The day of the week, counted from sunrise.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "classifications": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟢"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟢"
+      },
+      "Neutral": {
+        "name": "Neutral",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "⚪"
+      },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟠"
+      },
+      "Avoid": {
+        "name": "Avoid",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🔴"
+      }
+    },
+    "guidanceRatings": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are strongly supportive for common activities.",
+        "message": "Highly Favorable Day",
+        "icon": "🟢🟢"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are generally supportive for common activities.",
+        "message": "Favorable Day",
+        "icon": "🟢"
+      },
+      "Mixed": {
+        "name": "Mixed",
+        "meaning": null,
+        "description": "Today's Panchang factors are mixed; choose timings carefully for important activities.",
+        "message": "Mixed Day",
+        "icon": "🟡"
+      },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": "Several of today's Panchang factors call for caution; prefer the recommended time periods for important activities.",
+        "message": "Day for Caution",
+        "icon": "🟠"
+      },
+      "Avoid": {
+        "name": "Traditionally Avoided",
+        "meaning": null,
+        "description": "Today's Panchang factors are traditionally considered unfavorable for new beginnings.",
+        "message": "Traditionally Avoided for New Beginnings",
+        "icon": "🔴"
+      }
+    }
+  },
+  "days": [
+    {
+      "date": "2026-12-08",
+      "dateDisplay": "12/08/2026",
+      "weekday": "Tuesday",
+      "weekdayName": "Tuesday",
+      "sunrise": "2026-12-08T07:15:14-06:00",
+      "sunset": "2026-12-08T17:30:35-06:00",
+      "nextSunrise": "2026-12-09T07:15:57-06:00",
+      "sunriseDisplay": "12/08/2026 07:15:14 CST",
+      "sunsetDisplay": "12/08/2026 17:30:35 CST",
+      "nextSunriseDisplay": "12/09/2026 07:15:57 CST",
+      "tithis": [
+        {
+          "key": "Amavasya",
+          "number": 30,
+          "name": "Amavasya",
+          "start": "2026-12-07T16:43:20-06:00",
+          "end": "2026-12-08T18:52:00-06:00",
+          "startDisplay": "12/07/2026 16:43:20 CST",
+          "endDisplay": "12/08/2026 18:52:00 CST"
+        },
+        {
+          "key": "ShuklaPratipada",
+          "number": 1,
+          "name": "Shukla Pratipada",
+          "start": "2026-12-08T18:52:00-06:00",
+          "end": "2026-12-09T21:16:32-06:00",
+          "startDisplay": "12/08/2026 18:52:00 CST",
+          "endDisplay": "12/09/2026 21:16:32 CST"
+        }
+      ],
+      "nakshatras": [
+        {
+          "key": "Jyeshtha",
+          "number": 18,
+          "name": "Jyeshtha",
+          "start": "2026-12-08T06:46:26-06:00",
+          "end": "2026-12-09T09:30:39-06:00",
+          "startDisplay": "12/08/2026 06:46:26 CST",
+          "endDisplay": "12/09/2026 09:30:39 CST"
+        }
+      ],
+      "yogas": [
+        {
+          "key": "Dhriti",
+          "number": 8,
+          "name": "Dhriti",
+          "start": "2026-12-07T20:36:28-06:00",
+          "end": "2026-12-08T21:09:41-06:00",
+          "startDisplay": "12/07/2026 20:36:28 CST",
+          "endDisplay": "12/08/2026 21:09:41 CST"
+        },
+        {
+          "key": "Shula",
+          "number": 9,
+          "name": "Shula",
+          "start": "2026-12-08T21:09:41-06:00",
+          "end": "2026-12-09T21:54:25-06:00",
+          "startDisplay": "12/08/2026 21:09:41 CST",
+          "endDisplay": "12/09/2026 21:54:25 CST"
+        }
+      ],
+      "karanas": [
+        {
+          "key": "Naga",
+          "number": 11,
+          "name": "Naga",
+          "start": "2026-12-08T05:45:31-06:00",
+          "end": "2026-12-08T18:52:00-06:00",
+          "startDisplay": "12/08/2026 05:45:31 CST",
+          "endDisplay": "12/08/2026 18:52:00 CST"
+        },
+        {
+          "key": "Kimstughna",
+          "number": 1,
+          "name": "Kimstughna",
+          "start": "2026-12-08T18:52:00-06:00",
+          "end": "2026-12-09T08:02:28-06:00",
+          "startDisplay": "12/08/2026 18:52:00 CST",
+          "endDisplay": "12/09/2026 08:02:28 CST"
+        }
+      ],
+      "auspiciousPeriods": [
+        {
+          "kind": "AmritKalam",
+          "name": "Amrita Kalam",
+          "classification": "HighlyFavorable",
+          "start": "2026-12-08T23:42:26-06:00",
+          "end": "2026-12-09T01:29:23-06:00",
+          "startDisplay": "12/08/2026 23:42:26 CST",
+          "endDisplay": "12/09/2026 01:29:23 CST",
+          "overlaps": [
+            {
+              "kind": "DurMuhurtam",
+              "name": "Durmuhurtham",
+              "classification": "Avoid",
+              "start": "2026-12-08T23:42:26-06:00",
+              "end": "2026-12-08T23:55:46-06:00",
+              "startDisplay": "12/08/2026 23:42:26 CST",
+              "endDisplay": "12/08/2026 23:55:46 CST"
+            }
+          ],
+          "overlapMessage": "Overlaps Durmuhurtham (23:00–23:55 CST): avoid 23:42–23:55 CST for new beginnings."
+        }
+      ],
+      "inauspiciousPeriods": [
+        {
+          "kind": "DurMuhurtam",
+          "name": "Durmuhurtham",
+          "classification": "Avoid",
+          "start": "2026-12-08T09:18:18-06:00",
+          "end": "2026-12-08T09:59:20-06:00",
+          "startDisplay": "12/08/2026 09:18:18 CST",
+          "endDisplay": "12/08/2026 09:59:20 CST"
+        },
+        {
+          "kind": "Yamagandam",
+          "name": "Yamagandam",
+          "classification": "Avoid",
+          "start": "2026-12-08T09:49:04-06:00",
+          "end": "2026-12-08T11:05:59-06:00",
+          "startDisplay": "12/08/2026 09:49:04 CST",
+          "endDisplay": "12/08/2026 11:05:59 CST"
+        },
+        {
+          "kind": "GulikaKalam",
+          "name": "Gulika Kalam",
+          "classification": "Caution",
+          "start": "2026-12-08T12:22:55-06:00",
+          "end": "2026-12-08T13:39:50-06:00",
+          "startDisplay": "12/08/2026 12:22:55 CST",
+          "endDisplay": "12/08/2026 13:39:50 CST"
+        },
+        {
+          "kind": "Varjyam",
+          "name": "Varjyam",
+          "classification": "Avoid",
+          "start": "2026-12-08T13:00:45-06:00",
+          "end": "2026-12-08T14:47:42-06:00",
+          "startDisplay": "12/08/2026 13:00:45 CST",
+          "endDisplay": "12/08/2026 14:47:42 CST"
+        },
+        {
+          "kind": "RahuKalam",
+          "name": "Rahu Kalam",
+          "classification": "Avoid",
+          "start": "2026-12-08T14:56:45-06:00",
+          "end": "2026-12-08T16:13:40-06:00",
+          "startDisplay": "12/08/2026 14:56:45 CST",
+          "endDisplay": "12/08/2026 16:13:40 CST"
+        },
+        {
+          "kind": "DurMuhurtam",
+          "name": "Durmuhurtham",
+          "classification": "Avoid",
+          "start": "2026-12-08T23:00:44-06:00",
+          "end": "2026-12-08T23:55:46-06:00",
+          "startDisplay": "12/08/2026 23:00:44 CST",
+          "endDisplay": "12/08/2026 23:55:46 CST"
+        }
+      ],
+      "guidance": {
+        "rating": "Caution",
+        "ratingName": "Caution",
+        "icon": "🟠",
+        "headline": "🟠 Day for Caution",
+        "summary": "Several of today's Panchang factors call for caution; prefer the recommended time periods for important activities. Yoga Dhriti is supportive. Tithi Amavasya, Tuesday, Nakshatra Jyeshtha and Karana Naga call for caution. Best time: 07:15–09:18 CST, 11:05–12:22 CST, 16:13–17:30 CST. Favorable: Amrita Kalam 23:42–01:29(+1) CST. Avoid for new beginnings: Durmuhurtham 09:18–09:59 CST, Yamagandam 09:49–11:05 CST, Varjyam 13:00–14:47 CST, Rahu Kalam 14:56–16:13 CST, Durmuhurtham 23:00–23:55 CST. Use caution: Gulika Kalam 12:22–13:39 CST. Check the recommended and traditionally avoided time periods below before beginning an important activity.",
+        "factors": [
+          {
+            "limb": "tithi",
+            "limbName": "Tithi",
+            "key": "Amavasya",
+            "name": "Amavasya",
+            "rating": "Avoid",
+            "ratingName": "Traditionally Avoided",
+            "reason": "Tithi Amavasya: Traditionally Avoided. New moon, traditionally avoided for auspicious beginnings and observed for ancestral rites."
+          },
+          {
+            "limb": "vara",
+            "limbName": "Vara",
+            "key": "Tuesday",
+            "name": "Tuesday",
+            "rating": "Caution",
+            "ratingName": "Caution",
+            "reason": "Vara Tuesday: Caution. A harsh (Krura) weekday, traditionally treated with caution for auspicious beginnings."
+          },
+          {
+            "limb": "nakshatra",
+            "limbName": "Nakshatra",
+            "key": "Jyeshtha",
+            "name": "Jyeshtha",
+            "rating": "Avoid",
+            "ratingName": "Traditionally Avoided",
+            "reason": "Nakshatra Jyeshtha: Traditionally Avoided. A sharp (Tikshna) Nakshatra, traditionally avoided for auspicious beginnings."
+          },
+          {
+            "limb": "yoga",
+            "limbName": "Yoga",
+            "key": "Dhriti",
+            "name": "Dhriti",
+            "rating": "Favorable",
+            "ratingName": "Favorable",
+            "reason": "Yoga Dhriti: Favorable. A benefic Yoga, traditionally supportive."
+          },
+          {
+            "limb": "karana",
+            "limbName": "Karana",
+            "key": "Naga",
+            "name": "Naga",
+            "rating": "Caution",
+            "ratingName": "Caution",
+            "reason": "Karana Naga: Caution. A fixed Karana (Shakuni, Chatushpada, Naga), traditionally treated with caution."
+          }
+        ],
+        "bestWindows": [
+          {
+            "start": "2026-12-08T07:15:14-06:00",
+            "end": "2026-12-08T09:18:18-06:00",
+            "startDisplay": "12/08/2026 07:15:14 CST",
+            "endDisplay": "12/08/2026 09:18:18 CST"
+          },
+          {
+            "start": "2026-12-08T11:05:59-06:00",
+            "end": "2026-12-08T12:22:55-06:00",
+            "startDisplay": "12/08/2026 11:05:59 CST",
+            "endDisplay": "12/08/2026 12:22:55 CST"
+          },
+          {
+            "start": "2026-12-08T16:13:40-06:00",
+            "end": "2026-12-08T17:30:35-06:00",
+            "startDisplay": "12/08/2026 16:13:40 CST",
+            "endDisplay": "12/08/2026 17:30:35 CST"
+          }
+        ],
+        "favorableWindows": [
+          {
+            "kind": "AmritKalam",
+            "name": "Amrita Kalam",
+            "classification": "HighlyFavorable",
+            "start": "2026-12-08T23:42:26-06:00",
+            "end": "2026-12-09T01:29:23-06:00",
+            "startDisplay": "12/08/2026 23:42:26 CST",
+            "endDisplay": "12/09/2026 01:29:23 CST"
+          }
+        ],
+        "spiritualWindows": [],
+        "cautionWindows": [
+          {
+            "kind": "GulikaKalam",
+            "name": "Gulika Kalam",
+            "classification": "Caution",
+            "start": "2026-12-08T12:22:55-06:00",
+            "end": "2026-12-08T13:39:50-06:00",
+            "startDisplay": "12/08/2026 12:22:55 CST",
+            "endDisplay": "12/08/2026 13:39:50 CST"
+          }
+        ],
+        "avoidWindows": [
+          {
+            "kind": "DurMuhurtam",
+            "name": "Durmuhurtham",
+            "classification": "Avoid",
+            "start": "2026-12-08T09:18:18-06:00",
+            "end": "2026-12-08T09:59:20-06:00",
+            "startDisplay": "12/08/2026 09:18:18 CST",
+            "endDisplay": "12/08/2026 09:59:20 CST"
+          },
+          {
+            "kind": "Yamagandam",
+            "name": "Yamagandam",
+            "classification": "Avoid",
+            "start": "2026-12-08T09:49:04-06:00",
+            "end": "2026-12-08T11:05:59-06:00",
+            "startDisplay": "12/08/2026 09:49:04 CST",
+            "endDisplay": "12/08/2026 11:05:59 CST"
+          },
+          {
+            "kind": "Varjyam",
+            "name": "Varjyam",
+            "classification": "Avoid",
+            "start": "2026-12-08T13:00:45-06:00",
+            "end": "2026-12-08T14:47:42-06:00",
+            "startDisplay": "12/08/2026 13:00:45 CST",
+            "endDisplay": "12/08/2026 14:47:42 CST"
+          },
+          {
+            "kind": "RahuKalam",
+            "name": "Rahu Kalam",
+            "classification": "Avoid",
+            "start": "2026-12-08T14:56:45-06:00",
+            "end": "2026-12-08T16:13:40-06:00",
+            "startDisplay": "12/08/2026 14:56:45 CST",
+            "endDisplay": "12/08/2026 16:13:40 CST"
+          },
+          {
+            "kind": "DurMuhurtam",
+            "name": "Durmuhurtham",
+            "classification": "Avoid",
+            "start": "2026-12-08T23:00:44-06:00",
+            "end": "2026-12-08T23:55:46-06:00",
+            "startDisplay": "12/08/2026 23:00:44 CST",
+            "endDisplay": "12/08/2026 23:55:46 CST"
+          }
+        ],
+        "methodology": "Daily guidance summarizes the five Panchanga limbs (Tithi, Vara, Nakshatra, Yoga, Karana) using this app's methodology. It is not a universal traditional rule and not a Muhurta for a specific ceremony such as a marriage or housewarming.",
+        "rulesVersion": "2026.1-provisional"
+      },
+      "goodTime": {
+        "date": "2026-12-08",
+        "dateDisplay": "12/08/2026",
+        "status": {
+          "status": "Avoid",
+          "name": "Avoid",
+          "icon": "🔴"
+        },
+        "goodTimeCount": 0,
+        "bestGoodTime": null,
+        "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+      }
+    }
+  ]
+}

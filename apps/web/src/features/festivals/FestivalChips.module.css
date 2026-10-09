@@ -1,0 +1,24 @@
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.125rem var(--space-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-auspicious-surface);
+  color: var(--color-auspicious);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.chip[data-category='observance'] {
+  background: var(--color-info-surface);
+  color: var(--color-info);
+}

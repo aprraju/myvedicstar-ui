@@ -1,0 +1,92 @@
+import {
+  type AnalyticsClient,
+  consoleSink,
+  createApplicationInsightsSink,
+  createObservability,
+  type TelemetryClient,
+  type TelemetrySink,
+} from '@myvedicstar/analytics';
+import { type ApiClient, createApiClient } from '@myvedicstar/api-client';
+import { type AppConfig, applicationInsightsSettings } from '@myvedicstar/config';
+import { getWindowClass } from '@myvedicstar/design-tokens';
+import type { QueryClient } from '@tanstack/react-query';
+
+import { type AuthClient, createAuthClient } from '../auth/auth-client';
+import { createQueryClient } from './query-client';
+
+/**
+ * Everything the UI needs from the outside world, created once at startup and provided through context.
+ * Tests create the same structure with fakes (see src/test/render.tsx).
+ */
+export interface AppServices {
+  config: AppConfig;
+  api: ApiClient;
+  auth: AuthClient;
+  analytics: AnalyticsClient;
+  telemetry: TelemetryClient;
+  queryClient: QueryClient;
+}
+
+export interface ServiceOverrides {
+  auth?: AuthClient;
+  sinks?: readonly TelemetrySink[];
+  fetchImpl?: typeof fetch;
+}
+
+/**
+ * Telemetry destinations for the environment: the console locally, Application Insights when the runtime config enables
+ * it with a connection string, otherwise none.
+ */
+function telemetrySinks(config: AppConfig): TelemetrySink[] {
+  const sinks: TelemetrySink[] = config.environment === 'local' ? [consoleSink] : [];
+  const insights = applicationInsightsSettings(config);
+  if (insights) {
+    const sink = createApplicationInsightsSink({
+      ...insights,
+      roleName: 'myvedicstar-web',
+      sampleRate: config.telemetry.sampleRate,
+    });
+    // Send what is buffered before the tab is hidden or closed (keepalive requests outlive the page).
+    window.addEventListener('pagehide', () => sink.flush());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') sink.flush();
+    });
+    sinks.push(sink);
+  }
+  return sinks;
+}
+
+export function createServices(config: AppConfig, overrides: ServiceOverrides = {}): AppServices {
+  const sinks = overrides.sinks ?? telemetrySinks(config);
+  // Analytics consent UI arrives with Settings (Phase 5); until then no analytics events are sent.
+  const { analytics, telemetry } = createObservability({ sinks, hasAnalyticsConsent: () => false });
+
+  telemetry.setContext({
+    appVersion: __APP_VERSION__,
+    buildId: __BUILD_ID__,
+    environment: config.environment,
+    platform: 'web',
+    deviceClass: getWindowClass(window.innerWidth),
+  });
+
+  const auth = overrides.auth ?? createAuthClient(config.auth);
+
+  const api = createApiClient({
+    baseUrl: config.apiBaseUrl,
+    endpoints: config.endpoints,
+    timeoutMs: config.apiTimeoutMs,
+    getAccessToken: () => auth.getAccessToken(),
+    onUnauthorized: () => auth.handleUnauthorized(),
+    ...(overrides.fetchImpl ? { fetchImpl: overrides.fetchImpl } : {}),
+    onRequestComplete: (metrics) =>
+      telemetry.trackMetric('api.duration', metrics.durationMs, {
+        operation: metrics.operation,
+        status: metrics.status,
+        outcome: metrics.outcome,
+        errorKind: metrics.errorKind,
+        correlationId: metrics.correlationId,
+      }),
+  });
+
+  return { config, api, auth, analytics, telemetry, queryClient: createQueryClient() };
+}

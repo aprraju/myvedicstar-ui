@@ -1,0 +1,921 @@
+{
+  "location": {
+    "latitude": 30.27,
+    "longitude": -97.74,
+    "timeZone": "America/Chicago",
+    "source": "Coordinates",
+    "place": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "countryCode": "US",
+      "displayName": "Austin, Texas, United States"
+    }
+  },
+  "tradition": {
+    "key": "telugu",
+    "name": "Telugu"
+  },
+  "activity": {
+    "key": "general",
+    "name": "General",
+    "icon": "sun",
+    "requested": "general",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "date": "2026-04-28",
+  "dateDisplay": "04/28/2026",
+  "localToday": "2026-10-02",
+  "displayFormat": {
+    "datePattern": "MM/dd/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "US",
+    "example": "04/28/2026 06:50:21 CDT"
+  },
+  "generatedAt": "2026-10-02T05:59:20.6335716+00:00",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "calculationVersion": "1.0.0",
+  "dayStatus": {
+    "status": "HighlyFavorable",
+    "name": "Highly Favorable",
+    "icon": "🟢🟢"
+  },
+  "segments": [
+    {
+      "id": "s1",
+      "start": "2026-04-28T06:50:21-05:00",
+      "end": "2026-04-28T08:23:01-05:00",
+      "startDisplay": "04/28/2026 06:50:21 CDT",
+      "endDisplay": "04/28/2026 08:23:01 CDT",
+      "timeRangeDisplay": "06:50–08:23 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 74,
+      "isGoodTime": true,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaDwadashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s2",
+      "start": "2026-04-28T08:23:01-05:00",
+      "end": "2026-04-28T09:29:40-05:00",
+      "startDisplay": "04/28/2026 08:23:01 CDT",
+      "endDisplay": "04/28/2026 09:29:40 CDT",
+      "timeRangeDisplay": "08:23–09:29 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 74,
+      "isGoodTime": true,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s3",
+      "start": "2026-04-28T09:29:40-05:00",
+      "end": "2026-04-28T10:09:30-05:00",
+      "startDisplay": "04/28/2026 09:29:40 CDT",
+      "endDisplay": "04/28/2026 10:09:30 CDT",
+      "timeRangeDisplay": "09:29–10:09 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 74,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-04-28T09:29:40-05:00",
+          "end": "2026-04-28T10:22:47-05:00",
+          "startDisplay": "04/28/2026 09:29:40 CDT",
+          "endDisplay": "04/28/2026 10:22:47 CDT",
+          "overlapStart": "2026-04-28T09:29:40-05:00",
+          "overlapEnd": "2026-04-28T10:09:30-05:00",
+          "overlapStartDisplay": "04/28/2026 09:29:40 CDT",
+          "overlapEndDisplay": "04/28/2026 10:09:30 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "start": "2026-04-28T10:09:30-05:00",
+      "end": "2026-04-28T10:22:47-05:00",
+      "startDisplay": "04/28/2026 10:09:30 CDT",
+      "endDisplay": "04/28/2026 10:22:47 CDT",
+      "timeRangeDisplay": "10:09–10:22 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 74,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-04-28T09:29:40-05:00",
+          "end": "2026-04-28T10:22:47-05:00",
+          "startDisplay": "04/28/2026 09:29:40 CDT",
+          "endDisplay": "04/28/2026 10:22:47 CDT",
+          "overlapStart": "2026-04-28T10:09:30-05:00",
+          "overlapEnd": "2026-04-28T10:22:47-05:00",
+          "overlapStartDisplay": "04/28/2026 10:09:30 CDT",
+          "overlapEndDisplay": "04/28/2026 10:22:47 CDT"
+        },
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-04-28T10:09:30-05:00",
+          "end": "2026-04-28T11:49:04-05:00",
+          "startDisplay": "04/28/2026 10:09:30 CDT",
+          "endDisplay": "04/28/2026 11:49:04 CDT",
+          "overlapStart": "2026-04-28T10:09:30-05:00",
+          "overlapEnd": "2026-04-28T10:22:47-05:00",
+          "overlapStartDisplay": "04/28/2026 10:09:30 CDT",
+          "overlapEndDisplay": "04/28/2026 10:22:47 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "start": "2026-04-28T10:22:47-05:00",
+      "end": "2026-04-28T10:33:40-05:00",
+      "startDisplay": "04/28/2026 10:22:47 CDT",
+      "endDisplay": "04/28/2026 10:33:40 CDT",
+      "timeRangeDisplay": "10:22–10:33 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 74,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-04-28T10:09:30-05:00",
+          "end": "2026-04-28T11:49:04-05:00",
+          "startDisplay": "04/28/2026 10:09:30 CDT",
+          "endDisplay": "04/28/2026 11:49:04 CDT",
+          "overlapStart": "2026-04-28T10:22:47-05:00",
+          "overlapEnd": "2026-04-28T10:33:40-05:00",
+          "overlapStartDisplay": "04/28/2026 10:22:47 CDT",
+          "overlapEndDisplay": "04/28/2026 10:33:40 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "start": "2026-04-28T10:33:40-05:00",
+      "end": "2026-04-28T11:49:04-05:00",
+      "startDisplay": "04/28/2026 10:33:40 CDT",
+      "endDisplay": "04/28/2026 11:49:04 CDT",
+      "timeRangeDisplay": "10:33–11:49 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 79,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-04-28T10:09:30-05:00",
+          "end": "2026-04-28T11:49:04-05:00",
+          "startDisplay": "04/28/2026 10:09:30 CDT",
+          "endDisplay": "04/28/2026 11:49:04 CDT",
+          "overlapStart": "2026-04-28T10:33:40-05:00",
+          "overlapEnd": "2026-04-28T11:49:04-05:00",
+          "overlapStartDisplay": "04/28/2026 10:33:40 CDT",
+          "overlapEndDisplay": "04/28/2026 11:49:04 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "start": "2026-04-28T11:49:04-05:00",
+      "end": "2026-04-28T12:06:11-05:00",
+      "startDisplay": "04/28/2026 11:49:04 CDT",
+      "endDisplay": "04/28/2026 12:06:11 CDT",
+      "timeRangeDisplay": "11:49–12:06 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 79,
+      "isGoodTime": false,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "UttaraPhalguni"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s8",
+      "start": "2026-04-28T12:06:11-05:00",
+      "end": "2026-04-28T13:02:06-05:00",
+      "startDisplay": "04/28/2026 12:06:11 CDT",
+      "endDisplay": "04/28/2026 13:02:06 CDT",
+      "timeRangeDisplay": "12:06–13:02 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 79,
+      "isGoodTime": true,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s9",
+      "start": "2026-04-28T13:02:06-05:00",
+      "end": "2026-04-28T13:28:39-05:00",
+      "startDisplay": "04/28/2026 13:02:06 CDT",
+      "endDisplay": "04/28/2026 13:28:39 CDT",
+      "timeRangeDisplay": "13:02–13:28 CDT",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "score": 94,
+      "isGoodTime": true,
+      "headline": "Highly Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s10",
+      "start": "2026-04-28T13:28:39-05:00",
+      "end": "2026-04-28T13:55:12-05:00",
+      "startDisplay": "04/28/2026 13:28:39 CDT",
+      "endDisplay": "04/28/2026 13:55:12 CDT",
+      "timeRangeDisplay": "13:28–13:55 CDT",
+      "status": {
+        "status": "Mixed",
+        "name": "Mixed",
+        "icon": "🟠"
+      },
+      "score": 94,
+      "isGoodTime": false,
+      "headline": "Mixed for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Mixed",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": true,
+          "start": "2026-04-28T13:28:39-05:00",
+          "end": "2026-04-28T15:08:13-05:00",
+          "startDisplay": "04/28/2026 13:28:39 CDT",
+          "endDisplay": "04/28/2026 15:08:13 CDT",
+          "overlapStart": "2026-04-28T13:28:39-05:00",
+          "overlapEnd": "2026-04-28T13:55:12-05:00",
+          "overlapStartDisplay": "04/28/2026 13:28:39 CDT",
+          "overlapEndDisplay": "04/28/2026 13:55:12 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "start": "2026-04-28T13:55:12-05:00",
+      "end": "2026-04-28T15:08:13-05:00",
+      "startDisplay": "04/28/2026 13:55:12 CDT",
+      "endDisplay": "04/28/2026 15:08:13 CDT",
+      "timeRangeDisplay": "13:55–15:08 CDT",
+      "status": {
+        "status": "Caution",
+        "name": "Use Caution",
+        "icon": "🟠"
+      },
+      "score": 79,
+      "isGoodTime": false,
+      "headline": "Use Caution for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-04-28T13:28:39-05:00",
+          "end": "2026-04-28T15:08:13-05:00",
+          "startDisplay": "04/28/2026 13:28:39 CDT",
+          "endDisplay": "04/28/2026 15:08:13 CDT",
+          "overlapStart": "2026-04-28T13:55:12-05:00",
+          "overlapEnd": "2026-04-28T15:08:13-05:00",
+          "overlapStartDisplay": "04/28/2026 13:55:12 CDT",
+          "overlapEndDisplay": "04/28/2026 15:08:13 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "start": "2026-04-28T15:08:13-05:00",
+      "end": "2026-04-28T16:47:48-05:00",
+      "startDisplay": "04/28/2026 15:08:13 CDT",
+      "endDisplay": "04/28/2026 16:47:48 CDT",
+      "timeRangeDisplay": "15:08–16:47 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 79,
+      "isGoodTime": true,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s13",
+      "start": "2026-04-28T16:47:48-05:00",
+      "end": "2026-04-28T18:27:22-05:00",
+      "startDisplay": "04/28/2026 16:47:48 CDT",
+      "endDisplay": "04/28/2026 18:27:22 CDT",
+      "timeRangeDisplay": "16:47–18:27 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 79,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Avoid",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": false,
+          "start": "2026-04-28T16:47:48-05:00",
+          "end": "2026-04-28T18:27:22-05:00",
+          "startDisplay": "04/28/2026 16:47:48 CDT",
+          "endDisplay": "04/28/2026 18:27:22 CDT",
+          "overlapStart": "2026-04-28T16:47:48-05:00",
+          "overlapEnd": "2026-04-28T18:27:22-05:00",
+          "overlapStartDisplay": "04/28/2026 16:47:48 CDT",
+          "overlapEndDisplay": "04/28/2026 18:27:22 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s14",
+      "start": "2026-04-28T18:27:22-05:00",
+      "end": "2026-04-28T20:06:57-05:00",
+      "startDisplay": "04/28/2026 18:27:22 CDT",
+      "endDisplay": "04/28/2026 20:06:57 CDT",
+      "timeRangeDisplay": "18:27–20:06 CDT",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "score": 79,
+      "isGoodTime": true,
+      "headline": "Favorable for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "ShuklaTrayodashi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Hasta"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    }
+  ],
+  "goodTimes": ["s9", "s12", "s14", "s8", "s1", "s2"],
+  "noGoodTimeReason": null,
+  "noGoodTimeMessage": null,
+  "nowSegmentId": null,
+  "nextGoodTimeId": null,
+  "notices": [],
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

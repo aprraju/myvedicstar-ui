@@ -1,0 +1,240 @@
+{
+  "language": "en",
+  "sections": {
+    "periods": {
+      "RahuKalam": {
+        "name": "Rahu Kalam",
+        "meaning": "A daily period associated with Rahu that is traditionally considered unfavorable for beginning important or auspicious activities. Its timing is calculated using the local sunrise, sunset, and weekday.",
+        "description": "A traditionally unfavorable period for important new beginnings.",
+        "message": "Avoid important new beginnings",
+        "icon": null
+      },
+      "Yamagandam": {
+        "name": "Yamagandam",
+        "meaning": "A daily period associated with Yama that is traditionally considered unfavorable for beginning auspicious activities. It is calculated from the local sunrise, sunset, and weekday.",
+        "description": "A period traditionally avoided when starting important or auspicious activities.",
+        "message": "Avoid auspicious new activities",
+        "icon": null
+      },
+      "DurMuhurtam": {
+        "name": "Dur Muhurtam",
+        "meaning": "A period of the day considered unfavorable when selecting an auspicious Muhurta. Depending on the weekday, there may be more than one Dur Muhurtam period.",
+        "description": "An unfavorable Muhurta traditionally avoided for important beginnings.",
+        "message": "Unfavorable Muhurta",
+        "icon": null
+      },
+      "GulikaKalam": {
+        "name": "Gulika Kalam",
+        "meaning": "A daily period associated with Gulika and traditionally linked with Saturn. It is generally treated with caution when choosing an auspicious starting time.",
+        "description": "A period traditionally treated with caution for auspicious new beginnings.",
+        "message": "Use caution for auspicious beginnings",
+        "icon": null
+      },
+      "Varjyam": {
+        "name": "Varjyam",
+        "meaning": "A Nakshatra-based period traditionally considered unsuitable for auspicious beginnings. Unlike Rahu Kalam, its timing is derived from the day's Nakshatra and may occur during the day or night.",
+        "description": "A Nakshatra-based period traditionally considered unfavorable for auspicious beginnings.",
+        "message": "Nakshatra-based unfavorable period",
+        "icon": null
+      },
+      "BrahmaMuhurta": {
+        "name": "Brahma Muhurta",
+        "meaning": "A special period before sunrise traditionally regarded as ideal for meditation, prayer, yoga, study, reflection, and spiritual practices.",
+        "description": "A peaceful pre-sunrise period considered ideal for meditation, prayer, and spiritual practice.",
+        "message": "Excellent for spiritual practices",
+        "icon": null
+      },
+      "AbhijitMuhurta": {
+        "name": "Abhijit Muhurta",
+        "meaning": "An auspicious period occurring around local midday. It is traditionally regarded as a favorable time for beginning many important activities.",
+        "description": "An auspicious midday period considered favorable for important new beginnings.",
+        "message": "Good for important beginnings",
+        "icon": null
+      },
+      "AmritKalam": {
+        "name": "Amrit Kalam",
+        "meaning": "A highly auspicious period derived from Nakshatra-based calculations and traditionally associated with favorable energy and positive beginnings.",
+        "description": "A highly auspicious period considered favorable for important and positive activities.",
+        "message": "Auspicious period for positive activities",
+        "icon": null
+      },
+      "ChoghadiyaAmrit": {
+        "name": "Amrit",
+        "meaning": "The most auspicious Choghadiya, traditionally considered suitable for all kinds of activities.",
+        "description": "The most auspicious Choghadiya, suitable for all activities.",
+        "message": "Excellent for all activities",
+        "icon": null
+      },
+      "ChoghadiyaShubh": {
+        "name": "Shubh",
+        "meaning": "An auspicious Choghadiya traditionally favored for ceremonies, marriages, education and religious activities.",
+        "description": "An auspicious Choghadiya for ceremonies and religious activities.",
+        "message": "Good for auspicious activities",
+        "icon": null
+      },
+      "ChoghadiyaLabh": {
+        "name": "Labh",
+        "meaning": "A favorable Choghadiya traditionally associated with gain, and favored for business, trade, education and new ventures.",
+        "description": "A favorable Choghadiya for business, trade and new ventures.",
+        "message": "Good for business and gains",
+        "icon": null
+      },
+      "ChoghadiyaChal": {
+        "name": "Chal",
+        "meaning": "A neutral Choghadiya traditionally considered suitable for travel and routine activities.",
+        "description": "A neutral Choghadiya suitable for travel and routine work.",
+        "message": "Suitable for travel and routine work",
+        "icon": null
+      },
+      "ChoghadiyaUdveg": {
+        "name": "Udveg",
+        "meaning": "An unfavorable Choghadiya traditionally avoided for new beginnings, though associated with government-related work.",
+        "description": "An unfavorable Choghadiya traditionally avoided for new beginnings.",
+        "message": "Avoid new beginnings",
+        "icon": null
+      },
+      "ChoghadiyaKaal": {
+        "name": "Kaal",
+        "meaning": "An inauspicious Choghadiya traditionally avoided for auspicious activities.",
+        "description": "An inauspicious Choghadiya traditionally avoided for auspicious activities.",
+        "message": "Avoid auspicious activities",
+        "icon": null
+      },
+      "ChoghadiyaRog": {
+        "name": "Rog",
+        "meaning": "An inauspicious Choghadiya traditionally associated with illness and disputes and avoided for important activities.",
+        "description": "An inauspicious Choghadiya traditionally avoided for important activities.",
+        "message": "Avoid important activities",
+        "icon": null
+      }
+    },
+    "elements": {
+      "tithi": {
+        "name": "Tithi",
+        "meaning": "The lunar day. Each Tithi corresponds to 12° of separation between the Moon and the Sun, giving 30 Tithis in a lunar month: 15 in the waxing (Shukla) fortnight and 15 in the waning (Krishna) fortnight. A Tithi can begin at any time of day and lasts roughly 19 to 26 hours.",
+        "description": "The lunar day, based on the angle between the Moon and the Sun.",
+        "message": null,
+        "icon": null
+      },
+      "nakshatra": {
+        "name": "Nakshatra",
+        "meaning": "One of the 27 lunar mansions, each spanning 13°20′ of the sidereal zodiac. The day's Nakshatra is the one the Moon is passing through; it changes about once a day.",
+        "description": "The lunar mansion the Moon is passing through.",
+        "message": null,
+        "icon": null
+      },
+      "yoga": {
+        "name": "Yoga",
+        "meaning": "One of 27 combinations obtained by adding the sidereal longitudes of the Sun and the Moon and dividing by 13°20′. Each Yoga is traditionally associated with a favorable or unfavorable quality.",
+        "description": "A daily combination of the Sun's and the Moon's positions.",
+        "message": null,
+        "icon": null
+      },
+      "karana": {
+        "name": "Karana",
+        "meaning": "Half of a Tithi, corresponding to 6° of Moon–Sun separation. There are 11 Karanas: 7 that repeat through the lunar month and 4 fixed ones. Vishti (Bhadra) is traditionally avoided for auspicious activities.",
+        "description": "Half of a lunar day.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "terms": {
+      "sunrise": {
+        "name": "Sunrise",
+        "meaning": "The moment the upper edge of the Sun appears on the horizon at the location, allowing for atmospheric refraction. The Panchang day begins at sunrise, and Rahu Kalam, the Muhurtas and other periods are measured from it.",
+        "description": "The start of the Panchang day at this location.",
+        "message": null,
+        "icon": null
+      },
+      "sunset": {
+        "name": "Sunset",
+        "meaning": "The moment the upper edge of the Sun disappears below the horizon at the location. Daytime periods such as Rahu Kalam divide the time between sunrise and sunset.",
+        "description": "The end of daytime at this location.",
+        "message": null,
+        "icon": null
+      },
+      "vara": {
+        "name": "Vara",
+        "meaning": "The weekday. In the Panchang a weekday runs from one sunrise to the next, and several daily periods, including Rahu Kalam, Yamagandam and Gulika Kalam, depend on it.",
+        "description": "The day of the week, counted from sunrise.",
+        "message": null,
+        "icon": null
+      },
+      "choghadiya": {
+        "name": "Choghadiya",
+        "meaning": "A system, popular in northern and western India, that divides the daytime (sunrise to sunset) and the night (sunset to next sunrise) into eight segments each. Each segment is one of Amrit, Shubh, Labh, Chal, Udveg, Kaal or Rog, in an order set by the weekday, and is used to choose favorable times for daily activities.",
+        "description": "Eight day and eight night segments used to choose favorable times.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "classifications": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "\uD83D\uDFE2"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "\uD83D\uDFE2"
+      },
+      "Neutral": { "name": "Neutral", "meaning": null, "description": null, "message": null, "icon": "⚪" },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "\uD83D\uDFE0"
+      },
+      "Avoid": {
+        "name": "Avoid",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "\uD83D\uDD34"
+      }
+    },
+    "guidanceRatings": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are strongly supportive for common activities.",
+        "message": "Highly Favorable Day",
+        "icon": "\uD83D\uDFE2\uD83D\uDFE2"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are generally supportive for common activities.",
+        "message": "Favorable Day",
+        "icon": "\uD83D\uDFE2"
+      },
+      "Mixed": {
+        "name": "Mixed",
+        "meaning": null,
+        "description": "Today's Panchang factors are mixed; choose timings carefully for important activities.",
+        "message": "Mixed Day",
+        "icon": "\uD83D\uDFE1"
+      },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": "Several of today's Panchang factors call for caution; prefer the recommended time periods for important activities.",
+        "message": "Day for Caution",
+        "icon": "\uD83D\uDFE0"
+      },
+      "Avoid": {
+        "name": "Traditionally Avoided",
+        "meaning": null,
+        "description": "Today's Panchang factors are traditionally considered unfavorable for new beginnings.",
+        "message": "Traditionally Avoided for New Beginnings",
+        "icon": "\uD83D\uDD34"
+      }
+    }
+  }
+}

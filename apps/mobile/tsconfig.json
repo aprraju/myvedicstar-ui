@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "jsx": "react-jsx",
+    "types": ["jest", "node"],
+    "allowImportingTsExtensions": true
+  },
+  "include": ["app", "src", "app.config.ts", "expo-env.d.ts", ".expo/types/**/*.ts"]
+}

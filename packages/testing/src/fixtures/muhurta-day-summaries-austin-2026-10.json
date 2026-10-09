@@ -1,0 +1,630 @@
+{
+  "location": {
+    "latitude": 30.27,
+    "longitude": -97.74,
+    "timeZone": "America/Chicago",
+    "source": "Coordinates",
+    "place": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "countryCode": "US",
+      "displayName": "Austin, Texas, United States"
+    }
+  },
+  "tradition": {
+    "key": "telugu",
+    "name": "Telugu"
+  },
+  "activity": {
+    "key": "general",
+    "name": "General",
+    "icon": "sun",
+    "requested": "general",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "localToday": "2026-10-01",
+  "displayFormat": {
+    "datePattern": "MM/dd/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "US",
+    "example": "10/01/2026"
+  },
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "days": [
+    {
+      "date": "2026-10-01",
+      "dateDisplay": "10/01/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-01T08:53:27-05:00",
+        "end": "2026-10-01T10:22:24-05:00",
+        "startDisplay": "10/01/2026 08:53:27 CDT",
+        "endDisplay": "10/01/2026 10:22:24 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-02",
+      "dateDisplay": "10/02/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 2,
+      "bestGoodTime": {
+        "start": "2026-10-02T14:30:59-05:00",
+        "end": "2026-10-02T16:17:28-05:00",
+        "startDisplay": "10/02/2026 14:30:59 CDT",
+        "endDisplay": "10/02/2026 16:17:28 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-03",
+      "dateDisplay": "10/03/2026",
+      "status": {
+        "status": "Mixed",
+        "name": "Mixed",
+        "icon": "🟠"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "NO_QUALIFYING_PERIOD"
+    },
+    {
+      "date": "2026-10-04",
+      "dateDisplay": "10/04/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-04T11:27:35-05:00",
+        "end": "2026-10-04T12:55:50-05:00",
+        "startDisplay": "10/04/2026 11:27:35 CDT",
+        "endDisplay": "10/04/2026 12:55:50 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-05",
+      "dateDisplay": "10/05/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-06",
+      "dateDisplay": "10/06/2026",
+      "status": {
+        "status": "Mixed",
+        "name": "Mixed",
+        "icon": "🟠"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "NO_QUALIFYING_PERIOD"
+    },
+    {
+      "date": "2026-10-07",
+      "dateDisplay": "10/07/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 5,
+      "bestGoodTime": {
+        "start": "2026-10-07T14:46:06-05:00",
+        "end": "2026-10-07T16:22:08-05:00",
+        "startDisplay": "10/07/2026 14:46:06 CDT",
+        "endDisplay": "10/07/2026 16:22:08 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-08",
+      "dateDisplay": "10/08/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-08T08:56:04-05:00",
+        "end": "2026-10-08T10:23:27-05:00",
+        "startDisplay": "10/08/2026 08:56:04 CDT",
+        "endDisplay": "10/08/2026 10:23:27 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-09",
+      "dateDisplay": "10/09/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-10",
+      "dateDisplay": "10/10/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "NO_QUALIFYING_PERIOD"
+    },
+    {
+      "date": "2026-10-11",
+      "dateDisplay": "10/11/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 4,
+      "bestGoodTime": {
+        "start": "2026-10-11T14:44:08-05:00",
+        "end": "2026-10-11T16:10:51-05:00",
+        "startDisplay": "10/11/2026 14:44:08 CDT",
+        "endDisplay": "10/11/2026 16:10:51 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-12",
+      "dateDisplay": "10/12/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-12T10:24:11-05:00",
+        "end": "2026-10-12T11:43:31-05:00",
+        "startDisplay": "10/12/2026 10:24:11 CDT",
+        "endDisplay": "10/12/2026 11:43:31 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-13",
+      "dateDisplay": "10/13/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 2,
+      "bestGoodTime": {
+        "start": "2026-10-13T07:31:51-05:00",
+        "end": "2026-10-13T09:49:53-05:00",
+        "startDisplay": "10/13/2026 07:31:51 CDT",
+        "endDisplay": "10/13/2026 09:49:53 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-14",
+      "dateDisplay": "10/14/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-14T14:43:29-05:00",
+        "end": "2026-10-14T17:33:16-05:00",
+        "startDisplay": "10/14/2026 14:43:29 CDT",
+        "endDisplay": "10/14/2026 17:33:16 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-15",
+      "dateDisplay": "10/15/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-16",
+      "dateDisplay": "10/16/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-17",
+      "dateDisplay": "10/17/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-17T12:53:17-05:00",
+        "end": "2026-10-17T13:38:50-05:00",
+        "startDisplay": "10/17/2026 12:53:17 CDT",
+        "endDisplay": "10/17/2026 13:38:50 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-18",
+      "dateDisplay": "10/18/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-18T14:41:03-05:00",
+        "end": "2026-10-18T16:06:13-05:00",
+        "startDisplay": "10/18/2026 14:41:03 CDT",
+        "endDisplay": "10/18/2026 16:06:13 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-19",
+      "dateDisplay": "10/19/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-19T07:35:51-05:00",
+        "end": "2026-10-19T09:00:48-05:00",
+        "startDisplay": "10/19/2026 07:35:51 CDT",
+        "endDisplay": "10/19/2026 09:00:48 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-20",
+      "dateDisplay": "10/20/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-20T07:36:32-05:00",
+        "end": "2026-10-20T09:52:08-05:00",
+        "startDisplay": "10/20/2026 07:36:32 CDT",
+        "endDisplay": "10/20/2026 09:52:08 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-21",
+      "dateDisplay": "10/21/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-21T14:39:53-05:00",
+        "end": "2026-10-21T16:06:01-05:00",
+        "startDisplay": "10/21/2026 14:39:53 CDT",
+        "endDisplay": "10/21/2026 16:06:01 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-22",
+      "dateDisplay": "10/22/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 5,
+      "bestGoodTime": {
+        "start": "2026-10-22T09:02:15-05:00",
+        "end": "2026-10-22T10:19:04-05:00",
+        "startDisplay": "10/22/2026 09:02:15 CDT",
+        "endDisplay": "10/22/2026 10:19:04 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-23",
+      "dateDisplay": "10/23/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 4,
+      "bestGoodTime": {
+        "start": "2026-10-23T10:38:04-05:00",
+        "end": "2026-10-23T11:38:34-05:00",
+        "startDisplay": "10/23/2026 10:38:04 CDT",
+        "endDisplay": "10/23/2026 11:38:34 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-24",
+      "dateDisplay": "10/24/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-24T12:52:34-05:00",
+        "end": "2026-10-24T13:37:18-05:00",
+        "startDisplay": "10/24/2026 12:52:34 CDT",
+        "endDisplay": "10/24/2026 13:37:18 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-25",
+      "dateDisplay": "10/25/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 2,
+      "bestGoodTime": {
+        "start": "2026-10-25T14:38:30-05:00",
+        "end": "2026-10-25T16:02:11-05:00",
+        "startDisplay": "10/25/2026 14:38:30 CDT",
+        "endDisplay": "10/25/2026 16:02:11 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-26",
+      "dateDisplay": "10/26/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 3,
+      "bestGoodTime": {
+        "start": "2026-10-26T07:40:49-05:00",
+        "end": "2026-10-26T09:04:17-05:00",
+        "startDisplay": "10/26/2026 07:40:49 CDT",
+        "endDisplay": "10/26/2026 09:04:17 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-27",
+      "dateDisplay": "10/27/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-28",
+      "dateDisplay": "10/28/2026",
+      "status": {
+        "status": "Favorable",
+        "name": "Favorable",
+        "icon": "🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-28T14:37:37-05:00",
+        "end": "2026-10-28T17:10:25-05:00",
+        "startDisplay": "10/28/2026 14:37:37 CDT",
+        "endDisplay": "10/28/2026 17:10:25 CDT",
+        "status": {
+          "status": "Favorable",
+          "name": "Favorable",
+          "icon": "🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-29",
+      "dateDisplay": "10/29/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 5,
+      "bestGoodTime": {
+        "start": "2026-10-29T12:52:23-05:00",
+        "end": "2026-10-29T13:36:04-05:00",
+        "startDisplay": "10/29/2026 12:52:23 CDT",
+        "endDisplay": "10/29/2026 13:36:04 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    },
+    {
+      "date": "2026-10-30",
+      "dateDisplay": "10/30/2026",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "goodTimeCount": 0,
+      "bestGoodTime": null,
+      "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY"
+    },
+    {
+      "date": "2026-10-31",
+      "dateDisplay": "10/31/2026",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "goodTimeCount": 1,
+      "bestGoodTime": {
+        "start": "2026-10-31T17:22:06-05:00",
+        "end": "2026-10-31T18:24:50-05:00",
+        "startDisplay": "10/31/2026 17:22:06 CDT",
+        "endDisplay": "10/31/2026 18:24:50 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "🟢🟢"
+        }
+      },
+      "noGoodTimeReason": null
+    }
+  ]
+}

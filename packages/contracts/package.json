@@ -1,0 +1,23 @@
+{
+  "name": "@myvedicstar/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed, runtime-validated contracts of the MyVedicDay backend API.",
+  "type": "module",
+  "sideEffects": [
+    "./src/primitives.ts"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@myvedicstar/testing": "0.1.0"
+  }
+}

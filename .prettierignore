@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+package-lock.json
+apps/web/playwright-report
+apps/web/test-results
+apps/web/public/mockServiceWorker.js
+apps/mobile/.expo
+apps/mobile/android
+apps/mobile/ios
+packages/design-tokens/css

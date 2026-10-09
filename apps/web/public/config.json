@@ -1,0 +1,26 @@
+{
+  "environment": "local",
+  "apiBaseUrl": "http://localhost:5275/api/v1",
+  "endpoints": {
+    "traditions": "/traditions",
+    "glossary": "/panchang/glossary",
+    "panchangTraditions": "/panchang/traditions",
+    "panchangToday": "/panchang/today",
+    "panchangTomorrow": "/panchang/tomorrow",
+    "panchangTenDays": "/panchang/ten-days",
+    "panchangRange": "/panchang/range",
+    "panchangMonth": "/panchang/month/{year}/{month}",
+    "panchangYear": "/panchang/year/{year}",
+    "panchangDate": "/panchang/{date}",
+    "locationsResolve": "/locations/resolve"
+  },
+  "apiTimeoutMs": 15000,
+  "defaultTradition": "all",
+  "auth": {
+    "mode": "disabled"
+  },
+  "featureFlags": {},
+  "telemetry": {
+    "enabled": false
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@myvedicstar/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Runtime application configuration schema and feature flags.",
+  "type": "module",
+  "sideEffects": [
+    "./src/app-config.ts"
+  ],
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@myvedicstar/api-client": "0.1.0",
+    "zod": "4.6.5"
+  }
+}

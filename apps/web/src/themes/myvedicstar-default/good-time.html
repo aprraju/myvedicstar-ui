@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Find a Good Time</title>
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+  <body>
+    <header class="topbar shell">
+      <a class="brand" href="home.html"
+        ><span class="om">ॐ</span
+        ><span
+          ><strong>MyPanchang</strong>
+          <div class="tagline">Timeless Wisdom for Every Day</div></span
+        ></a
+      >
+      <nav class="nav">
+        <a href="home.html">⌂<span>Home</span></a
+        ><a class="active" href="dashboard.html">☼<span>Today</span></a
+        ><a href="calendar.html">▣<span>Calendar</span></a
+        ><a href="good-time.html">◴<span>Find Good Time</span></a
+        ><a href="#">♧<span>Festivals</span></a
+        ><a href="#">☰<span>More</span></a>
+      </nav>
+      <div class="actions">
+        <button class="select-pill" data-location>⌖ <span>Austin, TX, USA</span>⌄</button
+        ><button class="select-pill tradition">✿ Telugu Panchang⌄</button
+        ><span style="font-size: 27px; color: #ef6c00">卐</span
+        ><img class="icon" src="assets/icons/user.svg" alt="" />
+      </div>
+    </header>
+    <main class="page shell" style="max-width: 980px">
+      <section class="panel" style="padding: 24px">
+        <h1 style="font: 700 28px var(--font-display); margin-top: 0">Find a Good Time</h1>
+        <h2 style="font-size: 16px">What are you planning?</h2>
+        <div class="goodtime-grid">
+          <button class="activity">
+            <span class="circle green"><img class="icon" src="assets/icons/book.svg" alt="" /></span
+            ><strong>Business</strong></button
+          ><button class="activity">
+            <span class="circle teal"><img class="icon" src="assets/icons/plane.svg" alt="" /></span
+            ><strong>Travel</strong></button
+          ><button class="activity">
+            <span class="circle orange"><img class="icon" src="assets/icons/home.svg" alt="" /></span
+            ><strong>Property</strong></button
+          ><button class="activity">
+            <span class="circle blue"><img class="icon" src="assets/icons/location.svg" alt="" /></span
+            ><strong>Vehicle</strong></button
+          ><button class="activity">
+            <span class="circle orange"><img class="icon" src="assets/icons/book.svg" alt="" /></span
+            ><strong>Agreement</strong></button
+          ><button class="activity">
+            <span class="circle blue"><img class="icon" src="assets/icons/book.svg" alt="" /></span
+            ><strong>Education</strong></button
+          ><button class="activity">
+            <span class="circle orange"><img class="icon" src="assets/icons/flower.svg" alt="" /></span
+            ><strong>Puja / Spiritual</strong></button
+          ><button class="activity">
+            <span class="circle pink"><img class="icon" src="assets/icons/flower.svg" alt="" /></span
+            ><strong>Wedding</strong></button
+          ><button class="activity">
+            <span class="circle orange"><img class="icon" src="assets/icons/home.svg" alt="" /></span
+            ><strong>Housewarming</strong></button
+          ><button class="activity">
+            <span class="circle orange"><img class="icon" src="assets/icons/star.svg" alt="" /></span
+            ><strong>General</strong>
+          </button>
+        </div>
+        <div
+          style="
+            margin-top: 24px;
+            padding: 14px;
+            background: #fff8ed;
+            border: 1px solid #eedfc9;
+            border-radius: 10px;
+            font-size: 12px;
+          "
+        >
+          ⓘ This provides guidance based on today's Panchang. For important life events, please consult a
+          qualified astrologer for a personalized Muhurta.
+        </div>
+      </section>
+    </main>
+    <aside class="location-drawer" id="locationDrawer">
+      <div style="display: flex; justify-content: space-between">
+        <strong>Change Location</strong><button data-close style="border: 0; background: none">✕</button>
+      </div>
+      <div class="tabs">
+        <button class="active">Search</button><button>Coordinates</button><button>Recent</button>
+      </div>
+      <div class="searchbox">⌖<input placeholder="Enter city, state, country or ZIP code" />⌕</div>
+      <div class="loc">
+        ● <strong>Austin, TX, USA</strong><span style="color: #0672b8">Current location ✓</span>
+      </div>
+      <div class="loc">⌖ <strong>Hyderabad, Telangana, India</strong></div>
+      <div class="loc">⌖ <strong>San Jose, CA, USA</strong></div>
+      <div class="loc">⌖ <strong>Dallas, TX, USA</strong></div>
+      <div class="loc" style="color: #0667a2">◎ <strong>Use My Current Location</strong></div>
+    </aside>
+    <nav class="mobile-bottom">
+      <a href="dashboard.html">☀<span>Today</span></a
+      ><a href="calendar.html">▣<span>Calendar</span></a
+      ><a href="good-time.html">★<span>Good Time</span></a
+      ><a href="#">✿<span>Festivals</span></a
+      ><a href="#">☰<span>More</span></a>
+    </nav>
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "environment": "development",
+  "apiBaseUrl": "https://localhost:5173/api/v1",
+  "endpoints": {
+    "traditions": "/traditions",
+    "glossary": "/panchang/glossary",
+    "panchangTraditions": "/panchang/traditions",
+    "panchangToday": "/panchang/today",
+    "panchangTomorrow": "/panchang/tomorrow",
+    "panchangTenDays": "/panchang/ten-days",
+    "panchangRange": "/panchang/range",
+    "panchangMonth": "/panchang/month/{year}/{month}",
+    "panchangYear": "/panchang/year/{year}",
+    "panchangDate": "/panchang/{date}",
+    "locationsResolve": "/locations/resolve"
+  },
+  "apiTimeoutMs": 15000,
+  "defaultTradition": "all",
+  "auth": {
+    "mode": "entra-external-id",
+    "authority": "https://myvedicstarexternal.ciamlogin.com/",
+    "tenantId": "cbece845-e124-4de7-89d3-96a71abb7b83",
+    "clientId": "8a04afd8-56e8-49a1-b904-7c8f9e7b0df2",
+    "apiClientId": "fdaa908a-4c0b-4d63-a6d1-de637e0edc4e",
+    "apiScopes": ["api://fdaa908a-4c0b-4d63-a6d1-de637e0edc4e/access_as_user"],
+    "redirectUri": "https://localhost:5173/auth/callback",
+    "postLogoutRedirectUri": "https://localhost:5173/",
+    "providers": ["email"]
+  },
+  "featureFlags": {},
+  "telemetry": {
+    "enabled": false
+  }
+}

@@ -1,0 +1,93 @@
+name: Mobile
+
+# Android / iOS pipeline. Independent of the web pipeline: mobile changes never redeploy the web SPA.
+on:
+  pull_request:
+    paths:
+      [
+        'apps/mobile/**',
+        'packages/**',
+        'package.json',
+        'package-lock.json',
+        'tsconfig.base.json',
+        'eslint.config.js',
+        '.github/workflows/mobile.yml',
+      ]
+  push:
+    branches: [main]
+    paths:
+      [
+        'apps/mobile/**',
+        'packages/**',
+        'package.json',
+        'package-lock.json',
+        'tsconfig.base.json',
+        'eslint.config.js',
+        '.github/workflows/mobile.yml',
+      ]
+  workflow_dispatch:
+    inputs:
+      build:
+        description: 'EAS build profile to run (none = verify only)'
+        type: choice
+        options: [none, preview, production]
+        default: none
+      platform:
+        description: Platform
+        type: choice
+        options: [all, android, ios]
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Type check (shared packages + mobile)
+        run: |
+          npm run typecheck --workspace=packages
+          npm run typecheck -w @myvedicstar/mobile
+      - name: Unit and component tests
+        run: |
+          npm run test --workspace=packages
+          npm run test -w @myvedicstar/mobile -- --ci
+      - name: Bundle JavaScript for Android and iOS (Metro)
+        run: npx expo export --platform android --platform ios --output-dir /tmp/expo-export
+        working-directory: apps/mobile
+        env:
+          CI: 1
+
+  # Native builds and signing run on EAS; credentials live in EAS / the secret store, never in git.
+  eas-build:
+    needs: verify
+    if: github.event_name == 'workflow_dispatch' && inputs.build != 'none'
+    runs-on: ubuntu-latest
+    environment: mobile-${{ inputs.build }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: eas build --non-interactive --profile ${{ inputs.build }} --platform ${{ inputs.platform }}
+        working-directory: apps/mobile

@@ -1,0 +1,13 @@
+{
+  "latitude": 17.39,
+  "longitude": 78.49,
+  "timeZone": "Asia/Kolkata",
+  "source": "Coordinates",
+  "place": {
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "country": "India",
+    "countryCode": "IN",
+    "displayName": "Hyderabad, Telangana, India"
+  }
+}

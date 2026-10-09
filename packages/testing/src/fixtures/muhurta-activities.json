@@ -1,0 +1,106 @@
+{
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "defaultActivity": "general",
+  "activities": [
+    {
+      "key": "business",
+      "name": "Business",
+      "description": "Opening a shop, launching a product or starting a venture.",
+      "icon": "briefcase",
+      "order": 1,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "travel",
+      "name": "Travel",
+      "description": "Starting a journey or pilgrimage.",
+      "icon": "plane",
+      "order": 2,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "property",
+      "name": "Property",
+      "description": "Buying land, a home or registering property.",
+      "icon": "home-key",
+      "order": 3,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "vehicle",
+      "name": "Vehicle",
+      "description": "Buying or first driving a vehicle.",
+      "icon": "car",
+      "order": 4,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "agreement",
+      "name": "Agreement",
+      "description": "Signing a contract, lease or loan.",
+      "icon": "document-signature",
+      "order": 5,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "education",
+      "name": "Education",
+      "description": "Starting studies, a course or an exam.",
+      "icon": "book",
+      "order": 6,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "puja",
+      "name": "Puja / Spiritual",
+      "description": "Worship, homam, meditation or a vratam.",
+      "icon": "lamp",
+      "order": 7,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "wedding",
+      "name": "Wedding",
+      "description": "Marriage or engagement. Guidance only: a wedding Muhurta also depends on the couple's charts.",
+      "icon": "rings",
+      "order": 8,
+      "requiresInput": false,
+      "completeness": "partial"
+    },
+    {
+      "key": "housewarming",
+      "name": "Housewarming",
+      "description": "Griha Pravesh. Guidance only: a full Muhurta also considers the Lagna and personal factors.",
+      "icon": "house",
+      "order": 9,
+      "requiresInput": false,
+      "completeness": "partial"
+    },
+    {
+      "key": "general",
+      "name": "General",
+      "description": "Any everyday new beginning.",
+      "icon": "sun",
+      "order": 10,
+      "requiresInput": false,
+      "completeness": "full"
+    },
+    {
+      "key": "other",
+      "name": "Other",
+      "description": "Describe your activity; it is matched to the closest activity.",
+      "icon": "more",
+      "order": 11,
+      "requiresInput": true,
+      "completeness": "full"
+    }
+  ]
+}

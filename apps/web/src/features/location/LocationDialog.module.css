@@ -1,0 +1,273 @@
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xl);
+}
+
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.searchForm {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xs);
+}
+
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.input {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  min-block-size: var(--touch-target-minimum);
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+
+.error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.notice {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-info-surface);
+  color: var(--color-info);
+  font-size: var(--font-size-sm);
+}
+
+.notice svg {
+  flex: none;
+  margin-block-start: 0.1em;
+}
+
+.result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  color: var(--color-primary);
+}
+
+.resultText {
+  flex: 1 1 12rem;
+}
+
+.resultName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.details {
+  border-block: 1px solid var(--color-border);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--touch-target-minimum);
+  cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary);
+}
+
+.coordinates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--space-md);
+  padding-block-end: var(--space-lg);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.coordinatesSubmit {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+/* Recent locations: one bordered list with dividers. */
+.recentList {
+  display: grid;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  list-style: none;
+}
+
+.recentItem {
+  display: flex;
+  align-items: stretch;
+}
+
+.recentItem + .recentItem {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.recentButton,
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-block-size: var(--touch-target-minimum);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.recentButton {
+  flex: 1;
+  min-inline-size: 0;
+  padding: var(--space-sm) var(--space-md);
+  text-align: start;
+}
+
+.recentButton svg {
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+/* The selected location: soft warm highlight across the whole row rather than a heavy outline. */
+.recentItem:has([aria-current='true']) {
+  background: var(--color-auspicious-surface);
+}
+
+.recentButton[aria-current='true'] {
+  font-weight: var(--font-weight-semibold);
+}
+
+.recentButton[aria-current='true'] svg {
+  color: var(--color-primary);
+}
+
+.recentButton span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.recentButton:hover,
+.removeButton:hover {
+  background: var(--color-surface-subtle);
+}
+
+.removeButton {
+  justify-content: center;
+  inline-size: var(--touch-target-minimum);
+  color: var(--color-text-secondary);
+}
+
+.input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* Phones: a compact sheet — denser type, shorter controls, and the search label and example kept for screen
+   readers only (the placeholder shows an example). */
+@media (max-width: 599px) {
+  .content {
+    gap: var(--space-md);
+  }
+
+  .phoneHidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .content button,
+  .input {
+    min-block-size: 2.5rem;
+  }
+
+  .input {
+    font-size: var(--font-size-sm);
+  }
+
+  .details {
+    border-block-end: 0;
+  }
+
+  .summary {
+    min-block-size: 2.5rem;
+  }
+
+  .recentList {
+    margin-block-start: calc(-1 * var(--space-xs));
+  }
+
+  .recentButton {
+    padding-block: var(--space-xs);
+  }
+
+  .section {
+    gap: var(--space-xs);
+  }
+
+  .hint {
+    font-size: var(--font-size-xs);
+  }
+
+  .searchRow {
+    flex-wrap: nowrap;
+  }
+
+  .searchRow > button {
+    flex: none;
+    padding-inline: var(--space-md);
+  }
+
+  .summary {
+    font-size: var(--font-size-sm);
+  }
+
+  .coordinates {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .recentButton {
+    font-size: var(--font-size-sm);
+  }
+}

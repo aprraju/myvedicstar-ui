@@ -1,0 +1,243 @@
+{
+  "location": {
+    "latitude": 30.27,
+    "longitude": -97.74,
+    "timeZone": "America/Chicago",
+    "source": "Coordinates",
+    "place": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "countryCode": "US",
+      "displayName": "Austin, Texas, United States"
+    }
+  },
+  "tradition": { "key": "telugu", "name": "Telugu" },
+  "activity": {
+    "key": "business",
+    "name": "Business",
+    "icon": "briefcase",
+    "requested": "business",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "localToday": "2026-10-02",
+  "displayFormat": {
+    "datePattern": "MM/dd/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "US",
+    "example": "10/02/2026 14:30:59 CDT"
+  },
+  "generatedAt": "2026-10-02T14:36:33.0213419+00:00",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "calculationVersion": "1.0.0",
+  "searchedFrom": "2026-10-02",
+  "searchedThrough": "2026-10-31",
+  "options": [
+    {
+      "rank": 1,
+      "date": "2026-10-02",
+      "dateDisplay": "10/02/2026",
+      "segment": {
+        "id": "s14",
+        "start": "2026-10-02T14:30:59-05:00",
+        "end": "2026-10-02T16:17:28-05:00",
+        "startDisplay": "10/02/2026 14:30:59 CDT",
+        "endDisplay": "10/02/2026 16:17:28 CDT",
+        "timeRangeDisplay": "14:30–16:17 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "\uD83D\uDFE2\uD83D\uDFE2"
+        },
+        "score": 90,
+        "isGoodTime": true,
+        "headline": "Highly Favorable for Business",
+        "reasons": [
+          {
+            "type": "positive",
+            "code": "FAVORABLE_TITHI",
+            "label": "Favorable Tithi",
+            "subject": "KrishnaSaptami"
+          },
+          { "type": "positive", "code": "FAVORABLE_VARA", "label": "Suitable Vara", "subject": "Friday" },
+          {
+            "type": "positive",
+            "code": "FAVORABLE_NAKSHATRA",
+            "label": "Favorable Nakshatra",
+            "subject": "Mrigashira"
+          },
+          {
+            "type": "positive",
+            "code": "NO_RAHU_KALAM_CONFLICT",
+            "label": "No Rahu Kalam conflict",
+            "subject": "RahuKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_YAMAGANDAM_CONFLICT",
+            "label": "No Yamagandam conflict",
+            "subject": "Yamagandam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_GULIKA_KALAM_CONFLICT",
+            "label": "No Gulika Kalam conflict",
+            "subject": "GulikaKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_DUR_MUHURTAM_CONFLICT",
+            "label": "No Durmuhurtham conflict",
+            "subject": "DurMuhurtam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_VARJYAM_CONFLICT",
+            "label": "No Varjyam conflict",
+            "subject": "Varjyam"
+          }
+        ],
+        "conflicts": []
+      }
+    },
+    {
+      "rank": 2,
+      "date": "2026-10-04",
+      "dateDisplay": "10/04/2026",
+      "segment": {
+        "id": "s2",
+        "start": "2026-10-04T11:27:35-05:00",
+        "end": "2026-10-04T12:55:50-05:00",
+        "startDisplay": "10/04/2026 11:27:35 CDT",
+        "endDisplay": "10/04/2026 12:55:50 CDT",
+        "timeRangeDisplay": "11:27–12:55 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "\uD83D\uDFE2\uD83D\uDFE2"
+        },
+        "score": 92,
+        "isGoodTime": true,
+        "headline": "Highly Favorable for Business",
+        "reasons": [
+          {
+            "type": "negative",
+            "code": "ADVERSE_TITHI",
+            "label": "Less supportive Tithi",
+            "subject": "KrishnaNavami"
+          },
+          {
+            "type": "positive",
+            "code": "FAVORABLE_NAKSHATRA",
+            "label": "Favorable Nakshatra",
+            "subject": "Punarvasu"
+          },
+          { "type": "positive", "code": "AMRIT_KALAM", "label": "Amrita Kalam", "subject": "AmritKalam" },
+          {
+            "type": "positive",
+            "code": "NO_RAHU_KALAM_CONFLICT",
+            "label": "No Rahu Kalam conflict",
+            "subject": "RahuKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_YAMAGANDAM_CONFLICT",
+            "label": "No Yamagandam conflict",
+            "subject": "Yamagandam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_GULIKA_KALAM_CONFLICT",
+            "label": "No Gulika Kalam conflict",
+            "subject": "GulikaKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_DUR_MUHURTAM_CONFLICT",
+            "label": "No Durmuhurtham conflict",
+            "subject": "DurMuhurtam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_VARJYAM_CONFLICT",
+            "label": "No Varjyam conflict",
+            "subject": "Varjyam"
+          }
+        ],
+        "conflicts": []
+      }
+    },
+    {
+      "rank": 3,
+      "date": "2026-10-12",
+      "dateDisplay": "10/12/2026",
+      "segment": {
+        "id": "s4",
+        "start": "2026-10-12T10:24:11-05:00",
+        "end": "2026-10-12T11:43:31-05:00",
+        "startDisplay": "10/12/2026 10:24:11 CDT",
+        "endDisplay": "10/12/2026 11:43:31 CDT",
+        "timeRangeDisplay": "10:24–11:43 CDT",
+        "status": {
+          "status": "HighlyFavorable",
+          "name": "Highly Favorable",
+          "icon": "\uD83D\uDFE2\uD83D\uDFE2"
+        },
+        "score": 90,
+        "isGoodTime": true,
+        "headline": "Highly Favorable for Business",
+        "reasons": [
+          {
+            "type": "positive",
+            "code": "FAVORABLE_TITHI",
+            "label": "Favorable Tithi",
+            "subject": "ShuklaDwitiya"
+          },
+          { "type": "positive", "code": "FAVORABLE_VARA", "label": "Suitable Vara", "subject": "Monday" },
+          {
+            "type": "positive",
+            "code": "FAVORABLE_NAKSHATRA",
+            "label": "Favorable Nakshatra",
+            "subject": "Swati"
+          },
+          {
+            "type": "positive",
+            "code": "NO_RAHU_KALAM_CONFLICT",
+            "label": "No Rahu Kalam conflict",
+            "subject": "RahuKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_YAMAGANDAM_CONFLICT",
+            "label": "No Yamagandam conflict",
+            "subject": "Yamagandam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_GULIKA_KALAM_CONFLICT",
+            "label": "No Gulika Kalam conflict",
+            "subject": "GulikaKalam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_DUR_MUHURTAM_CONFLICT",
+            "label": "No Durmuhurtham conflict",
+            "subject": "DurMuhurtam"
+          },
+          {
+            "type": "positive",
+            "code": "NO_VARJYAM_CONFLICT",
+            "label": "No Varjyam conflict",
+            "subject": "Varjyam"
+          }
+        ],
+        "conflicts": []
+      }
+    }
+  ],
+  "noGoodTimeMessage": null,
+  "notices": [],
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

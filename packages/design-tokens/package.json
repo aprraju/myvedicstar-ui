@@ -1,0 +1,20 @@
+{
+  "name": "@myvedicstar/design-tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Semantic design tokens (color, spacing, type, radius, elevation, layout) for web and mobile.",
+  "type": "module",
+  "sideEffects": [
+    "./css/tokens.css"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./css/tokens.css"
+  },
+  "scripts": {
+    "build:css": "tsx scripts/build-css.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {}
+}

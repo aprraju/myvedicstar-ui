@@ -1,0 +1,1056 @@
+{
+  "location": {
+    "latitude": 30.27,
+    "longitude": -97.74,
+    "timeZone": "America/Chicago",
+    "source": "Coordinates",
+    "place": {
+      "city": "Austin",
+      "state": "Texas",
+      "country": "United States",
+      "countryCode": "US",
+      "displayName": "Austin, Texas, United States"
+    }
+  },
+  "tradition": {
+    "key": "telugu",
+    "name": "Telugu"
+  },
+  "activity": {
+    "key": "business",
+    "name": "Business",
+    "icon": "briefcase",
+    "requested": "business",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "date": "2026-10-01",
+  "dateDisplay": "10/01/2026",
+  "localToday": "2026-10-01",
+  "displayFormat": {
+    "datePattern": "MM/dd/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "US",
+    "example": "10/01/2026 07:24:30 CDT"
+  },
+  "generatedAt": "2026-10-02T02:55:30.7947316+00:00",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "calculationVersion": "1.0.0",
+  "dayStatus": {
+    "status": "HighlyFavorable",
+    "name": "Highly Favorable",
+    "icon": "🟢🟢"
+  },
+  "segments": [
+    {
+      "id": "s1",
+      "start": "2026-10-01T07:24:30-05:00",
+      "end": "2026-10-01T08:53:27-05:00",
+      "startDisplay": "10/01/2026 07:24:30 CDT",
+      "endDisplay": "10/01/2026 08:53:27 CDT",
+      "timeRangeDisplay": "07:24–08:53 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 86,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_YOGA",
+          "label": "Favorable Yoga",
+          "subject": "Siddhi"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-10-01T07:24:30-05:00",
+          "end": "2026-10-01T08:53:27-05:00",
+          "startDisplay": "10/01/2026 07:24:30 CDT",
+          "endDisplay": "10/01/2026 08:53:27 CDT",
+          "overlapStart": "2026-10-01T07:24:30-05:00",
+          "overlapEnd": "2026-10-01T08:53:27-05:00",
+          "overlapStartDisplay": "10/01/2026 07:24:30 CDT",
+          "overlapEndDisplay": "10/01/2026 08:53:27 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "start": "2026-10-01T08:53:27-05:00",
+      "end": "2026-10-01T10:22:24-05:00",
+      "startDisplay": "10/01/2026 08:53:27 CDT",
+      "endDisplay": "10/01/2026 10:22:24 CDT",
+      "timeRangeDisplay": "08:53–10:22 CDT",
+      "status": {
+        "status": "HighlyFavorable",
+        "name": "Highly Favorable",
+        "icon": "🟢🟢"
+      },
+      "score": 86,
+      "isGoodTime": true,
+      "headline": "Highly Favorable for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_YOGA",
+          "label": "Favorable Yoga",
+          "subject": "Siddhi"
+        },
+        {
+          "type": "positive",
+          "code": "NO_RAHU_KALAM_CONFLICT",
+          "label": "No Rahu Kalam conflict",
+          "subject": "RahuKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_YAMAGANDAM_CONFLICT",
+          "label": "No Yamagandam conflict",
+          "subject": "Yamagandam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_GULIKA_KALAM_CONFLICT",
+          "label": "No Gulika Kalam conflict",
+          "subject": "GulikaKalam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_DUR_MUHURTAM_CONFLICT",
+          "label": "No Durmuhurtham conflict",
+          "subject": "DurMuhurtam"
+        },
+        {
+          "type": "positive",
+          "code": "NO_VARJYAM_CONFLICT",
+          "label": "No Varjyam conflict",
+          "subject": "Varjyam"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s3",
+      "start": "2026-10-01T10:22:24-05:00",
+      "end": "2026-10-01T10:29:12-05:00",
+      "startDisplay": "10/01/2026 10:22:24 CDT",
+      "endDisplay": "10/01/2026 10:29:12 CDT",
+      "timeRangeDisplay": "10:22–10:29 CDT",
+      "status": {
+        "status": "Caution",
+        "name": "Use Caution",
+        "icon": "🟠"
+      },
+      "score": 86,
+      "isGoodTime": false,
+      "headline": "Use Caution for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_YOGA",
+          "label": "Favorable Yoga",
+          "subject": "Siddhi"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:22:24-05:00",
+          "end": "2026-10-01T11:51:22-05:00",
+          "startDisplay": "10/01/2026 10:22:24 CDT",
+          "endDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapStart": "2026-10-01T10:22:24-05:00",
+          "overlapEnd": "2026-10-01T10:29:12-05:00",
+          "overlapStartDisplay": "10/01/2026 10:22:24 CDT",
+          "overlapEndDisplay": "10/01/2026 10:29:12 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "start": "2026-10-01T10:29:12-05:00",
+      "end": "2026-10-01T10:48:18-05:00",
+      "startDisplay": "10/01/2026 10:29:12 CDT",
+      "endDisplay": "10/01/2026 10:48:18 CDT",
+      "timeRangeDisplay": "10:29–10:48 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 86,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_YOGA",
+          "label": "Favorable Yoga",
+          "subject": "Siddhi"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:22:24-05:00",
+          "end": "2026-10-01T11:51:22-05:00",
+          "startDisplay": "10/01/2026 10:22:24 CDT",
+          "endDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapStart": "2026-10-01T10:29:12-05:00",
+          "overlapEnd": "2026-10-01T10:48:18-05:00",
+          "overlapStartDisplay": "10/01/2026 10:29:12 CDT",
+          "overlapEndDisplay": "10/01/2026 10:48:18 CDT"
+        },
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:29:12-05:00",
+          "end": "2026-10-01T11:58:50-05:00",
+          "startDisplay": "10/01/2026 10:29:12 CDT",
+          "endDisplay": "10/01/2026 11:58:50 CDT",
+          "overlapStart": "2026-10-01T10:29:12-05:00",
+          "overlapEnd": "2026-10-01T10:48:18-05:00",
+          "overlapStartDisplay": "10/01/2026 10:29:12 CDT",
+          "overlapEndDisplay": "10/01/2026 10:48:18 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "start": "2026-10-01T10:48:18-05:00",
+      "end": "2026-10-01T11:21:43-05:00",
+      "startDisplay": "10/01/2026 10:48:18 CDT",
+      "endDisplay": "10/01/2026 11:21:43 CDT",
+      "timeRangeDisplay": "10:48–11:21 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:22:24-05:00",
+          "end": "2026-10-01T11:51:22-05:00",
+          "startDisplay": "10/01/2026 10:22:24 CDT",
+          "endDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapStart": "2026-10-01T10:48:18-05:00",
+          "overlapEnd": "2026-10-01T11:21:43-05:00",
+          "overlapStartDisplay": "10/01/2026 10:48:18 CDT",
+          "overlapEndDisplay": "10/01/2026 11:21:43 CDT"
+        },
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:29:12-05:00",
+          "end": "2026-10-01T11:58:50-05:00",
+          "startDisplay": "10/01/2026 10:29:12 CDT",
+          "endDisplay": "10/01/2026 11:58:50 CDT",
+          "overlapStart": "2026-10-01T10:48:18-05:00",
+          "overlapEnd": "2026-10-01T11:21:43-05:00",
+          "overlapStartDisplay": "10/01/2026 10:48:18 CDT",
+          "overlapEndDisplay": "10/01/2026 11:21:43 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "start": "2026-10-01T11:21:43-05:00",
+      "end": "2026-10-01T11:51:22-05:00",
+      "startDisplay": "10/01/2026 11:21:43 CDT",
+      "endDisplay": "10/01/2026 11:51:22 CDT",
+      "timeRangeDisplay": "11:21–11:51 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:22:24-05:00",
+          "end": "2026-10-01T11:51:22-05:00",
+          "startDisplay": "10/01/2026 10:22:24 CDT",
+          "endDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapStart": "2026-10-01T11:21:43-05:00",
+          "overlapEnd": "2026-10-01T11:51:22-05:00",
+          "overlapStartDisplay": "10/01/2026 11:21:43 CDT",
+          "overlapEndDisplay": "10/01/2026 11:51:22 CDT"
+        },
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:29:12-05:00",
+          "end": "2026-10-01T11:58:50-05:00",
+          "startDisplay": "10/01/2026 10:29:12 CDT",
+          "endDisplay": "10/01/2026 11:58:50 CDT",
+          "overlapStart": "2026-10-01T11:21:43-05:00",
+          "overlapEnd": "2026-10-01T11:51:22-05:00",
+          "overlapStartDisplay": "10/01/2026 11:21:43 CDT",
+          "overlapEndDisplay": "10/01/2026 11:51:22 CDT"
+        },
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-01T11:21:43-05:00",
+          "end": "2026-10-01T12:09:09-05:00",
+          "startDisplay": "10/01/2026 11:21:43 CDT",
+          "endDisplay": "10/01/2026 12:09:09 CDT",
+          "overlapStart": "2026-10-01T11:21:43-05:00",
+          "overlapEnd": "2026-10-01T11:51:22-05:00",
+          "overlapStartDisplay": "10/01/2026 11:21:43 CDT",
+          "overlapEndDisplay": "10/01/2026 11:51:22 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "start": "2026-10-01T11:51:22-05:00",
+      "end": "2026-10-01T11:58:50-05:00",
+      "startDisplay": "10/01/2026 11:51:22 CDT",
+      "endDisplay": "10/01/2026 11:58:50 CDT",
+      "timeRangeDisplay": "11:51–11:58 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-01T10:29:12-05:00",
+          "end": "2026-10-01T11:58:50-05:00",
+          "startDisplay": "10/01/2026 10:29:12 CDT",
+          "endDisplay": "10/01/2026 11:58:50 CDT",
+          "overlapStart": "2026-10-01T11:51:22-05:00",
+          "overlapEnd": "2026-10-01T11:58:50-05:00",
+          "overlapStartDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapEndDisplay": "10/01/2026 11:58:50 CDT"
+        },
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-01T11:21:43-05:00",
+          "end": "2026-10-01T12:09:09-05:00",
+          "startDisplay": "10/01/2026 11:21:43 CDT",
+          "endDisplay": "10/01/2026 12:09:09 CDT",
+          "overlapStart": "2026-10-01T11:51:22-05:00",
+          "overlapEnd": "2026-10-01T11:58:50-05:00",
+          "overlapStartDisplay": "10/01/2026 11:51:22 CDT",
+          "overlapEndDisplay": "10/01/2026 11:58:50 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "start": "2026-10-01T11:58:50-05:00",
+      "end": "2026-10-01T12:09:09-05:00",
+      "startDisplay": "10/01/2026 11:58:50 CDT",
+      "endDisplay": "10/01/2026 12:09:09 CDT",
+      "timeRangeDisplay": "11:58–12:09 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-01T11:21:43-05:00",
+          "end": "2026-10-01T12:09:09-05:00",
+          "startDisplay": "10/01/2026 11:21:43 CDT",
+          "endDisplay": "10/01/2026 12:09:09 CDT",
+          "overlapStart": "2026-10-01T11:58:50-05:00",
+          "overlapEnd": "2026-10-01T12:09:09-05:00",
+          "overlapStartDisplay": "10/01/2026 11:58:50 CDT",
+          "overlapEndDisplay": "10/01/2026 12:09:09 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "start": "2026-10-01T12:09:09-05:00",
+      "end": "2026-10-01T12:56:36-05:00",
+      "startDisplay": "10/01/2026 12:09:09 CDT",
+      "endDisplay": "10/01/2026 12:56:36 CDT",
+      "timeRangeDisplay": "12:09–12:56 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s10",
+      "start": "2026-10-01T12:56:36-05:00",
+      "end": "2026-10-01T13:44:02-05:00",
+      "startDisplay": "10/01/2026 12:56:36 CDT",
+      "endDisplay": "10/01/2026 13:44:02 CDT",
+      "timeRangeDisplay": "12:56–13:44 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 99,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s11",
+      "start": "2026-10-01T13:44:02-05:00",
+      "end": "2026-10-01T14:49:16-05:00",
+      "startDisplay": "10/01/2026 13:44:02 CDT",
+      "endDisplay": "10/01/2026 14:49:16 CDT",
+      "timeRangeDisplay": "13:44–14:49 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s12",
+      "start": "2026-10-01T14:49:16-05:00",
+      "end": "2026-10-01T14:58:07-05:00",
+      "startDisplay": "10/01/2026 14:49:16 CDT",
+      "endDisplay": "10/01/2026 14:58:07 CDT",
+      "timeRangeDisplay": "14:49–14:58 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Avoid",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": false,
+          "start": "2026-10-01T14:49:16-05:00",
+          "end": "2026-10-01T16:18:14-05:00",
+          "startDisplay": "10/01/2026 14:49:16 CDT",
+          "endDisplay": "10/01/2026 16:18:14 CDT",
+          "overlapStart": "2026-10-01T14:49:16-05:00",
+          "overlapEnd": "2026-10-01T14:58:07-05:00",
+          "overlapStartDisplay": "10/01/2026 14:49:16 CDT",
+          "overlapEndDisplay": "10/01/2026 14:58:07 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "start": "2026-10-01T14:58:07-05:00",
+      "end": "2026-10-01T16:06:22-05:00",
+      "startDisplay": "10/01/2026 14:58:07 CDT",
+      "endDisplay": "10/01/2026 16:06:22 CDT",
+      "timeRangeDisplay": "14:58–16:06 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "positive",
+          "code": "AMRIT_KALAM",
+          "label": "Amrita Kalam",
+          "subject": "AmritKalam"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Mixed",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": true,
+          "start": "2026-10-01T14:49:16-05:00",
+          "end": "2026-10-01T16:18:14-05:00",
+          "startDisplay": "10/01/2026 14:49:16 CDT",
+          "endDisplay": "10/01/2026 16:18:14 CDT",
+          "overlapStart": "2026-10-01T14:58:07-05:00",
+          "overlapEnd": "2026-10-01T16:06:22-05:00",
+          "overlapStartDisplay": "10/01/2026 14:58:07 CDT",
+          "overlapEndDisplay": "10/01/2026 16:06:22 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s14",
+      "start": "2026-10-01T16:06:22-05:00",
+      "end": "2026-10-01T16:18:14-05:00",
+      "startDisplay": "10/01/2026 16:06:22 CDT",
+      "endDisplay": "10/01/2026 16:18:14 CDT",
+      "timeRangeDisplay": "16:06–16:18 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "positive",
+          "code": "AMRIT_KALAM",
+          "label": "Amrita Kalam",
+          "subject": "AmritKalam"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Mixed",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": true,
+          "start": "2026-10-01T14:49:16-05:00",
+          "end": "2026-10-01T16:18:14-05:00",
+          "startDisplay": "10/01/2026 14:49:16 CDT",
+          "endDisplay": "10/01/2026 16:18:14 CDT",
+          "overlapStart": "2026-10-01T16:06:22-05:00",
+          "overlapEnd": "2026-10-01T16:18:14-05:00",
+          "overlapStartDisplay": "10/01/2026 16:06:22 CDT",
+          "overlapEndDisplay": "10/01/2026 16:18:14 CDT"
+        },
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Caution",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": true,
+          "start": "2026-10-01T16:06:22-05:00",
+          "end": "2026-10-01T16:53:49-05:00",
+          "startDisplay": "10/01/2026 16:06:22 CDT",
+          "endDisplay": "10/01/2026 16:53:49 CDT",
+          "overlapStart": "2026-10-01T16:06:22-05:00",
+          "overlapEnd": "2026-10-01T16:18:14-05:00",
+          "overlapStartDisplay": "10/01/2026 16:06:22 CDT",
+          "overlapEndDisplay": "10/01/2026 16:18:14 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "start": "2026-10-01T16:18:14-05:00",
+      "end": "2026-10-01T16:27:45-05:00",
+      "startDisplay": "10/01/2026 16:18:14 CDT",
+      "endDisplay": "10/01/2026 16:27:45 CDT",
+      "timeRangeDisplay": "16:18–16:27 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "positive",
+          "code": "AMRIT_KALAM",
+          "label": "Amrita Kalam",
+          "subject": "AmritKalam"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Caution",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": true,
+          "start": "2026-10-01T16:06:22-05:00",
+          "end": "2026-10-01T16:53:49-05:00",
+          "startDisplay": "10/01/2026 16:06:22 CDT",
+          "endDisplay": "10/01/2026 16:53:49 CDT",
+          "overlapStart": "2026-10-01T16:18:14-05:00",
+          "overlapEnd": "2026-10-01T16:27:45-05:00",
+          "overlapStartDisplay": "10/01/2026 16:18:14 CDT",
+          "overlapEndDisplay": "10/01/2026 16:27:45 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s16",
+      "start": "2026-10-01T16:27:45-05:00",
+      "end": "2026-10-01T16:53:49-05:00",
+      "startDisplay": "10/01/2026 16:27:45 CDT",
+      "endDisplay": "10/01/2026 16:53:49 CDT",
+      "timeRangeDisplay": "16:27–16:53 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-01T16:06:22-05:00",
+          "end": "2026-10-01T16:53:49-05:00",
+          "startDisplay": "10/01/2026 16:06:22 CDT",
+          "endDisplay": "10/01/2026 16:53:49 CDT",
+          "overlapStart": "2026-10-01T16:27:45-05:00",
+          "overlapEnd": "2026-10-01T16:53:49-05:00",
+          "overlapStartDisplay": "10/01/2026 16:27:45 CDT",
+          "overlapEndDisplay": "10/01/2026 16:53:49 CDT"
+        }
+      ]
+    },
+    {
+      "id": "s17",
+      "start": "2026-10-01T16:53:49-05:00",
+      "end": "2026-10-01T17:57:24-05:00",
+      "startDisplay": "10/01/2026 16:53:49 CDT",
+      "endDisplay": "10/01/2026 17:57:24 CDT",
+      "timeRangeDisplay": "16:53–17:57 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Rohini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s18",
+      "start": "2026-10-01T17:57:24-05:00",
+      "end": "2026-10-01T19:16:09-05:00",
+      "startDisplay": "10/01/2026 17:57:24 CDT",
+      "endDisplay": "10/01/2026 19:16:09 CDT",
+      "timeRangeDisplay": "17:57–19:16 CDT",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Thursday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    }
+  ],
+  "goodTimes": ["s2"],
+  "noGoodTimeReason": null,
+  "noGoodTimeMessage": null,
+  "nowSegmentId": null,
+  "nextGoodTimeId": null,
+  "notices": [],
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

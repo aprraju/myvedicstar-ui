@@ -1,0 +1,92 @@
+.root {
+  position: relative;
+}
+
+.trigger {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--touch-target-minimum);
+  block-size: var(--touch-target-minimum);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  border-radius: 50%;
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[aria-expanded='true'] {
+  border-color: var(--color-primary);
+}
+
+.panel {
+  position: absolute;
+  inset-block-start: calc(100% + var(--space-xs));
+  inset-inline-end: 0;
+  z-index: 20;
+  inline-size: min(18rem, calc(100vw - 2 * var(--gutter)));
+  padding-block: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-high);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.identity {
+  display: grid;
+  gap: 0.125rem;
+  padding: var(--space-sm) var(--space-lg) var(--space-md);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.name {
+  overflow: hidden;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.options {
+  display: grid;
+  margin: 0;
+  padding: var(--space-xs) 0 0;
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  inline-size: 100%;
+  min-block-size: var(--touch-target-minimum);
+  padding-inline: var(--space-lg);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--color-surface-subtle);
+}
+
+.option svg {
+  flex: none;
+  color: var(--color-text-secondary);
+}

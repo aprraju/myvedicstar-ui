@@ -1,0 +1,26 @@
+{
+  "colors": {
+    "ink": "#0d1b2e",
+    "muted": "#637083",
+    "canvas": "#fbfaf7",
+    "surface": "#fffefa",
+    "bronze": "#9b5a17",
+    "bronzeDark": "#7b4310",
+    "gold": "#e6a11b",
+    "favorable": "#087a3b",
+    "favorableBg": "#edf8ee",
+    "caution": "#c92f32",
+    "cautionBg": "#fff0ef",
+    "info": "#0866a6",
+    "infoBg": "#edf6ff",
+    "teal": "#008b88",
+    "pink": "#d83063",
+    "orange": "#f58220"
+  },
+  "radius": {
+    "sm": 10,
+    "md": 14,
+    "lg": 20,
+    "xl": 28
+  }
+}

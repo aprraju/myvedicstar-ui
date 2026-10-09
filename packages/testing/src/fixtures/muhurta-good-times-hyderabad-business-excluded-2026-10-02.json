@@ -1,0 +1,919 @@
+{
+  "location": {
+    "latitude": 17.39,
+    "longitude": 78.49,
+    "timeZone": "Asia/Kolkata",
+    "source": "Coordinates",
+    "place": {
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "countryCode": "IN",
+      "displayName": "Hyderabad, Telangana, India"
+    }
+  },
+  "tradition": {
+    "key": "telugu",
+    "name": "Telugu"
+  },
+  "activity": {
+    "key": "business",
+    "name": "Business",
+    "icon": "briefcase",
+    "requested": "business",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "date": "2026-10-02",
+  "dateDisplay": "02/10/2026",
+  "localToday": "2026-10-02",
+  "displayFormat": {
+    "datePattern": "dd/MM/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "IN",
+    "example": "02/10/2026 06:06:26 IST"
+  },
+  "generatedAt": "2026-10-02T02:55:30.8672995+00:00",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "calculationVersion": "1.0.0",
+  "dayStatus": {
+    "status": "Avoid",
+    "name": "Avoid",
+    "icon": "🔴"
+  },
+  "segments": [
+    {
+      "id": "s1",
+      "start": "2026-10-02T06:06:26+05:30",
+      "end": "2026-10-02T07:36:10+05:30",
+      "startDisplay": "02/10/2026 06:06:26 IST",
+      "endDisplay": "02/10/2026 07:36:10 IST",
+      "timeRangeDisplay": "06:06–07:36 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s2",
+      "start": "2026-10-02T07:36:10+05:30",
+      "end": "2026-10-02T08:30:00+05:30",
+      "startDisplay": "02/10/2026 07:36:10 IST",
+      "endDisplay": "02/10/2026 08:30:00 IST",
+      "timeRangeDisplay": "07:36–08:30 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-02T07:36:10+05:30",
+          "end": "2026-10-02T09:05:53+05:30",
+          "startDisplay": "02/10/2026 07:36:10 IST",
+          "endDisplay": "02/10/2026 09:05:53 IST",
+          "overlapStart": "2026-10-02T07:36:10+05:30",
+          "overlapEnd": "2026-10-02T08:30:00+05:30",
+          "overlapStartDisplay": "02/10/2026 07:36:10 IST",
+          "overlapEndDisplay": "02/10/2026 08:30:00 IST"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "start": "2026-10-02T08:30:00+05:30",
+      "end": "2026-10-02T09:05:53+05:30",
+      "startDisplay": "02/10/2026 08:30:00 IST",
+      "endDisplay": "02/10/2026 09:05:53 IST",
+      "timeRangeDisplay": "08:30–09:05 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-10-02T07:36:10+05:30",
+          "end": "2026-10-02T09:05:53+05:30",
+          "startDisplay": "02/10/2026 07:36:10 IST",
+          "endDisplay": "02/10/2026 09:05:53 IST",
+          "overlapStart": "2026-10-02T08:30:00+05:30",
+          "overlapEnd": "2026-10-02T09:05:53+05:30",
+          "overlapStartDisplay": "02/10/2026 08:30:00 IST",
+          "overlapEndDisplay": "02/10/2026 09:05:53 IST"
+        },
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-02T08:30:00+05:30",
+          "end": "2026-10-02T09:17:51+05:30",
+          "startDisplay": "02/10/2026 08:30:00 IST",
+          "endDisplay": "02/10/2026 09:17:51 IST",
+          "overlapStart": "2026-10-02T08:30:00+05:30",
+          "overlapEnd": "2026-10-02T09:05:53+05:30",
+          "overlapStartDisplay": "02/10/2026 08:30:00 IST",
+          "overlapEndDisplay": "02/10/2026 09:05:53 IST"
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "start": "2026-10-02T09:05:53+05:30",
+      "end": "2026-10-02T09:17:51+05:30",
+      "startDisplay": "02/10/2026 09:05:53 IST",
+      "endDisplay": "02/10/2026 09:17:51 IST",
+      "timeRangeDisplay": "09:05–09:17 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-02T08:30:00+05:30",
+          "end": "2026-10-02T09:17:51+05:30",
+          "startDisplay": "02/10/2026 08:30:00 IST",
+          "endDisplay": "02/10/2026 09:17:51 IST",
+          "overlapStart": "2026-10-02T09:05:53+05:30",
+          "overlapEnd": "2026-10-02T09:17:51+05:30",
+          "overlapStartDisplay": "02/10/2026 09:05:53 IST",
+          "overlapEndDisplay": "02/10/2026 09:17:51 IST"
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "start": "2026-10-02T09:17:51+05:30",
+      "end": "2026-10-02T09:41:53+05:30",
+      "startDisplay": "02/10/2026 09:17:51 IST",
+      "endDisplay": "02/10/2026 09:41:53 IST",
+      "timeRangeDisplay": "09:17–09:41 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s6",
+      "start": "2026-10-02T09:41:53+05:30",
+      "end": "2026-10-02T10:15:47+05:30",
+      "startDisplay": "02/10/2026 09:41:53 IST",
+      "endDisplay": "02/10/2026 10:15:47 IST",
+      "timeRangeDisplay": "09:41–10:15 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 84,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-02T09:41:53+05:30",
+          "end": "2026-10-02T11:11:45+05:30",
+          "startDisplay": "02/10/2026 09:41:53 IST",
+          "endDisplay": "02/10/2026 11:11:45 IST",
+          "overlapStart": "2026-10-02T09:41:53+05:30",
+          "overlapEnd": "2026-10-02T10:15:47+05:30",
+          "overlapStartDisplay": "02/10/2026 09:41:53 IST",
+          "overlapEndDisplay": "02/10/2026 10:15:47 IST"
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "start": "2026-10-02T10:15:47+05:30",
+      "end": "2026-10-02T10:35:37+05:30",
+      "startDisplay": "02/10/2026 10:15:47 IST",
+      "endDisplay": "02/10/2026 10:35:37 IST",
+      "timeRangeDisplay": "10:15–10:35 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-02T09:41:53+05:30",
+          "end": "2026-10-02T11:11:45+05:30",
+          "startDisplay": "02/10/2026 09:41:53 IST",
+          "endDisplay": "02/10/2026 11:11:45 IST",
+          "overlapStart": "2026-10-02T10:15:47+05:30",
+          "overlapEnd": "2026-10-02T10:35:37+05:30",
+          "overlapStartDisplay": "02/10/2026 10:15:47 IST",
+          "overlapEndDisplay": "02/10/2026 10:35:37 IST"
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "start": "2026-10-02T10:35:37+05:30",
+      "end": "2026-10-02T11:11:45+05:30",
+      "startDisplay": "02/10/2026 10:35:37 IST",
+      "endDisplay": "02/10/2026 11:11:45 IST",
+      "timeRangeDisplay": "10:35–11:11 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-10-02T09:41:53+05:30",
+          "end": "2026-10-02T11:11:45+05:30",
+          "startDisplay": "02/10/2026 09:41:53 IST",
+          "endDisplay": "02/10/2026 11:11:45 IST",
+          "overlapStart": "2026-10-02T10:35:37+05:30",
+          "overlapEnd": "2026-10-02T11:11:45+05:30",
+          "overlapStartDisplay": "02/10/2026 10:35:37 IST",
+          "overlapEndDisplay": "02/10/2026 11:11:45 IST"
+        },
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Avoid",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": false,
+          "start": "2026-10-02T10:35:37+05:30",
+          "end": "2026-10-02T12:05:20+05:30",
+          "startDisplay": "02/10/2026 10:35:37 IST",
+          "endDisplay": "02/10/2026 12:05:20 IST",
+          "overlapStart": "2026-10-02T10:35:37+05:30",
+          "overlapEnd": "2026-10-02T11:11:45+05:30",
+          "overlapStartDisplay": "02/10/2026 10:35:37 IST",
+          "overlapEndDisplay": "02/10/2026 11:11:45 IST"
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "start": "2026-10-02T11:11:45+05:30",
+      "end": "2026-10-02T11:41:25+05:30",
+      "startDisplay": "02/10/2026 11:11:45 IST",
+      "endDisplay": "02/10/2026 11:41:25 IST",
+      "timeRangeDisplay": "11:11–11:41 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Avoid",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": false,
+          "start": "2026-10-02T10:35:37+05:30",
+          "end": "2026-10-02T12:05:20+05:30",
+          "startDisplay": "02/10/2026 10:35:37 IST",
+          "endDisplay": "02/10/2026 12:05:20 IST",
+          "overlapStart": "2026-10-02T11:11:45+05:30",
+          "overlapEnd": "2026-10-02T11:41:25+05:30",
+          "overlapStartDisplay": "02/10/2026 11:11:45 IST",
+          "overlapEndDisplay": "02/10/2026 11:41:25 IST"
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "start": "2026-10-02T11:41:25+05:30",
+      "end": "2026-10-02T12:05:20+05:30",
+      "startDisplay": "02/10/2026 11:41:25 IST",
+      "endDisplay": "02/10/2026 12:05:20 IST",
+      "timeRangeDisplay": "11:41–12:05 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Mixed",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": true,
+          "start": "2026-10-02T10:35:37+05:30",
+          "end": "2026-10-02T12:05:20+05:30",
+          "startDisplay": "02/10/2026 10:35:37 IST",
+          "endDisplay": "02/10/2026 12:05:20 IST",
+          "overlapStart": "2026-10-02T11:41:25+05:30",
+          "overlapEnd": "2026-10-02T12:05:20+05:30",
+          "overlapStartDisplay": "02/10/2026 11:41:25 IST",
+          "overlapEndDisplay": "02/10/2026 12:05:20 IST"
+        }
+      ]
+    },
+    {
+      "id": "s11",
+      "start": "2026-10-02T12:05:20+05:30",
+      "end": "2026-10-02T12:29:16+05:30",
+      "startDisplay": "02/10/2026 12:05:20 IST",
+      "endDisplay": "02/10/2026 12:29:16 IST",
+      "timeRangeDisplay": "12:05–12:29 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s12",
+      "start": "2026-10-02T12:29:16+05:30",
+      "end": "2026-10-02T13:17:07+05:30",
+      "startDisplay": "02/10/2026 12:29:16 IST",
+      "endDisplay": "02/10/2026 13:17:07 IST",
+      "timeRangeDisplay": "12:29–13:17 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Durmuhurtham",
+          "withFavorable": false,
+          "start": "2026-10-02T12:29:16+05:30",
+          "end": "2026-10-02T13:17:07+05:30",
+          "startDisplay": "02/10/2026 12:29:16 IST",
+          "endDisplay": "02/10/2026 13:17:07 IST",
+          "overlapStart": "2026-10-02T12:29:16+05:30",
+          "overlapEnd": "2026-10-02T13:17:07+05:30",
+          "overlapStartDisplay": "02/10/2026 12:29:16 IST",
+          "overlapEndDisplay": "02/10/2026 13:17:07 IST"
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "start": "2026-10-02T13:17:07+05:30",
+      "end": "2026-10-02T15:04:47+05:30",
+      "startDisplay": "02/10/2026 13:17:07 IST",
+      "endDisplay": "02/10/2026 15:04:47 IST",
+      "timeRangeDisplay": "13:17–15:04 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s14",
+      "start": "2026-10-02T15:04:47+05:30",
+      "end": "2026-10-02T16:34:31+05:30",
+      "startDisplay": "02/10/2026 15:04:47 IST",
+      "endDisplay": "02/10/2026 16:34:31 IST",
+      "timeRangeDisplay": "15:04–16:34 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-10-02T15:04:47+05:30",
+          "end": "2026-10-02T16:34:31+05:30",
+          "startDisplay": "02/10/2026 15:04:47 IST",
+          "endDisplay": "02/10/2026 16:34:31 IST",
+          "overlapStart": "2026-10-02T15:04:47+05:30",
+          "overlapEnd": "2026-10-02T16:34:31+05:30",
+          "overlapStartDisplay": "02/10/2026 15:04:47 IST",
+          "overlapEndDisplay": "02/10/2026 16:34:31 IST"
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "start": "2026-10-02T16:34:31+05:30",
+      "end": "2026-10-02T18:04:14+05:30",
+      "startDisplay": "02/10/2026 16:34:31 IST",
+      "endDisplay": "02/10/2026 18:04:14 IST",
+      "timeRangeDisplay": "16:34–18:04 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 100,
+      "isGoodTime": false,
+      "headline": "Avoid for Business",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaSaptami"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_VARA",
+          "label": "Suitable Vara",
+          "subject": "Friday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Mrigashira"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_YOGA",
+          "label": "Yoga traditionally avoided for this activity",
+          "subject": "Vyatipata"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    }
+  ],
+  "goodTimes": [],
+  "noGoodTimeReason": "DAY_EXCLUDED_FOR_ACTIVITY",
+  "noGoodTimeMessage": "This day is traditionally avoided for this activity. Please choose another date.",
+  "nowSegmentId": "s2",
+  "nextGoodTimeId": null,
+  "notices": [],
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

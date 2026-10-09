@@ -1,0 +1,420 @@
+.page {
+  display: grid;
+  gap: var(--space-xxxl);
+  padding-block: 0 var(--space-xxxl);
+}
+
+/*
+ * Hero (myvedicstar-default theme): temple-at-sunrise photograph behind a warm fade, so text on the left stays
+ * readable. One column on compact/medium windows; text | card side by side when there is room.
+ */
+.hero {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: start;
+  padding: var(--space-xxl) var(--space-lg) var(--space-xl);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-background);
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-background) 96%, transparent) 0%,
+      color-mix(in srgb, var(--color-background) 82%, transparent) 45%,
+      color-mix(in srgb, var(--color-background) 30%, transparent) 100%
+    ),
+    url('../../themes/myvedicstar-default/assets/images/home.jpg');
+  background-size: cover;
+  background-position: 62% center;
+  box-shadow: var(--shadow-low);
+}
+
+@media (min-width: 840px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    gap: var(--space-xxl);
+    align-items: center;
+    min-block-size: 30rem;
+    padding: var(--space-xxxl) var(--space-huge);
+    background-image:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-background) 98%, transparent) 0%,
+        color-mix(in srgb, var(--color-background) 82%, transparent) 40%,
+        color-mix(in srgb, var(--color-background) 10%, transparent) 67%
+      ),
+      url('../../themes/myvedicstar-default/assets/images/home.jpg');
+    background-position: center;
+  }
+}
+
+.heroText {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.title {
+  max-inline-size: 14ch;
+  font-family: var(--font-serif);
+  font-size: clamp(var(--font-size-xxl), 2.6vw + 1rem, 2.625rem);
+  line-height: 1.05;
+  color: var(--color-text-primary);
+  text-wrap: balance;
+}
+
+.body {
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  max-inline-size: 26rem;
+}
+
+/* Hero highlights with the theme's diamond / half-disc markers; hidden on compact windows, as in the theme. */
+.heroPoints {
+  display: none;
+  gap: var(--space-md) var(--space-xl);
+  margin-block-start: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+/* Tablet portrait: two columns of highlights under the copy. */
+@media (min-width: 600px) {
+  .heroPoints {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+  }
+}
+
+@media (min-width: 840px) {
+  .heroPoints {
+    grid-template-columns: none;
+    gap: var(--space-lg);
+  }
+}
+
+.heroPoint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.marker {
+  flex: none;
+  inline-size: 0.875rem;
+  block-size: 0.875rem;
+  border: 2px solid #df8b0e;
+  color: #df8b0e;
+}
+
+.marker[data-marker='diamond'] {
+  padding: 2px;
+  background: currentColor content-box;
+  transform: rotate(45deg) scale(0.9);
+}
+
+.marker[data-marker='half'] {
+  border-radius: 50%;
+  background: linear-gradient(transparent 50%, currentColor 50%);
+}
+
+.heroCard {
+  justify-self: center;
+  inline-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: 30rem;
+}
+
+/* Tablet portrait: more breathing room around the stacked hero. */
+@media (min-width: 600px) and (max-width: 839px) {
+  .hero {
+    padding: var(--space-xxl);
+  }
+}
+
+@media (min-width: 840px) {
+  .heroCard {
+    justify-self: end;
+  }
+}
+
+.features {
+  display: grid;
+  gap: var(--space-xl);
+  justify-items: center;
+  scroll-margin-block-start: 8rem;
+  text-align: center;
+}
+
+.features:focus {
+  outline: none;
+}
+
+.featuresHeading {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.featuresTitle {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-xxl);
+  color: var(--color-text-primary);
+}
+
+.featuresSubtitle {
+  color: var(--color-text-secondary);
+}
+
+/* Six across on wide windows, three on medium, one on compact. */
+.featureList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-sm);
+  inline-size: 100%;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 1100px) {
+  .featureList {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.feature {
+  /* Accent tint per card via data-accent; icons are decorative, text carries meaning. */
+  --accent: var(--color-auspicious);
+  --accent-surface: var(--color-auspicious-surface);
+
+  display: grid;
+  gap: var(--space-sm);
+  align-content: start;
+  justify-items: center;
+  min-block-size: 10rem;
+  padding: var(--space-lg) var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--color-auspicious) 15%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+
+.feature[data-accent='orange'] {
+  --accent: #b55e05;
+  --accent-surface: #fff4e6;
+}
+
+.feature[data-accent='teal'] {
+  --accent: var(--color-secondary);
+  --accent-surface: #e8f7f5;
+}
+
+.feature[data-accent='pink'] {
+  --accent: #c42a59;
+  --accent-surface: #fff0f4;
+}
+
+.feature[data-accent='blue'] {
+  --accent: var(--color-info);
+  --accent-surface: var(--color-info-surface);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .feature {
+    --accent-surface: color-mix(in srgb, var(--accent) 22%, var(--color-surface));
+  }
+}
+
+:root[data-theme='dark'] .feature {
+  --accent-surface: color-mix(in srgb, var(--accent) 22%, var(--color-surface));
+}
+
+.featureIcon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 3rem;
+  block-size: 3rem;
+  border-radius: 50%;
+  background: var(--accent-surface);
+  color: var(--color-text-primary);
+}
+
+.featureTitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.featureBody {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+/* "Get Started for Free" panel: copy and actions | benefit checklist. */
+.getStarted {
+  display: grid;
+  gap: var(--space-xl);
+  inline-size: min(100%, 65rem);
+  margin-block-start: var(--space-sm);
+  padding: var(--space-xl);
+  border: 1px solid color-mix(in srgb, var(--color-auspicious) 22%, var(--color-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-auspicious-surface) 70%, var(--color-surface));
+  text-align: start;
+}
+
+@media (min-width: 840px) {
+  .getStarted {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+.getStartedText {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.getStartedTitle {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+.getStartedBody {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.getStartedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-block-start: var(--space-xs);
+}
+
+.primaryLink,
+.outlineLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: var(--touch-target-comfortable);
+  padding-inline: var(--space-lg);
+  border: 1px solid;
+  border-radius: var(--radius-md);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primaryLink {
+  border-color: var(--color-primary);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 80%, black),
+    color-mix(in srgb, var(--color-primary) 94%, white)
+  );
+  color: var(--color-on-primary);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-low);
+}
+
+.primaryLink:hover {
+  background: color-mix(in srgb, var(--color-primary) 85%, black);
+}
+
+.outlineLink {
+  border-color: color-mix(in srgb, var(--color-primary) 75%, var(--color-surface));
+  background: var(--color-surface);
+  color: var(--color-primary);
+}
+
+.outlineLink:hover {
+  background: var(--color-auspicious-surface);
+}
+
+.benefits {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.check {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1.125rem;
+  block-size: 1.125rem;
+  border-radius: 50%;
+  background: #eda11b;
+  color: #fff;
+}
+
+/* Compact windows: icon beside text, as in the theme's mobile layout. */
+@media (max-width: 599px) {
+  .featureList {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .feature {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    column-gap: var(--space-md);
+    justify-items: start;
+    text-align: start;
+    min-block-size: auto;
+  }
+
+  .featureIcon {
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+}
+
+/* Small laptops / tablets in landscape: tighter hero padding so the text and card keep their room. */
+@media (min-width: 840px) and (max-width: 1099px) {
+  .hero {
+    padding: var(--space-xxl);
+  }
+}
+
+/* Phones: calmer hero typography and spacing. */
+@media (max-width: 599px) {
+  .hero {
+    gap: var(--space-lg);
+    padding: var(--space-md);
+  }
+
+  .heroText {
+    gap: var(--space-sm);
+    padding-inline: var(--space-xs);
+  }
+
+  /* Heading and intro placed above "Get Started" in the (centered) features section. */
+  .features .heroText {
+    justify-self: stretch;
+    margin-block-start: var(--space-md);
+    text-align: start;
+  }
+
+  .title {
+    max-inline-size: none;
+    font-size: 1.625rem;
+    line-height: 1.15;
+  }
+
+  .body {
+    font-size: var(--font-size-md);
+  }
+
+  .featuresTitle {
+    font-size: var(--font-size-xl);
+  }
+}

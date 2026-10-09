@@ -1,0 +1,16 @@
+{
+  "name": "@myvedicstar/analytics",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Provider-independent analytics and telemetry interfaces with privacy redaction.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {}
+}

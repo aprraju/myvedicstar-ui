@@ -1,0 +1,58 @@
+{
+  "name": "myvedicstar-ui",
+  "private": true,
+  "type": "module",
+  "description": "My Vedic Star — web (React SPA) and mobile (React Native / Expo) frontends for the MyVedicDay Panchang API.",
+  "license": "UNLICENSED",
+  "packageManager": "npm@11.11.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "npm run typecheck --workspaces --if-present && npm run deploy:typecheck",
+    "test": "npm run test --workspaces --if-present && npm run deploy:test",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
+    "web:dev": "npm run dev -w @myvedicstar/web",
+    "web:build": "npm run build -w @myvedicstar/web",
+    "web:preview": "npm run preview -w @myvedicstar/web",
+    "web:e2e": "npm run e2e -w @myvedicstar/web",
+    "web:validate-build": "tsx infrastructure/web/static-web-apps/scripts/validate-build.ts apps/web/dist",
+    "web:deploy": "bash infrastructure/web/static-web-apps/scripts/deploy.sh",
+    "web:provision": "bash infrastructure/web/static-web-apps/scripts/provision.sh",
+    "deploy:typecheck": "tsc -p infrastructure/web/static-web-apps/tsconfig.json",
+    "deploy:test": "vitest run --root infrastructure/web/static-web-apps",
+    "mobile:start": "npm run start -w @myvedicstar/mobile",
+    "mobile:android": "npm run android -w @myvedicstar/mobile",
+    "mobile:ios": "npm run ios -w @myvedicstar/mobile",
+    "tokens:css": "npm run build:css -w @myvedicstar/design-tokens"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "24.19.0",
+    "eslint": "10.11.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-simple-import-sort": "14.0.0",
+    "globals": "17.12.0",
+    "prettier": "3.9.9",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vite": "8.3.1",
+    "vitest": "5.0.2"
+  },
+  "overrides": {
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
+  }
+}

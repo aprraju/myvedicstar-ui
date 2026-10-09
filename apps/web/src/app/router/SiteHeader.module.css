@@ -1,0 +1,373 @@
+.header {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 10;
+  border-block-end: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+/*
+ * Two lines on every window size: the main row, then a slim context line (location · tradition) that keeps the
+ * page's context visible without crowding the main row.
+ * compact (< 840):  [brand ········ actions]
+ *                   [context ··············]
+ *                   [nav (menu, when open)  ]
+ * ≥ 840:            [brand · nav · actions ]
+ *                   [context ··············]
+ */
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'brand actions'
+    'context context'
+    'nav nav';
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  inline-size: 100%;
+  max-inline-size: var(--content-max-width);
+  margin-inline: auto;
+  padding-block: var(--space-xs) var(--space-sm);
+  padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
+}
+
+.brand {
+  grid-area: brand;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+  min-block-size: var(--touch-target-minimum);
+  color: var(--color-text-primary);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.brandText {
+  display: grid;
+  min-inline-size: 0;
+  line-height: var(--line-height-tight);
+}
+
+.brandName,
+.tagline {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tagline under the name. */
+.tagline {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-secondary);
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  background: var(--color-auspicious-surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 25%, transparent);
+  color: var(--color-primary);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.nav {
+  grid-area: nav;
+  display: none;
+}
+
+.nav[data-open='true'] {
+  display: block;
+  padding-block: var(--space-sm);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.navList {
+  display: grid;
+  gap: var(--space-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Context line: location and tradition as light chips, separated from the main row by a hairline. */
+.context {
+  grid-area: context;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-lg);
+  min-inline-size: 0;
+  margin-inline-start: calc(-1 * var(--space-sm));
+  padding-block-start: var(--space-xxs);
+  border-block-start: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  font-size: var(--font-size-sm);
+}
+
+.context button,
+.context select {
+  min-block-size: 2.25rem;
+  border-color: transparent;
+  background-color: transparent;
+  font-size: var(--font-size-sm);
+}
+
+.context button:hover,
+.context select:hover {
+  border-color: transparent;
+  background-color: var(--color-surface-subtle);
+}
+
+.context select {
+  min-inline-size: 9.5rem;
+  padding-inline-start: var(--space-sm);
+}
+
+.actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.navLink,
+.cta,
+.outline {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--touch-target-minimum);
+  padding-inline: var(--space-md);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.navLink:hover {
+  background: var(--color-surface-subtle);
+}
+
+/* Theme active tab: warm fill with a bronze underline. */
+.active {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
+  background: var(--color-auspicious-surface);
+  box-shadow: inset 0 -3px 0 var(--color-primary);
+  color: var(--color-auspicious);
+}
+
+.cta {
+  border: 1px solid var(--color-primary);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 80%, black),
+    color-mix(in srgb, var(--color-primary) 94%, white)
+  );
+  color: var(--color-on-primary);
+  font-weight: var(--font-weight-bold);
+  box-shadow: var(--shadow-low);
+}
+
+.outline {
+  border: 1px solid color-mix(in srgb, var(--color-primary) 75%, var(--color-surface));
+  background: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.outline:hover {
+  background: var(--color-auspicious-surface);
+}
+
+/* Theme mark in the header's right corner; decorative. */
+.swastika {
+  padding-inline: var(--space-xs);
+  color: #e65100;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.menuButton {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--touch-target-minimum);
+  block-size: var(--touch-target-minimum);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.wideOnly {
+  display: none;
+}
+
+@media (min-width: 840px) {
+  .inner {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'brand nav actions'
+      'context context context';
+  }
+
+  .nav,
+  .nav[data-open='true'] {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .navList {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .compactOnly,
+  .menuButton {
+    display: none;
+  }
+
+  .wideOnly {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1200px) {
+  .navList {
+    flex-wrap: nowrap;
+  }
+}
+
+/*
+ * Phones (< 600px): one slim row — brand · swastika · menu — with Login inside the menu, and a light location /
+ * tradition row underneath. Touch targets stay at least 36px tall; only their chrome is lighter.
+ */
+.phoneOnly {
+  display: none;
+}
+
+@media (max-width: 599px) {
+  .phoneOnly {
+    display: list-item;
+  }
+
+  .notPhone {
+    display: none;
+  }
+
+  .inner {
+    column-gap: var(--space-sm);
+    row-gap: 0;
+    padding-block: var(--space-xs);
+  }
+
+  .brand {
+    gap: var(--space-sm);
+    font-size: var(--font-size-lg);
+  }
+
+  .brandMark {
+    inline-size: 2.125rem;
+    block-size: 2.125rem;
+    font-size: 1.375rem;
+  }
+
+  .tagline {
+    font-size: 0.6875rem;
+  }
+
+  .actions {
+    gap: 0;
+  }
+
+  .swastika {
+    padding-inline: var(--space-xs);
+    font-size: 1.375rem;
+  }
+
+  .menuButton {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  /* One context line on phones: the tradition's visible label is dropped (still announced) and the picker narrows. */
+  .context {
+    flex-wrap: nowrap;
+    gap: 0 var(--space-xs);
+  }
+
+  .context > * {
+    min-inline-size: 0;
+  }
+
+  .context label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .context select {
+    min-inline-size: 8rem;
+    max-inline-size: 11rem;
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .navLink,
+  .cta,
+  .outline {
+    padding-inline: var(--space-sm);
+  }
+
+  .inner {
+    column-gap: var(--space-sm);
+  }
+}
+
+/* Signed-in navigation: theme icons. Compact menu: icon beside label; wider windows: icon above label. */
+.nav[data-variant='app'] .navLink {
+  gap: var(--space-sm);
+}
+
+.nav[data-variant='app'] .navLink svg {
+  flex: none;
+}
+
+@media (min-width: 840px) {
+  .nav[data-variant='app'] .navList {
+    flex-wrap: nowrap;
+    gap: var(--space-xxs);
+  }
+
+  .nav[data-variant='app'] .navLink {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.125rem;
+    min-inline-size: 4.25rem;
+    min-block-size: 3.25rem;
+    padding-inline: var(--space-sm);
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-tight);
+    text-align: center;
+    white-space: normal;
+  }
+}

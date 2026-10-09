@@ -1,0 +1,10 @@
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "place": ["No matching city was found. Enter the place as \"City, State\" or \"City, State, Country\"."]
+  },
+  "traceId": "b45dcb2e50b7d8a1a6051fa8db3e6272",
+  "correlationId": "b45dcb2e50b7d8a1a6051fa8db3e6272"
+}

@@ -1,0 +1,196 @@
+/* Find a Good Time month view. Status colors come from the global [data-status-tone] map. */
+.month {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.hint {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.state {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateTitle {
+  font-weight: var(--font-weight-bold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  container-type: inline-size;
+}
+
+.weekday {
+  padding: var(--space-sm) var(--space-xxs);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.day,
+.pad {
+  min-block-size: 4.5rem;
+  border-block-start: 1px solid var(--color-border);
+  border-inline-end: 1px solid var(--color-border);
+}
+
+.weekday:nth-child(7n),
+.grid > :nth-child(7n) {
+  border-inline-end: 0;
+}
+
+.pad {
+  background: color-mix(in srgb, var(--color-surface-subtle) 50%, transparent);
+}
+
+/* Each day carries its status: a tinted background, the status icon and (when wide enough) its name. */
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+  padding: var(--space-xs);
+  border-block-end: 0;
+  border-inline-start: 0;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.day[data-status-tone] {
+  background: var(--tone-surface);
+}
+
+.day[data-status-tone] .dayTop {
+  color: var(--tone);
+}
+
+.day[data-past] {
+  opacity: 0.6;
+}
+
+.day:hover {
+  box-shadow: inset 0 0 0 2px var(--color-border-strong);
+}
+
+.day:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.dayTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  inline-size: 100%;
+}
+
+.dayNumber {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 50%;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.day[aria-current='date'] .dayNumber {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.dayDetail {
+  display: grid;
+  gap: 0;
+  min-inline-size: 0;
+  font-size: var(--font-size-xs);
+}
+
+.dayStatus {
+  color: var(--tone);
+  font-weight: var(--font-weight-bold);
+}
+
+.dayBest {
+  color: var(--color-text-primary);
+}
+
+.dayNone {
+  color: var(--color-text-secondary);
+}
+
+.dayStatus,
+.dayBest,
+.dayNone {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Narrow grids (phones): the icon and the accessible name carry the status; the text would be clipped. */
+@container (max-width: 34rem) {
+  .dayDetail {
+    display: none;
+  }
+}
+
+.dayLoading {
+  inline-size: 70%;
+  block-size: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-subtle);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  color: var(--tone);
+  font-weight: var(--font-weight-bold);
+}

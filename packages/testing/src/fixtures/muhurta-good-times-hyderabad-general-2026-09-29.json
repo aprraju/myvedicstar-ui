@@ -1,0 +1,970 @@
+{
+  "location": {
+    "latitude": 17.39,
+    "longitude": 78.49,
+    "timeZone": "Asia/Kolkata",
+    "source": "Coordinates",
+    "place": {
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "countryCode": "IN",
+      "displayName": "Hyderabad, Telangana, India"
+    }
+  },
+  "tradition": {
+    "key": "all",
+    "name": "All traditions"
+  },
+  "activity": {
+    "key": "general",
+    "name": "General",
+    "icon": "sun",
+    "requested": "general",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "date": "2026-09-29",
+  "dateDisplay": "29/09/2026",
+  "localToday": "2026-10-02",
+  "displayFormat": {
+    "datePattern": "dd/MM/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "IN",
+    "example": "29/09/2026 06:05:58 IST"
+  },
+  "generatedAt": "2026-10-02T05:59:20.6063193+00:00",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "calculationVersion": "1.0.0",
+  "dayStatus": {
+    "status": "Caution",
+    "name": "Use Caution",
+    "icon": "🟠"
+  },
+  "segments": [
+    {
+      "id": "s1",
+      "start": "2026-09-29T06:05:58+05:30",
+      "end": "2026-09-29T06:13:02+05:30",
+      "startDisplay": "29/09/2026 06:05:58 IST",
+      "endDisplay": "29/09/2026 06:13:02 IST",
+      "timeRangeDisplay": "06:05–06:13 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 74,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Ashwini"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_YOGA",
+          "label": "Less supportive Yoga",
+          "subject": "Vyaghata"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-09-29T05:15:36+05:30",
+          "end": "2026-09-29T06:46:44+05:30",
+          "startDisplay": "29/09/2026 05:15:36 IST",
+          "endDisplay": "29/09/2026 06:46:44 IST",
+          "overlapStart": "2026-09-29T06:05:58+05:30",
+          "overlapEnd": "2026-09-29T06:13:02+05:30",
+          "overlapStartDisplay": "29/09/2026 06:05:58 IST",
+          "overlapEndDisplay": "29/09/2026 06:13:02 IST"
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "start": "2026-09-29T06:13:02+05:30",
+      "end": "2026-09-29T06:13:58+05:30",
+      "startDisplay": "29/09/2026 06:13:02 IST",
+      "endDisplay": "29/09/2026 06:13:58 IST",
+      "timeRangeDisplay": "06:13–06:13 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 79,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Ashwini"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-09-29T05:15:36+05:30",
+          "end": "2026-09-29T06:46:44+05:30",
+          "startDisplay": "29/09/2026 05:15:36 IST",
+          "endDisplay": "29/09/2026 06:46:44 IST",
+          "overlapStart": "2026-09-29T06:13:02+05:30",
+          "overlapEnd": "2026-09-29T06:13:58+05:30",
+          "overlapStartDisplay": "29/09/2026 06:13:02 IST",
+          "overlapEndDisplay": "29/09/2026 06:13:58 IST"
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "start": "2026-09-29T06:13:58+05:30",
+      "end": "2026-09-29T06:46:44+05:30",
+      "startDisplay": "29/09/2026 06:13:58 IST",
+      "endDisplay": "29/09/2026 06:46:44 IST",
+      "timeRangeDisplay": "06:13–06:46 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 81,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Ashwini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-09-29T05:15:36+05:30",
+          "end": "2026-09-29T06:46:44+05:30",
+          "startDisplay": "29/09/2026 05:15:36 IST",
+          "endDisplay": "29/09/2026 06:46:44 IST",
+          "overlapStart": "2026-09-29T06:13:58+05:30",
+          "overlapEnd": "2026-09-29T06:46:44+05:30",
+          "overlapStartDisplay": "29/09/2026 06:13:58 IST",
+          "overlapEndDisplay": "29/09/2026 06:46:44 IST"
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "start": "2026-09-29T06:46:44+05:30",
+      "end": "2026-09-29T08:30:06+05:30",
+      "startDisplay": "29/09/2026 06:46:44 IST",
+      "endDisplay": "29/09/2026 08:30:06 IST",
+      "timeRangeDisplay": "06:46–08:30 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 81,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Ashwini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s5",
+      "start": "2026-09-29T08:30:06+05:30",
+      "end": "2026-09-29T09:03:28+05:30",
+      "startDisplay": "29/09/2026 08:30:06 IST",
+      "endDisplay": "29/09/2026 09:03:28 IST",
+      "timeRangeDisplay": "08:30–09:03 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 81,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "positive",
+          "code": "FAVORABLE_NAKSHATRA",
+          "label": "Favorable Nakshatra",
+          "subject": "Ashwini"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Dur Muhurtam",
+          "withFavorable": false,
+          "start": "2026-09-29T08:30:06+05:30",
+          "end": "2026-09-29T09:18:09+05:30",
+          "startDisplay": "29/09/2026 08:30:06 IST",
+          "endDisplay": "29/09/2026 09:18:09 IST",
+          "overlapStart": "2026-09-29T08:30:06+05:30",
+          "overlapEnd": "2026-09-29T09:03:28+05:30",
+          "overlapStartDisplay": "29/09/2026 08:30:06 IST",
+          "overlapEndDisplay": "29/09/2026 09:03:28 IST"
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "start": "2026-09-29T09:03:28+05:30",
+      "end": "2026-09-29T09:06:08+05:30",
+      "startDisplay": "29/09/2026 09:03:28 IST",
+      "endDisplay": "29/09/2026 09:06:08 IST",
+      "timeRangeDisplay": "09:03–09:06 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Dur Muhurtam",
+          "withFavorable": false,
+          "start": "2026-09-29T08:30:06+05:30",
+          "end": "2026-09-29T09:18:09+05:30",
+          "startDisplay": "29/09/2026 08:30:06 IST",
+          "endDisplay": "29/09/2026 09:18:09 IST",
+          "overlapStart": "2026-09-29T09:03:28+05:30",
+          "overlapEnd": "2026-09-29T09:06:08+05:30",
+          "overlapStartDisplay": "29/09/2026 09:03:28 IST",
+          "overlapEndDisplay": "29/09/2026 09:06:08 IST"
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "start": "2026-09-29T09:06:08+05:30",
+      "end": "2026-09-29T09:18:09+05:30",
+      "startDisplay": "29/09/2026 09:06:08 IST",
+      "endDisplay": "29/09/2026 09:18:09 IST",
+      "timeRangeDisplay": "09:06–09:18 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "DUR_MUHURTAM",
+          "kind": "DurMuhurtam",
+          "severity": "Avoid",
+          "label": "Overlaps Dur Muhurtam",
+          "withFavorable": false,
+          "start": "2026-09-29T08:30:06+05:30",
+          "end": "2026-09-29T09:18:09+05:30",
+          "startDisplay": "29/09/2026 08:30:06 IST",
+          "endDisplay": "29/09/2026 09:18:09 IST",
+          "overlapStart": "2026-09-29T09:06:08+05:30",
+          "overlapEnd": "2026-09-29T09:18:09+05:30",
+          "overlapStartDisplay": "29/09/2026 09:06:08 IST",
+          "overlapEndDisplay": "29/09/2026 09:18:09 IST"
+        },
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-09-29T09:06:08+05:30",
+          "end": "2026-09-29T10:36:13+05:30",
+          "startDisplay": "29/09/2026 09:06:08 IST",
+          "endDisplay": "29/09/2026 10:36:13 IST",
+          "overlapStart": "2026-09-29T09:06:08+05:30",
+          "overlapEnd": "2026-09-29T09:18:09+05:30",
+          "overlapStartDisplay": "29/09/2026 09:06:08 IST",
+          "overlapEndDisplay": "29/09/2026 09:18:09 IST"
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "start": "2026-09-29T09:18:09+05:30",
+      "end": "2026-09-29T10:36:13+05:30",
+      "startDisplay": "29/09/2026 09:18:09 IST",
+      "endDisplay": "29/09/2026 10:36:13 IST",
+      "timeRangeDisplay": "09:18–10:36 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "YAMAGANDAM",
+          "kind": "Yamagandam",
+          "severity": "Avoid",
+          "label": "Overlaps Yamagandam",
+          "withFavorable": false,
+          "start": "2026-09-29T09:06:08+05:30",
+          "end": "2026-09-29T10:36:13+05:30",
+          "startDisplay": "29/09/2026 09:06:08 IST",
+          "endDisplay": "29/09/2026 10:36:13 IST",
+          "overlapStart": "2026-09-29T09:18:09+05:30",
+          "overlapEnd": "2026-09-29T10:36:13+05:30",
+          "overlapStartDisplay": "29/09/2026 09:18:09 IST",
+          "overlapEndDisplay": "29/09/2026 10:36:13 IST"
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "start": "2026-09-29T10:36:13+05:30",
+      "end": "2026-09-29T11:42:17+05:30",
+      "startDisplay": "29/09/2026 10:36:13 IST",
+      "endDisplay": "29/09/2026 11:42:17 IST",
+      "timeRangeDisplay": "10:36–11:42 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s10",
+      "start": "2026-09-29T11:42:17+05:30",
+      "end": "2026-09-29T12:06:19+05:30",
+      "startDisplay": "29/09/2026 11:42:17 IST",
+      "endDisplay": "29/09/2026 12:06:19 IST",
+      "timeRangeDisplay": "11:42–12:06 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 72,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s11",
+      "start": "2026-09-29T12:06:19+05:30",
+      "end": "2026-09-29T12:30:20+05:30",
+      "startDisplay": "29/09/2026 12:06:19 IST",
+      "endDisplay": "29/09/2026 12:30:20 IST",
+      "timeRangeDisplay": "12:06–12:30 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 72,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        },
+        {
+          "type": "positive",
+          "code": "ABHIJIT_MUHURTA",
+          "label": "Abhijit Muhurta",
+          "subject": "AbhijitMuhurta"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Mixed",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": true,
+          "start": "2026-09-29T12:06:19+05:30",
+          "end": "2026-09-29T13:36:24+05:30",
+          "startDisplay": "29/09/2026 12:06:19 IST",
+          "endDisplay": "29/09/2026 13:36:24 IST",
+          "overlapStart": "2026-09-29T12:06:19+05:30",
+          "overlapEnd": "2026-09-29T12:30:20+05:30",
+          "overlapStartDisplay": "29/09/2026 12:06:19 IST",
+          "overlapEndDisplay": "29/09/2026 12:30:20 IST"
+        }
+      ]
+    },
+    {
+      "id": "s12",
+      "start": "2026-09-29T12:30:20+05:30",
+      "end": "2026-09-29T13:36:24+05:30",
+      "startDisplay": "29/09/2026 12:30:20 IST",
+      "endDisplay": "29/09/2026 13:36:24 IST",
+      "timeRangeDisplay": "12:30–13:36 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "GULIKA_KALAM",
+          "kind": "GulikaKalam",
+          "severity": "Caution",
+          "label": "Overlaps Gulika Kalam",
+          "withFavorable": false,
+          "start": "2026-09-29T12:06:19+05:30",
+          "end": "2026-09-29T13:36:24+05:30",
+          "startDisplay": "29/09/2026 12:06:19 IST",
+          "endDisplay": "29/09/2026 13:36:24 IST",
+          "overlapStart": "2026-09-29T12:30:20+05:30",
+          "overlapEnd": "2026-09-29T13:36:24+05:30",
+          "overlapStartDisplay": "29/09/2026 12:30:20 IST",
+          "overlapEndDisplay": "29/09/2026 13:36:24 IST"
+        }
+      ]
+    },
+    {
+      "id": "s13",
+      "start": "2026-09-29T13:36:24+05:30",
+      "end": "2026-09-29T15:06:29+05:30",
+      "startDisplay": "29/09/2026 13:36:24 IST",
+      "endDisplay": "29/09/2026 15:06:29 IST",
+      "timeRangeDisplay": "13:36–15:06 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s14",
+      "start": "2026-09-29T15:06:29+05:30",
+      "end": "2026-09-29T16:36:35+05:30",
+      "startDisplay": "29/09/2026 15:06:29 IST",
+      "endDisplay": "29/09/2026 16:36:35 IST",
+      "timeRangeDisplay": "15:06–16:36 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "RAHU_KALAM",
+          "kind": "RahuKalam",
+          "severity": "Avoid",
+          "label": "Overlaps Rahu Kalam",
+          "withFavorable": false,
+          "start": "2026-09-29T15:06:29+05:30",
+          "end": "2026-09-29T16:36:35+05:30",
+          "startDisplay": "29/09/2026 15:06:29 IST",
+          "endDisplay": "29/09/2026 16:36:35 IST",
+          "overlapStart": "2026-09-29T15:06:29+05:30",
+          "overlapEnd": "2026-09-29T16:36:35+05:30",
+          "overlapStartDisplay": "29/09/2026 15:06:29 IST",
+          "overlapEndDisplay": "29/09/2026 16:36:35 IST"
+        }
+      ]
+    },
+    {
+      "id": "s15",
+      "start": "2026-09-29T16:36:35+05:30",
+      "end": "2026-09-29T17:10:28+05:30",
+      "startDisplay": "29/09/2026 16:36:35 IST",
+      "endDisplay": "29/09/2026 17:10:28 IST",
+      "timeRangeDisplay": "16:36–17:10 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 57,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "positive",
+          "code": "FAVORABLE_TITHI",
+          "label": "Favorable Tithi",
+          "subject": "KrishnaTritiya"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        },
+        {
+          "type": "negative",
+          "code": "EXCLUDED_KARANA",
+          "label": "Karana traditionally avoided for this activity",
+          "subject": "Vishti"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s16",
+      "start": "2026-09-29T17:10:28+05:30",
+      "end": "2026-09-29T18:04:47+05:30",
+      "startDisplay": "29/09/2026 17:10:28 IST",
+      "endDisplay": "29/09/2026 18:04:47 IST",
+      "timeRangeDisplay": "17:10–18:04 IST",
+      "status": {
+        "status": "Caution",
+        "name": "Use Caution",
+        "icon": "🟠"
+      },
+      "score": 40,
+      "isGoodTime": false,
+      "headline": "Use Caution for General",
+      "reasons": [
+        {
+          "type": "negative",
+          "code": "ADVERSE_TITHI",
+          "label": "Less supportive Tithi",
+          "subject": "KrishnaChaturthi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        }
+      ],
+      "conflicts": []
+    },
+    {
+      "id": "s17",
+      "start": "2026-09-29T18:04:47+05:30",
+      "end": "2026-09-29T18:06:40+05:30",
+      "startDisplay": "29/09/2026 18:04:47 IST",
+      "endDisplay": "29/09/2026 18:06:40 IST",
+      "timeRangeDisplay": "18:04–18:06 IST",
+      "status": {
+        "status": "Avoid",
+        "name": "Avoid",
+        "icon": "🔴"
+      },
+      "score": 40,
+      "isGoodTime": false,
+      "headline": "Avoid for General",
+      "reasons": [
+        {
+          "type": "negative",
+          "code": "ADVERSE_TITHI",
+          "label": "Less supportive Tithi",
+          "subject": "KrishnaChaturthi"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_VARA",
+          "label": "Less supportive Vara",
+          "subject": "Tuesday"
+        },
+        {
+          "type": "negative",
+          "code": "ADVERSE_NAKSHATRA",
+          "label": "Less supportive Nakshatra",
+          "subject": "Bharani"
+        }
+      ],
+      "conflicts": [
+        {
+          "code": "VARJYAM",
+          "kind": "Varjyam",
+          "severity": "Avoid",
+          "label": "Overlaps Varjyam",
+          "withFavorable": false,
+          "start": "2026-09-29T18:04:47+05:30",
+          "end": "2026-09-29T19:35:00+05:30",
+          "startDisplay": "29/09/2026 18:04:47 IST",
+          "endDisplay": "29/09/2026 19:35:00 IST",
+          "overlapStart": "2026-09-29T18:04:47+05:30",
+          "overlapEnd": "2026-09-29T18:06:40+05:30",
+          "overlapStartDisplay": "29/09/2026 18:04:47 IST",
+          "overlapEndDisplay": "29/09/2026 18:06:40 IST"
+        }
+      ]
+    }
+  ],
+  "goodTimes": [],
+  "noGoodTimeReason": "NO_QUALIFYING_PERIOD",
+  "noGoodTimeMessage": "No strongly favorable time was found for this activity today. Please choose another date.",
+  "nowSegmentId": null,
+  "nextGoodTimeId": null,
+  "notices": [],
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

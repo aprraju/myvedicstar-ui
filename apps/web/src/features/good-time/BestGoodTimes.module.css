@@ -1,0 +1,106 @@
+/* "Next best times" tile. Status colors come from the global [data-status-tone] map. */
+.tile {
+  display: grid;
+  gap: var(--space-md);
+  align-content: start;
+  min-inline-size: 0;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, var(--radius-md));
+  background: var(--color-surface);
+  box-shadow: var(--shadow-low);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.hint {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-inline-start: 6px solid var(--tone);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.rank {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: var(--tone-surface);
+  color: var(--tone);
+  font-weight: var(--font-weight-bold);
+}
+
+.optionBody {
+  display: grid;
+  gap: var(--space-xxs);
+  justify-items: start;
+  min-inline-size: 0;
+}
+
+.optionDate {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.optionTime {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.optionStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  color: var(--tone);
+  font-weight: var(--font-weight-bold);
+}
+
+.reasons {
+  display: grid;
+  gap: var(--space-xxs);
+  margin: 0 0 var(--space-xs);
+  padding: 0;
+  list-style: none;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.empty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  color: var(--color-text-primary);
+}
+
+.state {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.stateTitle {
+  font-weight: var(--font-weight-bold);
+}

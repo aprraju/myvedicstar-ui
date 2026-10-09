@@ -1,0 +1,22 @@
+{
+  "name": "@myvedicstar/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Typed HTTP client for the MyVedicDay backend: transport, error normalization, retry policy, endpoints.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "@myvedicstar/contracts": "0.1.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@myvedicstar/testing": "0.1.0"
+  }
+}

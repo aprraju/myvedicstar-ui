@@ -1,0 +1,24 @@
+{
+  "name": "@myvedicstar/domain-models",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UI view models derived from backend Panchang data (no astronomy): day summary, current periods, locations.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@myvedicstar/contracts": "0.1.0",
+    "@myvedicstar/date-time": "0.1.0",
+    "@myvedicstar/validation": "0.1.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@myvedicstar/testing": "0.1.0"
+  }
+}

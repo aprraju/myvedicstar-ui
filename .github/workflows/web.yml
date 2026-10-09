@@ -1,0 +1,103 @@
+name: Web
+
+# Web SPA pipeline. Independent of the mobile pipeline: web changes never trigger mobile builds.
+on:
+  pull_request:
+    paths:
+      [
+        'apps/web/**',
+        'packages/**',
+        'package.json',
+        'package-lock.json',
+        'tsconfig.base.json',
+        'eslint.config.js',
+        '.github/workflows/web.yml',
+        '.github/workflows/web-deploy.yml',
+        'infrastructure/web/**',
+      ]
+  push:
+    branches: [main]
+    paths:
+      [
+        'apps/web/**',
+        'packages/**',
+        'package.json',
+        'package-lock.json',
+        'tsconfig.base.json',
+        'eslint.config.js',
+        '.github/workflows/web.yml',
+        '.github/workflows/web-deploy.yml',
+        'infrastructure/web/**',
+      ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Format
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Type check (shared packages + web + deployment scripts)
+        run: |
+          npm run typecheck --workspace=packages
+          npm run typecheck -w @myvedicstar/web
+          npm run deploy:typecheck
+      - name: Unit and component tests
+        run: |
+          npm run test --workspace=packages
+          npm run test -w @myvedicstar/web
+          npm run deploy:test
+      - name: Build
+        run: npm run web:build
+        env:
+          BUILD_ID: ${{ github.sha }}
+      # CSP compatibility (no inline scripts or eval), no secrets or environment-specific values, size budgets.
+      - name: Validate production build
+        run: npm run web:validate-build
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - name: E2E (production build, production CSP)
+        run: npm run e2e -w @myvedicstar/web
+      - name: Dependency audit (runtime dependencies)
+        run: npm audit --omit=dev --audit-level=high
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+          retention-days: 7
+      - uses: actions/upload-artifact@v5
+        with:
+          name: web-dist
+          path: apps/web/dist
+          # Rollback window: any build from the last 90 days can be redeployed (Web deploy workflow).
+          retention-days: 90
+
+  # Deploys the artifact verified above (built once) to production, for pushes to main only — never for pull requests.
+  # Uses the GitHub environment "production" (add required reviewers there to gate releases). To add environments
+  # later, add a settings file per environment and chain more jobs like this one.
+  deploy-production:
+    needs: verify
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions: { contents: read, id-token: write, actions: read }
+    uses: ./.github/workflows/web-deploy.yml
+    with:
+      environment: production
+    secrets: inherit

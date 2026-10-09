@@ -1,0 +1,13 @@
+{
+  "latitude": 30.27,
+  "longitude": -97.74,
+  "timeZone": "America/Chicago",
+  "source": "Place",
+  "place": {
+    "city": "Austin",
+    "state": "Texas",
+    "country": "United States",
+    "countryCode": "US",
+    "displayName": "Austin, Texas, United States"
+  }
+}

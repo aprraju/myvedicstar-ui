@@ -1,0 +1,41 @@
+.article {
+  display: grid;
+  gap: var(--space-lg);
+  max-inline-size: var(--readable-max-width);
+  padding-block: var(--space-lg) var(--space-xxxl);
+  color: var(--color-text-primary);
+}
+
+.topic {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.question {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+/* Markdown content pages (src/content/pages/*.md). */
+.document {
+  gap: var(--space-md);
+  line-height: var(--line-height-relaxed);
+}
+
+.h2 {
+  margin-block-start: var(--space-lg);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+}
+
+.h3 {
+  margin-block-start: var(--space-sm);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-xxs);
+  padding-inline-start: var(--space-xl);
+}

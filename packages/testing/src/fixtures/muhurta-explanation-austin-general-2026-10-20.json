@@ -1,0 +1,46 @@
+{
+  "activity": {
+    "key": "general",
+    "name": "General",
+    "icon": "sun",
+    "requested": "general",
+    "requestedText": null,
+    "completeness": "full"
+  },
+  "date": "2026-10-20",
+  "language": "en",
+  "rulesVersion": "2026.2-provisional",
+  "source": "template",
+  "summary": "The best time for General is 07:36–09:52 CDT (Favorable). Why: Favorable Tithi, Favorable Nakshatra. 2 other good times are listed below. 12:52–13:15 CDT is Use Caution: Abhijit Muhurta overlaps Varjyam.",
+  "notes": [
+    {
+      "segmentId": "s1",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ No Rahu Kalam conflict · ✓ No Yamagandam conflict · ✓ No Gulika Kalam conflict · ✓ No Durmuhurtham conflict · ✓ No Varjyam conflict"
+    },
+    {
+      "segmentId": "s7",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ Abhijit Muhurta · ⚠ Overlaps Varjyam"
+    },
+    {
+      "segmentId": "s8",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ Abhijit Muhurta · ⚠ Overlaps Varjyam · ⚠ Overlaps Gulika Kalam"
+    },
+    {
+      "segmentId": "s9",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ Abhijit Muhurta · ⚠ Overlaps Gulika Kalam"
+    },
+    {
+      "segmentId": "s12",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ No Rahu Kalam conflict · ✓ No Yamagandam conflict · ✓ No Gulika Kalam conflict · ✓ No Durmuhurtham conflict · ✓ No Varjyam conflict"
+    },
+    {
+      "segmentId": "s14",
+      "text": "✓ Favorable Tithi · ✓ Favorable Nakshatra · ✓ No Rahu Kalam conflict · ✓ No Yamagandam conflict · ✓ No Gulika Kalam conflict · ✓ No Durmuhurtham conflict · ✓ No Varjyam conflict"
+    }
+  ],
+  "provider": null,
+  "model": null,
+  "promptVersion": "2026.1",
+  "fallbackReason": null,
+  "disclaimer": "This provides guidance based on today's Panchang. For important life events, please consult a qualified astrologer for a personalized Muhurta."
+}

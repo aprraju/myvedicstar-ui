@@ -1,0 +1,181 @@
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it } from 'vitest';
+
+import { axeViolations } from '../../test/axe';
+import { austin, hyderabad, storeSelectedLocation } from '../../test/location-fixtures';
+import { apiRequests, scenarios } from '../../test/msw/handlers';
+import { server } from '../../test/msw/server';
+import { fakeGeolocation, renderRoute } from '../../test/render';
+
+const openDialog = async () => {
+  const banner = await screen.findByRole('banner');
+  await userEvent.click(await within(banner).findByRole('button', { name: /location/i }));
+  return screen.findByRole('dialog', { name: 'Choose your location' });
+};
+
+const searchFor = async (dialog: HTMLElement, text: string) => {
+  const input = within(dialog).getByRole('searchbox', { name: 'City, ZIP code or coordinates' });
+  await userEvent.clear(input);
+  await userEvent.type(input, text);
+  await userEvent.click(within(dialog).getByRole('button', { name: 'Search' }));
+};
+
+describe('location selection', () => {
+  it('finds a city, confirms it and updates the Panchang', async () => {
+    renderRoute('/');
+    const dialog = await openDialog();
+    expect(await axeViolations(dialog)).toEqual([]);
+
+    await searchFor(dialog, 'Austin, TX');
+    expect(await within(dialog).findByText('Austin, Texas, United States')).toBeInTheDocument();
+    expect(within(dialog).getByText('Time zone: America/Chicago')).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Use this location' }));
+
+    expect(await screen.findByRole('button', { name: 'Change location: Austin, Texas' })).toBeInTheDocument();
+    expect(await screen.findByText('All times shown in local time — Austin, Texas')).toBeInTheDocument();
+    expect(apiRequests.some((u) => u.searchParams.get('place') === 'Austin, TX')).toBe(true);
+  });
+
+  it('explains that ZIP codes are not searchable yet', async () => {
+    renderRoute('/');
+    const dialog = await openDialog();
+    await searchFor(dialog, '78701');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'ZIP or postal code isn’t available yet',
+    );
+    expect(apiRequests.filter((u) => u.pathname.endsWith('/resolve'))).toHaveLength(0);
+  });
+
+  it('reports places the backend cannot find', async () => {
+    renderRoute('/');
+    const dialog = await openDialog();
+    await searchFor(dialog, 'Nowhereville, ZZ');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('We couldn’t find that place');
+  });
+
+  it('validates coordinates typed into the search box', async () => {
+    renderRoute('/');
+    const dialog = await openDialog();
+    await searchFor(dialog, '95, 10');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Latitude must be between -90 and 90.',
+    );
+  });
+
+  it('accepts latitude and longitude in the coordinates form', async () => {
+    renderRoute('/');
+    const dialog = await openDialog();
+    await userEvent.click(within(dialog).getByText('Enter latitude and longitude'));
+    await userEvent.type(within(dialog).getByRole('textbox', { name: 'Latitude' }), '200');
+    await userEvent.type(within(dialog).getByRole('textbox', { name: 'Longitude' }), 'abc');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Use these coordinates' }));
+    expect(await within(dialog).findByText('Latitude must be between -90 and 90.')).toBeInTheDocument();
+    expect(within(dialog).getByText('Longitude must be a number.')).toBeInTheDocument();
+
+    await userEvent.clear(within(dialog).getByRole('textbox', { name: 'Latitude' }));
+    await userEvent.type(within(dialog).getByRole('textbox', { name: 'Latitude' }), '17.385');
+    await userEvent.clear(within(dialog).getByRole('textbox', { name: 'Longitude' }));
+    await userEvent.type(within(dialog).getByRole('textbox', { name: 'Longitude' }), '78.4867');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Use these coordinates' }));
+    expect(
+      await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
+    ).toBeInTheDocument();
+  });
+
+  it('uses the current location when the user asks', async () => {
+    const geolocation = fakeGeolocation({
+      permission: 'prompt',
+      position: { latitude: 17.385, longitude: 78.4867 },
+    });
+    window.localStorage.setItem('mvs.location.permissionDenied', 'true'); // no automatic request in this test
+    renderRoute('/', { geolocation });
+    const dialog = await openDialog();
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Use my current location' }));
+    expect(
+      await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
+    ).toBeInTheDocument();
+    expect(geolocation.requests).toBe(1);
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('explains a denied permission and remembers it', async () => {
+    renderRoute('/', { geolocation: fakeGeolocation({ permission: 'prompt', error: 'permissionDenied' }) });
+    expect(await screen.findByText(/Location access is turned off/)).toBeInTheDocument();
+    expect(window.localStorage.getItem('mvs.location.permissionDenied')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Use my current location' })).toBeInTheDocument();
+  });
+
+  it('never asks again automatically after a denial', async () => {
+    window.localStorage.setItem('mvs.location.permissionDenied', 'true');
+    const geolocation = fakeGeolocation({
+      permission: 'prompt',
+      position: { latitude: 30.27, longitude: -97.74 },
+    });
+    renderRoute('/', { geolocation });
+    expect(await screen.findByText('Choose a location to see today’s Panchang')).toBeInTheDocument();
+    expect(geolocation.requests).toBe(0);
+  });
+
+  it('detects the location on first visit when permission allows', async () => {
+    const geolocation = fakeGeolocation({
+      permission: 'granted',
+      position: { latitude: 30.2672, longitude: -97.7431 },
+    });
+    renderRoute('/', { geolocation });
+    expect(await screen.findByText('All times shown in local time — Austin, Texas')).toBeInTheDocument();
+    expect(geolocation.requests).toBe(1);
+  });
+
+  it('keeps a returning visitor’s location without asking', async () => {
+    storeSelectedLocation(hyderabad);
+    const geolocation = fakeGeolocation({
+      permission: 'granted',
+      position: { latitude: 30.27, longitude: -97.74 },
+    });
+    renderRoute('/', { geolocation });
+    expect(
+      await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
+    ).toBeInTheDocument();
+    expect(geolocation.requests).toBe(0);
+  });
+
+  it('lists recent locations and lets the user remove one', async () => {
+    window.localStorage.setItem('mvs.location.recent', JSON.stringify([austin, hyderabad]));
+    storeSelectedLocation(austin);
+    renderRoute('/');
+    const dialog = await openDialog();
+    const recent = within(dialog).getByRole('region', { name: 'Recent locations' });
+    await userEvent.click(within(recent).getByRole('button', { name: /Hyderabad, Telangana, India/ }));
+    expect(
+      await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
+    ).toBeInTheDocument();
+
+    const reopened = await openDialog();
+    await userEvent.click(
+      within(reopened).getByRole('button', { name: 'Remove Austin, Texas from recent locations' }),
+    );
+    await waitFor(() =>
+      expect(JSON.parse(window.localStorage.getItem('mvs.location.recent')!)).toHaveLength(1),
+    );
+  });
+
+  it('ignores tampered stored locations', async () => {
+    window.localStorage.setItem(
+      'mvs.location.selected',
+      JSON.stringify({ label: '<img onerror=x>', latitude: 999 }),
+    );
+    renderRoute('/');
+    expect(await screen.findByText('Choose a location to see today’s Panchang')).toBeInTheDocument();
+  });
+
+  it('shows a friendly error when resolving the current position fails', async () => {
+    server.use(scenarios.serverError('/locations/resolve'));
+    renderRoute('/', {
+      geolocation: fakeGeolocation({ permission: 'granted', position: { latitude: 1, longitude: 1 } }),
+    });
+    expect(
+      await screen.findByText("We couldn't load this right now. Please try again in a moment."),
+    ).toBeInTheDocument();
+  });
+});

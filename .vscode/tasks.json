@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "web: dev server",
+      "type": "shell",
+      "command": "npm run web:dev",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": { "regexp": "^x^" },
+        "background": {
+          "activesBegin": ".",
+          "beginsPattern": "VITE v",
+          "endsPattern": "Local:"
+        }
+      }
+    },
+    {
+      "label": "api: MyVedicDay (sibling repo, http://localhost:5275)",
+      "type": "shell",
+      "command": "dotnet run --project ../MyVedicDay/src/MyVedicDay.Api --launch-profile http",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "dotnet",
+        "pattern": { "regexp": "^x^" },
+        "background": {
+          "activesBegin": ".",
+          "beginsPattern": "Building|info:",
+          "endsPattern": "Now listening on|Application started"
+        }
+      }
+    },
+    {
+      "label": "web + api",
+      "dependsOn": ["api: MyVedicDay (sibling repo, http://localhost:5275)", "web: dev server"]
+    },
+    {
+      "label": "mobile: expo start",
+      "type": "shell",
+      "command": "npm run mobile:start",
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": { "Latitude": ["The field Latitude must be between -90 and 90."] },
+  "traceId": "120618f6c617ae0ad9e169830419da81",
+  "correlationId": "120618f6c617ae0ad9e169830419da81"
+}

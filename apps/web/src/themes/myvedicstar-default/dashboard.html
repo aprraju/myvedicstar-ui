@@ -1,0 +1,238 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MyPanchang Dashboard</title>
+    <link rel="stylesheet" href="css/theme.css" />
+  </head>
+  <body>
+    <header class="topbar shell">
+      <a class="brand" href="home.html"
+        ><span class="om">ॐ</span
+        ><span
+          ><strong>MyPanchang</strong>
+          <div class="tagline">Timeless Wisdom for Every Day</div></span
+        ></a
+      >
+      <nav class="nav">
+        <a href="home.html">⌂<span>Home</span></a
+        ><a class="active" href="dashboard.html">☼<span>Today</span></a
+        ><a href="calendar.html">▣<span>Calendar</span></a
+        ><a href="good-time.html">◴<span>Find Good Time</span></a
+        ><a href="#">♧<span>Festivals</span></a
+        ><a href="#">☰<span>More</span></a>
+      </nav>
+      <div class="actions">
+        <button class="select-pill" data-location>⌖ <span>Austin, TX, USA</span>⌄</button
+        ><button class="select-pill tradition">✿ Telugu Panchang⌄</button
+        ><span style="font-size: 27px; color: #ef6c00">卐</span
+        ><img class="icon" src="assets/icons/user.svg" alt="" />
+      </div>
+    </header>
+    <main class="page shell">
+      <section class="dashboard-hero">
+        <h1>Monday, 29 September 2025</h1>
+        <p>Shukla Paksha • Margashirsha Masa</p>
+      </section>
+      <div class="dashboard-grid">
+        <section class="panel panel-pad">
+          <div class="status-card">
+            <span class="status-icon"><img class="icon" src="assets/icons/leaf.svg" alt="" /></span>
+            <div>
+              <h2>Favorable Day</h2>
+              <p>Today is generally good for routine and important activities.</p>
+            </div>
+          </div>
+          <div class="mini-grid">
+            <div class="mini">
+              <span class="circle good"><img class="icon" src="assets/icons/clock.svg" alt="" /></span>
+              <div>
+                <small>Good Time Now</small><strong>10:22 AM</strong
+                ><small>No major caution period active.</small>
+              </div>
+            </div>
+            <div class="mini">
+              <span class="circle bad"><img class="icon" src="assets/icons/hourglass.svg" alt="" /></span>
+              <div>
+                <small>Next Caution Period</small><strong>Rahu Kalam at 3:10 PM</strong
+                ><small>Avoid new important activities.</small>
+              </div>
+            </div>
+          </div>
+          <button class="cta-wide">☀ &nbsp; Find a Good Time &nbsp; →</button>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Today’s Panchang</h2>
+            <a href="full-panchang.html">View Full Panchang →</a>
+          </div>
+          <div class="rows">
+            <div class="row">
+              <span class="circle orange" style="width: 26px; height: 26px">☾</span><span>Tithi</span
+              ><span class="value">Panchami</span><span class="until">until 2:42 PM → Shashti</span>
+            </div>
+            <div class="row">
+              <span class="circle blue" style="width: 26px; height: 26px">✹</span><span>Nakshatra</span
+              ><span class="value">Rohini</span><span class="until">until 11:18 AM → Mrigashira</span>
+            </div>
+            <div class="row">
+              <span class="circle orange" style="width: 26px; height: 26px">☀</span><span>Yoga</span
+              ><span class="value">Siddha</span><span class="until">until 4:32 PM</span>
+            </div>
+            <div class="row">
+              <span class="circle teal" style="width: 26px; height: 26px">♙</span><span>Karana</span
+              ><span class="value">Bava</span><span class="until">until 2:42 PM → Balava</span>
+            </div>
+            <div class="row">
+              <span class="circle good" style="width: 26px; height: 26px">⚑</span><span>Vara</span
+              ><span class="value">Monday (Soma)</span><span class="until"></span>
+            </div>
+            <div class="row">
+              <span class="circle purple" style="width: 26px; height: 26px">☾</span><span>Paksha</span
+              ><span class="value">Shukla Paksha</span><span class="until"></span>
+            </div>
+          </div>
+        </section>
+      </div>
+      <section class="panel timeline-panel">
+        <h2>Today’s Timeline</h2>
+        <p>Your day at a glance (All times in Local Time – Austin, TX)</p>
+        <div class="timeline">
+          <span class="now"></span>
+          <div class="period p1"><strong>Amrit Kalam</strong>9:24 – 10:51 AM</div>
+          <div class="period p2"><strong>Abhijit Muhurta</strong>12:07 – 12:54 PM</div>
+          <div class="period p3"><strong>Durmuhurtham</strong>12:31 – 1:19 PM</div>
+          <div class="period p4"><strong>Rahu Kalam</strong>3:10 – 4:39 PM</div>
+          <div class="period p5"><strong>Varjyam</strong>7:42 – 9:18 PM</div>
+        </div>
+      </section>
+      <div class="quick">
+        <div class="panel">
+          ▥
+          <div><strong>How is Today?</strong><small>Overall day analysis</small></div>
+        </div>
+        <a class="panel" href="good-time.html"
+          >▣
+          <div><strong>Find a Good Time</strong><small>For your activity</small></div></a
+        ><a class="panel" href="calendar.html"
+          >▣
+          <div><strong>View Calendar</strong><small>Monthly view</small></div></a
+        >
+        <div class="panel">
+          ✿
+          <div><strong>Upcoming Festivals</strong><small>Ekadashi, Purnima, etc.</small></div>
+        </div>
+        <div class="panel">
+          ♟
+          <div><strong>Set Notifications</strong><small>Rahu Kalam, Festivals, etc.</small></div>
+        </div>
+      </div>
+      <div class="three">
+        <section class="panel">
+          <div class="section-title green-head">
+            <span class="circle good">♨</span>
+            <div>
+              <h3>Auspicious Times</h3>
+              <small>Good for important activities</small>
+            </div>
+          </div>
+          <div class="list-item">
+            <span class="circle good">♨</span>
+            <div><strong>Brahma Muhurta</strong><span>4:48 AM – 5:36 AM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle good">♨</span>
+            <div><strong>Abhijit Muhurta</strong><span>12:07 PM – 12:54 PM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle good">♨</span>
+            <div><strong>Amrit Kalam</strong><span>9:24 AM – 10:51 AM</span></div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="section-title red-head">
+            <span class="circle bad">✿</span>
+            <div>
+              <h3>Times to Avoid</h3>
+              <small>Traditionally avoided for new beginnings</small>
+            </div>
+          </div>
+          <div class="list-item">
+            <span class="circle bad">♨</span>
+            <div><strong>Rahu Kalam</strong><span>3:10 PM – 4:39 PM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle bad">♨</span>
+            <div><strong>Yamagandam</strong><span>9:16 AM – 10:45 AM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle bad">♨</span>
+            <div><strong>Gulika Kalam</strong><span>1:42 PM – 3:10 PM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle bad">♨</span>
+            <div><strong>Durmuhurtham</strong><span>12:31 PM – 1:19 PM</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle bad">♨</span>
+            <div><strong>Varjyam</strong><span>7:42 PM – 9:18 PM</span></div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="section-title blue-head">
+            <span class="circle blue">✿</span>
+            <div>
+              <h3>Festivals & Observances</h3>
+              <small>Important days and vratams</small>
+            </div>
+          </div>
+          <div class="list-item">
+            <span class="circle orange">♨</span>
+            <div><strong>Ekadashi</strong><span>Wed, Oct 1, 2025</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle orange">♨</span>
+            <div><strong>Purnima</strong><span>Mon, Oct 6, 2025</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle orange">♨</span>
+            <div><strong>Pradosham</strong><span>Sat, Oct 11, 2025</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle orange">♨</span>
+            <div><strong>Sankashti Chaturthi</strong><span>Tue, Oct 14, 2025</span></div>
+          </div>
+          <div class="list-item">
+            <span class="circle orange">♨</span>
+            <div><strong>Amavasya</strong><span>Mon, Oct 20, 2025</span></div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <aside class="location-drawer" id="locationDrawer">
+      <div style="display: flex; justify-content: space-between">
+        <strong>Change Location</strong><button data-close style="border: 0; background: none">✕</button>
+      </div>
+      <div class="tabs">
+        <button class="active">Search</button><button>Coordinates</button><button>Recent</button>
+      </div>
+      <div class="searchbox">⌖<input placeholder="Enter city, state, country or ZIP code" />⌕</div>
+      <div class="loc">
+        ● <strong>Austin, TX, USA</strong><span style="color: #0672b8">Current location ✓</span>
+      </div>
+      <div class="loc">⌖ <strong>Hyderabad, Telangana, India</strong></div>
+      <div class="loc">⌖ <strong>San Jose, CA, USA</strong></div>
+      <div class="loc">⌖ <strong>Dallas, TX, USA</strong></div>
+      <div class="loc" style="color: #0667a2">◎ <strong>Use My Current Location</strong></div>
+    </aside>
+    <nav class="mobile-bottom">
+      <a href="dashboard.html">☀<span>Today</span></a
+      ><a href="calendar.html">▣<span>Calendar</span></a
+      ><a href="good-time.html">★<span>Good Time</span></a
+      ><a href="#">✿<span>Festivals</span></a
+      ><a href="#">☰<span>More</span></a>
+    </nav>
+    <script src="js/app.js"></script>
+  </body>
+</html>

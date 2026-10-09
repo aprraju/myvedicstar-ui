@@ -1,0 +1,555 @@
+/* Today dashboard — myvedicstar-default theme. */
+.page {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+/* Sunrise-over-hills banner with a navy fade for white text. */
+.hero {
+  display: grid;
+  gap: var(--space-xxs);
+  padding: var(--space-lg) var(--space-lg) 3.5rem;
+  border-radius: var(--radius-md);
+  background-color: #0f2237;
+  background-image:
+    linear-gradient(90deg, rgb(15 34 55 / 0.78), rgb(15 34 55 / 0.2)),
+    url('../../themes/myvedicstar-default/assets/images/dashboard.jpg');
+  background-size: cover;
+  background-position: center;
+  color: #fff;
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.35);
+}
+
+.greeting {
+  font-size: var(--font-size-sm);
+  opacity: 0.9;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: inherit;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs) var(--space-sm);
+  font-size: var(--font-size-sm);
+}
+
+.meta span + span::before {
+  content: '•';
+  margin-inline-end: var(--space-sm);
+}
+
+/* Cards overlap the bottom of the banner, as in the theme. */
+.overlap {
+  position: relative;
+  margin-block-start: calc(-1 * (var(--space-lg) + 2.5rem));
+  padding-inline: var(--space-xs);
+}
+
+.topGrid {
+  display: grid;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+/* Generic panel */
+.panel {
+  min-inline-size: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  box-shadow: var(--shadow-low);
+}
+
+.panelBody {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+}
+
+.panelHead {
+  padding: var(--space-md) var(--space-lg);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.panelTitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.panelSubtitle {
+  margin-block-start: var(--space-xxs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Today's Panchang rows */
+.rows {
+  display: grid;
+  margin: 0;
+  padding: var(--space-xs) var(--space-lg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(5.5rem, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-sm);
+  min-block-size: 2.75rem;
+  padding-block: var(--space-xs);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-block-end: 0;
+}
+
+.rowIcon {
+  --accent: var(--color-auspicious);
+  --accent-surface: var(--color-auspicious-surface);
+
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 50%;
+  background: var(--accent-surface);
+  color: var(--accent);
+}
+
+.rowIcon[data-accent='blue'] {
+  --accent: var(--color-info);
+  --accent-surface: var(--color-info-surface);
+}
+
+.rowIcon[data-accent='teal'] {
+  --accent: var(--color-secondary);
+  --accent-surface: color-mix(in srgb, var(--color-secondary) 12%, var(--color-surface));
+}
+
+.rowIcon[data-accent='green'] {
+  --accent: var(--color-favorable);
+  --accent-surface: var(--color-favorable-surface);
+}
+
+.rowIcon[data-accent='purple'] {
+  --accent: #5a4bc4;
+  --accent-surface: color-mix(in srgb, #6655d9 12%, var(--color-surface));
+}
+
+.rowIcon[data-accent='pink'] {
+  --accent: #c42a59;
+  --accent-surface: color-mix(in srgb, #d83063 12%, var(--color-surface));
+}
+
+.rowLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.rowLabel[title] {
+  cursor: help;
+}
+
+.rowValue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xxs) var(--space-md);
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.rowName {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.rowDetail {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Timeline */
+.timelinePanel {
+  padding: var(--space-lg);
+}
+
+.timeline {
+  margin-block: var(--space-xxl) var(--space-sm);
+}
+
+.track {
+  position: relative;
+  block-size: 0.875rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-auspicious-surface) 80%, var(--color-border)) 0%,
+    var(--color-surface-subtle) 50%,
+    color-mix(in srgb, var(--color-info-surface) 80%, var(--color-border)) 100%
+  );
+}
+
+.segment {
+  position: absolute;
+  inset-block: 0;
+  min-inline-size: 3px;
+  border-radius: var(--radius-pill);
+}
+
+.segment[data-tone='favorable'] {
+  background: var(--color-favorable);
+}
+
+.segment[data-tone='warning'] {
+  background: var(--color-warning);
+}
+
+.segment[data-tone='caution'] {
+  background: var(--color-caution);
+}
+
+.segment[data-tone='neutral'] {
+  background: var(--color-border-strong);
+}
+
+.segment[data-state='past'] {
+  opacity: 0.4;
+}
+
+.sunsetMark {
+  position: absolute;
+  inset-block: -0.25rem;
+  inline-size: 2px;
+  background: var(--color-text-secondary);
+}
+
+.nowMark {
+  position: absolute;
+  inset-block: -0.375rem;
+  inline-size: 3px;
+  margin-inline-start: -1px;
+  border-radius: 2px;
+  background: var(--color-info);
+}
+
+.nowLabel {
+  position: absolute;
+  inset-block-end: calc(100% + var(--space-xxs));
+  inset-inline-start: 50%;
+  padding: 0.125rem var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-info);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.axis {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-block-start: var(--space-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.axisMid {
+  position: absolute;
+  inset-block-start: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-lg);
+  margin-block-start: var(--space-md);
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.legend li::before {
+  content: '';
+  inline-size: 0.75rem;
+  block-size: 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.legend li[data-tone='favorable']::before {
+  background: var(--color-favorable);
+}
+
+.legend li[data-tone='warning']::before {
+  background: var(--color-warning);
+}
+
+.legend li[data-tone='caution']::before {
+  background: var(--color-caution);
+}
+
+/* Three columns: auspicious, avoid, why */
+.columns {
+  display: grid;
+  gap: var(--space-md);
+  align-items: start;
+}
+
+.sectionTitle {
+  --tone: var(--color-info);
+  --tone-surface: var(--color-info-surface);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-block-end: 1px solid var(--color-border);
+  border-start-start-radius: var(--radius-md);
+  border-start-end-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--tone-surface),
+    color-mix(in srgb, var(--tone-surface) 40%, var(--color-surface))
+  );
+}
+
+.sectionTitle[data-tone='favorable'] {
+  --tone: var(--color-favorable);
+  --tone-surface: var(--color-favorable-surface);
+}
+
+.sectionTitle[data-tone='caution'] {
+  --tone: var(--color-caution);
+  --tone-surface: var(--color-caution-surface);
+}
+
+.sectionIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--tone) 14%, var(--color-surface));
+  color: var(--tone);
+}
+
+.sectionHeading {
+  font-size: var(--font-size-md);
+  color: var(--tone);
+}
+
+.sectionSubtitle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.list {
+  display: grid;
+  padding: 0;
+  list-style: none;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.listItem:last-child {
+  border-block-end: 0;
+}
+
+.listItem[data-state='past'] {
+  opacity: 0.6;
+}
+
+.listItem[data-state='now'] {
+  background: color-mix(in srgb, var(--color-info-surface) 60%, transparent);
+}
+
+.listIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2rem;
+  block-size: 2rem;
+  border-radius: 50%;
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}
+
+.listIcon[data-tone='favorable'] {
+  background: var(--color-favorable-surface);
+  color: var(--color-favorable);
+}
+
+.listIcon[data-tone='warning'] {
+  background: var(--color-warning-surface);
+  color: var(--color-warning);
+}
+
+.listIcon[data-tone='caution'] {
+  background: var(--color-caution-surface);
+  color: var(--color-caution);
+}
+
+.listIcon[data-tone='mixed'] {
+  background: var(--color-auspicious-surface);
+  color: var(--color-auspicious);
+}
+
+.listText {
+  display: grid;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+
+.listName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.listTime {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.listNote {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Resolved conflict: the overlap explained inside the favorable entry. */
+.conflict {
+  color: var(--color-warning);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge {
+  padding: 0.0625rem var(--space-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge[data-state='now'] {
+  background: var(--color-info);
+  color: #fff;
+}
+
+.badge[data-tone='favorable'] {
+  background: var(--color-favorable-surface);
+  color: var(--color-favorable);
+}
+
+.badge[data-tone='caution'] {
+  background: var(--color-caution-surface);
+  color: var(--color-caution);
+}
+
+.badge[data-tone='mixed'] {
+  background: var(--color-auspicious-surface);
+  color: var(--color-auspicious);
+}
+
+.empty {
+  padding: var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Tablet and up */
+@media (min-width: 600px) {
+  .hero {
+    padding: var(--space-xl) var(--space-xl) 5.25rem;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .title {
+    font-size: var(--font-size-xxl);
+  }
+
+  .overlap {
+    margin-block-start: calc(-1 * (var(--space-lg) + 4.25rem));
+    padding-inline: var(--space-md);
+  }
+
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .columns > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Laptop and up: status | Panchang side by side; three columns. */
+@media (min-width: 1024px) {
+  .topGrid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.12fr);
+  }
+
+  .columns > :last-child {
+    grid-column: auto;
+  }
+}
+
+/* Phones: rows stack the detail under the value. */
+@media (max-width: 599px) {
+  .row {
+    grid-template-columns: 1.75rem minmax(4.5rem, auto) minmax(0, 1fr);
+  }
+
+  .rowValue {
+    display: grid;
+    justify-content: start;
+  }
+
+  .axisMid {
+    display: none;
+  }
+}
+
+/* Day-factor ratings use the app-wide status tones (global [data-status-tone] map); after the period tones so it wins. */
+.listIcon[data-status-tone],
+.badge[data-status-tone] {
+  background: var(--tone-surface);
+  color: var(--tone);
+}

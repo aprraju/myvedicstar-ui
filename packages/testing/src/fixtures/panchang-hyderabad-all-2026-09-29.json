@@ -1,0 +1,857 @@
+{
+  "location": {
+    "latitude": 17.39,
+    "longitude": 78.49,
+    "timeZone": "Asia/Kolkata",
+    "source": "Coordinates",
+    "place": {
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "countryCode": "IN",
+      "displayName": "Hyderabad, Telangana, India"
+    }
+  },
+  "tradition": {
+    "key": "all",
+    "name": "All traditions",
+    "description": "Every timing the app calculates, including Choghadiya.",
+    "display": [
+      "RahuKalam",
+      "Yamagandam",
+      "GulikaKalam",
+      "DurMuhurtam",
+      "Varjyam",
+      "AmritKalam",
+      "AbhijitMuhurta",
+      "BrahmaMuhurta",
+      "Choghadiya"
+    ]
+  },
+  "calculationMethod": "drik",
+  "calculationVersion": "1.1.0",
+  "localToday": "2026-09-29",
+  "localTodayDisplay": "29/09/2026",
+  "displayFormat": {
+    "datePattern": "dd/MM/yyyy",
+    "timePattern": "HH:mm:ss",
+    "countryCode": "IN",
+    "example": "29/09/2026 06:05:58 IST"
+  },
+  "generatedAt": "2026-09-29T07:46:36.4475438+00:00",
+  "language": "en",
+  "glossary": {
+    "periods": {
+      "RahuKalam": {
+        "name": "Rahu Kalam",
+        "meaning": "A daily period associated with Rahu that is traditionally considered unfavorable for beginning important or auspicious activities. Its timing is calculated using the local sunrise, sunset, and weekday.",
+        "description": "A traditionally unfavorable period for important new beginnings.",
+        "message": "Avoid important new beginnings",
+        "icon": null
+      },
+      "Yamagandam": {
+        "name": "Yamagandam",
+        "meaning": "A daily period associated with Yama that is traditionally considered unfavorable for beginning auspicious activities. It is calculated from the local sunrise, sunset, and weekday.",
+        "description": "A period traditionally avoided when starting important or auspicious activities.",
+        "message": "Avoid auspicious new activities",
+        "icon": null
+      },
+      "DurMuhurtam": {
+        "name": "Dur Muhurtam",
+        "meaning": "A period of the day considered unfavorable when selecting an auspicious Muhurta. Depending on the weekday, there may be more than one Dur Muhurtam period.",
+        "description": "An unfavorable Muhurta traditionally avoided for important beginnings.",
+        "message": "Unfavorable Muhurta",
+        "icon": null
+      },
+      "GulikaKalam": {
+        "name": "Gulika Kalam",
+        "meaning": "A daily period associated with Gulika and traditionally linked with Saturn. It is generally treated with caution when choosing an auspicious starting time.",
+        "description": "A period traditionally treated with caution for auspicious new beginnings.",
+        "message": "Use caution for auspicious beginnings",
+        "icon": null
+      },
+      "Varjyam": {
+        "name": "Varjyam",
+        "meaning": "A Nakshatra-based period traditionally considered unsuitable for auspicious beginnings. Unlike Rahu Kalam, its timing is derived from the day's Nakshatra and may occur during the day or night.",
+        "description": "A Nakshatra-based period traditionally considered unfavorable for auspicious beginnings.",
+        "message": "Nakshatra-based unfavorable period",
+        "icon": null
+      },
+      "BrahmaMuhurta": {
+        "name": "Brahma Muhurta",
+        "meaning": "A special period before sunrise traditionally regarded as ideal for meditation, prayer, yoga, study, reflection, and spiritual practices.",
+        "description": "A peaceful pre-sunrise period considered ideal for meditation, prayer, and spiritual practice.",
+        "message": "Excellent for spiritual practices",
+        "icon": null
+      },
+      "AbhijitMuhurta": {
+        "name": "Abhijit Muhurta",
+        "meaning": "An auspicious period occurring around local midday. It is traditionally regarded as a favorable time for beginning many important activities.",
+        "description": "An auspicious midday period considered favorable for important new beginnings.",
+        "message": "Good for important beginnings",
+        "icon": null
+      },
+      "AmritKalam": {
+        "name": "Amrit Kalam",
+        "meaning": "A highly auspicious period derived from Nakshatra-based calculations and traditionally associated with favorable energy and positive beginnings.",
+        "description": "A highly auspicious period considered favorable for important and positive activities.",
+        "message": "Auspicious period for positive activities",
+        "icon": null
+      },
+      "ChoghadiyaAmrit": {
+        "name": "Amrit",
+        "meaning": "The most auspicious Choghadiya, traditionally considered suitable for all kinds of activities.",
+        "description": "The most auspicious Choghadiya, suitable for all activities.",
+        "message": "Excellent for all activities",
+        "icon": null
+      },
+      "ChoghadiyaShubh": {
+        "name": "Shubh",
+        "meaning": "An auspicious Choghadiya traditionally favored for ceremonies, marriages, education and religious activities.",
+        "description": "An auspicious Choghadiya for ceremonies and religious activities.",
+        "message": "Good for auspicious activities",
+        "icon": null
+      },
+      "ChoghadiyaLabh": {
+        "name": "Labh",
+        "meaning": "A favorable Choghadiya traditionally associated with gain, and favored for business, trade, education and new ventures.",
+        "description": "A favorable Choghadiya for business, trade and new ventures.",
+        "message": "Good for business and gains",
+        "icon": null
+      },
+      "ChoghadiyaChal": {
+        "name": "Chal",
+        "meaning": "A neutral Choghadiya traditionally considered suitable for travel and routine activities.",
+        "description": "A neutral Choghadiya suitable for travel and routine work.",
+        "message": "Suitable for travel and routine work",
+        "icon": null
+      },
+      "ChoghadiyaUdveg": {
+        "name": "Udveg",
+        "meaning": "An unfavorable Choghadiya traditionally avoided for new beginnings, though associated with government-related work.",
+        "description": "An unfavorable Choghadiya traditionally avoided for new beginnings.",
+        "message": "Avoid new beginnings",
+        "icon": null
+      },
+      "ChoghadiyaKaal": {
+        "name": "Kaal",
+        "meaning": "An inauspicious Choghadiya traditionally avoided for auspicious activities.",
+        "description": "An inauspicious Choghadiya traditionally avoided for auspicious activities.",
+        "message": "Avoid auspicious activities",
+        "icon": null
+      },
+      "ChoghadiyaRog": {
+        "name": "Rog",
+        "meaning": "An inauspicious Choghadiya traditionally associated with illness and disputes and avoided for important activities.",
+        "description": "An inauspicious Choghadiya traditionally avoided for important activities.",
+        "message": "Avoid important activities",
+        "icon": null
+      }
+    },
+    "elements": {
+      "tithi": {
+        "name": "Tithi",
+        "meaning": "The lunar day. Each Tithi corresponds to 12° of separation between the Moon and the Sun, giving 30 Tithis in a lunar month: 15 in the waxing (Shukla) fortnight and 15 in the waning (Krishna) fortnight. A Tithi can begin at any time of day and lasts roughly 19 to 26 hours.",
+        "description": "The lunar day, based on the angle between the Moon and the Sun.",
+        "message": null,
+        "icon": null
+      },
+      "nakshatra": {
+        "name": "Nakshatra",
+        "meaning": "One of the 27 lunar mansions, each spanning 13°20′ of the sidereal zodiac. The day's Nakshatra is the one the Moon is passing through; it changes about once a day.",
+        "description": "The lunar mansion the Moon is passing through.",
+        "message": null,
+        "icon": null
+      },
+      "yoga": {
+        "name": "Yoga",
+        "meaning": "One of 27 combinations obtained by adding the sidereal longitudes of the Sun and the Moon and dividing by 13°20′. Each Yoga is traditionally associated with a favorable or unfavorable quality.",
+        "description": "A daily combination of the Sun's and the Moon's positions.",
+        "message": null,
+        "icon": null
+      },
+      "karana": {
+        "name": "Karana",
+        "meaning": "Half of a Tithi, corresponding to 6° of Moon–Sun separation. There are 11 Karanas: 7 that repeat through the lunar month and 4 fixed ones. Vishti (Bhadra) is traditionally avoided for auspicious activities.",
+        "description": "Half of a lunar day.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "terms": {
+      "sunrise": {
+        "name": "Sunrise",
+        "meaning": "The moment the upper edge of the Sun appears on the horizon at the location, allowing for atmospheric refraction. The Panchang day begins at sunrise, and Rahu Kalam, the Muhurtas and other periods are measured from it.",
+        "description": "The start of the Panchang day at this location.",
+        "message": null,
+        "icon": null
+      },
+      "sunset": {
+        "name": "Sunset",
+        "meaning": "The moment the upper edge of the Sun disappears below the horizon at the location. Daytime periods such as Rahu Kalam divide the time between sunrise and sunset.",
+        "description": "The end of daytime at this location.",
+        "message": null,
+        "icon": null
+      },
+      "vara": {
+        "name": "Vara",
+        "meaning": "The weekday. In the Panchang a weekday runs from one sunrise to the next, and several daily periods, including Rahu Kalam, Yamagandam and Gulika Kalam, depend on it.",
+        "description": "The day of the week, counted from sunrise.",
+        "message": null,
+        "icon": null
+      },
+      "choghadiya": {
+        "name": "Choghadiya",
+        "meaning": "A system, popular in northern and western India, that divides the daytime (sunrise to sunset) and the night (sunset to next sunrise) into eight segments each. Each segment is one of Amrit, Shubh, Labh, Chal, Udveg, Kaal or Rog, in an order set by the weekday, and is used to choose favorable times for daily activities.",
+        "description": "Eight day and eight night segments used to choose favorable times.",
+        "message": null,
+        "icon": null
+      }
+    },
+    "classifications": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟢"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟢"
+      },
+      "Neutral": {
+        "name": "Neutral",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "⚪"
+      },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🟠"
+      },
+      "Avoid": {
+        "name": "Avoid",
+        "meaning": null,
+        "description": null,
+        "message": null,
+        "icon": "🔴"
+      }
+    },
+    "guidanceRatings": {
+      "HighlyFavorable": {
+        "name": "Highly Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are strongly supportive for common activities.",
+        "message": "Highly Favorable Day",
+        "icon": "🟢🟢"
+      },
+      "Favorable": {
+        "name": "Favorable",
+        "meaning": null,
+        "description": "Today's Panchang factors are generally supportive for common activities.",
+        "message": "Favorable Day",
+        "icon": "🟢"
+      },
+      "Mixed": {
+        "name": "Mixed",
+        "meaning": null,
+        "description": "Today's Panchang factors are mixed; choose timings carefully for important activities.",
+        "message": "Mixed Day",
+        "icon": "🟡"
+      },
+      "Caution": {
+        "name": "Caution",
+        "meaning": null,
+        "description": "Several of today's Panchang factors call for caution; prefer the recommended time periods for important activities.",
+        "message": "Day for Caution",
+        "icon": "🟠"
+      },
+      "Avoid": {
+        "name": "Traditionally Avoided",
+        "meaning": null,
+        "description": "Today's Panchang factors are traditionally considered unfavorable for new beginnings.",
+        "message": "Traditionally Avoided for New Beginnings",
+        "icon": "🔴"
+      }
+    }
+  },
+  "days": [
+    {
+      "date": "2026-09-29",
+      "dateDisplay": "29/09/2026",
+      "weekday": "Tuesday",
+      "weekdayName": "Tuesday",
+      "sunrise": "2026-09-29T06:05:58+05:30",
+      "sunset": "2026-09-29T18:06:40+05:30",
+      "nextSunrise": "2026-09-30T06:06:07+05:30",
+      "sunriseDisplay": "29/09/2026 06:05:58 IST",
+      "sunsetDisplay": "29/09/2026 18:06:40 IST",
+      "nextSunriseDisplay": "30/09/2026 06:06:07 IST",
+      "tithis": [
+        {
+          "key": "KrishnaTritiya",
+          "number": 18,
+          "name": "Krishna Tritiya",
+          "start": "2026-09-28T19:13:46+05:30",
+          "end": "2026-09-29T17:10:28+05:30",
+          "startDisplay": "28/09/2026 19:13:46 IST",
+          "endDisplay": "29/09/2026 17:10:28 IST"
+        },
+        {
+          "key": "KrishnaChaturthi",
+          "number": 19,
+          "name": "Krishna Chaturthi",
+          "start": "2026-09-29T17:10:28+05:30",
+          "end": "2026-09-30T14:55:42+05:30",
+          "startDisplay": "29/09/2026 17:10:28 IST",
+          "endDisplay": "30/09/2026 14:55:42 IST"
+        }
+      ],
+      "nakshatras": [
+        {
+          "key": "Ashwini",
+          "number": 1,
+          "name": "Ashwini",
+          "start": "2026-09-28T10:16:15+05:30",
+          "end": "2026-09-29T09:03:28+05:30",
+          "startDisplay": "28/09/2026 10:16:15 IST",
+          "endDisplay": "29/09/2026 09:03:28 IST"
+        },
+        {
+          "key": "Bharani",
+          "number": 2,
+          "name": "Bharani",
+          "start": "2026-09-29T09:03:28+05:30",
+          "end": "2026-09-30T07:36:46+05:30",
+          "startDisplay": "29/09/2026 09:03:28 IST",
+          "endDisplay": "30/09/2026 07:36:46 IST"
+        }
+      ],
+      "yogas": [
+        {
+          "key": "Vyaghata",
+          "number": 13,
+          "name": "Vyaghata",
+          "start": "2026-09-28T08:53:44+05:30",
+          "end": "2026-09-29T06:13:02+05:30",
+          "startDisplay": "28/09/2026 08:53:44 IST",
+          "endDisplay": "29/09/2026 06:13:02 IST"
+        },
+        {
+          "key": "Harshana",
+          "number": 14,
+          "name": "Harshana",
+          "start": "2026-09-29T06:13:02+05:30",
+          "end": "2026-09-30T03:20:13+05:30",
+          "startDisplay": "29/09/2026 06:13:02 IST",
+          "endDisplay": "30/09/2026 03:20:13 IST"
+        },
+        {
+          "key": "Vajra",
+          "number": 15,
+          "name": "Vajra",
+          "start": "2026-09-30T03:20:13+05:30",
+          "end": "2026-10-01T00:20:27+05:30",
+          "startDisplay": "30/09/2026 03:20:13 IST",
+          "endDisplay": "01/10/2026 00:20:27 IST"
+        }
+      ],
+      "karanas": [
+        {
+          "key": "Vanija",
+          "number": 7,
+          "name": "Vanija",
+          "start": "2026-09-28T19:13:46+05:30",
+          "end": "2026-09-29T06:13:58+05:30",
+          "startDisplay": "28/09/2026 19:13:46 IST",
+          "endDisplay": "29/09/2026 06:13:58 IST"
+        },
+        {
+          "key": "Vishti",
+          "number": 8,
+          "name": "Vishti (Bhadra)",
+          "start": "2026-09-29T06:13:58+05:30",
+          "end": "2026-09-29T17:10:28+05:30",
+          "startDisplay": "29/09/2026 06:13:58 IST",
+          "endDisplay": "29/09/2026 17:10:28 IST"
+        },
+        {
+          "key": "Bava",
+          "number": 2,
+          "name": "Bava",
+          "start": "2026-09-29T17:10:28+05:30",
+          "end": "2026-09-30T04:04:06+05:30",
+          "startDisplay": "29/09/2026 17:10:28 IST",
+          "endDisplay": "30/09/2026 04:04:06 IST"
+        },
+        {
+          "key": "Balava",
+          "number": 3,
+          "name": "Balava",
+          "start": "2026-09-30T04:04:06+05:30",
+          "end": "2026-09-30T14:55:42+05:30",
+          "startDisplay": "30/09/2026 04:04:06 IST",
+          "endDisplay": "30/09/2026 14:55:42 IST"
+        }
+      ],
+      "auspiciousPeriods": [
+        {
+          "kind": "BrahmaMuhurta",
+          "name": "Brahma Muhurta",
+          "classification": "Favorable",
+          "start": "2026-09-29T04:30:10+05:30",
+          "end": "2026-09-29T05:18:04+05:30",
+          "startDisplay": "29/09/2026 04:30:10 IST",
+          "endDisplay": "29/09/2026 05:18:04 IST",
+          "overlaps": [
+            {
+              "kind": "Varjyam",
+              "name": "Varjyam",
+              "classification": "Avoid",
+              "start": "2026-09-29T05:15:36+05:30",
+              "end": "2026-09-29T05:18:04+05:30",
+              "startDisplay": "29/09/2026 05:15:36 IST",
+              "endDisplay": "29/09/2026 05:18:04 IST"
+            }
+          ],
+          "overlapMessage": "Overlaps Varjyam (05:15–06:46 IST): avoid 05:15–05:18 IST for new beginnings."
+        },
+        {
+          "kind": "AbhijitMuhurta",
+          "name": "Abhijit Muhurta",
+          "classification": "Favorable",
+          "start": "2026-09-29T11:42:17+05:30",
+          "end": "2026-09-29T12:30:20+05:30",
+          "startDisplay": "29/09/2026 11:42:17 IST",
+          "endDisplay": "29/09/2026 12:30:20 IST",
+          "overlaps": [
+            {
+              "kind": "GulikaKalam",
+              "name": "Gulika Kalam",
+              "classification": "Caution",
+              "start": "2026-09-29T12:06:19+05:30",
+              "end": "2026-09-29T12:30:20+05:30",
+              "startDisplay": "29/09/2026 12:06:19 IST",
+              "endDisplay": "29/09/2026 12:30:20 IST"
+            }
+          ],
+          "overlapMessage": "Overlaps Gulika Kalam (12:06–13:36 IST): use caution 12:06–12:30 IST."
+        },
+        {
+          "kind": "AmritKalam",
+          "name": "Amrit Kalam",
+          "classification": "HighlyFavorable",
+          "start": "2026-09-30T03:06:07+05:30",
+          "end": "2026-09-30T04:36:20+05:30",
+          "startDisplay": "30/09/2026 03:06:07 IST",
+          "endDisplay": "30/09/2026 04:36:20 IST"
+        }
+      ],
+      "inauspiciousPeriods": [
+        {
+          "kind": "Varjyam",
+          "name": "Varjyam",
+          "classification": "Avoid",
+          "start": "2026-09-29T05:15:36+05:30",
+          "end": "2026-09-29T06:46:44+05:30",
+          "startDisplay": "29/09/2026 05:15:36 IST",
+          "endDisplay": "29/09/2026 06:46:44 IST"
+        },
+        {
+          "kind": "DurMuhurtam",
+          "name": "Dur Muhurtam",
+          "classification": "Avoid",
+          "start": "2026-09-29T08:30:06+05:30",
+          "end": "2026-09-29T09:18:09+05:30",
+          "startDisplay": "29/09/2026 08:30:06 IST",
+          "endDisplay": "29/09/2026 09:18:09 IST"
+        },
+        {
+          "kind": "Yamagandam",
+          "name": "Yamagandam",
+          "classification": "Avoid",
+          "start": "2026-09-29T09:06:08+05:30",
+          "end": "2026-09-29T10:36:13+05:30",
+          "startDisplay": "29/09/2026 09:06:08 IST",
+          "endDisplay": "29/09/2026 10:36:13 IST"
+        },
+        {
+          "kind": "GulikaKalam",
+          "name": "Gulika Kalam",
+          "classification": "Caution",
+          "start": "2026-09-29T12:06:19+05:30",
+          "end": "2026-09-29T13:36:24+05:30",
+          "startDisplay": "29/09/2026 12:06:19 IST",
+          "endDisplay": "29/09/2026 13:36:24 IST"
+        },
+        {
+          "kind": "RahuKalam",
+          "name": "Rahu Kalam",
+          "classification": "Avoid",
+          "start": "2026-09-29T15:06:29+05:30",
+          "end": "2026-09-29T16:36:35+05:30",
+          "startDisplay": "29/09/2026 15:06:29 IST",
+          "endDisplay": "29/09/2026 16:36:35 IST"
+        },
+        {
+          "kind": "Varjyam",
+          "name": "Varjyam",
+          "classification": "Avoid",
+          "start": "2026-09-29T18:04:47+05:30",
+          "end": "2026-09-29T19:35:00+05:30",
+          "startDisplay": "29/09/2026 18:04:47 IST",
+          "endDisplay": "29/09/2026 19:35:00 IST"
+        },
+        {
+          "kind": "DurMuhurtam",
+          "name": "Dur Muhurtam",
+          "classification": "Avoid",
+          "start": "2026-09-29T22:54:27+05:30",
+          "end": "2026-09-29T23:42:25+05:30",
+          "startDisplay": "29/09/2026 22:54:27 IST",
+          "endDisplay": "29/09/2026 23:42:25 IST"
+        }
+      ],
+      "guidance": {
+        "rating": "Mixed",
+        "ratingName": "Mixed",
+        "icon": "🟡",
+        "headline": "🟡 Mixed Day",
+        "summary": "Today's Panchang factors are mixed; choose timings carefully for important activities. Tithi Krishna Tritiya and Yoga Harshana are supportive. Tuesday, Nakshatra Bharani and Karana Vishti (Bhadra) call for caution. Best time: 06:46–08:30 IST, 10:36–12:06 IST, 13:36–15:06 IST. Favorable: Abhijit Muhurta 11:42–12:30 IST, Amrit Kalam 03:06(+1)–04:36(+1) IST. Avoid for new beginnings: Varjyam 05:15–06:46 IST, Dur Muhurtam 08:30–09:18 IST, Yamagandam 09:06–10:36 IST, Rahu Kalam 15:06–16:36 IST, Varjyam 18:04–19:35 IST, Dur Muhurtam 22:54–23:42 IST. Use caution: Gulika Kalam 12:06–13:36 IST. For spiritual practice: Brahma Muhurta 04:30–05:18 IST. Check the recommended and traditionally avoided time periods below before beginning an important activity.",
+        "factors": [
+          {
+            "limb": "tithi",
+            "limbName": "Tithi",
+            "key": "KrishnaTritiya",
+            "name": "Krishna Tritiya",
+            "rating": "Favorable",
+            "ratingName": "Favorable",
+            "reason": "Tithi Krishna Tritiya: Favorable. Jaya Tithi (3rd, 8th, 13th), traditionally associated with success."
+          },
+          {
+            "limb": "vara",
+            "limbName": "Vara",
+            "key": "Tuesday",
+            "name": "Tuesday",
+            "rating": "Caution",
+            "ratingName": "Caution",
+            "reason": "Vara Tuesday: Caution. A harsh (Krura) weekday, traditionally treated with caution for auspicious beginnings."
+          },
+          {
+            "limb": "nakshatra",
+            "limbName": "Nakshatra",
+            "key": "Bharani",
+            "name": "Bharani",
+            "rating": "Caution",
+            "ratingName": "Caution",
+            "reason": "Nakshatra Bharani: Caution. A fierce (Ugra) Nakshatra, traditionally treated with caution for auspicious beginnings."
+          },
+          {
+            "limb": "yoga",
+            "limbName": "Yoga",
+            "key": "Harshana",
+            "name": "Harshana",
+            "rating": "Favorable",
+            "ratingName": "Favorable",
+            "reason": "Yoga Harshana: Favorable. A benefic Yoga, traditionally supportive."
+          },
+          {
+            "limb": "karana",
+            "limbName": "Karana",
+            "key": "Vishti",
+            "name": "Vishti (Bhadra)",
+            "rating": "Avoid",
+            "ratingName": "Traditionally Avoided",
+            "reason": "Karana Vishti (Bhadra): Traditionally Avoided. Vishti (Bhadra) Karana, traditionally avoided for auspicious beginnings."
+          }
+        ],
+        "bestWindows": [
+          {
+            "start": "2026-09-29T06:46:44+05:30",
+            "end": "2026-09-29T08:30:06+05:30",
+            "startDisplay": "29/09/2026 06:46:44 IST",
+            "endDisplay": "29/09/2026 08:30:06 IST"
+          },
+          {
+            "start": "2026-09-29T10:36:13+05:30",
+            "end": "2026-09-29T12:06:19+05:30",
+            "startDisplay": "29/09/2026 10:36:13 IST",
+            "endDisplay": "29/09/2026 12:06:19 IST"
+          },
+          {
+            "start": "2026-09-29T13:36:24+05:30",
+            "end": "2026-09-29T15:06:29+05:30",
+            "startDisplay": "29/09/2026 13:36:24 IST",
+            "endDisplay": "29/09/2026 15:06:29 IST"
+          }
+        ],
+        "favorableWindows": [
+          {
+            "kind": "AbhijitMuhurta",
+            "name": "Abhijit Muhurta",
+            "classification": "Favorable",
+            "start": "2026-09-29T11:42:17+05:30",
+            "end": "2026-09-29T12:30:20+05:30",
+            "startDisplay": "29/09/2026 11:42:17 IST",
+            "endDisplay": "29/09/2026 12:30:20 IST"
+          },
+          {
+            "kind": "AmritKalam",
+            "name": "Amrit Kalam",
+            "classification": "HighlyFavorable",
+            "start": "2026-09-30T03:06:07+05:30",
+            "end": "2026-09-30T04:36:20+05:30",
+            "startDisplay": "30/09/2026 03:06:07 IST",
+            "endDisplay": "30/09/2026 04:36:20 IST"
+          }
+        ],
+        "spiritualWindows": [
+          {
+            "kind": "BrahmaMuhurta",
+            "name": "Brahma Muhurta",
+            "classification": "Favorable",
+            "start": "2026-09-29T04:30:10+05:30",
+            "end": "2026-09-29T05:18:04+05:30",
+            "startDisplay": "29/09/2026 04:30:10 IST",
+            "endDisplay": "29/09/2026 05:18:04 IST"
+          }
+        ],
+        "cautionWindows": [
+          {
+            "kind": "GulikaKalam",
+            "name": "Gulika Kalam",
+            "classification": "Caution",
+            "start": "2026-09-29T12:06:19+05:30",
+            "end": "2026-09-29T13:36:24+05:30",
+            "startDisplay": "29/09/2026 12:06:19 IST",
+            "endDisplay": "29/09/2026 13:36:24 IST"
+          }
+        ],
+        "avoidWindows": [
+          {
+            "kind": "Varjyam",
+            "name": "Varjyam",
+            "classification": "Avoid",
+            "start": "2026-09-29T05:15:36+05:30",
+            "end": "2026-09-29T06:46:44+05:30",
+            "startDisplay": "29/09/2026 05:15:36 IST",
+            "endDisplay": "29/09/2026 06:46:44 IST"
+          },
+          {
+            "kind": "DurMuhurtam",
+            "name": "Dur Muhurtam",
+            "classification": "Avoid",
+            "start": "2026-09-29T08:30:06+05:30",
+            "end": "2026-09-29T09:18:09+05:30",
+            "startDisplay": "29/09/2026 08:30:06 IST",
+            "endDisplay": "29/09/2026 09:18:09 IST"
+          },
+          {
+            "kind": "Yamagandam",
+            "name": "Yamagandam",
+            "classification": "Avoid",
+            "start": "2026-09-29T09:06:08+05:30",
+            "end": "2026-09-29T10:36:13+05:30",
+            "startDisplay": "29/09/2026 09:06:08 IST",
+            "endDisplay": "29/09/2026 10:36:13 IST"
+          },
+          {
+            "kind": "RahuKalam",
+            "name": "Rahu Kalam",
+            "classification": "Avoid",
+            "start": "2026-09-29T15:06:29+05:30",
+            "end": "2026-09-29T16:36:35+05:30",
+            "startDisplay": "29/09/2026 15:06:29 IST",
+            "endDisplay": "29/09/2026 16:36:35 IST"
+          },
+          {
+            "kind": "Varjyam",
+            "name": "Varjyam",
+            "classification": "Avoid",
+            "start": "2026-09-29T18:04:47+05:30",
+            "end": "2026-09-29T19:35:00+05:30",
+            "startDisplay": "29/09/2026 18:04:47 IST",
+            "endDisplay": "29/09/2026 19:35:00 IST"
+          },
+          {
+            "kind": "DurMuhurtam",
+            "name": "Dur Muhurtam",
+            "classification": "Avoid",
+            "start": "2026-09-29T22:54:27+05:30",
+            "end": "2026-09-29T23:42:25+05:30",
+            "startDisplay": "29/09/2026 22:54:27 IST",
+            "endDisplay": "29/09/2026 23:42:25 IST"
+          }
+        ],
+        "methodology": "Daily guidance summarizes the five Panchanga limbs (Tithi, Vara, Nakshatra, Yoga, Karana) using this app's methodology. It is not a universal traditional rule and not a Muhurta for a specific ceremony such as a marriage or housewarming.",
+        "rulesVersion": "2026.1-provisional"
+      },
+      "choghadiya": [
+        {
+          "kind": "ChoghadiyaRog",
+          "name": "Rog",
+          "classification": "Avoid",
+          "start": "2026-09-29T06:05:58+05:30",
+          "end": "2026-09-29T07:36:03+05:30",
+          "startDisplay": "29/09/2026 06:05:58 IST",
+          "endDisplay": "29/09/2026 07:36:03 IST"
+        },
+        {
+          "kind": "ChoghadiyaUdveg",
+          "name": "Udveg",
+          "classification": "Avoid",
+          "start": "2026-09-29T07:36:03+05:30",
+          "end": "2026-09-29T09:06:08+05:30",
+          "startDisplay": "29/09/2026 07:36:03 IST",
+          "endDisplay": "29/09/2026 09:06:08 IST"
+        },
+        {
+          "kind": "ChoghadiyaChal",
+          "name": "Chal",
+          "classification": "Neutral",
+          "start": "2026-09-29T09:06:08+05:30",
+          "end": "2026-09-29T10:36:13+05:30",
+          "startDisplay": "29/09/2026 09:06:08 IST",
+          "endDisplay": "29/09/2026 10:36:13 IST"
+        },
+        {
+          "kind": "ChoghadiyaLabh",
+          "name": "Labh",
+          "classification": "Favorable",
+          "start": "2026-09-29T10:36:13+05:30",
+          "end": "2026-09-29T12:06:19+05:30",
+          "startDisplay": "29/09/2026 10:36:13 IST",
+          "endDisplay": "29/09/2026 12:06:19 IST"
+        },
+        {
+          "kind": "ChoghadiyaAmrit",
+          "name": "Amrit",
+          "classification": "HighlyFavorable",
+          "start": "2026-09-29T12:06:19+05:30",
+          "end": "2026-09-29T13:36:24+05:30",
+          "startDisplay": "29/09/2026 12:06:19 IST",
+          "endDisplay": "29/09/2026 13:36:24 IST"
+        },
+        {
+          "kind": "ChoghadiyaKaal",
+          "name": "Kaal",
+          "classification": "Avoid",
+          "start": "2026-09-29T13:36:24+05:30",
+          "end": "2026-09-29T15:06:29+05:30",
+          "startDisplay": "29/09/2026 13:36:24 IST",
+          "endDisplay": "29/09/2026 15:06:29 IST"
+        },
+        {
+          "kind": "ChoghadiyaShubh",
+          "name": "Shubh",
+          "classification": "Favorable",
+          "start": "2026-09-29T15:06:29+05:30",
+          "end": "2026-09-29T16:36:35+05:30",
+          "startDisplay": "29/09/2026 15:06:29 IST",
+          "endDisplay": "29/09/2026 16:36:35 IST"
+        },
+        {
+          "kind": "ChoghadiyaRog",
+          "name": "Rog",
+          "classification": "Avoid",
+          "start": "2026-09-29T16:36:35+05:30",
+          "end": "2026-09-29T18:06:40+05:30",
+          "startDisplay": "29/09/2026 16:36:35 IST",
+          "endDisplay": "29/09/2026 18:06:40 IST"
+        },
+        {
+          "kind": "ChoghadiyaKaal",
+          "name": "Kaal",
+          "classification": "Avoid",
+          "start": "2026-09-29T18:06:40+05:30",
+          "end": "2026-09-29T19:36:36+05:30",
+          "startDisplay": "29/09/2026 18:06:40 IST",
+          "endDisplay": "29/09/2026 19:36:36 IST"
+        },
+        {
+          "kind": "ChoghadiyaLabh",
+          "name": "Labh",
+          "classification": "Favorable",
+          "start": "2026-09-29T19:36:36+05:30",
+          "end": "2026-09-29T21:06:32+05:30",
+          "startDisplay": "29/09/2026 19:36:36 IST",
+          "endDisplay": "29/09/2026 21:06:32 IST"
+        },
+        {
+          "kind": "ChoghadiyaUdveg",
+          "name": "Udveg",
+          "classification": "Avoid",
+          "start": "2026-09-29T21:06:32+05:30",
+          "end": "2026-09-29T22:36:28+05:30",
+          "startDisplay": "29/09/2026 21:06:32 IST",
+          "endDisplay": "29/09/2026 22:36:28 IST"
+        },
+        {
+          "kind": "ChoghadiyaShubh",
+          "name": "Shubh",
+          "classification": "Favorable",
+          "start": "2026-09-29T22:36:28+05:30",
+          "end": "2026-09-30T00:06:23+05:30",
+          "startDisplay": "29/09/2026 22:36:28 IST",
+          "endDisplay": "30/09/2026 00:06:23 IST"
+        },
+        {
+          "kind": "ChoghadiyaAmrit",
+          "name": "Amrit",
+          "classification": "HighlyFavorable",
+          "start": "2026-09-30T00:06:23+05:30",
+          "end": "2026-09-30T01:36:19+05:30",
+          "startDisplay": "30/09/2026 00:06:23 IST",
+          "endDisplay": "30/09/2026 01:36:19 IST"
+        },
+        {
+          "kind": "ChoghadiyaChal",
+          "name": "Chal",
+          "classification": "Neutral",
+          "start": "2026-09-30T01:36:19+05:30",
+          "end": "2026-09-30T03:06:15+05:30",
+          "startDisplay": "30/09/2026 01:36:19 IST",
+          "endDisplay": "30/09/2026 03:06:15 IST"
+        },
+        {
+          "kind": "ChoghadiyaRog",
+          "name": "Rog",
+          "classification": "Avoid",
+          "start": "2026-09-30T03:06:15+05:30",
+          "end": "2026-09-30T04:36:11+05:30",
+          "startDisplay": "30/09/2026 03:06:15 IST",
+          "endDisplay": "30/09/2026 04:36:11 IST"
+        },
+        {
+          "kind": "ChoghadiyaKaal",
+          "name": "Kaal",
+          "classification": "Avoid",
+          "start": "2026-09-30T04:36:11+05:30",
+          "end": "2026-09-30T06:06:07+05:30",
+          "startDisplay": "30/09/2026 04:36:11 IST",
+          "endDisplay": "30/09/2026 06:06:07 IST"
+        }
+      ],
+      "goodTime": {
+        "date": "2026-09-29",
+        "dateDisplay": "29/09/2026",
+        "status": {
+          "status": "Caution",
+          "name": "Use Caution",
+          "icon": "🟠"
+        },
+        "goodTimeCount": 0,
+        "bestGoodTime": null,
+        "noGoodTimeReason": "NO_QUALIFYING_PERIOD"
+      }
+    }
+  ]
+}
