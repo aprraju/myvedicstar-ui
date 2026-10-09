@@ -67,8 +67,12 @@ branches: main" (the environment is created automatically by the first run).
 
 Azure side (already configured):
 
-- Federated credential `github-myvedicstar-ui-production` on `myvedicstar-ui`:
-  `repo:aprraju/myvedicstar-ui:environment:production`, issuer `https://token.actions.githubusercontent.com`.
+- Federated credential `github-myvedicstar-ui-production-ids` on `myvedicstar-ui`:
+  `repo:aprraju@867910/myvedicstar-ui@1394636919:environment:production`, issuer
+  `https://token.actions.githubusercontent.com`, audience `api://AzureADTokenExchange`. This repository's OIDC tokens
+  use GitHub's immutable owner/repository-ID subject format (`<owner>@<owner id>/<repo>@<repo id>`), so the plain
+  `repo:aprraju/myvedicstar-ui:…` form does not match (error AADSTS700213). The "Federated token details" printed by
+  the Azure sign-in step show the exact subject to register.
 - Role assignment: **MyVedicStar Static Web App Deployer** (`Microsoft.Web/staticSites/read`,
   `Microsoft.Web/staticSites/listSecrets/action`) on `stapp-myvedicstar-prod`. The pipeline reads the deployment
   token at deploy time; nothing long-lived is stored in GitHub.
