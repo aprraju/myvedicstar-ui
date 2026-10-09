@@ -75,8 +75,10 @@ jobs:
         working-directory: apps/web
       - name: E2E (production build, production CSP)
         run: npm run e2e -w @myvedicstar/web
-      - name: Dependency audit (runtime dependencies)
-        run: npm audit --omit=dev --audit-level=high
+      # The web app's own runtime dependency tree (including the shared packages it uses). The mobile app's Expo /
+      # React Native toolchain is in the same lockfile but never ships in the web build; it is audited by its own pipeline.
+      - name: Dependency audit (web runtime dependencies)
+        run: npm audit --omit=dev --audit-level=high --workspace=@myvedicstar/web
       - uses: actions/upload-artifact@v5
         if: always()
         with:

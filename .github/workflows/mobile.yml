@@ -66,6 +66,13 @@ jobs:
         run: |
           npm run test --workspace=packages
           npm run test -w @myvedicstar/mobile -- --ci
+      # Report only: the open advisories are in the Expo / React Native build toolchain (Metro, Expo CLI, config
+      # plugins) and are fixed only by an Expo SDK upgrade. Make this blocking once that upgrade lands.
+      - name: Dependency audit (mobile runtime dependencies, report only)
+        run: |
+          if ! npm audit --omit=dev --audit-level=high --workspace=@myvedicstar/mobile; then
+            echo "::warning title=Mobile dependency audit::High-severity advisories in the Expo / React Native toolchain; most need an Expo SDK upgrade. See this step's log."
+          fi
       - name: Bundle JavaScript for Android and iOS (Metro)
         run: npx expo export --platform android --platform ios --output-dir /tmp/expo-export
         working-directory: apps/mobile
