@@ -1,5 +1,7 @@
 .shell {
   display: grid;
+  /* minmax(0, …): one wide child must never stretch the whole page (header, main, footer) past the viewport. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto 1fr auto;
   min-block-size: 100dvh;
 }

@@ -77,11 +77,14 @@
   list-style: none;
 }
 
-/* Tablet portrait: two columns of highlights under the copy. */
+/*
+ * Tablet portrait: two columns of highlights under the copy, each as wide as its text but able to shrink (and wrap)
+ * when the text does not fit — system fonts differ in width between platforms.
+ */
 @media (min-width: 600px) {
   .heroPoints {
     display: grid;
-    grid-template-columns: repeat(2, max-content);
+    grid-template-columns: repeat(2, minmax(0, max-content));
   }
 }
 
