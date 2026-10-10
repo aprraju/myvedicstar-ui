@@ -1,6 +1,13 @@
 name: Web
 
 # Web SPA pipeline. Independent of the mobile pipeline: web changes never trigger mobile builds.
+# Builds and verifies once, then deploys that build to Azure Static Web Apps (pushes to main only).
+# Redeploy / rollback: Actions → Web → Run workflow (main) → the run ID of the Web run whose build to deploy;
+# verification is skipped and that run's web-dist artifact is deployed as is.
+#
+# Settings: infrastructure/web/static-web-apps/environments/<environment>.env (public values, committed). A non-empty
+# GitHub variable with the same name overrides the file, e.g. MVS_FEATURE_FLAGS, without a commit.
+# GitHub variables required: AZURE_CLIENT_ID, AZURE_TENANT_ID (Azure OIDC sign-in; no stored Azure secrets).
 on:
   pull_request:
     paths:
@@ -13,7 +20,6 @@ on:
         'eslint.config.js',
         'knip.json',
         '.github/workflows/web.yml',
-        '.github/workflows/web-deploy.yml',
         'infrastructure/web/**',
       ]
   push:
@@ -28,10 +34,14 @@ on:
         'eslint.config.js',
         'knip.json',
         '.github/workflows/web.yml',
-        '.github/workflows/web-deploy.yml',
         'infrastructure/web/**',
       ]
   workflow_dispatch:
+    inputs:
+      artifact-run-id:
+        description: 'Redeploy / rollback: run ID of the Web run whose web-dist build to deploy (blank = build and deploy).'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -42,6 +52,7 @@ concurrency:
 
 jobs:
   verify:
+    if: inputs.artifact-run-id == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -93,17 +104,122 @@ jobs:
         with:
           name: web-dist
           path: apps/web/dist
-          # Rollback window: any build from the last 90 days can be redeployed (Web deploy workflow).
+          # Rollback window: any build from the last 90 days can be redeployed (Run workflow with its run ID).
           retention-days: 90
 
-  # Deploys the artifact verified above (built once) to production, for pushes to main only — never for pull requests.
-  # Uses the GitHub environment "production" (add required reviewers there to gate releases). To add environments
-  # later, add a settings file per environment and chain more jobs like this one.
+  # Deploys the artifact verified above (built once) to production, for pushes to main only — never for pull requests —
+  # or an earlier run's artifact on a manual redeploy / rollback. Uses the GitHub environment "production" (add required
+  # reviewers there to gate releases). To add environments later, add a settings file per environment and a job like this.
   deploy-production:
+    name: Deploy to production
     needs: verify
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    permissions: { contents: read, id-token: write, actions: read }
-    uses: ./.github/workflows/web-deploy.yml
-    with:
-      environment: production
-    secrets: inherit
+    if: >-
+      !cancelled() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' &&
+      (needs.verify.result == 'success' || (needs.verify.result == 'skipped' && inputs.artifact-run-id != ''))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The GitHub environment of the same name: its protection rules apply, and Azure trusts this job through the
+    # federated credential subject repo:<owner>/<repo>:environment:<name>.
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.site-url }}
+    # Never run two deployments to the same environment at once; never cancel one half way.
+    concurrency:
+      group: web-deploy-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # Azure OIDC sign-in
+      actions: read # download an artifact from another run (redeploy / rollback)
+    env:
+      TARGET_ENVIRONMENT: production
+      SETTINGS_FILE: infrastructure/web/static-web-apps/environments/production.env
+      BUILD_ID: ${{ inputs.artifact-run-id || github.sha }}
+      SWA_DEPLOYMENT_TOKEN: ${{ secrets.SWA_DEPLOYMENT_TOKEN }} # optional fallback when OIDC is not set up
+      # Optional overrides of the settings file (blank = use the file).
+      AZURE_STATIC_WEB_APP_NAME: ${{ vars.AZURE_STATIC_WEB_APP_NAME }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_STATIC_WEB_APP_RESOURCE_GROUP }}
+      AZURE_STATIC_WEB_APP_SUBSCRIPTION_ID: ${{ vars.AZURE_STATIC_WEB_APP_SUBSCRIPTION_ID }}
+      MVS_SITE_URL: ${{ vars.MVS_SITE_URL }}
+      MVS_API_BASE_URL: ${{ vars.MVS_API_BASE_URL }}
+      MVS_API_ENDPOINT_PREFIX: ${{ vars.MVS_API_ENDPOINT_PREFIX }}
+      MVS_API_ENDPOINTS: ${{ vars.MVS_API_ENDPOINTS }}
+      MVS_AUTH_MODE: ${{ vars.MVS_AUTH_MODE }}
+      MVS_AUTH_CLIENT_ID: ${{ vars.MVS_AUTH_CLIENT_ID }}
+      MVS_FEATURE_FLAGS: ${{ vars.MVS_FEATURE_FLAGS }}
+      MVS_TELEMETRY_ENABLED: ${{ vars.MVS_TELEMETRY_ENABLED }}
+      MVS_TELEMETRY_SAMPLE_RATE: ${{ vars.MVS_TELEMETRY_SAMPLE_RATE }}
+    steps:
+      - uses: actions/checkout@v5
+
+      # Fail fast with a precise message before any install or Azure call.
+      - name: Check settings
+        env:
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        run: |
+          problems=()
+          [[ -f "$SETTINGS_FILE" ]] || problems+=("$SETTINGS_FILE does not exist")
+          if [[ -z "$SWA_DEPLOYMENT_TOKEN" ]]; then
+            guid='^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            for name in AZURE_CLIENT_ID AZURE_TENANT_ID; do
+              if [[ -z "${!name}" ]]; then problems+=("GitHub variable $name is not set")
+              elif [[ ! "${!name}" =~ $guid ]]; then problems+=("GitHub variable $name must be a GUID")
+              fi
+            done
+          fi
+          if (( ${#problems[@]} )); then
+            for problem in "${problems[@]}"; do echo "::error title=Deployment settings::$problem"; done
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      # Deployment scripts reuse the app's config schema and header builder; no app build happens here.
+      - run: npm ci
+
+      # Same run: the artifact uploaded by the verify job.
+      - name: Download build artifact
+        if: inputs.artifact-run-id == ''
+        uses: actions/download-artifact@v5
+        with:
+          name: web-dist
+          path: apps/web/dist
+
+      # Redeploy / rollback: the artifact of an earlier Web run.
+      - name: Download build artifact from run ${{ inputs.artifact-run-id }}
+        if: inputs.artifact-run-id != ''
+        uses: actions/download-artifact@v5
+        with:
+          name: web-dist
+          path: apps/web/dist
+          run-id: ${{ inputs.artifact-run-id }}
+          github-token: ${{ github.token }}
+
+      # The identity holds one role on the Static Web App only (read + deployment token), whose subscription comes from
+      # the settings file; it needs no default subscription.
+      - name: Azure sign-in (OIDC)
+        if: env.SWA_DEPLOYMENT_TOKEN == ''
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      - name: Validate, deploy and smoke test
+        id: deploy
+        run: >-
+          bash infrastructure/web/static-web-apps/scripts/deploy.sh --environment "$TARGET_ENVIRONMENT"
+          --dist apps/web/dist --env-file "$SETTINGS_FILE"
+
+      - name: Rollback instructions
+        if: failure()
+        run: |
+          {
+            echo "### ❌ Web deployment to $TARGET_ENVIRONMENT failed"
+            echo "See the 'Validate, deploy and smoke test' log for the failing step."
+            echo "To restore the last good release: Actions → **Web** → Run workflow (main) →"
+            echo "artifact run ID of the last successful **Web** run."
+          } >> "$GITHUB_STEP_SUMMARY"

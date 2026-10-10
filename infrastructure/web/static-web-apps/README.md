@@ -6,7 +6,7 @@ about Azure, URLs and identities lives here.
 ```text
 push to main ─► Web workflow: lint · typecheck · tests · build once · validate · E2E ─► web-dist artifact
                                                                                          │
-             Web deploy workflow (GitHub environment "production", Azure OIDC) ◄─────────┘
+         deploy-production job (GitHub environment "production", Azure OIDC) ◄─────────┘
              validate ─► render config.json + staticwebapp.config.json ─► upload ─► smoke test
 ```
 
@@ -36,7 +36,7 @@ pipeline only deploys content; infrastructure changes belong in that repository.
 schema is strict, connection strings with keys are refused and the bundle is scanned for secret patterns.
 
 A non-empty GitHub variable with the same name overrides the file without a commit (e.g. `MVS_FEATURE_FLAGS`,
-`MVS_TELEMETRY_SAMPLE_RATE`); `.github/workflows/web-deploy.yml` lists the overridable names.
+`MVS_TELEMETRY_SAMPLE_RATE`); the `deploy-production` job in `.github/workflows/web.yml` lists the overridable names.
 
 | Variable                                               | Notes                                                                        |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------- |
@@ -80,8 +80,8 @@ Azure side (already configured):
 
 - **Automatic:** every push to `main` that touches the web app runs the Web workflow; after all checks pass, the same
   artifact is deployed to production.
-- **Redeploy / rollback:** Actions → **Web deploy** → Run workflow → run ID of a successful **Web** run (builds are
-  kept 90 days). The build is redeployed with the current settings file.
+- **Redeploy / rollback:** Actions → **Web** → Run workflow (branch `main`) → run ID of a successful **Web** run
+  (builds are kept 90 days). Checks are skipped; the build is redeployed with the current settings file.
 - **Settings-only change:** edit `environments/production.env` (or set a GitHub variable override) and redeploy the
   current build as above — no rebuild.
 - **From a workstation** (Git Bash, signed in with `az login`):

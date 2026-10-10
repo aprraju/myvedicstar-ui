@@ -62,7 +62,7 @@ on_error() {
   echo "Deployment to '${ENVIRONMENT:-?}' FAILED during: ${CURRENT_STEP} (exit ${code})." >&2
   case "$CURRENT_STEP" in
     Smoke*) echo "The new release IS deployed but did not verify. Roll back by redeploying the last good build:" >&2
-            echo "  GitHub → Actions → 'Web deploy' → Run workflow (environment, artifact run ID of the last good run)." >&2 ;;
+            echo "  GitHub → Actions → 'Web' → Run workflow (main, artifact run ID of the last good run)." >&2 ;;
     Deploy*) echo "The previous release is still being served (Static Web Apps switches content atomically)." >&2 ;;
     *) echo "Nothing was deployed." >&2 ;;
   esac
