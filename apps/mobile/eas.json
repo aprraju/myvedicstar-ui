@@ -22,7 +22,7 @@
       "channel": "production",
       "env": {
         "EXPO_PUBLIC_ENVIRONMENT": "production",
-        "EXPO_PUBLIC_API_BASE_URL": "https://apim-myvedicstar-prod-xw4t.azure-api.net/myvedicday/v1/api/v1"
+        "EXPO_PUBLIC_API_BASE_URL": "https://apim-myvedicstar-prod-xw4t.azure-api.net/myvedicday/api/v1"
       }
     }
   },

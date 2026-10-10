@@ -19,7 +19,7 @@ const RUNTIME_CONFIG_VARIABLES = {
   MVS_API_BASE_URL: 'Backend base URL including the version prefix, e.g. https://api.example.com/api/v1',
   MVS_API_TIMEOUT_MS: 'Optional request timeout (1000–60000)',
   MVS_API_ENDPOINT_PREFIX:
-    'Optional path prefixed to every default endpoint, e.g. /myvedicday/v1/api/v1 (gateway route)',
+    'Optional path prefixed to every default endpoint, e.g. /myvedicday/api/v1 (gateway route)',
   MVS_API_ENDPOINTS: 'Optional JSON object of endpoint path overrides, e.g. {"panchangToday":"/v2/today"}',
   MVS_DEFAULT_TRADITION: 'Optional default tradition key (default "all")',
   MVS_AUTH_MODE: 'disabled | entra-external-id (default disabled)',
@@ -94,7 +94,7 @@ export function renderRuntimeConfig(env: Env): RenderResult {
   // overrides individual endpoints, e.g. one served by a different API behind the same gateway.
   const prefix = read(env, 'MVS_API_ENDPOINT_PREFIX')?.replace(/\/+$/, '');
   if (prefix && (!prefix.startsWith('/') || prefix.startsWith('//'))) {
-    issues.push('MVS_API_ENDPOINT_PREFIX: must be a path starting with "/", e.g. /myvedicday/v1/api/v1');
+    issues.push('MVS_API_ENDPOINT_PREFIX: must be a path starting with "/", e.g. /myvedicday/api/v1');
   }
   const endpoints: Record<string, unknown> = prefix
     ? Object.fromEntries(
