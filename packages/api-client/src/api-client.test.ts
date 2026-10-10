@@ -274,6 +274,9 @@ describe('createApiClient', () => {
     expect(new URL(String(url)).pathname).toBe('/api/v1/auth/userinfo');
     expect(init?.method).toBe('POST');
     expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer token-1');
+    // The API gateway answers 415 to a POST without a Content-Type.
+    expect(new Headers(init?.headers).get('Content-Type')).toBe('application/json');
+    expect(init?.body).toBe('{}');
   });
 
   it('never calls /auth/userinfo without a token', async () => {

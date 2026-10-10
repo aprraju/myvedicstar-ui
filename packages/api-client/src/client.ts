@@ -277,6 +277,8 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'auth.userInfo',
           method: 'POST',
           path: path('authUserInfo'),
+          // The backend reads no body, but the API gateway rejects a POST without a Content-Type (415), so send `{}`.
+          body: {},
           schema: userInfoSchema,
           signal: call?.signal,
           auth: 'required',
