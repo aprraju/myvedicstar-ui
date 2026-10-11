@@ -425,7 +425,7 @@ function Results({
               {t('goodTime.recommended', { count: view.goodTimes.length })}
             </h2>
             <ol className={styles.list}>
-              {view.goodTimes.map((item, rank) => (
+              {view.goodTimes.map((item) => (
                 <SegmentCard
                   key={item.segment.id}
                   item={item}
@@ -436,7 +436,7 @@ function Results({
                       ? t('goodTime.goodTimeNow')
                       : item.segment.id === view.next?.segment.id
                         ? t('goodTime.nextGoodTime')
-                        : rank === 0
+                        : item.segment.id === response.goodTimes[0]
                           ? t('goodTime.best')
                           : undefined
                   }
@@ -484,7 +484,7 @@ function Results({
           </section>
         )}
 
-        <Timeline segments={view.segments} />
+        <Timeline segments={view.segments} timeZone={tz} date={response.date} />
 
         <p className={styles.disclaimer}>{response.disclaimer}</p>
       </div>
@@ -547,8 +547,13 @@ function SegmentCard({
 }
 
 /** The whole evaluated window as a bar: each segment colored by its backend status, with a text list for everyone. */
-function Timeline({ segments }: Readonly<{ segments: readonly ExplainedSegment[] }>) {
+function Timeline({
+  segments,
+  timeZone,
+  date,
+}: Readonly<{ segments: readonly ExplainedSegment[]; timeZone: string; date: string }>) {
   const { t } = useTranslation();
+  const format = useFormatters();
   const first = segments[0];
   const last = segments.at(-1);
   if (!first || !last) return null;
@@ -577,7 +582,7 @@ function Timeline({ segments }: Readonly<{ segments: readonly ExplainedSegment[]
           <li key={item.segment.id} data-status-tone={item.tone}>
             <Icon name={STATUS_ICON[item.tone]} size={14} />
             {t('goodTime.timelineLabel', {
-              time: item.segment.timeRangeDisplay,
+              time: format.range(item.segment.start, item.segment.end, timeZone, date),
               status: item.segment.status.name,
             })}
           </li>

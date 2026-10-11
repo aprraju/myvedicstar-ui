@@ -63,7 +63,7 @@ export interface ExplainedSegment {
 }
 
 export interface GoodTimeView {
-  /** Good Times in the backend's ranking order (best first). Empty when none qualifies. */
+  /** Good Times in ascending start-time order. Empty when none qualifies. */
   goodTimes: ExplainedSegment[];
   /**
    * Favorable periods the backend did not recommend because of a conflict (e.g. Amrit Kalam overlapping Rahu Kalam),
@@ -94,11 +94,14 @@ export function explainSegment(segment: GoodTimeSegment): ExplainedSegment {
 }
 
 export function buildGoodTimeView(response: GoodTimesResponse, now: number = Date.now()): GoodTimeView {
-  const segments = response.segments.map(explainSegment);
+  const byStart = (a: ExplainedSegment, b: ExplainedSegment) =>
+    toEpochMs(a.segment.start) - toEpochMs(b.segment.start);
+  const segments = response.segments.map(explainSegment).sort(byStart);
   const byId = new Map(segments.map((item) => [item.segment.id, item]));
   const goodTimes = response.goodTimes
     .map((id) => byId.get(id))
-    .filter((item): item is ExplainedSegment => item !== undefined && item.segment.isGoodTime);
+    .filter((item): item is ExplainedSegment => item !== undefined && item.segment.isGoodTime)
+    .sort(byStart);
 
   const notRecommended = segments.filter(
     (item) => !item.segment.isGoodTime && item.conflicts.some((conflict) => conflict.withFavorable),

@@ -12,7 +12,7 @@ export type LocalDate = string;
 export interface ZoneFormatOptions {
   timeZone: string;
   locale: string;
-  /** Force 12- or 24-hour time; omit to follow the locale. */
+  /** Use 12-hour time by default; set false to explicitly request 24-hour time. */
   hour12?: boolean | undefined;
 }
 
@@ -36,14 +36,17 @@ export function toEpochMs(instant: Instant): number {
   return ms;
 }
 
-/** `10:22 AM` (en-US) or `10:22` (en-GB) in the given zone. */
-export function formatTime(instant: Instant, { timeZone, locale, hour12 }: ZoneFormatOptions): string {
+/** `09:05 AM` in the given zone, with two-digit hours and minutes. */
+export function formatTime(instant: Instant, { timeZone, locale, hour12 = true }: ZoneFormatOptions): string {
   return formatter(locale, {
     timeZone,
-    hour: 'numeric',
+    hour: '2-digit',
     minute: '2-digit',
-    ...(hour12 === undefined ? {} : { hour12 }),
-  }).format(toEpochMs(instant));
+    hour12,
+  })
+    .formatToParts(toEpochMs(instant))
+    .map((part) => (part.type === 'dayPeriod' ? part.value.toUpperCase() : part.value))
+    .join('');
 }
 
 /** `3:10 PM – 4:39 PM`. The separator is locale-neutral; callers add "(next day)" via {@link dayOffset}. */

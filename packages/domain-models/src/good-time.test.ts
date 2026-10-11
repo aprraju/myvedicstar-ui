@@ -26,12 +26,28 @@ describe('toneForStatus', () => {
 });
 
 describe('buildGoodTimeView', () => {
-  it("lists the backend's Good Times in its ranking order, and only those", () => {
+  it("lists only the backend's Good Times in ascending start-time order", () => {
     const view = buildGoodTimeView(general, at('06:00'));
-    expect(view.goodTimes.map((item) => item.segment.id)).toEqual(general.goodTimes);
+    const expected = general.segments
+      .filter((segment) => general.goodTimes.includes(segment.id) && segment.isGoodTime)
+      .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+    expect(view.goodTimes.map((item) => item.segment.id)).toEqual(expected.map((segment) => segment.id));
     expect(view.goodTimes.every((item) => item.segment.isGoodTime && item.conflicts.length === 0)).toBe(true);
     expect(view.goodTimes.every((item) => ['highly-favorable', 'favorable'].includes(item.tone))).toBe(true);
     expect(view.noGoodTime).toBeUndefined();
+  });
+
+  it('sorts shuffled periods chronologically without changing the response', () => {
+    const response = structuredClone(general);
+    response.segments.reverse();
+    response.goodTimes.reverse();
+    const original = structuredClone(response);
+    const view = buildGoodTimeView(response);
+    for (const list of [view.goodTimes, view.notRecommended, view.segments]) {
+      const starts = list.map((item) => Date.parse(item.segment.start));
+      expect(starts).toEqual([...starts].sort((a, b) => a - b));
+    }
+    expect(response).toEqual(original);
   });
 
   it('explains Good Times with supportive reasons and the conflicts they avoid', () => {

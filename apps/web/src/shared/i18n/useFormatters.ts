@@ -21,10 +21,10 @@ export function useFormatters() {
         new Intl.DateTimeFormat(locale, {
           month: 'short',
           day: 'numeric',
-          hour: 'numeric',
-          minute: '2-digit',
           timeZone,
-        }).format(new Date(instant)),
+        }).format(new Date(instant)) +
+        ', ' +
+        formatTime(instant, { timeZone, locale }),
     }),
     [locale, t],
   );

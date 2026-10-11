@@ -22,6 +22,13 @@ const NARROW_NO_BREAK_SPACE = String.fromCharCode(0x202f);
 const norm = (text: string) => text.split(NARROW_NO_BREAK_SPACE).join(' ');
 
 describe('formatting in the selected location zone', () => {
+  it('uses padded 12-hour times even for a locale that defaults to 24 hours', () => {
+    const options = { ...austin, locale: 'en-GB' };
+    expect(norm(formatTime('2026-09-29T09:05:00-05:00', options))).toBe('09:05 AM');
+    expect(norm(formatTime('2026-09-29T00:00:00-05:00', options))).toBe('12:00 AM');
+    expect(norm(formatTime('2026-09-29T12:00:00-05:00', options))).toBe('12:00 PM');
+  });
+
   it('formats an instant in the location zone regardless of its offset', () => {
     // Same instant expressed in IST: must still display as Austin local time.
     expect(norm(formatTime('2026-09-29T20:52:00+05:30', austin))).toBe('10:22 AM');
@@ -30,7 +37,7 @@ describe('formatting in the selected location zone', () => {
 
   it('formats a range', () => {
     expect(norm(formatTimeRange('2026-09-29T15:10:00-05:00', '2026-09-29T16:39:00-05:00', austin))).toBe(
-      '3:10 PM – 4:39 PM',
+      '03:10 PM – 04:39 PM',
     );
   });
 
@@ -101,7 +108,7 @@ describe('daylight saving time', () => {
   });
 
   it('keeps sunrise on the fall-back day in local time', () => {
-    expect(norm(formatTime('2026-11-01T06:39:00-06:00', austin))).toBe('6:39 AM');
+    expect(norm(formatTime('2026-11-01T06:39:00-06:00', austin))).toBe('06:39 AM');
     expect(localDateOf('2026-11-01T01:30:00-06:00', 'America/Chicago')).toBe('2026-11-01');
   });
 });
