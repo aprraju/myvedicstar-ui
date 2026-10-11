@@ -259,21 +259,17 @@ describe('smoke-test.ts', () => {
     'checks actual GET CORS and anonymous access (status %s, header %s)',
     async (status, cors, expectedCode) => {
       const { stage, siteUrl } = await stagedSite();
+      const requests: { method: string | undefined; url: URL; origin: string | undefined }[] = [];
       const api = createServer((request, response) => {
+        requests.push({
+          method: request.method,
+          url: new URL(request.url!, 'http://localhost'),
+          origin: request.headers.origin,
+        });
         if (request.method === 'OPTIONS') {
           response.setHeader('Access-Control-Allow-Origin', siteUrl);
           return response.writeHead(200).end();
         }
-        const url = new URL(request.url!, 'http://localhost');
-        expect(url.pathname).toBe('/api/v1/panchang/today');
-        expect(Object.fromEntries(url.searchParams)).toEqual({
-          latitude: '30.63',
-          longitude: '-97.68',
-          timeZone: 'America/Chicago',
-          tradition: 'all',
-          language: 'en',
-        });
-        expect(request.headers.origin).toBe(siteUrl);
         if (cors) response.setHeader('Access-Control-Allow-Origin', siteUrl);
         return response.writeHead(status).end('{}');
       });
@@ -287,6 +283,18 @@ describe('smoke-test.ts', () => {
       expect(output).toContain('API GET CORS allows');
       expect(output).toContain(`public today endpoint succeeds without sign-in (${status})`);
       expect(code).toBe(expectedCode);
+      expect(requests.map((request) => request.method)).toEqual(['OPTIONS', 'GET']);
+      for (const request of requests) {
+        expect(request.url.pathname).toBe('/panchang/today');
+        expect(Object.fromEntries(request.url.searchParams)).toEqual({
+          latitude: '30.63',
+          longitude: '-97.68',
+          timeZone: 'America/Chicago',
+          tradition: 'all',
+          language: 'en',
+        });
+        expect(request.origin).toBe(siteUrl);
+      }
     },
     TIMEOUT,
   );

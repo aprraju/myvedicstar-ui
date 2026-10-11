@@ -172,6 +172,11 @@ test.describe('calendar (signed in)', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'October 2026' })).toBeVisible();
     const grid = page.getByRole('group', { name: 'Days of October 2026' });
     await expect(grid.getByRole('button', { name: /^Tuesday, October 20,.*Vijayadashami/ })).toBeVisible();
+    const festivalDay = grid.getByRole('button', { name: /^Tuesday, October 20,.*Vijayadashami/ });
+    await expect(festivalDay.getByText('Amavasya', { exact: true })).toBeVisible();
+    await expect(festivalDay.getByText(/Vijayadashami \(Dasara\)/)).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await grid.screenshot({ path: test.info().outputPath('calendar-month.png') });
 
     await grid.getByRole('button', { name: /^Tuesday, October 20,/ }).click();
     await expect(

@@ -328,7 +328,7 @@
   color: var(--color-text-secondary);
 }
 
-/* Phones: compact cells — number and rating dot, observance as a short tag; details in the panel below. */
+/* Phones: keep both the Tithi and festival tag in each compact cell. */
 @media (max-width: 599px) {
   .card {
     padding: var(--space-md);
@@ -340,7 +340,7 @@
 
   .day,
   .pad {
-    min-block-size: 3.5rem;
+    min-block-size: 5.5rem;
   }
 
   .day {
@@ -359,7 +359,7 @@
   }
 
   .tithi {
-    display: none;
+    font-size: 0.625rem;
   }
 
   .tag {

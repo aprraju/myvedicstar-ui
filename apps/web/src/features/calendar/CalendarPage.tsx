@@ -247,8 +247,7 @@ function MonthGrid({
               <span className={styles.dayLoading} />
             ) : (
               <>
-                {/* A festival or observance tag replaces the Tithi name (the full Tithi is in the day's panel). */}
-                {day.tithi && !first && !observance && <span className={styles.tithi}>{day.tithi.name}</span>}
+                {day.tithi && <span className={styles.tithi}>{day.tithi.name}</span>}
                 {first && (
                   <span className={styles.tag} data-category={first.category}>
                     {first.icon && <span aria-hidden="true">{first.icon} </span>}
