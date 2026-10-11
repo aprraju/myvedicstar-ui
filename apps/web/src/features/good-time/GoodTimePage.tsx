@@ -196,9 +196,7 @@ export function GoodTimePage() {
                 }
               />
 
-              {view === 'day' && shownDate && (
-                <DatePicker date={shownDate} today={today} onChange={selectDay} />
-              )}
+              {shownDate && <DatePicker date={shownDate} today={today} onChange={selectDay} />}
             </div>
           </div>
 
@@ -216,9 +214,6 @@ export function GoodTimePage() {
                   onSelectDay={selectDay}
                 />
               ) : null}
-              {view === 'month' && shownDate && (
-                <DatePicker date={shownDate} today={today} onChange={selectDay} />
-              )}
               <Results
                 showAllCards={view === 'month'}
                 response={response}
