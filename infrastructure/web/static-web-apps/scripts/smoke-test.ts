@@ -8,7 +8,7 @@
  * - security headers: the CSP and other headers equal staticwebapp.config.json's globalHeaders;
  * - caching: hashed assets immutable, config.json and HTML revalidated; source maps not served;
  * - SPA routing: a deep link returns the app with HTTP 200;
- * - backend CORS: the API answers a preflight from this site's origin;
+ * - backend CORS: the API allows preflight and GET responses from this site's origin;
  * - sign-in: the Entra External ID OpenID configuration is reachable for the configured authority.
  */
 import { readFileSync } from 'node:fs';
@@ -143,6 +143,7 @@ async function runChecks(siteUrl: string): Promise<void> {
     try {
       const preflight = await fetch(apiUrl, {
         method: 'OPTIONS',
+        redirect: 'manual',
         headers: {
           Origin: site.origin,
           'Access-Control-Request-Method': 'GET',
@@ -151,7 +152,7 @@ async function runChecks(siteUrl: string): Promise<void> {
       });
       const allowed = preflight.headers.get('access-control-allow-origin');
       check(
-        allowed === site.origin || allowed === '*',
+        preflight.ok && (allowed === site.origin || allowed === '*'),
         `API CORS allows ${site.origin} (got ${allowed ?? 'none'})`,
       );
     } catch (error) {
@@ -159,6 +160,27 @@ async function runChecks(siteUrl: string): Promise<void> {
         false,
         `API reachable for CORS preflight (${error instanceof Error ? error.message : String(error)})`,
       );
+    }
+  }
+
+  // A successful preflight does not guarantee CORS headers on the actual response, especially a 401.
+  if (!values['skip-cors']) {
+    const apiUrl = new URL(`${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.traditions}`);
+    apiUrl.searchParams.set('language', 'en');
+    try {
+      const response = await fetch(apiUrl, {
+        redirect: 'manual',
+        headers: { Origin: site.origin },
+      });
+      const allowed = response.headers.get('access-control-allow-origin');
+      check(
+        allowed === site.origin || allowed === '*',
+        `API GET CORS allows ${site.origin} (status ${response.status}, got ${allowed ?? 'none'})`,
+      );
+      check(response.ok, `public traditions endpoint succeeds without sign-in (${response.status})`);
+      await response.body?.cancel();
+    } catch (error) {
+      check(false, `API GET reachable (${error instanceof Error ? error.message : String(error)})`);
     }
   }
 

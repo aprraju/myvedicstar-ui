@@ -104,7 +104,7 @@ Azure side (already configured):
 | Smoke test                  | New release live but unverified; job fails                       | Investigate, or roll back (above)                                        |
 
 The smoke test checks: new release live, HTTP→HTTPS, security headers, caching, hidden source maps, deep links, APIM
-CORS preflight from the site origin, and the Entra External ID discovery document.
+CORS preflight and actual public traditions GET response from the site origin, and the Entra External ID discovery document.
 
 ## Hosting behaviour (generated staticwebapp.config.json)
 
@@ -114,3 +114,14 @@ CORS preflight from the site origin, and the Entra External ID discovery documen
 - `/assets/*` immutable for a year; HTML revalidated; `/config.json` never cached.
 - Deep links return `index.html` with 200; missing assets return real 404s; source maps are never published.
 - Built-in Static Web Apps sign-in routes (`/.auth/login/*`) are closed.
+
+## Troubleshooting API CORS
+
+A passing OPTIONS preflight is insufficient: the actual API response must also include
+`Access-Control-Allow-Origin` matching the site's origin. The smoke test checks both and requires the public
+`traditions?language=en` endpoint to succeed without sign-in.
+
+If OPTIONS succeeds but GET returns 401 without that header, inspect APIM's effective policy and backend
+authorization for `/myvedicday/api/v1/traditions`. Allow anonymous access to this public endpoint, and ensure
+CORS headers are included on error responses too. The API/APIM configuration is owned by the backend and
+`myvedicstar-infra`; adding response headers to Static Web Apps or changing fetch to `no-cors` cannot fix it.
