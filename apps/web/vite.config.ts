@@ -121,6 +121,17 @@ export default defineConfig(({ mode, command, isPreview }) => ({
     // Never inline assets as data: URIs into JS/CSS; keeps CSP simple and caching effective.
     assetsInlineLimit: 0,
     modulePreload: { polyfill: false },
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            // Zod and src/zod-config.ts share one chunk so jitless mode is on before any chunk can create a schema;
+            // otherwise Zod's caught `new Function` probe is reported as a CSP (no `unsafe-eval`) violation.
+            { name: 'zod', test: /[\\/]node_modules[\\/]zod[\\/]|[\\/]src[\\/]zod-config\.ts$/ },
+          ],
+        },
+      },
+    },
   },
   server: {
     port: 5173,

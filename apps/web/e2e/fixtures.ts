@@ -67,6 +67,18 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
         }
       });
       page.on('pageerror', (error) => violations.push(`Uncaught: ${error.message}`));
+      // A blocked `eval` / `new Function` that the page catches never reaches the console (Chrome lists it only under
+      // DevTools → Issues), so listen for the CSP violation event itself.
+      await page.exposeFunction('__reportCspViolation', (violation: string) => violations.push(violation));
+      await page.addInitScript(() => {
+        document.addEventListener('securitypolicyviolation', (event) => {
+          const report = (window as unknown as { __reportCspViolation: (violation: string) => void })
+            .__reportCspViolation;
+          void report(
+            `CSP ${event.effectiveDirective} blocked ${event.blockedURI} at ${event.sourceFile}:${event.lineNumber}`,
+          );
+        });
+      });
 
       await page.route('**/config.json', async (route) => {
         const response = await route.fetch();

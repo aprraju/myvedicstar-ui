@@ -44,15 +44,15 @@ libraries; it can be removed if unused after Phase 6 review.
 
 ## How the codebase stays compatible
 
-| Risk                          | Mitigation                                                                                                                    |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Inline bootstrap scripts      | `index.html` contains only `<script type="module" src>`; Vite module-preload polyfill disabled; E2E asserts no CSP violations |
-| Theme "flash" scripts         | Theme uses CSS `prefers-color-scheme`; explicit choice set via `data-theme` from the app bundle                               |
-| CSS-in-JS injecting `<style>` | Not used: CSS Modules are extracted to `.css` files                                                                           |
-| `style` attributes            | React sets `style` via the CSSOM at runtime, which CSP does not block (only markup attributes/`<style>` are)                  |
-| `eval` / `new Function`       | ESLint `no-eval`, `no-implied-eval`, `no-new-func`; Zod configured `jitless`; build output grep in CI                         |
-| Inlined assets                | `assetsInlineLimit: 0`                                                                                                        |
-| HTML injection                | `dangerouslySetInnerHTML` banned by ESLint                                                                                    |
+| Risk                          | Mitigation                                                                                                                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Inline bootstrap scripts      | `index.html` contains only `<script type="module" src>`; Vite module-preload polyfill disabled; E2E asserts no CSP violations                                                                    |
+| Theme "flash" scripts         | Theme uses CSS `prefers-color-scheme`; explicit choice set via `data-theme` from the app bundle                                                                                                  |
+| CSS-in-JS injecting `<style>` | Not used: CSS Modules are extracted to `.css` files                                                                                                                                              |
+| `style` attributes            | React sets `style` via the CSSOM at runtime, which CSP does not block (only markup attributes/`<style>` are)                                                                                     |
+| `eval` / `new Function`       | ESLint `no-eval`, `no-implied-eval`, `no-new-func`; Zod `jitless` set in the Zod chunk (`apps/web/src/zod-config.ts`); build output grep in CI; E2E fails on any `securitypolicyviolation` event |
+| Inlined assets                | `assetsInlineLimit: 0`                                                                                                                                                                           |
+| HTML injection                | `dangerouslySetInnerHTML` banned by ESLint                                                                                                                                                       |
 
 **Verification:** Playwright E2E runs against `vite preview`, which sends this policy; any
 `securitypolicyviolation`/"Refused to …" console error fails the test.
