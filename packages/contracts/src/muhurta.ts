@@ -27,13 +27,23 @@ export type KnownActivityKey =
   | 'general'
   | 'other';
 
-export const muhurtaNakshatrasResponseSchema = z.array(
+const muhurtaNakshatraCatalogSchema = z.array(
   z.object({
     key: z.string(),
     name: z.string(),
     order: z.number().int(),
   }),
 );
+
+/** The API wraps the catalog with its language; older versions return the array directly. */
+export const muhurtaNakshatrasResponseSchema = z
+  .union([
+    z
+      .object({ language: z.string(), nakshatras: muhurtaNakshatraCatalogSchema })
+      .transform((response) => response.nakshatras),
+    muhurtaNakshatraCatalogSchema,
+  ])
+  .transform((stars) => [...stars].sort((a, b) => a.order - b.order));
 
 export const muhurtaActivitySchema = z.object({
   key: z.string(),

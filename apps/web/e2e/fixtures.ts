@@ -93,10 +93,13 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
         if (url.pathname.endsWith('/auth/userinfo')) return route.fulfill({ json: fixtures.userInfo });
         if (url.pathname.endsWith('/muhurta/nakshatras'))
           return route.fulfill({
-            json: [
-              { key: 'Ashwini', name: 'Ashwini', order: 1 },
-              { key: 'Bharani', name: 'Bharani', order: 2 },
-            ],
+            json: {
+              language: 'en',
+              nakshatras: [
+                { key: 'Ashwini', name: 'Ashwini', order: 1 },
+                { key: 'Bharani', name: 'Bharani', order: 2 },
+              ],
+            },
           });
         if (url.pathname.endsWith('/muhurta/activities')) return route.fulfill({ json: fixtures.activities });
         if (url.pathname.endsWith('/muhurta/good-times/explanation')) {

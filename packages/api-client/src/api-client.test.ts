@@ -26,6 +26,18 @@ function setup(fetchImpl: typeof fetch, extra: Partial<Parameters<typeof createA
 }
 
 describe('createApiClient', () => {
+  it.each(['wrapped', 'array'])('loads the %s birth-star catalog in display order', async (shape) => {
+    const stars = [
+      { key: 'Bharani', name: 'Bharani', order: 2 },
+      { key: 'Ashwini', name: 'Ashwini', order: 1 },
+    ];
+    const payload = shape === 'wrapped' ? { language: 'en', nakshatras: stars } : stars;
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(payload));
+    const { client } = setup(fetchImpl);
+    expect(await client.muhurta.nakshatras()).toEqual([stars[1], stars[0]]);
+    expect(fetchImpl.mock.calls[0]![0]).toBe(`${BASE_URL}/muhurta/nakshatras`);
+  });
+
   it('builds the request URL, rounds coordinates and sends a correlation ID', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.panchang.hyderabadAll));
     const { client } = setup(fetchImpl);

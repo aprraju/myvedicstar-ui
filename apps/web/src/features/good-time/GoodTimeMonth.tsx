@@ -1,5 +1,6 @@
 import type { LocalDate } from '@myvedicstar/date-time';
 import {
+  addMonths,
   buildGoodTimeMonth,
   type GoodTimeMonthDay,
   type StatusTone,
@@ -7,6 +8,7 @@ import {
 } from '@myvedicstar/domain-models';
 import { useMemo } from 'react';
 
+import { Button } from '../../shared/components/Button';
 import { Icon } from '../../shared/components/Icon';
 import { ErrorState } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
@@ -23,12 +25,16 @@ const TONES: readonly StatusTone[] = ['highly-favorable', 'favorable', 'mixed', 
  */
 export function GoodTimeMonth({
   yearMonth,
+  thisMonth,
+  onMonthChange,
   activity,
   otherText,
   nakshatra,
   onSelectDay,
 }: Readonly<{
   yearMonth: YearMonth;
+  thisMonth: YearMonth | undefined;
+  onMonthChange: (yearMonth: YearMonth) => void;
   activity: string;
   otherText: string | undefined;
   nakshatra?: string | undefined;
@@ -53,12 +59,36 @@ export function GoodTimeMonth({
     [locale, yearMonth.year, yearMonth.month],
   );
 
+  const isThisMonth =
+    thisMonth !== undefined && thisMonth.year === yearMonth.year && thisMonth.month === yearMonth.month;
+
   return (
     <section className={styles.month} aria-labelledby="good-time-month-title">
       <div className={styles.toolbar}>
         <h2 id="good-time-month-title" className={styles.title}>
           {monthTitle}
         </h2>
+        <div className={styles.actions}>
+          <Button
+            variant="secondary"
+            aria-label={t('goodTime.previousMonth')}
+            onClick={() => onMonthChange(addMonths(yearMonth, -1))}
+          >
+            <span aria-hidden="true">&lsaquo;</span>
+          </Button>
+          {thisMonth && !isThisMonth && (
+            <Button variant="secondary" onClick={() => onMonthChange(thisMonth)}>
+              {t('goodTime.thisMonth')}
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            aria-label={t('goodTime.nextMonth')}
+            onClick={() => onMonthChange(addMonths(yearMonth, 1))}
+          >
+            <span aria-hidden="true">&rsaquo;</span>
+          </Button>
+        </div>
       </div>
 
       {awaitingDescription ? (

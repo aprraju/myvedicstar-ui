@@ -455,9 +455,10 @@
 }
 
 .birthStar {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-xs);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
 }
 
 .birthStar select {

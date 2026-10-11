@@ -46,10 +46,13 @@ export const handlers = [
     );
   }),
   http.get(api('/muhurta/nakshatras'), () =>
-    HttpResponse.json([
-      { key: 'Ashwini', name: 'Ashwini', order: 1 },
-      { key: 'Bharani', name: 'Bharani', order: 2 },
-    ]),
+    HttpResponse.json({
+      language: 'en',
+      nakshatras: [
+        { key: 'Ashwini', name: 'Ashwini', order: 1 },
+        { key: 'Bharani', name: 'Bharani', order: 2 },
+      ],
+    }),
   ),
   http.get(api('/muhurta/activities'), ({ request }) => {
     apiRequests.push(new URL(request.url));

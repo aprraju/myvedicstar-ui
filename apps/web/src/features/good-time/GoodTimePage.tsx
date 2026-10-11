@@ -1,7 +1,6 @@
 import type { GoodTimesResponse } from '@myvedicstar/contracts';
 import { addDays, type LocalDate, todayIn } from '@myvedicstar/date-time';
 import {
-  addMonths,
   buildGoodTimeView,
   defaultActivityKey,
   type ExplainedSegment,
@@ -150,61 +149,6 @@ export function GoodTimePage() {
               />
             )}
 
-            <div className={styles.planningRow}>
-              <ViewToggle
-                view={view}
-                onChange={(next) =>
-                  update(
-                    next === 'month'
-                      ? { view: 'month', month: shownMonth ? formatYearMonth(shownMonth) : undefined }
-                      : { view: undefined, month: undefined },
-                  )
-                }
-              />
-
-              {view === 'day' && shownDate && (
-                <DatePicker
-                  date={shownDate}
-                  today={today}
-                  onChange={(value) => update({ date: value === today ? undefined : value })}
-                />
-              )}
-              {view === 'month' && shownMonth && (
-                <div className={styles.date}>
-                  <Button
-                    variant="ghost"
-                    aria-label={t('goodTime.previousMonth')}
-                    onClick={() => update({ month: formatYearMonth(addMonths(shownMonth, -1)) })}
-                  >
-                    &lsaquo;
-                  </Button>
-                  <label className="visually-hidden" htmlFor={`${starId}-month`}>
-                    {t('goodTime.views.month')}
-                  </label>
-                  <input
-                    id={`${starId}-month`}
-                    type="month"
-                    value={formatYearMonth(shownMonth)}
-                    onChange={(event) => event.target.value && update({ month: event.target.value })}
-                  />
-                  {today && formatYearMonth(shownMonth) !== formatYearMonth(yearMonthOf(today)) && (
-                    <Button
-                      variant="secondary"
-                      onClick={() => update({ month: formatYearMonth(yearMonthOf(today)) })}
-                    >
-                      {t('goodTime.thisMonth')}
-                    </Button>
-                  )}
-                  <Button
-                    variant="ghost"
-                    aria-label={t('goodTime.nextMonth')}
-                    onClick={() => update({ month: formatYearMonth(addMonths(shownMonth, 1)) })}
-                  >
-                    &rsaquo;
-                  </Button>
-                </div>
-              )}
-            </div>
             <div className={styles.birthStar}>
               <label htmlFor={starId}>{t('goodTime.birthStar')}</label>
               <select
@@ -228,6 +172,26 @@ export function GoodTimePage() {
                 />
               )}
             </div>
+            <div className={styles.planningRow}>
+              <ViewToggle
+                view={view}
+                onChange={(next) =>
+                  update(
+                    next === 'month'
+                      ? { view: 'month', month: shownMonth ? formatYearMonth(shownMonth) : undefined }
+                      : { view: undefined, month: undefined },
+                  )
+                }
+              />
+
+              {view === 'day' && shownDate && (
+                <DatePicker
+                  date={shownDate}
+                  today={today}
+                  onChange={(value) => update({ date: value === today ? undefined : value })}
+                />
+              )}
+            </div>
           </div>
 
           <div className={styles.body}>
@@ -235,6 +199,8 @@ export function GoodTimePage() {
               {view === 'month' && shownMonth ? (
                 <GoodTimeMonth
                   yearMonth={shownMonth}
+                  thisMonth={today ? yearMonthOf(today) : undefined}
+                  onMonthChange={(next) => update({ month: formatYearMonth(next) })}
                   activity={activity}
                   otherText={otherText}
                   nakshatra={nakshatra}
