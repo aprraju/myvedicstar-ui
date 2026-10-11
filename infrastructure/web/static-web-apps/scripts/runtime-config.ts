@@ -17,7 +17,7 @@ const RUNTIME_CONFIG_VARIABLES = {
   MVS_ENVIRONMENT: 'development | test | production (also uat, staging)',
   MVS_SITE_URL: 'Public origin of this environment, e.g. https://www.example.com (default for redirect URIs)',
   MVS_API_BASE_URL: 'Backend base URL including the version prefix, e.g. https://api.example.com/api/v1',
-  MVS_API_TIMEOUT_MS: 'Optional request timeout (1000–60000)',
+  MVS_API_TIMEOUT_MS: 'Optional request timeout (1000–120000)',
   MVS_API_ENDPOINT_PREFIX:
     'Optional path prefixed to every default endpoint, e.g. /myvedicday/api/v1 (gateway route)',
   MVS_API_ENDPOINTS: 'Optional JSON object of endpoint path overrides, e.g. {"panchangToday":"/v2/today"}',

@@ -207,7 +207,7 @@ export const appConfigSchema = z
     /** Backend base URL including the API version prefix, e.g. `https://api.example.com/api/v1`. */
     apiBaseUrl: z.url(),
     endpoints: endpointsSchema,
-    apiTimeoutMs: z.number().int().min(1000).max(60_000).default(15_000),
+    apiTimeoutMs: z.number().int().min(1000).max(120_000).default(15_000),
     defaultTradition: z.string().default('all'),
     auth: authSchema.default({ mode: 'disabled' }),
     featureFlags: featureFlagsSchema.default(

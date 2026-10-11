@@ -99,7 +99,7 @@ export interface ApiClientOptions extends HttpTransportOptions {
 export type ApiClient = ReturnType<typeof createApiClient>;
 
 /**
- * Typed endpoints of the MyVedicDay API. Every endpoint sends the signed-in user's access token
+ * Typed endpoints of the MyVedicDay API. Requests attach the signed-in user's access token.
  * Only today's Panchang and location resolve allow anonymous requests; all other endpoints require a token.
  * `baseUrl` includes the API version prefix, e.g. `https://api.example.com/api/v1`;
  * endpoint paths come from configuration (see ./endpoints.ts). UI code reaches the backend only through this client.
