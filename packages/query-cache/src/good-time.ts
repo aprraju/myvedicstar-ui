@@ -5,13 +5,25 @@ import { scopedKey } from './keys';
 import { useLocalDate } from './local-date';
 import type { CalculationContext } from './panchang';
 import { cachePolicies, defaultCacheSettings } from './policies';
+import { validCalculationParams, validLocalDate } from './validation';
 
-export function goodTimeOptions(context: CalculationContext & { params: GoodTimesParams | null }) {
+export function goodTimeOptions(
+  context: CalculationContext & { params: GoodTimesParams | null },
+  localDate?: string,
+) {
   const { api, params, userId, enabled = true, settings = defaultCacheSettings } = context;
-  const valid = params !== null && Boolean(params.date && /^\d{4}-\d{2}-\d{2}$/.test(params.date)) &&
+  const date = params?.date ?? localDate;
+  const valid =
+    validCalculationParams(params) &&
+    params !== null &&
+    Boolean(date && validLocalDate(date)) &&
     (params.activity !== 'other' || Boolean(params.otherText?.trim()));
   return queryOptions({
-    queryKey: scopedKey(params ? queryKeys.muhurta.goodTimes(params) : ['muhurta', 'good-times', 'idle'], userId, settings),
+    queryKey: scopedKey(
+      params ? queryKeys.muhurta.goodTimes({ ...params, date }) : ['muhurta', 'good-times', 'idle'],
+      userId,
+      settings,
+    ),
     queryFn: ({ signal }) => api.muhurta.goodTimes(params as GoodTimesParams, { signal }),
     enabled: enabled && userId !== null && valid,
     ...(settings.enabled ? cachePolicies.goodTime : { staleTime: 0, gcTime: 0 }),
@@ -21,6 +33,5 @@ export function goodTimeOptions(context: CalculationContext & { params: GoodTime
 /** Stable intervals are cached; Now/Next remains computed locally by the existing view model. */
 export function useGoodTime(context: CalculationContext & { params: GoodTimesParams | null }) {
   const today = useLocalDate(context.params?.location.timeZone);
-  const params = context.params ? { ...context.params, date: context.params.date ?? today } : null;
-  return useQuery(goodTimeOptions({ ...context, params }));
+  return useQuery(goodTimeOptions(context, today));
 }

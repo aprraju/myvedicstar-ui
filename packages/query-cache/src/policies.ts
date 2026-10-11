@@ -7,6 +7,7 @@ export const cachePolicies = {
   panchang: { staleTime: 12 * HOUR, gcTime: 24 * HOUR },
   calendar: { staleTime: 12 * HOUR, gcTime: 24 * HOUR },
   goodTime: { staleTime: HOUR, gcTime: 6 * HOUR },
+  liveBest: { staleTime: 5 * 60_000, gcTime: 6 * HOUR },
   catalog: { staleTime: 24 * HOUR, gcTime: 24 * HOUR },
   profile: { staleTime: 5 * 60_000, gcTime: 15 * 60_000 },
   persistence: { maxAge: 24 * HOUR, maxQueryBytes: 512 * 1024, maxTotalBytes: 2 * 1024 * 1024 },
@@ -18,6 +19,7 @@ export interface CacheSettings {
   prefetchTomorrow: boolean;
   schemaVersion: string;
   rulesVersion: string;
+  calculationVersion: string;
 }
 
 export const defaultCacheSettings: CacheSettings = {
@@ -26,4 +28,5 @@ export const defaultCacheSettings: CacheSettings = {
   prefetchTomorrow: false,
   schemaVersion: '1',
   rulesVersion: '1',
+  calculationVersion: '1',
 };

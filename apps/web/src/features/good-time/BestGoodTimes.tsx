@@ -5,6 +5,7 @@ import { useId, useMemo } from 'react';
 import { Button } from '../../shared/components/Button';
 import { Icon } from '../../shared/components/Icon';
 import { ErrorState, Skeleton } from '../../shared/components/states';
+import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
 import { STATUS_ICON } from './activityIcons';
@@ -32,6 +33,7 @@ export function BestGoodTimes({
   onSelectDay: (date: LocalDate) => void;
 }>) {
   const { t } = useTranslation();
+  const now = useNow();
   const format = useFormatters();
   const titleId = useId();
   const awaitingDescription = activity === 'other' && !otherText?.trim();
@@ -42,7 +44,7 @@ export function BestGoodTimes({
   const query = date ? selected.query : standard;
   const response = date ? (selected.start === date ? selected.query.data : undefined) : standard.data;
   const items = useMemo(() => {
-    if (!date) return buildBestGoodTimes(standard.data);
+    if (!date) return buildBestGoodTimes(standard.data).filter((item) => Date.parse(item.segment.end) > now);
     if (selected.start !== date) return [];
     return (selected.query.data?.days ?? [])
       .flatMap((day) => {
@@ -64,7 +66,7 @@ export function BestGoodTimes({
         tone: toneForStatus(day.segment.status.status),
         supports: [],
       }));
-  }, [date, standard.data, selected.query.data, selected.start]);
+  }, [date, now, standard.data, selected.query.data, selected.start]);
 
   let body;
   if (awaitingDescription) {

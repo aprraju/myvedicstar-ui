@@ -6,8 +6,8 @@ import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-c
 import { LocationProvider } from '../features/location/LocationProvider';
 import { LocationSheet } from '../features/location/LocationSheet';
 import { TraditionProvider } from '../features/tradition/TraditionProvider';
-import { I18nProvider } from '../shared/i18n';
 import { CacheLifecycle } from '../shared/CacheLifecycle';
+import { I18nProvider } from '../shared/i18n';
 import { type MobileServices, ServicesProvider } from '../shared/services';
 
 /**
@@ -29,7 +29,11 @@ export function AppProviders({
     // Initial metrics avoid a blank first frame while insets are measured.
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <ServicesProvider services={services}>
-        <CacheProvider client={services.queryClient} settings={services.config.cache} persister={services.cachePersister}>
+        <CacheProvider
+          client={services.queryClient}
+          settings={services.config.cache}
+          persister={services.cachePersister}
+        >
           <CacheLifecycle />
           <I18nProvider {...(language ? { language } : {})}>
             <TraditionProvider>

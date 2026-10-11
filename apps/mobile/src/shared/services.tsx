@@ -7,7 +7,13 @@ import {
 } from '@myvedicstar/analytics';
 import { type ApiClient, createApiClient } from '@myvedicstar/api-client';
 import type { AppConfig } from '@myvedicstar/config';
-import { type CacheReporter, createCachePersister, createCachingClient } from '@myvedicstar/query-cache';
+import {
+  type CacheReporter,
+  createCachePersister,
+  createCachingClient,
+  createLocationSearchService,
+  type LocationSearchService,
+} from '@myvedicstar/query-cache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { QueryClient } from '@tanstack/react-query';
 import type { Persister } from '@tanstack/react-query-persist-client';
@@ -26,6 +32,7 @@ export interface MobileServices {
   telemetry: TelemetryClient;
   queryClient: QueryClient;
   cachePersister?: Persister | undefined;
+  locationSearch: LocationSearchService;
 }
 
 export function createMobileServices(
@@ -46,6 +53,7 @@ export function createMobileServices(
     baseUrl: config.apiBaseUrl,
     endpoints: config.endpoints,
     timeoutMs: config.apiTimeoutMs,
+    ...(config.locationSearch.enabled ? { coordinateDecimals: false as const } : {}),
     getAccessToken: () => auth.getAccessToken(),
     onUnauthorized: () => auth.handleUnauthorized(),
     ...(overrides.fetchImpl ? { fetchImpl: overrides.fetchImpl } : {}),
@@ -59,15 +67,18 @@ export function createMobileServices(
       }),
   });
 
-  const report: CacheReporter = config.environment === 'local' || config.environment === 'test'
-    ? (event) => telemetry.trackMetric(`cache.${event.event}`, event.value ?? 1, { family: event.family })
-    : () => undefined;
+  const report: CacheReporter =
+    config.environment === 'local' || config.environment === 'test'
+      ? (event) => telemetry.trackMetric(`cache.${event.event}`, event.value ?? 1, { family: event.family })
+      : () => undefined;
   const queryClient = createCachingClient(config.cache, report);
-  const cachePersister = config.cache.enabled && config.cache.persist
-    ? createCachePersister(AsyncStorage, config.cache, report)
-    : undefined;
+  const cachePersister =
+    config.cache.enabled && config.cache.persist
+      ? createCachePersister(AsyncStorage, config.cache, report)
+      : undefined;
 
-  return { config, api, auth, analytics, telemetry, queryClient, cachePersister };
+  const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
+  return { config, api, auth, analytics, telemetry, queryClient, cachePersister, locationSearch };
 }
 
 const ServicesContext = createContext<MobileServices | null>(null);

@@ -25,7 +25,13 @@ export function usePanchangToday() {
     [location, tradition, language],
   );
 
-  const query = useToday({ api, params, userId: user?.id ?? null, enabled: !loading, settings: config.cache });
+  const query = useToday({
+    api,
+    params,
+    userId: user?.id ?? null,
+    enabled: !loading,
+    settings: config.cache,
+  });
 
   return { query, location };
 }

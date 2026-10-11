@@ -61,7 +61,7 @@ export function LocationProvider({
   children: ReactNode;
   geolocation?: GeolocationProvider;
 }) {
-  const { api } = useServices();
+  const { api, config, locationSearch } = useServices();
   const [ready, setReady] = useState(false);
   const [location, setLocation] = useState<SelectedLocation | null>(null);
   const [recent, setRecent] = useState<SelectedLocation[]>([]);
@@ -70,17 +70,20 @@ export function LocationProvider({
   const [sheetOpen, setSheetOpen] = useState(false);
   const choice = useRef(0);
 
-  const select = useCallback((next: SelectedLocation) => {
-    choice.current += 1;
-    setLocation(next);
-    setDetectError(null);
-    void preferenceStorage.write(KEYS.selected, next);
-    setRecent((current) => {
-      const updated = addRecentLocation(current, next);
-      void preferenceStorage.write(KEYS.recent, updated);
-      return updated;
-    });
-  }, []);
+  const select = useCallback(
+    (next: SelectedLocation) => {
+      choice.current += 1;
+      setLocation(next);
+      setDetectError(null);
+      void preferenceStorage.write(KEYS.selected, next);
+      setRecent((current) => {
+        const updated = addRecentLocation(current, next, config.locationSearch.recentLimit);
+        void preferenceStorage.write(KEYS.recent, updated);
+        return updated;
+      });
+    },
+    [config.locationSearch.recentLimit],
+  );
 
   const removeRecent = useCallback((id: string) => {
     setRecent((current) => {
@@ -92,12 +95,19 @@ export function LocationProvider({
 
   const detect = useCallback(
     async (automatic: boolean) => {
+      if (automatic && config.locationSearch.enabled) return false;
       const startedAt = choice.current;
       setDetecting(true);
       setDetectError(null);
       try {
-        const located = await locateAndResolve(geolocation, (params) => api.locations.resolve(params));
-        if (automatic && choice.current !== startedAt) return false;
+        const located = config.locationSearch.enabled
+          ? await geolocation
+              .getCurrentPosition()
+              .then((position) =>
+                locationSearch.resolveCoordinates(position.latitude, position.longitude, 'current'),
+              )
+          : await locateAndResolve(geolocation, (params) => api.locations.resolve(params));
+        if (choice.current !== startedAt) return false;
         void preferenceStorage.remove(KEYS.denied);
         select(located);
         return true;
@@ -113,7 +123,7 @@ export function LocationProvider({
         setDetecting(false);
       }
     },
-    [api, geolocation, select],
+    [api, config.locationSearch.enabled, geolocation, locationSearch, select],
   );
 
   useEffect(() => {
@@ -128,7 +138,7 @@ export function LocationProvider({
       setRecent(storedRecent ?? []);
       if (stored) setLocation(stored);
       setReady(true);
-      if (stored) return;
+      if (stored || config.locationSearch.enabled) return;
       const permission = await geolocation.permission();
       if (active && mayAutoDetect(permission, denied ?? false)) void detect(true);
     })();

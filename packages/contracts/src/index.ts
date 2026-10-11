@@ -6,3 +6,4 @@ export * from './panchang';
 export * from './primitives';
 export * from './problem-details';
 export * from './traditions';
+export * from './location-search';

@@ -208,14 +208,53 @@ export const appConfigSchema = z
     apiBaseUrl: z.url(),
     endpoints: endpointsSchema,
     apiTimeoutMs: z.number().int().min(1000).max(120_000).default(15_000),
-    cache: z.object({
-      enabled: z.boolean().default(true),
-      persist: z.boolean().default(false),
-      prefetchTomorrow: z.boolean().default(false),
-      schemaVersion: z.string().min(1).max(80).default('1'),
-      rulesVersion: z.string().min(1).max(80).default('1'),
-    }).strict().default({ enabled: true, persist: false, prefetchTomorrow: false, schemaVersion: '1', rulesVersion: '1' }),
+    cache: z
+      .object({
+        enabled: z.boolean().default(true),
+        persist: z.boolean().default(false),
+        prefetchTomorrow: z.boolean().default(false),
+        schemaVersion: z.string().min(1).max(80).default('1'),
+        rulesVersion: z.string().min(1).max(80).default('1'),
+        calculationVersion: z.string().min(1).max(80).default('1'),
+      })
+      .strict()
+      .default({
+        enabled: true,
+        persist: false,
+        prefetchTomorrow: false,
+        schemaVersion: '1',
+        rulesVersion: '1',
+        calculationVersion: '1',
+      }),
     defaultTradition: z.string().default('all'),
+    locationSearch: z
+      .object({
+        enabled: z.boolean().default(false),
+        debounceMs: z.number().int().min(200).max(1000).default(350),
+        maxResults: z.number().int().min(1).max(8).default(8),
+        recentLimit: z.number().int().min(1).max(10).default(5),
+        searchStaleTimeMs: z
+          .number()
+          .int()
+          .min(0)
+          .max(7 * 24 * 60 * 60_000)
+          .default(24 * 60 * 60_000),
+        resolveStaleTimeMs: z
+          .number()
+          .int()
+          .min(0)
+          .max(30 * 24 * 60 * 60_000)
+          .default(7 * 24 * 60 * 60_000),
+      })
+      .strict()
+      .default({
+        enabled: false,
+        debounceMs: 350,
+        maxResults: 8,
+        recentLimit: 5,
+        searchStaleTimeMs: 24 * 60 * 60_000,
+        resolveStaleTimeMs: 7 * 24 * 60 * 60_000,
+      }),
     auth: authSchema.default({ mode: 'disabled' }),
     featureFlags: featureFlagsSchema.default(
       Object.fromEntries(featureFlagNames.map((f) => [f, false])) as Record<FeatureFlag, boolean>,

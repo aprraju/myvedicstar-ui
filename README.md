@@ -140,6 +140,7 @@ apps/
 packages/
   analytics/      provider-independent analytics & telemetry, redaction
   api-client/     typed HTTP client, errors, retry policy, query keys
+  query-cache/    shared React query hooks, policies, account isolation and optional persistence
   config/         runtime config schema, feature flags, safe return paths
   contracts/      Zod schemas of the backend API
   domain-models/  day summary, location and geolocation logic shared by web and mobile

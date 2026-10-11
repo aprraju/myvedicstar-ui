@@ -244,6 +244,8 @@ export function Sheet({
         <ScrollView
           contentContainerStyle={[styles.sheetBody, { padding: theme.spacing.lg }]}
           keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
+          keyboardDismissMode="interactive"
         >
           <View style={styles.readable}>{children}</View>
         </ScrollView>

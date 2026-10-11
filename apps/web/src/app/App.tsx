@@ -41,7 +41,11 @@ export function AppProviders({
 }) {
   return (
     <ServicesProvider services={services}>
-      <CacheProvider client={services.queryClient} settings={services.config.cache} persister={services.cachePersister}>
+      <CacheProvider
+        client={services.queryClient}
+        settings={services.config.cache}
+        persister={services.cachePersister}
+      >
         <RefetchOnUserChange />
         <I18nProvider {...(language ? { language } : {})}>
           <ThemeProvider>

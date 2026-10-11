@@ -22,6 +22,8 @@ const RUNTIME_CONFIG_VARIABLES = {
     'Optional path prefixed to every default endpoint, e.g. /myvedicday/api/v1 (gateway route)',
   MVS_API_ENDPOINTS: 'Optional JSON object of endpoint path overrides, e.g. {"panchangToday":"/v2/today"}',
   MVS_DEFAULT_TRADITION: 'Optional default tradition key (default "all")',
+  MVS_CACHE: 'Optional JSON cache settings; persistence and Tomorrow prefetch default off',
+  MVS_LOCATION_SEARCH: 'Optional JSON location search settings; GeoNames proxy workflow defaults off',
   MVS_AUTH_MODE: 'disabled | entra-external-id (default disabled)',
   MVS_AUTH_AUTHORITY: 'Entra External ID authority, https://<subdomain>.ciamlogin.com/',
   MVS_AUTH_TENANT_ID: 'Optional directory (tenant) ID of the external tenant',
@@ -89,6 +91,12 @@ export function renderRuntimeConfig(env: Env): RenderResult {
 
   const timeout = read(env, 'MVS_API_TIMEOUT_MS');
   if (timeout) raw.apiTimeoutMs = Number(timeout);
+  for (const [variable, field] of [['MVS_CACHE', 'cache'], ['MVS_LOCATION_SEARCH', 'locationSearch']] as const) {
+    const value = read(env, variable);
+    if (!value) continue;
+    try { raw[field] = JSON.parse(value); }
+    catch { issues.push(`${variable}: not valid JSON`); }
+  }
 
   // A gateway route prefix (e.g. API Management `/<api>/v1`) applies to every default endpoint; MVS_API_ENDPOINTS then
   // overrides individual endpoints, e.g. one served by a different API behind the same gateway.

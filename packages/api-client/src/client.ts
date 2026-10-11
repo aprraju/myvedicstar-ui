@@ -8,6 +8,9 @@ import {
   goodTimeExplanationResponseSchema,
   goodTimesResponseSchema,
   locationSchema,
+  locationSearchResponseSchema,
+  locationReverseResponseSchema,
+  locationTimezoneResponseSchema,
   muhurtaActivitiesResponseSchema,
   muhurtaNakshatrasResponseSchema,
   panchangResponseSchema,
@@ -86,12 +89,19 @@ export interface CallOptions {
   signal?: AbortSignal | undefined;
 }
 
+export interface LocationSearchParams {
+  text: string;
+  country?: string | undefined;
+  language?: string | undefined;
+  maxRows?: number | undefined;
+}
+
 export interface ApiClientOptions extends HttpTransportOptions {
   /**
    * Decimal places sent for coordinates. Matches the backend's `Location:CoordinateDecimalPlaces` (2 ≈ 1 km), so the
    * UI never transmits more precision than the calculation uses and cache keys stay stable.
    */
-  coordinateDecimals?: number;
+  coordinateDecimals?: number | false;
   /** Endpoint paths from runtime configuration; missing entries use the defaults from the OpenAPI document. */
   endpoints?: Partial<ApiEndpoints> | undefined;
 }
@@ -186,6 +196,42 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     locations: {
+      search: (params: LocationSearchParams, call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.search',
+          path: path('locationsSearch'),
+          query: { ...params },
+          schema: locationSearchResponseSchema,
+          signal: call?.signal,
+          auth: 'optional',
+        }),
+      postal: (params: LocationSearchParams, call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.postal',
+          path: path('locationsPostal'),
+          query: { ...params },
+          schema: locationSearchResponseSchema,
+          signal: call?.signal,
+          auth: 'optional',
+        }),
+      reverse: (latitude: number, longitude: number, language?: string, call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.reverse',
+          path: path('locationsReverse'),
+          query: { latitude, longitude, language },
+          schema: locationReverseResponseSchema,
+          signal: call?.signal,
+          auth: 'optional',
+        }),
+      timezone: (latitude: number, longitude: number, call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.timezone',
+          path: path('locationsTimezone'),
+          query: { latitude, longitude },
+          schema: locationTimezoneResponseSchema,
+          signal: call?.signal,
+          auth: 'optional',
+        }),
       resolve: (location: LocationParams, call?: CallOptions) =>
         transport.request({
           operation: 'locations.resolve',
@@ -345,11 +391,17 @@ export function roundCoordinate(value: number, decimals: number): number {
 }
 
 /** Query parameter names follow the OpenAPI document (`timeZone`, not `timezone`). */
-function locationQuery(location: LocationParams, decimals: number): Record<string, QueryValue> {
+function locationQuery(location: LocationParams, decimals: number | false): Record<string, QueryValue> {
   return {
     place: location.place?.trim(),
-    latitude: location.latitude === undefined ? undefined : roundCoordinate(location.latitude, decimals),
-    longitude: location.longitude === undefined ? undefined : roundCoordinate(location.longitude, decimals),
+    latitude:
+      location.latitude === undefined || decimals === false
+        ? location.latitude
+        : roundCoordinate(location.latitude, decimals),
+    longitude:
+      location.longitude === undefined || decimals === false
+        ? location.longitude
+        : roundCoordinate(location.longitude, decimals),
     timeZone: location.timeZone,
   };
 }

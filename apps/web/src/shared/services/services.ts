@@ -9,13 +9,18 @@ import {
 import { type ApiClient, createApiClient } from '@myvedicstar/api-client';
 import { type AppConfig, applicationInsightsSettings } from '@myvedicstar/config';
 import { getWindowClass } from '@myvedicstar/design-tokens';
-import { type CacheReporter, createCachePersister } from '@myvedicstar/query-cache';
+import {
+  type CacheReporter,
+  createCachePersister,
+  createLocationSearchService,
+  type LocationSearchService,
+} from '@myvedicstar/query-cache';
 import type { QueryClient } from '@tanstack/react-query';
 import type { Persister } from '@tanstack/react-query-persist-client';
 
 import { type AuthClient, createAuthClient } from '../auth/auth-client';
-import { createQueryClient } from './query-client';
 import { createIndexedDbCacheStorage } from './cache-storage';
+import { createQueryClient } from './query-client';
 
 /**
  * Everything the UI needs from the outside world, created once at startup and provided through context.
@@ -29,6 +34,7 @@ export interface AppServices {
   telemetry: TelemetryClient;
   queryClient: QueryClient;
   cachePersister?: Persister | undefined;
+  locationSearch: LocationSearchService;
 }
 
 interface ServiceOverrides {
@@ -79,6 +85,7 @@ export function createServices(config: AppConfig, overrides: ServiceOverrides = 
     baseUrl: config.apiBaseUrl,
     endpoints: config.endpoints,
     timeoutMs: config.apiTimeoutMs,
+    ...(config.locationSearch.enabled ? { coordinateDecimals: false as const } : {}),
     getAccessToken: () => auth.getAccessToken(),
     onUnauthorized: () => auth.handleUnauthorized(),
     ...(overrides.fetchImpl ? { fetchImpl: overrides.fetchImpl } : {}),
@@ -92,12 +99,15 @@ export function createServices(config: AppConfig, overrides: ServiceOverrides = 
       }),
   });
 
-  const report: CacheReporter = config.environment === 'local' || config.environment === 'test'
-    ? (event) => telemetry.trackMetric(`cache.${event.event}`, event.value ?? 1, { family: event.family })
-    : () => undefined;
+  const report: CacheReporter =
+    config.environment === 'local' || config.environment === 'test'
+      ? (event) => telemetry.trackMetric(`cache.${event.event}`, event.value ?? 1, { family: event.family })
+      : () => undefined;
   const queryClient = createQueryClient(config.cache, report);
-  const cachePersister = config.cache.enabled && config.cache.persist
-    ? createCachePersister(createIndexedDbCacheStorage(), config.cache, report)
-    : undefined;
-  return { config, api, auth, analytics, telemetry, queryClient, cachePersister };
+  const cachePersister =
+    config.cache.enabled && config.cache.persist
+      ? createCachePersister(createIndexedDbCacheStorage(), config.cache, report)
+      : undefined;
+  const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
+  return { config, api, auth, analytics, telemetry, queryClient, cachePersister, locationSearch };
 }

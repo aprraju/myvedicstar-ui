@@ -86,7 +86,10 @@ describe('buildGoodTimeView', () => {
   });
 
   it('has no now / next for another date', () => {
-    const view = buildGoodTimeView({ ...general, localToday: '2026-10-19' }, at('08:00'));
+    const view = buildGoodTimeView(
+      { ...general, localToday: '2026-10-19' },
+      Date.parse('2026-10-19T08:00:00-05:00'),
+    );
     expect(view.now).toBeUndefined();
     expect(view.next).toBeUndefined();
   });

@@ -75,7 +75,11 @@ export const queryKeys = {
 } as const;
 
 function normalize({ location, tradition, language }: PanchangParams) {
-  return { location: normalizeLocation(location), tradition: tradition ?? null, language: language ?? null };
+  return {
+    location: normalizeLocation(location),
+    tradition: tradition ?? null,
+    language: language ?? null,
+  } satisfies Record<keyof PanchangParams, unknown>;
 }
 
 function goodTimesKey(params: GoodTimesParams) {
@@ -85,7 +89,7 @@ function goodTimesKey(params: GoodTimesParams) {
     activity: params.activity ?? null,
     otherText: otherTextKey(params.activity, params.otherText),
     nakshatra: params.nakshatra?.trim().toLowerCase() || null,
-  };
+  } satisfies Record<keyof GoodTimesParams, unknown>;
 }
 
 function otherTextKey(activity: string | undefined, otherText: string | undefined) {

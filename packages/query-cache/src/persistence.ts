@@ -1,7 +1,7 @@
 import { panchangResponseSchema } from '@myvedicstar/contracts';
 import { todayIn } from '@myvedicstar/date-time';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
-import type { Query } from '@tanstack/react-query';
+import { hashKey, type Query } from '@tanstack/react-query';
 import type { PersistedClient, Persister } from '@tanstack/react-query-persist-client';
 
 import type { CacheReporter } from './client';
@@ -15,15 +15,18 @@ export interface CacheStorage {
 }
 
 export function persistenceBuster(settings: CacheSettings): string {
-  return `myvedicstar:${settings.schemaVersion}:${settings.rulesVersion}`;
+  return `myvedicstar:${settings.schemaVersion}:${settings.rulesVersion}:${settings.calculationVersion}`;
 }
 
 /** Only anonymous Today is approved. Authenticated calculations, birth stars, profiles and mutations stay in memory. */
 export function shouldPersistQuery(query: Query): boolean {
-  return query.state.status === 'success' &&
-    query.queryKey[0] === 'panchang' && query.queryKey[1] === 'today' &&
+  return (
+    query.state.status === 'success' &&
+    query.queryKey[0] === 'panchang' &&
+    query.queryKey[1] === 'today' &&
     keyScope(query.queryKey)?.userId === null &&
-    JSON.stringify(query.state.data).length * 2 <= cachePolicies.persistence.maxQueryBytes;
+    JSON.stringify(query.state.data).length * 2 <= cachePolicies.persistence.maxQueryBytes
+  );
 }
 
 /** Supported TanStack persister with bounded storage and validation before hydration. Failures never block API use. */
@@ -34,8 +37,12 @@ export function createCachePersister(
 ): Persister {
   const guarded: CacheStorage = {
     async getItem(key) {
-      try { return await storage.getItem(key); }
-      catch { report({ event: 'storage-error' }); return null; }
+      try {
+        return await storage.getItem(key);
+      } catch {
+        report({ event: 'storage-error' });
+        return null;
+      }
     },
     async setItem(key, value) {
       try {
@@ -44,11 +51,16 @@ export function createCachePersister(
           return;
         }
         await storage.setItem(key, value);
-      } catch { report({ event: 'storage-error' }); }
+      } catch {
+        report({ event: 'storage-error' });
+      }
     },
     async removeItem(key) {
-      try { await storage.removeItem(key); }
-      catch { report({ event: 'storage-error' }); }
+      try {
+        await storage.removeItem(key);
+      } catch {
+        report({ event: 'storage-error' });
+      }
     },
   };
   const base = createAsyncStoragePersister({
@@ -64,25 +76,50 @@ export function createCachePersister(
         const restored = await base.restoreClient();
         if (!restored) return undefined;
         const now = Date.now();
-        if (restored.buster !== persistenceBuster(settings) ||
-          !Number.isFinite(restored.timestamp) || restored.timestamp > now ||
-          now - restored.timestamp > cachePolicies.persistence.maxAge) {
+        if (
+          restored.buster !== persistenceBuster(settings) ||
+          !Number.isFinite(restored.timestamp) ||
+          restored.timestamp > now ||
+          now - restored.timestamp > cachePolicies.persistence.maxAge
+        ) {
           await base.removeClient();
           return undefined;
         }
         restored.clientState.mutations = [];
         restored.clientState.queries = restored.clientState.queries.filter((query) => {
-          if (query.queryKey[0] !== 'panchang' || query.queryKey[1] !== 'today' || keyScope(query.queryKey)?.userId !== null) return false;
+          if (
+            query.queryKey[0] !== 'panchang' ||
+            query.queryKey[1] !== 'today' ||
+            keyScope(query.queryKey)?.userId !== null
+          )
+            return false;
           const scope = keyScope(query.queryKey);
-          if (scope?.schemaVersion !== settings.schemaVersion || scope.rulesVersion !== settings.rulesVersion) return false;
-          if (query.state.status !== 'success' || query.state.dataUpdatedAt > now || now - query.state.dataUpdatedAt > cachePolicies.persistence.maxAge) return false;
-          if (JSON.stringify(query.state.data).length * 2 > cachePolicies.persistence.maxQueryBytes) return false;
+          if (
+            scope?.schemaVersion !== settings.schemaVersion ||
+            scope.rulesVersion !== settings.rulesVersion ||
+            scope.calculationVersion !== settings.calculationVersion
+          )
+            return false;
+          if (
+            query.state.status !== 'success' ||
+            query.state.dataUpdatedAt > now ||
+            now - query.state.dataUpdatedAt > cachePolicies.persistence.maxAge
+          )
+            return false;
+          if (JSON.stringify(query.state.data).length * 2 > cachePolicies.persistence.maxQueryBytes)
+            return false;
           const parsed = panchangResponseSchema.safeParse(query.state.data);
           if (!parsed.success) return false;
+          query.state.data = parsed.data;
           const today = todayIn(parsed.data.location.timeZone);
-          return query.queryKey[3] === today && parsed.data.localToday === today &&
-            parsed.data.days.length === 1 && parsed.data.days[0]?.date === today;
+          return (
+            query.queryKey[3] === today &&
+            parsed.data.localToday === today &&
+            parsed.data.days.length === 1 &&
+            parsed.data.days[0]?.date === today
+          );
         });
+        for (const query of restored.clientState.queries) query.queryHash = hashKey(query.queryKey);
         return restored;
       } catch {
         report({ event: 'storage-error' });

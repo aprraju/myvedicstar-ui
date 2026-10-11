@@ -1,6 +1,7 @@
 import type { Glossary, TimePeriod } from '@myvedicstar/contracts';
 import type { DaySummary, DayTone, WindowStatus } from '@myvedicstar/domain-models';
 import type { SelectedLocation } from '@myvedicstar/domain-models';
+import { useCacheOnline } from '@myvedicstar/query-cache';
 import { useId } from 'react';
 import { Link } from 'react-router';
 
@@ -33,6 +34,8 @@ export function DaySummaryCard({
   todayOnly = false,
 }: Readonly<{ showDate?: boolean; todayOnly?: boolean }>) {
   const { t } = useTranslation();
+  const online = useCacheOnline();
+  const format = useFormatters();
   const { query, goodTimes, location, summary, glossary } = useDaySummary(todayOnly);
   const { detecting } = useLocationState();
   const titleId = useId();
@@ -41,8 +44,8 @@ export function DaySummaryCard({
   if (!location) {
     body = detecting ? <CardSkeleton label={t('location.locating')} /> : <ChooseLocation />;
   } else if (query.isPending) {
-    body = <CardSkeleton label={t('states.loading')} />;
-  } else if (query.isError || !summary) {
+    body = <CardSkeleton label={t(online ? 'states.loading' : 'cache.unavailable')} />;
+  } else if ((query.isError && !query.data) || !summary) {
     body = (
       <div className={styles.state}>
         <p className={styles.stateTitle}>{t('summary.errorTitle')}</p>
@@ -73,6 +76,14 @@ export function DaySummaryCard({
         {t('summary.label')}
       </h2>
       {body}
+      {!online && query.data && location && (
+        <p role="status" className={styles.cacheNotice}>
+          {t('cache.offline', {
+            time: format.time(new Date(query.dataUpdatedAt).toISOString(), location.timeZone),
+          })}
+        </p>
+      )}
+      {query.isError && query.data && <ErrorState error={query.error} onRetry={() => void query.refetch()} />}
     </section>
   );
 }

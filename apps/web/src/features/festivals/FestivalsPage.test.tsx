@@ -45,11 +45,11 @@ describe('Festivals', () => {
     expect(ekadashi).toHaveTextContent('In 5 days');
     expect(ekadashi).toHaveTextContent('Observance');
     expect(ekadashi).toHaveTextContent('observed with fasting in honor of Lord Vishnu');
-    expect(ekadashi).toHaveTextContent(/Observed at Sunrise: Oct 6, 7:27\sAM/);
-    expect(ekadashi).toHaveTextContent(/Tithi: Oct 5, 3:37\sPM – Oct 6, 2:04\sPM/);
+    expect(ekadashi).toHaveTextContent(/Observed at Sunrise: Oct 6, 07:27\sAM/);
+    expect(ekadashi).toHaveTextContent(/Tithi: Oct 5, 03:37\sPM – Oct 6, 02:04\sPM/);
 
     const pradosham = card(/^Pradosham$/);
-    expect(pradosham).toHaveTextContent(/Observed at Pradosha: Oct 7, 7:08\sPM – Oct 7, 9:36\sPM/);
+    expect(pradosham).toHaveTextContent(/Observed at Pradosha: Oct 7, 07:08\sPM – Oct 7, 09:36\sPM/);
 
     expect(card(/^Sankranti$/)).toHaveTextContent(/Sankranti: Oct 17, /);
   });

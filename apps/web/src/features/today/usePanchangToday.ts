@@ -3,8 +3,8 @@ import { buildDaySummary, panchangLocationParams, windowStatus } from '@myvedics
 import { useToday } from '@myvedicstar/query-cache';
 import { useMemo } from 'react';
 
-import { useNow } from '../../shared/hooks/useNow';
 import { useAuth } from '../../shared/auth';
+import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { useGoodTimes } from '../good-time/useGoodTimes';
@@ -27,7 +27,13 @@ export function usePanchangToday() {
     [location, tradition, language],
   );
 
-  const query = useToday({ api, params, userId: user?.id ?? null, enabled: !loading, settings: config.cache });
+  const query = useToday({
+    api,
+    params,
+    userId: user?.id ?? null,
+    enabled: !loading,
+    settings: config.cache,
+  });
 
   return { query, location };
 }

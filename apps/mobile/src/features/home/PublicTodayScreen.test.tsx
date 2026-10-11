@@ -39,7 +39,7 @@ describe('public Today (mobile)', () => {
       ),
     ).toBe(true);
     expect(
-      screen.getByLabelText(/Use caution now\. Durmuhurtham 9:46\sAM – 10:34\sAM\. Unfavorable Muhurta/),
+      screen.getByLabelText(/Use caution now\. Durmuhurtham 09:46\sAM – 10:34\sAM\. Unfavorable Muhurta/),
     ).toBeTruthy();
     expect(screen.getByText('All times shown in local time — Austin, Texas')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Change location: Austin, Texas' })).toBeTruthy();
@@ -89,11 +89,14 @@ describe('public Today (mobile)', () => {
     ['austinCaution', 'Mixed day'],
     ['austinAvoid', 'Traditionally avoided for new beginnings'],
   ] as const)('shows the General status of %s as the day headline', async (fixture, headline) => {
+    const response = fixtures.panchang[fixture];
+    const date = response.days[0]!.date;
+    atInstant(`${date}T12:00:00-05:00`);
     await storeLocation();
     await renderApp(routes, {
       fetchOverride: (url) =>
         url.pathname.endsWith('/panchang/today')
-          ? { status: 200, body: fixtures.panchang[fixture] }
+          ? { status: 200, body: { ...response, localToday: date } }
           : undefined,
     });
     expect(await screen.findByText(headline)).toBeTruthy();

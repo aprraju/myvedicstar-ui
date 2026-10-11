@@ -1,4 +1,5 @@
 node_modules/
+.npm-cache/
 dist/
 coverage/
 *.tsbuildinfo
@@ -6,6 +7,9 @@ coverage/
 .env.*
 !.env.example
 *.log
+**/bin/
+**/obj/
+apps/*/cache-regression-results.json
 .DS_Store
 
 # Web

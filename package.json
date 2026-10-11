@@ -28,6 +28,8 @@
     "web:deploy": "bash infrastructure/web/static-web-apps/scripts/deploy.sh",
     "deploy:typecheck": "tsc -p infrastructure/web/static-web-apps/tsconfig.json",
     "deploy:test": "vitest run --root infrastructure/web/static-web-apps",
+    "cache:benchmark": "tsx infrastructure/cache/benchmark.ts",
+    "location:proxy:test": "dotnet run --project infrastructure/location-search-proxy/tests/ProxyTests.csproj --no-launch-profile",
     "mobile:start": "npm run start -w @myvedicstar/mobile",
     "mobile:android": "npm run android -w @myvedicstar/mobile",
     "mobile:ios": "npm run ios -w @myvedicstar/mobile",

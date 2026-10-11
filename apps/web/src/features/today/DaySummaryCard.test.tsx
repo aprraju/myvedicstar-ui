@@ -92,7 +92,7 @@ describe('DaySummaryCard', () => {
         'No strongly favorable time was found for this activity today. Please choose another date.',
       ),
     ).toBeInTheDocument();
-    expect(region).toHaveTextContent(/Use caution now\s*Durmuhurtham 9:46\sAM – 10:34\sAM/);
+    expect(region).toHaveTextContent(/Use caution now\s*Durmuhurtham 09:46\sAM – 10:34\sAM/);
     expect(region).toHaveTextContent('Unfavorable Muhurta');
     expect(region).toHaveTextContent('All times shown in local time — Austin, Texas');
     expect(within(region).getByRole('link', { name: 'Find a Good Time' })).toHaveAttribute(
@@ -108,10 +108,10 @@ describe('DaySummaryCard', () => {
     expect(await axeViolations(container)).toEqual([]);
   });
 
-  describe('Good Time from the backend evaluation (Austin, 2026-04-28: six Good Times from 6:50 AM)', () => {
+  describe('Good Time from the backend evaluation (Austin, 2026-04-28: six Good Times from 06:50 AM)', () => {
     const favorableDay = () =>
       server.use(
-        scenarios.json('/panchang/today', fixtures.panchang.austinFavorable),
+        scenarios.json('/panchang/today', { ...fixtures.panchang.austinFavorable, localToday: '2026-04-28' }),
         scenarios.json('/muhurta/good-times', fixtures.muhurta.goodTimes.austinFavorableDay),
       );
 
@@ -121,7 +121,7 @@ describe('DaySummaryCard', () => {
       storeSelectedLocation();
       renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       expect(await screen.findByText('Good time now')).toBeInTheDocument();
-      expect(card()).toHaveTextContent(/until 8:23\sAM/);
+      expect(card()).toHaveTextContent(/until 08:23\sAM/);
     });
 
     it('shows the next Good Time between Good Times', async () => {
@@ -130,7 +130,7 @@ describe('DaySummaryCard', () => {
       storeSelectedLocation();
       renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       expect(await screen.findByText('Next good time')).toBeInTheDocument();
-      expect(card()).toHaveTextContent(/Next good time\s*12:06\sPM – 1:02\sPM/);
+      expect(card()).toHaveTextContent(/Next good time\s*12:06\sPM – 01:02\sPM/);
     });
   });
 
@@ -153,7 +153,10 @@ describe('DaySummaryCard', () => {
   ] as const)(
     'conveys the General status of %s with text and icon, not color alone',
     async (fixture, headline, tone) => {
-      server.use(scenarios.json('/panchang/today', fixtures.panchang[fixture]));
+      const response = fixtures.panchang[fixture];
+      const date = response.days[0]!.date;
+      await atInstant(`${date}T12:00:00-05:00`);
+      server.use(scenarios.json('/panchang/today', { ...response, localToday: date }));
       storeSelectedLocation();
       renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       const text = await screen.findByText(headline);
@@ -179,13 +182,13 @@ describe('DaySummaryCard', () => {
   it('shows no Good Time while the evaluation is loading', async () => {
     await atInstant('2026-04-28T10:00:00-05:00');
     server.use(
-      scenarios.json('/panchang/today', fixtures.panchang.austinFavorable),
+      scenarios.json('/panchang/today', { ...fixtures.panchang.austinFavorable, localToday: '2026-04-28' }),
       scenarios.slow('/muhurta/good-times', fixtures.muhurta.goodTimes.austinFavorableDay, 300),
     );
     storeSelectedLocation();
     renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByText('Checking good times…')).toBeInTheDocument();
-    expect(await screen.findByText(/12:06\sPM – 1:02\sPM/)).toBeInTheDocument();
+    expect(await screen.findByText(/12:06\sPM – 01:02\sPM/)).toBeInTheDocument();
   });
 
   it("shows the day's festivals and observances from the backend", async () => {

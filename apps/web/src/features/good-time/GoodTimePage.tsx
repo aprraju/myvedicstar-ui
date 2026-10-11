@@ -64,8 +64,19 @@ export function GoodTimePage() {
   const view: PlanningView = searchParams.get('view') === 'month' ? 'month' : 'day';
 
   const today = location ? todayIn(location.timeZone) : undefined;
-  const shownDate = date ?? today;
-  const { query, params } = useGoodTimes(location ? { date, activity, otherText, nakshatra } : null);
+  const requestedMonth = searchParams.get('month');
+  const monthDate =
+    view === 'month' &&
+    requestedMonth &&
+    /^\d{4}-(0[1-9]|1[0-2])$/.test(requestedMonth) &&
+    !today?.startsWith(requestedMonth)
+      ? `${requestedMonth}-01`
+      : undefined;
+  const shownDate = date ?? monthDate ?? today;
+  const evaluationDate = date ?? monthDate;
+  const { query, params } = useGoodTimes(
+    location ? { date: evaluationDate, activity, otherText, nakshatra } : null,
+  );
   const matchesSelection =
     params !== null &&
     (params.date ?? today) === shownDate &&

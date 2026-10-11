@@ -5,7 +5,7 @@ import {
   queryKeys,
 } from '@myvedicstar/api-client';
 import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { scopedKey, useGoodTime, useLocalDate } from '@myvedicstar/query-cache';
+import { scopedKey, useGoodTime, useLocalDate, useRefreshAtWindowEnd } from '@myvedicstar/query-cache';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
@@ -81,8 +81,13 @@ export function useGoodTimes(selection: GoodTimeSelection | null) {
   const { user, isAuthenticated, loading } = useAuth();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params = useGoodTimeParams(selection);
-  const query = useGoodTime({ api, params, userId: user?.id ?? null, settings: config.cache,
-    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled) });
+  const query = useGoodTime({
+    api,
+    params,
+    userId: user?.id ?? null,
+    settings: config.cache,
+    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+  });
   return { query, params };
 }
 
@@ -93,7 +98,11 @@ export function useGoodTimeExplanation(params: GoodTimesParams | null, enabled: 
   const today = useLocalDate(params?.location.timeZone);
   const resolved = params ? { ...params, date: params.date ?? today } : null;
   return useQuery({
-    queryKey: scopedKey(resolved ? queryKeys.muhurta.explanation(resolved) : ['muhurta', 'explanation', 'idle'], user?.id ?? null, config.cache),
+    queryKey: scopedKey(
+      resolved ? queryKeys.muhurta.explanation(resolved) : ['muhurta', 'explanation', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => api.muhurta.explanation(params as GoodTimesParams, { signal }),
     enabled: enabled && params !== null && isAuthenticated && !loading,
     retry: false,
@@ -144,14 +153,22 @@ export function useGoodTimeMonth(
   }, [base, selection]);
 
   return useQuery({
-    queryKey: scopedKey(request
-      ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
-      : ['muhurta', 'day-summaries', 'idle'], user?.id ?? null, config.cache),
+    queryKey: scopedKey(
+      request
+        ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
+        : ['muhurta', 'day-summaries', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => {
       const { start, days, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, days, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+    enabled:
+      request !== null &&
+      isAuthenticated &&
+      !loading &&
+      JSON.stringify(selection) === JSON.stringify(settled),
   });
 }
 
@@ -175,11 +192,18 @@ export function useBestGoodTimes(
     };
   }, [base, selection]);
 
-  return useQuery({
-    queryKey: scopedKey(params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'], user?.id ?? null, config.cache),
+  const query = useQuery({
+    queryKey: scopedKey(
+      params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => api.muhurta.bestGoodTimes(params as BestGoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+    enabled:
+      params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
+  useRefreshAtWindowEnd(query.data, query.refetch, params !== null && isAuthenticated && !loading);
+  return query;
 }
 
 /** How many options the "Next best times" tile shows. */
@@ -214,14 +238,22 @@ export function useBestGoodTimeWindows(
     [base, selection],
   );
   const query = useQuery({
-    queryKey: scopedKey(request
-      ? queryKeys.muhurta.daySummaries(request.start, 30, request.params)
-      : ['muhurta', 'date-best', 'idle'], user?.id ?? null, config.cache),
+    queryKey: scopedKey(
+      request
+        ? queryKeys.muhurta.daySummaries(request.start, 30, request.params)
+        : ['muhurta', 'date-best', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => {
       const { start, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, 30, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+    enabled:
+      request !== null &&
+      isAuthenticated &&
+      !loading &&
+      JSON.stringify(selection) === JSON.stringify(settled),
   });
   return { query, start: request?.start };
 }

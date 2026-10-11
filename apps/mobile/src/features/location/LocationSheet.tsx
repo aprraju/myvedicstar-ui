@@ -12,6 +12,7 @@ import { errorMessageKey } from '../../shared/errors';
 import { useTranslation } from '../../shared/i18n';
 import { useServices } from '../../shared/services';
 import { useTheme } from '../../shared/theme';
+import { LocationAutocomplete } from './LocationAutocomplete';
 import { type DetectError, useLocationState } from './LocationProvider';
 
 const GEO_MESSAGES: Record<Extract<DetectError, { kind: 'geolocation' }>['reason'], MessageKey> = {
@@ -30,18 +31,30 @@ export function LocationPermissionMessage({ error }: { error: DetectError }) {
 /** The location picker: current location, search, coordinates and recent locations. */
 export function LocationSheet() {
   const { t } = useTranslation();
+  const { config } = useServices();
+  const [hasSearch, setHasSearch] = useState(false);
+  const close = () => {
+    setHasSearch(false);
+    closeSheet();
+  };
   const { sheetOpen, closeSheet, select } = useLocationState();
   const choose = (location: SelectedLocation) => {
     select(location);
-    closeSheet();
+    close();
   };
   return (
-    <Sheet visible={sheetOpen} title={t('location.dialogTitle')} onClose={closeSheet}>
-      <AppText variant="secondary">{t('location.privacy')}</AppText>
-      <CurrentLocation onDone={closeSheet} />
-      <Search onChoose={choose} />
-      <Coordinates onChoose={choose} />
-      <Recent onChoose={choose} />
+    <Sheet visible={sheetOpen} title={t('location.dialogTitle')} onClose={close}>
+      <AppText variant="secondary">
+        {t(config.locationSearch.enabled ? 'locationSearch.privacy' : 'location.privacy')}
+      </AppText>
+      <CurrentLocation onDone={close} />
+      {config.locationSearch.enabled ? (
+        sheetOpen && <LocationAutocomplete onChoose={choose} onSearchChange={setHasSearch} />
+      ) : (
+        <Search onChoose={choose} />
+      )}
+      {sheetOpen && <Coordinates onChoose={choose} />}
+      {!hasSearch && <Recent onChoose={choose} />}
     </Sheet>
   );
 }
@@ -129,13 +142,16 @@ function Search({ onChoose }: { onChoose: (location: SelectedLocation) => void }
 
 function Coordinates({ onChoose }: { onChoose: (location: SelectedLocation) => void }) {
   const { t, tDynamic } = useTranslation();
-  const { api } = useServices();
+  const { api, config, locationSearch } = useServices();
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState({ latitude: '', longitude: '' });
   const [errors, setErrors] = useState<{ latitude?: string; longitude?: string }>({});
   const resolve = useMutation({
-    mutationFn: (coordinates: { latitude: number; longitude: number }) => api.locations.resolve(coordinates),
-    onSuccess: (resolved) => onChoose(toSelectedLocation(resolved, 'coordinates')),
+    mutationFn: async (coordinates: { latitude: number; longitude: number }) =>
+      config.locationSearch.enabled
+        ? locationSearch.resolveCoordinates(coordinates.latitude, coordinates.longitude, 'coordinates')
+        : toSelectedLocation(await api.locations.resolve(coordinates), 'coordinates'),
+    onSuccess: onChoose,
   });
 
   const submit = () => {

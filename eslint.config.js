@@ -44,7 +44,7 @@ export default tseslint.config(
       'no-console': ['error', { allow: ['warn', 'error'] }],
     },
   },
-  // Shared packages are framework-agnostic: no React, no platform APIs beyond fetch/Intl.
+  // Shared packages avoid platform APIs beyond fetch/Intl. query-cache supplies shared React hooks.
   {
     files: ['packages/**/*.ts'],
     rules: {
@@ -65,6 +65,23 @@ export default tseslint.config(
             {
               group: ['react', 'react-*', 'react-native', 'expo*'],
               message: 'Shared packages must stay framework-agnostic.',
+            },
+            { group: ['@myvedicstar/*/src/*'], message: 'Import packages through their public entry point.' },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['packages/query-cache/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['react-native', 'expo*'],
+              message: 'Shared cache code must not import native dependencies.',
             },
             { group: ['@myvedicstar/*/src/*'], message: 'Import packages through their public entry point.' },
           ],

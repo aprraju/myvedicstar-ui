@@ -101,13 +101,14 @@ describe('Find a Good Time', () => {
   });
 
   it('shows the recommended times with "Why this time?" from the backend, best first', async () => {
+    await atInstant('2026-10-02T10:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
     const section = await screen.findByRole('region', { name: 'Recommended time' });
     const [best] = within(section)
       .getAllByRole('listitem')
       .filter((item) => item.parentElement?.tagName === 'OL');
-    expect(best).toHaveTextContent(/8:53\sAM – 10:22\sAM/);
+    expect(best).toHaveTextContent(/08:53\sAM – 10:22\sAM/);
     expect(best).toHaveTextContent('Highly Favorable for Business');
     expect(best).toHaveTextContent('Best');
     expect(best).toHaveTextContent('Why this time?');
@@ -245,7 +246,7 @@ describe('Find a Good Time', () => {
         .filter((item) => item.parentElement?.tagName === 'OL');
       expect(options).toHaveLength(3);
       expect(options[0]).toHaveTextContent(/October 2/);
-      expect(options[0]).toHaveTextContent(/2:30\sPM – 4:17\sPM/);
+      expect(options[0]).toHaveTextContent(/02:30\sPM – 04:17\sPM/);
       expect(options[0]).toHaveTextContent('Highly Favorable');
       expect(options[0]).toHaveAttribute('data-status-tone', 'highly-favorable');
       expect(options[1]).toHaveTextContent(/October 4/);
@@ -366,7 +367,7 @@ describe('Find a Good Time', () => {
       await waitFor(() => expect(grid()).not.toHaveAttribute('aria-busy'));
       const days = within(grid()).getAllByRole('button');
       expect(days).toHaveLength(31);
-      expect(days[0]).toHaveAccessibleName(/October 1.*Highly Favorable.*best 8:53\sAM – 10:22\sAM/);
+      expect(days[0]).toHaveAccessibleName(/October 1.*Highly Favorable.*best 08:53\sAM – 10:22\sAM/);
       expect(days[0]).toHaveAttribute('data-status-tone', 'highly-favorable');
       expect(days[2]).toHaveAccessibleName(/October 3.*Mixed.*no good time/);
       expect(days[4]).toHaveAttribute('data-status-tone', 'avoid');

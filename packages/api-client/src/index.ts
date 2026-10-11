@@ -7,6 +7,7 @@ export {
   type DaySummariesParams,
   type GoodTimesParams,
   type LocationParams,
+  type LocationSearchParams,
   type PanchangParams,
   resolveEndpoints,
   roundCoordinate,

@@ -2,6 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import type { Glossary, TimePeriod } from '@myvedicstar/contracts';
 import { formatLocalDate, formatRangeForDay, formatTime } from '@myvedicstar/date-time';
 import type { DaySummary, DayTone, WindowStatus } from '@myvedicstar/domain-models';
+import { useCacheOnline } from '@myvedicstar/query-cache';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { AppText, Button, type IconName, Notice } from '../../shared/components';
@@ -17,7 +18,8 @@ const TONE_ICON: Record<DayTone, IconName> = STATUS_ICON;
 
 /** "How is today?" card — the same answers as web: the day, good time now, next caution period. */
 export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const online = useCacheOnline();
   const theme = useTheme();
   const { query, location, summary, glossary } = useDaySummary();
   const { ready, detecting } = useLocationState();
@@ -28,8 +30,8 @@ export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void 
   } else if (!location) {
     body = <ChooseLocation />;
   } else if (query.isPending) {
-    body = <Loading label={t('states.loading')} />;
-  } else if (query.isError || !summary) {
+    body = <Loading label={t(online ? 'states.loading' : 'cache.unavailable')} />;
+  } else if ((query.isError && !query.data) || !summary) {
     body = (
       <View style={styles.gap}>
         <AppText variant="heading">{t('summary.errorTitle')}</AppText>
@@ -67,6 +69,14 @@ export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void 
       ]}
     >
       {body}
+      {!online && query.data && location && (
+        <Notice>
+          {t('cache.offline', {
+            time: formatTime(query.dataUpdatedAt, { timeZone: location.timeZone, locale }),
+          })}
+        </Notice>
+      )}
+      {query.isError && query.data && <Notice tone="error">{t(errorMessageKey(query.error))}</Notice>}
     </View>
   );
 }

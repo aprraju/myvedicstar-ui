@@ -26,6 +26,10 @@ export const defaultApiEndpoints = {
   panchangDate: '/panchang/{date}',
   /** ResolveLocation */
   locationsResolve: '/locations/resolve',
+  locationsSearch: '/locations/search',
+  locationsPostal: '/locations/postal',
+  locationsReverse: '/locations/reverse',
+  locationsTimezone: '/locations/timezone',
   /** GetUpcomingFestivals */
   festivalsUpcoming: '/festivals/upcoming',
   /** GetMuhurtaActivities */
@@ -64,6 +68,10 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   panchangYear: ['year'],
   panchangDate: ['date'],
   locationsResolve: [],
+  locationsSearch: [],
+  locationsPostal: [],
+  locationsReverse: [],
+  locationsTimezone: [],
   festivalsUpcoming: [],
   muhurtaActivities: [],
   muhurtaNakshatras: [],

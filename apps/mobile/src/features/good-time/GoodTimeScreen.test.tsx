@@ -36,7 +36,7 @@ describe('Find a Good Time (mobile)', () => {
     await renderApp({ index: () => <GoodTimeScreen initialActivity="business" /> });
 
     expect(
-      await screen.findByLabelText(/^8:53\sAM – 10:22\sAM\. Highly Favorable for Business\./),
+      await screen.findByLabelText(/^08:53\sAM – 10:22\sAM\. Highly Favorable for Business\./),
     ).toBeTruthy();
     expect(screen.getAllByText('✓ No Rahu Kalam conflict').length).toBeGreaterThan(0);
     // Amrit Kalam overlapping Rahu Kalam is explained, not recommended.
@@ -66,7 +66,7 @@ describe('Find a Good Time (mobile)', () => {
 
     expect(await screen.findByText('Next best times')).toBeTruthy();
     const first = await screen.findByLabelText(
-      /^Option 1\. .*October 2.*2:30\sPM – 4:17\sPM\. Highly Favorable/,
+      /^Option 1\. .*October 2.*02:30\sPM – 04:17\sPM\. Highly Favorable/,
     );
     expect(first).toBeTruthy();
     expect(screen.getByLabelText(/^Option 2\. .*October 4/)).toBeTruthy();
@@ -93,7 +93,7 @@ describe('Find a Good Time (mobile)', () => {
     await fireEvent.press(await screen.findByRole('radio', { name: 'Month' }));
     expect(await screen.findByText('October 2026')).toBeTruthy();
     expect(
-      await screen.findByLabelText(/October 1.*Highly Favorable.*best 8:53\sAM – 10:22\sAM/),
+      await screen.findByLabelText(/October 1.*Highly Favorable.*best 08:53\sAM – 10:22\sAM/),
     ).toBeTruthy();
     expect(screen.getByLabelText(/October 3.*Mixed.*no good time/)).toBeTruthy();
     const month = apiRequests.find((url) => url.pathname.endsWith('/muhurta/day-summaries'))!;

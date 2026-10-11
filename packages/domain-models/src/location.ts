@@ -19,6 +19,11 @@ export interface SelectedLocation {
   timeZone: string;
   countryCode: string | undefined;
   source: 'current' | 'search' | 'coordinates';
+  geonameId?: string | undefined;
+  postalCode?: string | undefined;
+  city?: string | undefined;
+  region?: string | undefined;
+  country?: string | undefined;
 }
 
 export const COORDINATE_DECIMALS = 2;
@@ -57,7 +62,12 @@ export function addRecentLocation(
   location: SelectedLocation,
   max = MAX_RECENT_LOCATIONS,
 ): SelectedLocation[] {
-  return [location, ...recent.filter((l) => l.id !== location.id)].slice(0, max);
+  return [
+    location,
+    ...recent.filter(
+      (l) => l.id !== location.id && (!location.geonameId || l.geonameId !== location.geonameId),
+    ),
+  ].slice(0, max);
 }
 
 /** Location parameters for Panchang requests: the resolved coordinates plus their zone. */
@@ -119,6 +129,11 @@ export const selectedLocationSchema = z.object({
   timeZone: z.string().regex(/^[A-Za-z0-9_+\-/]{1,64}$/),
   countryCode: z.string().max(3).optional(),
   source: z.enum(['current', 'search', 'coordinates']),
+  geonameId: z.string().max(160).optional(),
+  postalCode: z.string().max(20).optional(),
+  city: z.string().max(160).optional(),
+  region: z.string().max(160).optional(),
+  country: z.string().max(160).optional(),
 });
 
 export const recentLocationsSchema = z.array(selectedLocationSchema).max(10);

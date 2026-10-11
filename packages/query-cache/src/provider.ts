@@ -1,12 +1,17 @@
-import { onlineManager, QueryClientProvider, type QueryClient } from '@tanstack/react-query';
-import { PersistQueryClientProvider, type Persister } from '@tanstack/react-query-persist-client';
+import { onlineManager, type QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type Persister, PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createElement, type ReactNode, useSyncExternalStore } from 'react';
 
 import { persistenceBuster, shouldPersistQuery } from './persistence';
 import { cachePolicies, type CacheSettings } from './policies';
 
 /** TanStack's provider suspends query fetching until the optional cache restore finishes. */
-export function CacheProvider({ client, settings, persister, children }: {
+export function CacheProvider({
+  client,
+  settings,
+  persister,
+  children,
+}: {
   client: QueryClient;
   settings: CacheSettings;
   persister?: Persister | undefined;
@@ -15,20 +20,28 @@ export function CacheProvider({ client, settings, persister, children }: {
   if (!settings.enabled || !settings.persist || !persister) {
     return createElement(QueryClientProvider, { client }, children);
   }
-  return createElement(PersistQueryClientProvider, {
-    client,
-    persistOptions: {
-      persister,
-      buster: persistenceBuster(settings),
-      maxAge: cachePolicies.persistence.maxAge,
-      dehydrateOptions: {
-        shouldDehydrateQuery: shouldPersistQuery,
-        shouldDehydrateMutation: () => false,
+  return createElement(
+    PersistQueryClientProvider,
+    {
+      client,
+      persistOptions: {
+        persister,
+        buster: persistenceBuster(settings),
+        maxAge: cachePolicies.persistence.maxAge,
+        dehydrateOptions: {
+          shouldDehydrateQuery: shouldPersistQuery,
+          shouldDehydrateMutation: () => false,
+        },
       },
     },
-  }, children);
+    children,
+  );
 }
 
 export function useCacheOnline(): boolean {
-  return useSyncExternalStore(onlineManager.subscribe.bind(onlineManager), () => onlineManager.isOnline(), () => true);
+  return useSyncExternalStore(
+    onlineManager.subscribe.bind(onlineManager),
+    () => onlineManager.isOnline(),
+    () => true,
+  );
 }

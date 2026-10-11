@@ -20,6 +20,7 @@ import { createMobileServices } from '../shared/services';
 
 export const austin = toSelectedLocation(fixtures.location.austin, 'search');
 export const hyderabad = toSelectedLocation(fixtures.location.hyderabadCoordinates, 'current');
+beforeEach(() => atInstant('2026-09-29T10:00:00-05:00'));
 
 /** Same choice as the web MSW handlers: Other → Business; Business → one Good Time; General today → that date. */
 function goodTimesFor(url: URL, hyderabadRequested: boolean) {
@@ -124,14 +125,15 @@ export interface AppRenderOptions {
   geolocation?: GeolocationProvider;
   fetchOverride?: Responder;
   initialUrl?: string;
+  configOverrides?: Record<string, unknown>;
 }
 
 /** Renders app routes inside the real AppProviders with a fake backend. */
 export async function renderApp(
   routes: Record<string, ComponentType>,
-  { auth, geolocation, fetchOverride, initialUrl = '/' }: AppRenderOptions = {},
+  { auth, geolocation, fetchOverride, initialUrl = '/', configOverrides = {} }: AppRenderOptions = {},
 ) {
-  const result = parseAppConfig({ environment: 'test', apiBaseUrl: 'https://api.test.example/api/v1' });
+  const result = parseAppConfig({ environment: 'test', apiBaseUrl: 'https://api.test.example/api/v1', ...configOverrides });
   if (!result.ok) throw new Error(result.issues.join());
   const services = createMobileServices(result.config, {
     sinks: [createMemorySink()],

@@ -16,9 +16,14 @@ export function CacheLifecycle() {
     focusManager.setFocused(AppState.currentState === 'active');
     const state = AppState.addEventListener('change', (value) => focusManager.setFocused(value === 'active'));
     const network = NetInfo.addEventListener((value) => {
-      if (value.isConnected !== null) onlineManager.setOnline(value.isConnected && value.isInternetReachable !== false);
+      if (value.isConnected !== null)
+        onlineManager.setOnline(value.isConnected && value.isInternetReachable !== false);
     });
-    return () => { state.remove(); network(); focusManager.setFocused(undefined); };
+    return () => {
+      state.remove();
+      network();
+      focusManager.setFocused(undefined);
+    };
   }, []);
   useEffect(() => {
     if (loading) return;

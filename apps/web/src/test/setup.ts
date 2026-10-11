@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 
 import { cleanup, configure } from '@testing-library/react';
-import { afterAll, afterEach, beforeAll, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, vi } from 'vitest';
 
 import { apiRequests } from './msw/handlers';
 import { server } from './msw/server';
@@ -12,6 +12,10 @@ configure({ asyncUtilTimeout: 8000 });
 
 // Any request without a handler fails the test: tests never reach live APIs.
 beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-09-29T10:00:00-05:00'));
+});
 afterEach(() => {
   vi.useRealTimers();
   server.resetHandlers();

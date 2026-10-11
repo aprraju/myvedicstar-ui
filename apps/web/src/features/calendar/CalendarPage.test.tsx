@@ -91,7 +91,7 @@ describe('Calendar', () => {
     expect(screen.getByRole('region', { name: 'Times to avoid' })).toHaveTextContent('Rahu Kalam');
     // The selected day's timeline sits under the calendar, without a "Now" marker for another date.
     const timeline = screen.getByRole('region', { name: 'Timeline for Monday, October 5' });
-    expect(timeline).toHaveTextContent(/Sunrise\s*7:23\sAM/);
+    expect(timeline).toHaveTextContent(/Sunrise\s*07:23\sAM/);
     expect(within(timeline).queryByText('Now')).not.toBeInTheDocument();
     // Another date: no Now / Over badges.
     expect(

@@ -31,7 +31,7 @@ describe('Dashboard (authenticated Today)', () => {
     renderRoute('/dashboard', { auth: signedIn() });
     await screen.findByRole('region', { name: "Today's Panchang" });
     const panchang = region("Today's Panchang");
-    expect(panchang).toHaveTextContent(/Tithi\s*Krishna Chaturthi\s*until 4:25\sAM/);
+    expect(panchang).toHaveTextContent(/Tithi\s*Krishna Chaturthi\s*until 04:25\sAM/);
     expect(panchang).toHaveTextContent('then Krishna Panchami');
     expect(panchang).toHaveTextContent('Bharani');
     // At 18:00 Yoga Harshana (ended 16:50) and Karana Bava (ended 17:34) have given way to Vajra and Balava.
@@ -40,8 +40,8 @@ describe('Dashboard (authenticated Today)', () => {
     expect(panchang).toHaveTextContent('then Kaulava');
     expect(panchang).toHaveTextContent('Tuesday');
     expect(panchang).toHaveTextContent('Krishna Paksha');
-    expect(panchang).toHaveTextContent(/Sunrise\s*7:23\sAM/);
-    expect(panchang).toHaveTextContent(/Sunset\s*7:18\sPM/);
+    expect(panchang).toHaveTextContent(/Sunrise\s*07:23\sAM/);
+    expect(panchang).toHaveTextContent(/Sunset\s*07:18\sPM/);
   });
 
   it('lists auspicious times and times to avoid with what is happening now', async () => {
@@ -50,10 +50,10 @@ describe('Dashboard (authenticated Today)', () => {
     renderRoute('/dashboard', { auth: signedIn() });
     const auspicious = await screen.findByRole('region', { name: 'Auspicious times' });
     expect(auspicious).toHaveTextContent('Amrita Kalam');
-    expect(auspicious).toHaveTextContent(/4:36\sPM – 6:06\sPM/);
-    // Amrit Kalam overlaps Rahu Kalam (4:19–5:49 PM): a resolved conflict — the overlap is explained inside the entry
+    expect(auspicious).toHaveTextContent(/04:36\sPM – 06:06\sPM/);
+    // Amrit Kalam overlaps Rahu Kalam (4:19–05:49 PM): a resolved conflict — the overlap is explained inside the entry
     // and the standard "good" message is not shown.
-    expect(auspicious).toHaveTextContent(/Overlaps with Rahu Kalam: 4:36\sPM – 5:49\sPM/);
+    expect(auspicious).toHaveTextContent(/Overlaps with Rahu Kalam: 04:36\sPM – 05:49\sPM/);
     expect(auspicious).not.toHaveTextContent('Auspicious period for positive activities');
 
     const avoid = region('Times to avoid');

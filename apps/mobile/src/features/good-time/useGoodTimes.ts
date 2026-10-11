@@ -5,7 +5,7 @@ import {
   queryKeys,
 } from '@myvedicstar/api-client';
 import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { scopedKey, useGoodTime, useLocalDate } from '@myvedicstar/query-cache';
+import { scopedKey, useGoodTime, useLocalDate, useRefreshAtWindowEnd } from '@myvedicstar/query-cache';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -68,11 +68,22 @@ export function useGoodTimes(selection: GoodTimeSelection | null) {
     if (!location || !selection) return null;
     if (selection.activity === 'other' && !selection.otherText?.trim()) return null;
     const base: PanchangParams = { location: panchangLocationParams(location), tradition, language };
-    return { ...base, date: selection.date, activity: selection.activity, otherText: selection.otherText, nakshatra: selection.nakshatra };
+    return {
+      ...base,
+      date: selection.date,
+      activity: selection.activity,
+      otherText: selection.otherText,
+      nakshatra: selection.nakshatra,
+    };
   }, [location, tradition, language, selection]);
 
-  const query = useGoodTime({ api, params, userId: user?.id ?? null, settings: config.cache,
-    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled) });
+  const query = useGoodTime({
+    api,
+    params,
+    userId: user?.id ?? null,
+    settings: config.cache,
+    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+  });
   return { query, params };
 }
 
@@ -109,14 +120,22 @@ export function useGoodTimeMonth(
   }, [base, selection]);
 
   return useQuery({
-    queryKey: scopedKey(request
-      ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
-      : ['muhurta', 'day-summaries', 'idle'], user?.id ?? null, config.cache),
+    queryKey: scopedKey(
+      request
+        ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
+        : ['muhurta', 'day-summaries', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => {
       const { start, days, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, days, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+    enabled:
+      request !== null &&
+      isAuthenticated &&
+      !loading &&
+      JSON.stringify(selection) === JSON.stringify(settled),
   });
 }
 
@@ -132,9 +151,16 @@ export function useBestGoodTimes(selection: { activity: string; otherText?: stri
     return { ...base, activity: selection.activity, otherText: selection.otherText, count: BEST_COUNT };
   }, [base, selection]);
 
-  return useQuery({
-    queryKey: scopedKey(params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'], user?.id ?? null, config.cache),
+  const query = useQuery({
+    queryKey: scopedKey(
+      params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => api.muhurta.bestGoodTimes(params as BestGoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
+    enabled:
+      params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
+  useRefreshAtWindowEnd(query.data, query.refetch, params !== null && isAuthenticated && !loading);
+  return query;
 }

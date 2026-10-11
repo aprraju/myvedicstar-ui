@@ -9,6 +9,7 @@ import { errorMessageKey } from '../../shared/errors';
 import { useTranslation } from '../../shared/i18n';
 import { STATUS_ICON, statusToneColors } from '../../shared/statusTone';
 import { useTheme, weight } from '../../shared/theme';
+import { useNow } from '../today/usePanchangToday';
 import { useBestGoodTimes } from './useGoodTimes';
 
 /** Reasons shown per option; the day view has the full list. */
@@ -24,11 +25,15 @@ export function BestGoodTimes({
   onSelectDay,
 }: Readonly<{ activity: string; otherText: string | undefined; onSelectDay: (date: LocalDate) => void }>) {
   const { t, locale } = useTranslation();
+  const now = useNow();
   const theme = useTheme();
   const awaitingDescription = activity === 'other' && !otherText?.trim();
   const query = useBestGoodTimes(awaitingDescription ? null : { activity, otherText });
   const response = query.data;
-  const items = useMemo(() => buildBestGoodTimes(response), [response]);
+  const items = useMemo(
+    () => buildBestGoodTimes(response).filter((item) => Date.parse(item.segment.end) > now),
+    [response, now],
+  );
 
   let body;
   if (awaitingDescription) {

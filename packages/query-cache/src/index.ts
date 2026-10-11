@@ -1,12 +1,30 @@
-export { createCachingClient, invalidateCalculations, removeUserCache } from './client';
 export type { CacheDiagnostic, CacheReporter } from './client';
+export { createCachingClient, invalidateCalculations, removeUserCache } from './client';
 export { goodTimeOptions, useGoodTime } from './good-time';
 export { keyScope, scopedKey } from './keys';
+export { useRefreshAtWindowEnd } from './live-best';
 export { subscribeLocalDate, useLocalDate } from './local-date';
-export { panchangDateOptions, panchangMonthOptions, seedPanchangDays, useNextTenDays, usePanchangDate, usePanchangRange, useToday, useTomorrow } from './panchang';
+export { useLocationResolution } from './location-resolution';
+export type { LocationSearchService, LocationSearchSettings } from './location-search';
+export {
+  createLocationSearchService,
+  locationSearchOptions,
+  useLocationAutocomplete,
+} from './location-search';
 export type { CalculationContext } from './panchang';
-export { createCachePersister, persistenceBuster, shouldPersistQuery } from './persistence';
+export {
+  panchangDateOptions,
+  panchangMonthOptions,
+  seedPanchangDays,
+  useNextTenDays,
+  usePanchangDate,
+  usePanchangRange,
+  useToday,
+  useTomorrow,
+} from './panchang';
+export { cachedPanchangRange } from './panchang';
 export type { CacheStorage } from './persistence';
-export { cachePolicies, defaultCacheSettings } from './policies';
+export { createCachePersister, persistenceBuster, shouldPersistQuery } from './persistence';
 export type { CacheSettings } from './policies';
+export { cachePolicies, defaultCacheSettings } from './policies';
 export { CacheProvider, useCacheOnline } from './provider';

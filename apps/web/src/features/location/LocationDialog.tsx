@@ -14,19 +14,21 @@ import { Icon } from '../../shared/components/Icon';
 import { ErrorState } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
+import { LocationAutocomplete } from './LocationAutocomplete';
 import styles from './LocationDialog.module.css';
 import { type DetectError, useLocationState } from './LocationStateProvider';
 
 /** The single location picker: current location, search, coordinates and recent locations. */
 export function LocationDialog() {
   const { t } = useTranslation();
+  const { config } = useServices();
   const { dialogOpen, closeDialog } = useLocationState();
   return (
     <Dialog
       open={dialogOpen}
       onClose={closeDialog}
       title={t('location.dialogTitle')}
-      description={t('location.privacy')}
+      description={t(config.locationSearch.enabled ? 'locationSearch.privacy' : 'location.privacy')}
     >
       <LocationDialogContent onDone={closeDialog} />
     </Dialog>
@@ -34,6 +36,8 @@ export function LocationDialog() {
 }
 
 function LocationDialogContent({ onDone }: { onDone: () => void }) {
+  const { config } = useServices();
+  const [hasSearch, setHasSearch] = useState(false);
   const { select } = useLocationState();
   const choose = (location: SelectedLocation) => {
     select(location);
@@ -42,9 +46,13 @@ function LocationDialogContent({ onDone }: { onDone: () => void }) {
   return (
     <div className={styles.content}>
       <CurrentLocationButton onDone={onDone} />
-      <LocationSearch onChoose={choose} />
+      {config.locationSearch.enabled ? (
+        <LocationAutocomplete onChoose={choose} onSearchChange={setHasSearch} />
+      ) : (
+        <LocationSearch onChoose={choose} />
+      )}
       <CoordinatesForm onChoose={choose} />
-      <RecentLocations onChoose={choose} />
+      {!hasSearch && <RecentLocations onChoose={choose} />}
     </div>
   );
 }
@@ -193,7 +201,7 @@ function LocationSearchResult({
 
 function CoordinatesForm({ onChoose }: { onChoose: (location: SelectedLocation) => void }) {
   const { t, tDynamic } = useTranslation();
-  const { api } = useServices();
+  const { api, config, locationSearch } = useServices();
   const latId = useId();
   const lonId = useId();
   const form = useForm<
@@ -205,8 +213,11 @@ function CoordinatesForm({ onChoose }: { onChoose: (location: SelectedLocation) 
     defaultValues: { latitude: '', longitude: '' },
   });
   const resolve = useMutation({
-    mutationFn: (coordinates: z.output<typeof coordinatesFormSchema>) => api.locations.resolve(coordinates),
-    onSuccess: (resolved) => onChoose(toSelectedLocation(resolved, 'coordinates')),
+    mutationFn: async (coordinates: z.output<typeof coordinatesFormSchema>) =>
+      config.locationSearch.enabled
+        ? locationSearch.resolveCoordinates(coordinates.latitude, coordinates.longitude, 'coordinates')
+        : toSelectedLocation(await api.locations.resolve(coordinates), 'coordinates'),
+    onSuccess: onChoose,
   });
   const errors = form.formState.errors;
 

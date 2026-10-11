@@ -36,6 +36,7 @@ export function createCachingClient(
     client.setQueryDefaults(['panchang', 'today'], cachePolicies.today);
     client.setQueryDefaults(['panchang', 'month'], cachePolicies.calendar);
     client.setQueryDefaults(['muhurta'], cachePolicies.goodTime);
+    client.setQueryDefaults(['muhurta', 'best'], cachePolicies.liveBest);
     client.setQueryDefaults(['muhurta', 'activities'], cachePolicies.catalog);
     client.setQueryDefaults(['muhurta', 'nakshatras'], cachePolicies.catalog);
     client.setQueryDefaults(['traditions'], cachePolicies.catalog);
@@ -56,7 +57,12 @@ export function createCachingClient(
     if (event.action.type === 'fetch') started.set(query.queryHash, Date.now());
     if (event.action.type === 'success' || event.action.type === 'error') {
       const start = started.get(query.queryHash);
-      if (start !== undefined) report({ event: event.action.type === 'error' ? 'error' : 'fetch', family, value: Date.now() - start });
+      if (start !== undefined)
+        report({
+          event: event.action.type === 'error' ? 'error' : 'fetch',
+          family,
+          value: Date.now() - start,
+        });
       started.delete(query.queryHash);
     }
     if (event.action.type === 'failed') report({ event: 'retry', family });
@@ -78,8 +84,9 @@ export async function removeUserCache(client: QueryClient, userId: string): Prom
 
 export function invalidateCalculations(client: QueryClient, family?: 'panchang' | 'muhurta' | 'festivals') {
   return client.invalidateQueries({
-    predicate: (query) => family
-      ? query.queryKey[0] === family
-      : ['panchang', 'muhurta', 'festivals'].includes(String(query.queryKey[0])),
+    predicate: (query) =>
+      family
+        ? query.queryKey[0] === family
+        : ['panchang', 'muhurta', 'festivals'].includes(String(query.queryKey[0])),
   });
 }

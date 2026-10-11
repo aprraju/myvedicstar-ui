@@ -5,6 +5,22 @@
  * `{name}` placeholders are interpolated; plural forms use `_one` / `_other` suffixes selected with Intl.PluralRules.
  */
 export const en = {
+  cache: {
+    offline: 'Offline — showing saved results, updated {time}.',
+    unavailable: 'Offline — no saved results for this date and location.',
+  },
+  locationSearch: {
+    country: 'Country',
+    countryHint: 'Country name or two-letter ISO code; leave empty for all countries.',
+    allCountries: 'All countries',
+    clear: 'Clear search',
+    suggestions: 'Matching locations',
+    noResults: 'No matches in this provider. Try a country filter, a city name, or coordinates.',
+    postalCoverage: 'Postal-code coverage varies by country; some providers only store part of a code.',
+    invalidCountry: 'Choose a country name or a valid two-letter ISO code.',
+    privacy:
+      'Location searches and selected coordinates are sent through our API to GeoNames for place and timezone lookup. Recent locations stay on this device.',
+  },
   app: {
     name: 'My Vedic Star',
     tagline: 'Timeless Wisdom for Every Day',

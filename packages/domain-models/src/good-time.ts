@@ -5,7 +5,7 @@ import type {
   GoodTimesResponse,
   MuhurtaActivity,
 } from '@myvedicstar/contracts';
-import { isWithin, toEpochMs } from '@myvedicstar/date-time';
+import { isWithin, todayIn, toEpochMs } from '@myvedicstar/date-time';
 
 /**
  * View models for Find a Good Time. The backend rules engine is authoritative: every status, Good Time, reason and
@@ -107,7 +107,7 @@ export function buildGoodTimeView(response: GoodTimesResponse, now: number = Dat
     (item) => !item.segment.isGoodTime && item.conflicts.some((conflict) => conflict.withFavorable),
   );
 
-  const isToday = response.date === response.localToday;
+  const isToday = response.date === todayIn(response.location.timeZone, now);
   const current = isToday
     ? segments.find((item) => isWithin(now, item.segment.start, item.segment.end))
     : undefined;

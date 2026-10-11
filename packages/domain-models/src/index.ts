@@ -85,3 +85,10 @@ export {
   selectedLocationSchema,
   toSelectedLocation,
 } from './location';
+export {
+  countries,
+  countryCodeFor,
+  isIanaTimeZone,
+  suggestionLabel,
+  toPreciseSelectedLocation,
+} from './location-search';

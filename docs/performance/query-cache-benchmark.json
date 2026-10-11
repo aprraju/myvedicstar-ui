@@ -1,0 +1,35 @@
+{
+  "methodology": "Mocked transport with 20 ms simulated latency; ten identical Good Time visits. Query resolution only, no device rendering or live Azure measurements.",
+  "immediateNavigation": [
+    {
+      "policy": "existing-5-minute",
+      "visits": 10,
+      "apiRequests": 1,
+      "firstQueryMs": 22.577,
+      "meanRepeatQueryMs": 0.042
+    },
+    {
+      "policy": "shared",
+      "visits": 10,
+      "apiRequests": 1,
+      "firstQueryMs": 24.678,
+      "meanRepeatQueryMs": 0.036
+    }
+  ],
+  "navigationEverySixMinutes": [
+    {
+      "policy": "existing-5-minute",
+      "visits": 10,
+      "apiRequests": 10,
+      "firstQueryMs": 25.026,
+      "meanRepeatQueryMs": 27.875
+    },
+    {
+      "policy": "shared",
+      "visits": 10,
+      "apiRequests": 1,
+      "firstQueryMs": 25.748,
+      "meanRepeatQueryMs": 0.062
+    }
+  ]
+}
