@@ -131,7 +131,11 @@ describe('Good Time from the General evaluation', () => {
     const inside = Date.parse(caution.start) + 60_000;
     const summary = buildDaySummary(panchang, inside, evaluation)!;
     expect(summary.goodTime.status).toBe('next');
-    expect(summary.goodTime.status === 'next' && summary.goodTime.window.isGoodTime).toBe(true);
+    expect(
+      summary.goodTime.status === 'next' &&
+        'isGoodTime' in summary.goodTime.window &&
+        summary.goodTime.window.isGoodTime,
+    ).toBe(true);
   });
 
   it('reports none after the last Good Time', () => {

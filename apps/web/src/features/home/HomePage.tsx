@@ -50,7 +50,7 @@ export function HomePage() {
       <section className={styles.hero} aria-labelledby={compact ? undefined : 'home-title'}>
         {!compact && <HeroIntro />}
         <div className={styles.heroCard}>
-          <DaySummaryCard />
+          <DaySummaryCard todayOnly />
         </div>
       </section>
 
@@ -83,14 +83,6 @@ export function HomePage() {
               </h3>
               <p className={styles.getStartedBody}>{t('home.getStarted.body')}</p>
               <div className={styles.getStartedActions}>
-                <button
-                  type="button"
-                  className={styles.primaryLink}
-                  aria-busy={pending === 'register' || undefined}
-                  onClick={() => void start('register')}
-                >
-                  {t('auth.register')}
-                </button>
                 <button
                   type="button"
                   className={styles.outlineLink}

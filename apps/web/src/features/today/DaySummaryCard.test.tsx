@@ -13,6 +13,48 @@ import { DaySummaryCard } from './DaySummaryCard';
 const card = () => screen.getByRole('region', { name: "Today's summary" });
 
 describe('DaySummaryCard', () => {
+  it('uses only Today data for the public home tile', async () => {
+    await atInstant('2026-09-29T10:00:00-05:00');
+    const response = structuredClone(fixtures.panchang.austinTelugu);
+    response.days[0]!.goodTime = {
+      date: '2026-09-29',
+      dateDisplay: 'September 29',
+      status: { status: 'Favorable', name: 'Favorable', icon: null },
+      goodTimeCount: 1,
+      bestGoodTime: {
+        start: '2026-09-29T11:00:00-05:00',
+        end: '2026-09-29T12:00:00-05:00',
+        startDisplay: '11:00 AM',
+        endDisplay: '12:00 PM',
+        status: { status: 'Favorable', name: 'Favorable', icon: null },
+      },
+      noGoodTimeReason: null,
+    };
+    server.use(scenarios.json('/panchang/today', response));
+    storeSelectedLocation();
+    renderWithProviders(<DaySummaryCard todayOnly />);
+    expect(await screen.findByText('Favorable day')).toBeInTheDocument();
+    expect(card()).toHaveTextContent(/11:00\sAM.*12:00\sPM/);
+    expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
+    expect(apiRequests.some((u) => u.pathname.includes('/festivals/'))).toBe(false);
+  });
+
+  it('uses the Today no-good-time reason without requesting an evaluation', async () => {
+    await atInstant('2026-09-29T10:00:00-05:00');
+    const response = structuredClone(fixtures.panchang.austinTelugu);
+    response.days[0]!.goodTime = {
+      ...response.days[0]!.goodTime!,
+      bestGoodTime: null,
+      goodTimeCount: 0,
+      noGoodTimeReason: 'No good time is available today.',
+    };
+    server.use(scenarios.json('/panchang/today', response));
+    storeSelectedLocation();
+    renderWithProviders(<DaySummaryCard todayOnly />);
+    expect(await screen.findByText('No good time is available today.')).toBeInTheDocument();
+    expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
+  });
+
   it('answers how today is, whether now is good and the next caution period', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();

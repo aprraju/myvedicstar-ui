@@ -42,7 +42,7 @@ describe('routing', () => {
       expect(within(features).getByRole('heading', { level: 3, name: title })).toBeInTheDocument();
     }
     const getStarted = within(features).getByRole('region', { name: 'Get Started for Free' });
-    expect(within(getStarted).getByRole('button', { name: 'Register' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Register' })).not.toBeInTheDocument();
     expect(within(getStarted).getByRole('button', { name: 'Login' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Dashboard' })).not.toBeInTheDocument();
   });

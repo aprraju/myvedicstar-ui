@@ -2,6 +2,7 @@ import type {
   DailyPanchang,
   GoodTimeSegment,
   GoodTimesResponse,
+  GoodTimeWindow,
   MuhurtaStatusInfo,
   PanchangElement,
   PanchangResponse,
@@ -23,7 +24,7 @@ import { type StatusTone, toneForStatus } from './good-time';
 export type DayTone = StatusTone;
 
 /** `unavailable` while the Good Time evaluation has not loaded (or failed): show nothing rather than a guess. */
-export type GoodTimeStatus = WindowStatus<GoodTimeSegment> | { status: 'unavailable' };
+export type GoodTimeStatus = WindowStatus<GoodTimeSegment | GoodTimeWindow> | { status: 'unavailable' };
 
 export type Paksha = 'shukla' | 'krishna';
 

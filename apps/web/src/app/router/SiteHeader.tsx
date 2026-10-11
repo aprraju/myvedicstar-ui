@@ -43,6 +43,7 @@ export function SiteHeader() {
   const menuId = useId();
   const { pathname, hash } = useLocation();
   const here = `${pathname}${hash}`;
+  const showRegister = pathname !== routes.home;
   const showTradition = !NO_TRADITION_PATHS.has(pathname);
   const menuOpen = openAt === here;
   const setMenuOpen = (open: boolean) => setOpenAt(open ? here : null);
@@ -122,11 +123,13 @@ export function SiteHeader() {
                     {t('auth.login')}
                   </button>
                 </li>
-                <li className={styles.compactOnly}>
-                  <button type="button" className={styles.navLink} onClick={() => void start('register')}>
-                    {t('auth.register')}
-                  </button>
-                </li>
+                {showRegister && (
+                  <li className={styles.compactOnly}>
+                    <button type="button" className={styles.navLink} onClick={() => void start('register')}>
+                      {t('auth.register')}
+                    </button>
+                  </li>
+                )}
               </>
             )}
           </ul>
@@ -151,14 +154,16 @@ export function SiteHeader() {
                 >
                   {t('auth.login')}
                 </button>
-                <button
-                  type="button"
-                  className={`${styles.cta} ${styles.wideOnly}`}
-                  aria-busy={pending === 'register' || undefined}
-                  onClick={() => void start('register')}
-                >
-                  {t('auth.register')}
-                </button>
+                {showRegister && (
+                  <button
+                    type="button"
+                    className={`${styles.cta} ${styles.wideOnly}`}
+                    aria-busy={pending === 'register' || undefined}
+                    onClick={() => void start('register')}
+                  >
+                    {t('auth.register')}
+                  </button>
+                )}
               </>
             )
           )}

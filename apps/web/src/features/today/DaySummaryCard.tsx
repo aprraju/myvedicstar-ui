@@ -28,9 +28,12 @@ const TONE_ICON: Record<DayTone, IconName> = {
  * "How is today?" — the one primary Panchang card on the public home page. Answers, at a glance: how is the day, is
  * now a good time, and when is the next caution period. All values come from the backend.
  */
-export function DaySummaryCard({ showDate = true }: Readonly<{ showDate?: boolean }>) {
+export function DaySummaryCard({
+  showDate = true,
+  todayOnly = false,
+}: Readonly<{ showDate?: boolean; todayOnly?: boolean }>) {
   const { t } = useTranslation();
-  const { query, goodTimes, location, summary, glossary } = useDaySummary();
+  const { query, goodTimes, location, summary, glossary } = useDaySummary(todayOnly);
   const { detecting } = useLocationState();
   const titleId = useId();
 
@@ -52,7 +55,8 @@ export function DaySummaryCard({ showDate = true }: Readonly<{ showDate?: boolea
         summary={summary}
         location={location}
         glossary={glossary}
-        goodTimeLoading={goodTimes.isPending}
+        goodTimeLoading={!todayOnly && goodTimes.isPending}
+        todayOnly={todayOnly}
         refreshing={query.isFetching}
         showDate={showDate}
       />
@@ -78,6 +82,7 @@ function SummaryContent({
   location,
   glossary,
   goodTimeLoading,
+  todayOnly,
   refreshing,
   showDate,
 }: {
@@ -85,6 +90,7 @@ function SummaryContent({
   location: SelectedLocation;
   glossary: Glossary | undefined;
   goodTimeLoading: boolean;
+  todayOnly: boolean;
   refreshing: boolean;
   showDate: boolean;
 }) {
@@ -92,7 +98,6 @@ function SummaryContent({
   const format = useFormatters();
   const tithi = summary.tithi?.current;
   // Festivals and observances on this date (backend, next 90 days).
-  const festivals = useFestivalsByDate().festivalsOn(summary.date);
   const headline = useDayHeadline(summary);
 
   return (
@@ -104,11 +109,7 @@ function SummaryContent({
           {tithi && <span>{tithi.name}</span>}
         </p>
       </div>
-      {festivals.length > 0 && (
-        <div className={styles.festivals}>
-          <FestivalChips festivals={festivals} label={t('festivals.onThisDay')} />
-        </div>
-      )}
+      {!todayOnly && <SummaryFestivals date={summary.date} />}
 
       <div className={styles.tone} data-tone={summary.tone} data-status-tone={summary.tone}>
         <span className={styles.toneIcon}>
@@ -250,4 +251,14 @@ function CardSkeleton({ label }: { label: string }) {
       <Skeleton height="4.5rem" />
     </div>
   );
+}
+
+function SummaryFestivals({ date }: { date: string }) {
+  const { t } = useTranslation();
+  const festivals = useFestivalsByDate().festivalsOn(date);
+  return festivals.length > 0 ? (
+    <div className={styles.festivals}>
+      <FestivalChips festivals={festivals} label={t('festivals.onThisDay')} />
+    </div>
+  ) : null;
 }

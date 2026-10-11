@@ -1,6 +1,6 @@
 import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
 import { msUntilNextLocalDay, todayIn } from '@myvedicstar/date-time';
-import { buildDaySummary, panchangLocationParams } from '@myvedicstar/domain-models';
+import { buildDaySummary, panchangLocationParams, windowStatus } from '@myvedicstar/domain-models';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 
@@ -49,16 +49,28 @@ export function usePanchangToday() {
 }
 
 /**
- * The day summary view model, recomputed every minute. The Good Time comes from the backend's General evaluation of
- * today (`/muhurta/good-times`) — the same service as Find a Good Time — never from Panchang periods.
+ * Recompute the summary every minute. Public home uses today's embedded Good Time evaluation;
+ * other views request the General good-times evaluation for its full set of windows.
  */
-export function useDaySummary() {
+export function useDaySummary(todayOnly = false) {
   const { query, location } = usePanchangToday();
-  const { query: goodTimes } = useGoodTimes(location ? { activity: 'general' } : null);
+  const { query: goodTimes } = useGoodTimes(!todayOnly && location ? { activity: 'general' } : null);
   const now = useNow();
-  const summary = useMemo(
-    () => (query.data ? buildDaySummary(query.data, now, goodTimes.data) : undefined),
-    [query.data, now, goodTimes.data],
-  );
+  const summary = useMemo(() => {
+    if (!query.data) return undefined;
+    const result = buildDaySummary(query.data, now, todayOnly ? undefined : goodTimes.data);
+    if (!todayOnly || !result) return result;
+    const day = query.data.days[0];
+    if (!day) return result;
+    const goodTime = day.goodTime;
+    const reference = result.isToday ? now : Date.parse(day.sunrise);
+    return {
+      ...result,
+      goodTime: goodTime
+        ? windowStatus(goodTime.bestGoodTime ? [goodTime.bestGoodTime] : [], reference)
+        : { status: 'unavailable' as const },
+      noGoodTimeMessage: goodTime?.noGoodTimeReason ?? undefined,
+    };
+  }, [query.data, now, goodTimes.data, todayOnly]);
   return { query, goodTimes, location, summary, glossary: query.data?.glossary };
 }
