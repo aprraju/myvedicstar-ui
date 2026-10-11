@@ -187,3 +187,44 @@ export function useBestGoodTimes(
 
 /** How many options the "Next best times" tile shows. */
 export const BEST_COUNT = 3;
+
+/** Date-based best windows are returned authoritatively by day-summaries; /best searches only from today. */
+export function useBestGoodTimeWindows(
+  selection: {
+    date: string;
+    activity: string;
+    otherText?: string | undefined;
+    nakshatra?: string | undefined;
+  } | null,
+) {
+  const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
+  const base = useBaseParams();
+  const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
+  const request = useMemo(
+    () =>
+      base && settled && isComplete(settled.activity, settled.otherText)
+        ? {
+            start: settled.date,
+            params: {
+              ...base,
+              activity: settled.activity,
+              otherText: settled.otherText,
+              nakshatra: settled.nakshatra,
+            },
+          }
+        : null,
+    [base, settled],
+  );
+  const query = useQuery({
+    queryKey: request
+      ? queryKeys.muhurta.daySummaries(request.start, 30, request.params)
+      : ['muhurta', 'date-best', 'idle'],
+    queryFn: ({ signal }) => {
+      const { start, params } = request as NonNullable<typeof request>;
+      return api.muhurta.daySummaries(start, 30, params, { signal });
+    },
+    enabled: request !== null && isAuthenticated && !loading,
+  });
+  return { query, start: request?.start };
+}

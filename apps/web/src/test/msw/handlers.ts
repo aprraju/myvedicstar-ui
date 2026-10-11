@@ -93,7 +93,19 @@ export const handlers = [
       ...october,
       days: Array.from({ length: days }, (_, i) => {
         const date = addDays(start, i);
-        return { ...october.days[i % october.days.length]!, date, dateDisplay: date };
+        const source = october.days[i % october.days.length]!;
+        return {
+          ...source,
+          date,
+          dateDisplay: date,
+          bestGoodTime: source.bestGoodTime
+            ? {
+                ...source.bestGoodTime,
+                start: source.bestGoodTime.start.replace(/^\d{4}-\d{2}-\d{2}/, date),
+                end: source.bestGoodTime.end.replace(/^\d{4}-\d{2}-\d{2}/, date),
+              }
+            : null,
+        };
       }),
     });
   }),

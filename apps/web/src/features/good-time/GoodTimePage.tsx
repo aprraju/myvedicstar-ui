@@ -5,7 +5,6 @@ import {
   defaultActivityKey,
   type ExplainedSegment,
   formatYearMonth,
-  parseYearMonth,
   yearMonthOf,
 } from '@myvedicstar/domain-models';
 import { type FormEvent, useId, useMemo, useState } from 'react';
@@ -64,11 +63,20 @@ export function GoodTimePage() {
   const otherText = activity === OTHER ? (searchParams.get('text') ?? '') : undefined;
   const view: PlanningView = searchParams.get('view') === 'month' ? 'month' : 'day';
 
-  const { query, params } = useGoodTimes(
-    location && view === 'day' ? { date, activity, otherText, nakshatra } : null,
+  const today = location ? todayIn(location.timeZone) : undefined;
+  const shownDate = date ?? today;
+  const { query, params } = useGoodTimes(location ? { date, activity, otherText, nakshatra } : null);
+  const matchesSelection =
+    params !== null &&
+    (params.date ?? today) === shownDate &&
+    params.activity === activity &&
+    params.nakshatra === nakshatra &&
+    params.otherText === otherText;
+  const response = matchesSelection && !query.isPlaceholderData ? query.data : undefined;
+  const explanation = useGoodTimeExplanation(
+    params,
+    matchesSelection && query.isSuccess && !query.isPlaceholderData,
   );
-  const response = query.data;
-  const explanation = useGoodTimeExplanation(params, query.isSuccess && !query.isPlaceholderData);
 
   const update = (next: Record<string, string | undefined>) => {
     const updated = new URLSearchParams(searchParams);
@@ -79,10 +87,7 @@ export function GoodTimePage() {
     setSearchParams(updated, { replace: true });
   };
 
-  const today = location ? todayIn(location.timeZone) : undefined;
-  const shownDate = (view === 'day' ? response?.date : undefined) ?? date ?? today;
-  const shownMonth =
-    parseYearMonth(searchParams.get('month')) ?? (shownDate ? yearMonthOf(shownDate) : undefined);
+  const shownMonth = shownDate ? yearMonthOf(shownDate) : undefined;
 
   /** Selects a date without changing the user's Day/Month choice. */
   const selectDay = (day: LocalDate) =>
@@ -181,18 +186,18 @@ export function GoodTimePage() {
                 onChange={(next) =>
                   update(
                     next === 'month'
-                      ? { view: 'month', month: shownMonth ? formatYearMonth(shownMonth) : undefined }
+                      ? {
+                          view: 'month',
+                          date: undefined,
+                          month: today ? formatYearMonth(yearMonthOf(today)) : undefined,
+                        }
                       : { view: undefined, month: undefined },
                   )
                 }
               />
 
               {view === 'day' && shownDate && (
-                <DatePicker
-                  date={shownDate}
-                  today={today}
-                  onChange={(value) => update({ date: value === today ? undefined : value })}
-                />
+                <DatePicker date={shownDate} today={today} onChange={selectDay} />
               )}
             </div>
           </div>
@@ -203,27 +208,32 @@ export function GoodTimePage() {
                 <GoodTimeMonth
                   yearMonth={shownMonth}
                   thisMonth={today ? yearMonthOf(today) : undefined}
-                  onMonthChange={(next) => update({ month: formatYearMonth(next) })}
+                  onMonthChange={(next) => selectDay(`${formatYearMonth(next)}-01`)}
+                  selectedDate={shownDate}
                   activity={activity}
                   otherText={otherText}
                   nakshatra={nakshatra}
                   onSelectDay={selectDay}
                 />
-              ) : (
-                <Results
-                  response={response}
-                  pending={query.isPending && params !== null}
-                  updating={query.isFetching && query.isPlaceholderData}
-                  awaitingDescription={activity === OTHER && !otherText?.trim()}
-                  error={query.isError ? query.error : undefined}
-                  onRetry={() => void query.refetch()}
-                  retrying={query.isFetching}
-                  explanation={explanation.data}
-                  onNextDate={shownDate ? () => update({ date: addDays(shownDate, 1) }) : undefined}
-                />
+              ) : null}
+              {view === 'month' && shownDate && (
+                <DatePicker date={shownDate} today={today} onChange={selectDay} />
               )}
+              <Results
+                showAllCards={view === 'month'}
+                response={response}
+                pending={query.isPending && params !== null}
+                updating={query.isFetching && query.isPlaceholderData}
+                awaitingDescription={activity === OTHER && !otherText?.trim()}
+                error={query.isError ? query.error : undefined}
+                onRetry={() => void query.refetch()}
+                retrying={query.isFetching}
+                explanation={explanation.data}
+                onNextDate={shownDate ? () => selectDay(addDays(shownDate, 1)) : undefined}
+              />
             </div>
             <BestGoodTimes
+              date={shownDate !== today ? shownDate : undefined}
               activity={activity}
               otherText={otherText}
               nakshatra={nakshatra}
@@ -311,9 +321,8 @@ function DatePicker({
 }: Readonly<{ date: string; today: string | undefined; onChange: (date: string) => void }>) {
   const { t } = useTranslation();
   const format = useFormatters();
-  const inputId = useId();
   return (
-    <div className={styles.date}>
+    <div className={styles.date} role="group" aria-label={t('goodTime.date')}>
       <Button
         variant="ghost"
         aria-label={t('goodTime.previousDay')}
@@ -321,22 +330,13 @@ function DatePicker({
       >
         ‹
       </Button>
-      <label htmlFor={inputId} className="visually-hidden">
-        {t('goodTime.date')}
-      </label>
-      <input
-        id={inputId}
-        type="date"
-        value={date}
-        min="1900-01-01"
-        max="2100-12-31"
-        onChange={(event) => event.target.value && onChange(event.target.value)}
-      />
-      <span className={styles.dateText}>{format.date(date)}</span>
+      <span className={styles.dateText} aria-live="polite">
+        {format.date(date)}
+      </span>
       <Button variant="ghost" aria-label={t('goodTime.nextDay')} onClick={() => onChange(addDays(date, 1))}>
         ›
       </Button>
-      {today && date !== today && (
+      {today && (
         <Button variant="secondary" onClick={() => onChange(today)}>
           {t('goodTime.today')}
         </Button>
@@ -346,6 +346,7 @@ function DatePicker({
 }
 
 function Results({
+  showAllCards,
   response,
   pending,
   updating,
@@ -356,6 +357,7 @@ function Results({
   explanation,
   onNextDate,
 }: Readonly<{
+  showAllCards: boolean;
   response: GoodTimesResponse | undefined;
   pending: boolean;
   updating: boolean;
@@ -415,6 +417,13 @@ function Results({
           </p>
         ))}
 
+        {showAllCards && view.goodTimes.length === 0 && (
+          <section aria-labelledby="recommended-title" className={styles.section}>
+            <h2 id="recommended-title" className={styles.sectionTitle}>
+              {t('goodTime.recommended', { count: 0 })}
+            </h2>
+          </section>
+        )}
         {view.goodTimes.length > 0 ? (
           <section aria-labelledby="recommended-title" className={styles.section}>
             <h2 id="recommended-title" className={styles.sectionTitle}>
@@ -454,12 +463,14 @@ function Results({
           </div>
         )}
 
-        {view.notRecommended.length > 0 && (
+        {(showAllCards || view.notRecommended.length > 0) && (
           <section aria-labelledby="not-recommended-title" className={styles.section}>
             <h2 id="not-recommended-title" className={styles.sectionTitle}>
               {t('goodTime.whyNot')}
             </h2>
-            <p className={styles.hint}>{t('goodTime.whyNotBody')}</p>
+            <p className={styles.hint}>
+              {t(view.notRecommended.length > 0 ? 'goodTime.whyNotBody' : 'goodTime.noNotRecommended')}
+            </p>
             <ul className={styles.list}>
               {view.notRecommended.map((item) => (
                 <SegmentCard key={item.segment.id} item={item} timeZone={tz} date={response.date} />
@@ -468,13 +479,13 @@ function Results({
           </section>
         )}
 
-        {explanation && (
+        {(showAllCards || explanation) && (
           <section aria-labelledby="in-brief-title" className={styles.brief}>
             <h2 id="in-brief-title" className={styles.sectionTitle}>
               {t('goodTime.inBrief')}
             </h2>
-            <p>{explanation.summary}</p>
-            {explanation.source === 'ai' && <p className={styles.hint}>{t('goodTime.writtenWithAi')}</p>}
+            <p>{explanation?.summary ?? t('goodTime.briefUnavailable')}</p>
+            {explanation?.source === 'ai' && <p className={styles.hint}>{t('goodTime.writtenWithAi')}</p>}
           </section>
         )}
 

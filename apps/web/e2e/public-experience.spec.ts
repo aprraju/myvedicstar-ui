@@ -201,7 +201,7 @@ test.describe('calendar (signed in)', () => {
 test.describe('find a good time (signed in)', () => {
   test('month view stays selected and precedes other cards on mobile', async ({ page }) => {
     await withSavedLocation(page);
-    await page.goto('/good-time?activity=business&view=month&month=2026-10');
+    await page.goto('/good-time?activity=business&view=month&month=2026-10&date=2026-10-01');
     await expect(page.getByRole('heading', { level: 2, name: 'October 2026' })).toBeVisible();
     const grid = page.getByRole('group', { name: 'Days of October 2026' });
     await expect(grid.getByRole('button', { name: /^Thursday, October 1,.*Highly Favorable/ })).toBeVisible();
@@ -218,6 +218,14 @@ test.describe('find a good time (signed in)', () => {
     await grid.getByRole('button', { name: /^Sunday, October 4,/ }).click();
     await expect(page).toHaveURL(/date=2026-10-04/);
     await expect(page.getByRole('radio', { name: 'Month' })).toBeChecked();
+    await expect(grid.getByRole('button', { name: /^Sunday, October 4,/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.getByRole('region', { name: 'Recommended time', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Not recommended', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'In brief', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'The day at a glance', exact: true })).toBeVisible();
     if (page.viewportSize()!.width < 1024) {
       const calendarBounds = await page
         .getByRole('heading', { level: 2, name: 'October 2026' })
@@ -226,7 +234,7 @@ test.describe('find a good time (signed in)', () => {
       expect(calendarBounds!.y).toBeLessThan(tileBounds!.y);
     }
 
-    await tile.getByRole('button', { name: /View .*October 12/ }).click();
+    await grid.getByRole('button', { name: /^Monday, October 12,/ }).click();
     await expect(page).toHaveURL(/date=2026-10-12/);
     await expect(page.getByRole('radio', { name: 'Month' })).toBeChecked();
     await page.getByRole('radio', { name: 'Day' }).click();

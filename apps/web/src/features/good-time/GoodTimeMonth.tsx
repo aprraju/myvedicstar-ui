@@ -26,6 +26,7 @@ const TONES: readonly StatusTone[] = ['highly-favorable', 'favorable', 'mixed', 
 export function GoodTimeMonth({
   yearMonth,
   thisMonth,
+  selectedDate,
   onMonthChange,
   activity,
   otherText,
@@ -34,6 +35,7 @@ export function GoodTimeMonth({
 }: Readonly<{
   yearMonth: YearMonth;
   thisMonth: YearMonth | undefined;
+  selectedDate: LocalDate | undefined;
   onMonthChange: (yearMonth: YearMonth) => void;
   activity: string;
   otherText: string | undefined;
@@ -107,6 +109,7 @@ export function GoodTimeMonth({
           </p>
           <MonthGrid
             weeks={month.weeks}
+            selectedDate={selectedDate}
             monthTitle={monthTitle}
             loading={!response}
             timeZone={response?.location.timeZone}
@@ -128,12 +131,14 @@ export function GoodTimeMonth({
 
 function MonthGrid({
   weeks,
+  selectedDate,
   monthTitle,
   loading,
   timeZone,
   onSelectDay,
 }: Readonly<{
   weeks: (GoodTimeMonthDay | null)[][];
+  selectedDate: LocalDate | undefined;
   monthTitle: string;
   loading: boolean;
   timeZone: string | undefined;
@@ -190,6 +195,7 @@ function MonthGrid({
             className={styles.day}
             data-status-tone={day.tone}
             data-past={day.isPast || undefined}
+            aria-pressed={day.date === selectedDate}
             aria-current={day.isToday ? 'date' : undefined}
             aria-label={describe(day)}
             onClick={() => onSelectDay(day.date)}

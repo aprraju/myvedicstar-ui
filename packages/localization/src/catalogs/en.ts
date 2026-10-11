@@ -243,6 +243,8 @@ export const en = {
     timeline: 'The day at a glance',
     timelineLabel: '{time}: {status}',
     inBrief: 'In brief',
+    briefUnavailable: 'An explanation is not available yet for this date.',
+    noNotRecommended: 'No additional periods to explain for this date.',
     writtenWithAi: 'Written with AI from the evaluation above',
     statusLegend: 'Status colors',
     birthStar: 'Select your birth star to get more accurate results',

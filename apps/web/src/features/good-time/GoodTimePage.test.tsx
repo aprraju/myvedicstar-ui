@@ -1,3 +1,4 @@
+import { todayIn } from '@myvedicstar/date-time';
 import { fixtures } from '@myvedicstar/testing';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -5,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
-import { storeSelectedLocation } from '../../test/location-fixtures';
+import { atInstant, storeSelectedLocation } from '../../test/location-fixtures';
 import { apiRequests, scenarios } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
 import { renderRoute } from '../../test/render';
@@ -287,6 +288,71 @@ describe('Find a Good Time', () => {
   });
 
   describe('month view', () => {
+    it('synchronizes selected-date results, navigation, highlight and Today across month boundaries', async () => {
+      await atInstant('2026-10-11T12:00:00-05:00');
+      storeSelectedLocation();
+      const { router, container } = renderRoute(
+        '/good-time?activity=business&view=month&month=2026-10&date=2026-10-31',
+        { auth: signedIn() },
+      );
+      await screen.findByRole('region', { name: 'Recommended time' });
+      expect(screen.getByRole('region', { name: 'Not recommended' })).toBeInTheDocument();
+      await screen.findByRole('region', { name: 'In brief' });
+      expect(screen.getByRole('region', { name: 'The day at a glance' })).toBeInTheDocument();
+      expect(
+        within(screen.getByRole('group', { name: 'Date' })).getByText('Saturday, October 31'),
+      ).toBeInTheDocument();
+      expect(container.querySelector('input[type="date"], input[type="month"]')).toBeNull();
+      expect(
+        within(screen.getByRole('group', { name: 'Days of October 2026' })).getByRole('button', {
+          name: /October 31/,
+        }),
+      ).toHaveAttribute('aria-pressed', 'true');
+      await userEvent.click(screen.getByRole('button', { name: 'Next day' }));
+      expect(router.state.location.search).toContain('date=2026-11-01');
+      expect(
+        within(screen.getByRole('group', { name: 'Date' })).getByText('Sunday, November 1'),
+      ).toBeInTheDocument();
+      const november = screen.getByRole('group', { name: 'Days of November 2026' });
+      expect(within(november).getByRole('button', { name: /November 1(?:,|$)/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      for (const endpoint of ['good-times', 'good-times/explanation']) {
+        await waitFor(() =>
+          expect(
+            apiRequests.some(
+              (url) =>
+                url.pathname.endsWith(`/muhurta/${endpoint}`) &&
+                url.searchParams.get('date') === '2026-11-01',
+            ),
+          ).toBe(true),
+        );
+      }
+      await waitFor(() =>
+        expect(
+          apiRequests.some(
+            (url) =>
+              url.pathname.endsWith('/muhurta/day-summaries') &&
+              url.searchParams.get('start') === '2026-11-01' &&
+              url.searchParams.get('days') === '30',
+          ),
+        ).toBe(true),
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Previous day' }));
+      expect(router.state.location.search).toContain('date=2026-10-31');
+      await userEvent.click(screen.getByRole('button', { name: 'Today' }));
+      expect(router.state.location.search).not.toContain('date=');
+      const today = todayIn('America/Chicago');
+      expect(today).toBe('2026-10-11');
+      expect(
+        within(screen.getByRole('group', { name: 'Days of October 2026' })).getByRole('button', {
+          name: /October 11/,
+        }),
+      ).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
+    });
+
     const grid = () => screen.getByRole('group', { name: 'Days of October 2026' });
 
     it("shows each day's status and stays in month view until Day is selected", async () => {
@@ -318,8 +384,7 @@ describe('Find a Good Time', () => {
       expect(router.state.location.search).toContain('view=month');
       expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
       expect(grid()).toBeInTheDocument();
-      const best = screen.getByRole('complementary', { name: 'Next best times' });
-      await userEvent.click(within(best).getByRole('button', { name: /View .*October 12/ }));
+      await userEvent.click(within(grid()).getByRole('button', { name: /October 12/ }));
       expect(router.state.location.search).toContain('date=2026-10-12');
       expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
       await userEvent.click(screen.getByRole('radio', { name: 'Day' }));
@@ -331,6 +396,7 @@ describe('Find a Good Time', () => {
     });
 
     it('switches between day and month and moves between months', async () => {
+      await atInstant('2026-10-11T12:00:00-05:00');
       storeSelectedLocation();
       const { router } = renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
       await screen.findByRole('region', { name: 'Recommended time' });
@@ -338,6 +404,11 @@ describe('Find a Good Time', () => {
       await userEvent.click(screen.getByRole('radio', { name: 'Month' }));
       expect(await screen.findByRole('heading', { name: 'October 2026' })).toBeInTheDocument();
       expect(router.state.location.search).toContain('month=2026-10');
+      expect(router.state.location.search).not.toContain('date=2026-10-01');
+      expect(within(grid()).getByRole('button', { name: /October 11/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
 
       await userEvent.click(screen.getByRole('button', { name: 'Next month' }));
       expect(await screen.findByRole('heading', { name: 'November 2026' })).toBeInTheDocument();

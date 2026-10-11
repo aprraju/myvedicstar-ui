@@ -1,5 +1,5 @@
-import type { LocalDate } from '@myvedicstar/date-time';
-import { buildBestGoodTimes } from '@myvedicstar/domain-models';
+import { addDays, type LocalDate } from '@myvedicstar/date-time';
+import { buildBestGoodTimes, toneForStatus } from '@myvedicstar/domain-models';
 import { useId, useMemo } from 'react';
 
 import { Button } from '../../shared/components/Button';
@@ -9,7 +9,7 @@ import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
 import { STATUS_ICON } from './activityIcons';
 import styles from './BestGoodTimes.module.css';
-import { BEST_COUNT, useBestGoodTimes } from './useGoodTimes';
+import { BEST_COUNT, useBestGoodTimes, useBestGoodTimeWindows } from './useGoodTimes';
 
 /** Reasons shown per option; the day view has the full list. */
 const REASONS_SHOWN = 2;
@@ -20,11 +20,13 @@ const REASONS_SHOWN = 2;
  */
 export function BestGoodTimes({
   activity,
+  date,
   otherText,
   nakshatra,
   onSelectDay,
 }: Readonly<{
   activity: string;
+  date?: LocalDate | undefined;
   otherText: string | undefined;
   nakshatra?: string | undefined;
   onSelectDay: (date: LocalDate) => void;
@@ -33,9 +35,36 @@ export function BestGoodTimes({
   const format = useFormatters();
   const titleId = useId();
   const awaitingDescription = activity === 'other' && !otherText?.trim();
-  const query = useBestGoodTimes(awaitingDescription ? null : { activity, otherText, nakshatra });
-  const response = query.data;
-  const items = useMemo(() => buildBestGoodTimes(response), [response]);
+  const standard = useBestGoodTimes(awaitingDescription || date ? null : { activity, otherText, nakshatra });
+  const selected = useBestGoodTimeWindows(
+    !awaitingDescription && date ? { date, activity, otherText, nakshatra } : null,
+  );
+  const query = date ? selected.query : standard;
+  const response = date ? (selected.start === date ? selected.query.data : undefined) : standard.data;
+  const items = useMemo(() => {
+    if (!date) return buildBestGoodTimes(standard.data);
+    if (selected.start !== date) return [];
+    return (selected.query.data?.days ?? [])
+      .flatMap((day) => {
+        const segment = day.bestGoodTime;
+        return day.date >= date && day.date <= addDays(date, 29) && day.goodTimeCount > 0 && segment
+          ? [{ date: day.date, segment }]
+          : [];
+      })
+      .sort(
+        (a, b) =>
+          Number(b.segment.status.status === 'HighlyFavorable') -
+            Number(a.segment.status.status === 'HighlyFavorable') || a.date.localeCompare(b.date),
+      )
+      .slice(0, BEST_COUNT)
+      .map((day, index) => ({
+        rank: index + 1,
+        date: day.date,
+        segment: day.segment,
+        tone: toneForStatus(day.segment.status.status),
+        supports: [],
+      }));
+  }, [date, standard.data, selected.query.data, selected.start]);
 
   let body;
   if (awaitingDescription) {
@@ -60,7 +89,7 @@ export function BestGoodTimes({
     body = (
       <p className={styles.empty} role="status">
         <Icon name="info" size={18} />
-        {response.noGoodTimeMessage || t('goodTime.noGoodTime')}
+        {('noGoodTimeMessage' in response && response.noGoodTimeMessage) || t('goodTime.noGoodTime')}
       </p>
     );
   } else {
@@ -70,14 +99,22 @@ export function BestGoodTimes({
         <p className={styles.hint}>
           {t('goodTime.bestSubtitle', {
             activity: response.activity.name,
-            from: format.date(response.searchedFrom),
-            through: format.date(response.searchedThrough),
+            from: format.date(
+              date ?? ('searchedFrom' in response ? response.searchedFrom : response.localToday),
+            ),
+            through: format.date(
+              date
+                ? addDays(date, 29)
+                : 'searchedThrough' in response
+                  ? response.searchedThrough
+                  : response.localToday,
+            ),
           })}
         </p>
         <ol className={styles.list}>
           {items.map((item) => (
             <li
-              key={`${item.date}-${item.segment.id}`}
+              key={`${item.date}-${item.segment.start}`}
               className={styles.option}
               data-status-tone={item.tone}
             >
@@ -113,7 +150,7 @@ export function BestGoodTimes({
             </li>
           ))}
         </ol>
-        {query.isFetching && query.isPlaceholderData && (
+        {standard.isFetching && standard.isPlaceholderData && !date && (
           <p className={styles.hint}>{t('goodTime.updating')}</p>
         )}
       </>
