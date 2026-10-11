@@ -1,6 +1,5 @@
 import type { LocalDate } from '@myvedicstar/date-time';
 import {
-  addMonths,
   buildGoodTimeMonth,
   type GoodTimeMonthDay,
   type StatusTone,
@@ -8,7 +7,6 @@ import {
 } from '@myvedicstar/domain-models';
 import { useMemo } from 'react';
 
-import { Button } from '../../shared/components/Button';
 import { Icon } from '../../shared/components/Icon';
 import { ErrorState } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
@@ -25,22 +23,20 @@ const TONES: readonly StatusTone[] = ['highly-favorable', 'favorable', 'mixed', 
  */
 export function GoodTimeMonth({
   yearMonth,
-  thisMonth,
   activity,
   otherText,
-  onMonthChange,
+  nakshatra,
   onSelectDay,
 }: Readonly<{
   yearMonth: YearMonth;
-  thisMonth: YearMonth | undefined;
   activity: string;
   otherText: string | undefined;
-  onMonthChange: (yearMonth: YearMonth) => void;
+  nakshatra?: string | undefined;
   onSelectDay: (date: LocalDate) => void;
 }>) {
   const { t, locale } = useTranslation();
   const awaitingDescription = activity === 'other' && !otherText?.trim();
-  const query = useGoodTimeMonth(awaitingDescription ? null : { yearMonth, activity, otherText });
+  const query = useGoodTimeMonth(awaitingDescription ? null : { yearMonth, activity, otherText, nakshatra });
   // A placeholder from another month must not be laid out as this one.
   const response =
     query.data &&
@@ -56,8 +52,6 @@ export function GoodTimeMonth({
       ),
     [locale, yearMonth.year, yearMonth.month],
   );
-  const isThisMonth =
-    thisMonth !== undefined && thisMonth.year === yearMonth.year && thisMonth.month === yearMonth.month;
 
   return (
     <section className={styles.month} aria-labelledby="good-time-month-title">
@@ -65,27 +59,6 @@ export function GoodTimeMonth({
         <h2 id="good-time-month-title" className={styles.title}>
           {monthTitle}
         </h2>
-        <div className={styles.actions}>
-          <Button
-            variant="secondary"
-            aria-label={t('goodTime.previousMonth')}
-            onClick={() => onMonthChange(addMonths(yearMonth, -1))}
-          >
-            <span aria-hidden="true">‹</span>
-          </Button>
-          {thisMonth && !isThisMonth && (
-            <Button variant="secondary" onClick={() => onMonthChange(thisMonth)}>
-              {t('goodTime.thisMonth')}
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            aria-label={t('goodTime.nextMonth')}
-            onClick={() => onMonthChange(addMonths(yearMonth, 1))}
-          >
-            <span aria-hidden="true">›</span>
-          </Button>
-        </div>
       </div>
 
       {awaitingDescription ? (

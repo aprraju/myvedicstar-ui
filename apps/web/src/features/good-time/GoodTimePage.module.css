@@ -446,3 +446,27 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
 }
+
+.planningRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--space-md);
+}
+
+.birthStar {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-xs);
+}
+
+.birthStar select {
+  min-block-size: 2.75rem;
+  inline-size: min(100%, 22rem);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}

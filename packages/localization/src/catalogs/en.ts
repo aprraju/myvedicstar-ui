@@ -245,6 +245,8 @@ export const en = {
     inBrief: 'In brief',
     writtenWithAi: 'Written with AI from the evaluation above',
     statusLegend: 'Status colors',
+    birthStar: 'Select your birth star to get more accurate results',
+    noBirthStar: 'None',
     view: 'Show',
     views: {
       day: 'Day',

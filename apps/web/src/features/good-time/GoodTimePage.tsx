@@ -1,6 +1,7 @@
 import type { GoodTimesResponse } from '@myvedicstar/contracts';
 import { addDays, type LocalDate, todayIn } from '@myvedicstar/date-time';
 import {
+  addMonths,
   buildGoodTimeView,
   defaultActivityKey,
   type ExplainedSegment,
@@ -23,7 +24,12 @@ import { STATUS_ICON } from './activityIcons';
 import { BestGoodTimes } from './BestGoodTimes';
 import { GoodTimeMonth } from './GoodTimeMonth';
 import styles from './GoodTimePage.module.css';
-import { useGoodTimeExplanation, useGoodTimes, useMuhurtaActivities } from './useGoodTimes';
+import {
+  useGoodTimeExplanation,
+  useGoodTimes,
+  useMuhurtaActivities,
+  useMuhurtaNakshatras,
+} from './useGoodTimes';
 
 const OTHER = 'other';
 const OTHER_MAX_LENGTH = 80;
@@ -46,6 +52,9 @@ export function GoodTimePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const questionId = useId();
   const activities = useMuhurtaActivities();
+  const stars = useMuhurtaNakshatras();
+  const starId = useId();
+  const nakshatra = searchParams.get('nakshatra') || undefined;
 
   const activityList = useMemo(() => activities.data?.activities ?? [], [activities.data]);
   const activity = activities.data
@@ -56,7 +65,9 @@ export function GoodTimePage() {
   const otherText = activity === OTHER ? (searchParams.get('text') ?? '') : undefined;
   const view: PlanningView = searchParams.get('view') === 'month' ? 'month' : 'day';
 
-  const { query, params } = useGoodTimes(location && view === 'day' ? { date, activity, otherText } : null);
+  const { query, params } = useGoodTimes(
+    location && view === 'day' ? { date, activity, otherText, nakshatra } : null,
+  );
   const response = query.data;
   const explanation = useGoodTimeExplanation(params, query.isSuccess && !query.isPlaceholderData);
 
@@ -139,24 +150,84 @@ export function GoodTimePage() {
               />
             )}
 
-            <ViewToggle
-              view={view}
-              onChange={(next) =>
-                update(
-                  next === 'month'
-                    ? { view: 'month', month: shownMonth ? formatYearMonth(shownMonth) : undefined }
-                    : { view: undefined, month: undefined },
-                )
-              }
-            />
-
-            {view === 'day' && shownDate && (
-              <DatePicker
-                date={shownDate}
-                today={today}
-                onChange={(value) => update({ date: value === today ? undefined : value })}
+            <div className={styles.planningRow}>
+              <ViewToggle
+                view={view}
+                onChange={(next) =>
+                  update(
+                    next === 'month'
+                      ? { view: 'month', month: shownMonth ? formatYearMonth(shownMonth) : undefined }
+                      : { view: undefined, month: undefined },
+                  )
+                }
               />
-            )}
+
+              {view === 'day' && shownDate && (
+                <DatePicker
+                  date={shownDate}
+                  today={today}
+                  onChange={(value) => update({ date: value === today ? undefined : value })}
+                />
+              )}
+              {view === 'month' && shownMonth && (
+                <div className={styles.date}>
+                  <Button
+                    variant="ghost"
+                    aria-label={t('goodTime.previousMonth')}
+                    onClick={() => update({ month: formatYearMonth(addMonths(shownMonth, -1)) })}
+                  >
+                    &lsaquo;
+                  </Button>
+                  <label className="visually-hidden" htmlFor={`${starId}-month`}>
+                    {t('goodTime.views.month')}
+                  </label>
+                  <input
+                    id={`${starId}-month`}
+                    type="month"
+                    value={formatYearMonth(shownMonth)}
+                    onChange={(event) => event.target.value && update({ month: event.target.value })}
+                  />
+                  {today && formatYearMonth(shownMonth) !== formatYearMonth(yearMonthOf(today)) && (
+                    <Button
+                      variant="secondary"
+                      onClick={() => update({ month: formatYearMonth(yearMonthOf(today)) })}
+                    >
+                      {t('goodTime.thisMonth')}
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    aria-label={t('goodTime.nextMonth')}
+                    onClick={() => update({ month: formatYearMonth(addMonths(shownMonth, 1)) })}
+                  >
+                    &rsaquo;
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className={styles.birthStar}>
+              <label htmlFor={starId}>{t('goodTime.birthStar')}</label>
+              <select
+                id={starId}
+                value={nakshatra ?? ''}
+                onChange={(event) => update({ nakshatra: event.target.value })}
+                disabled={stars.isPending}
+              >
+                <option value="">{t('goodTime.noBirthStar')}</option>
+                {stars.data?.map((star) => (
+                  <option key={star.key} value={star.name}>
+                    {star.name}
+                  </option>
+                ))}
+              </select>
+              {stars.isError && (
+                <ErrorState
+                  error={stars.error}
+                  onRetry={() => void stars.refetch()}
+                  retrying={stars.isFetching}
+                />
+              )}
+            </div>
           </div>
 
           <div className={styles.body}>
@@ -164,10 +235,9 @@ export function GoodTimePage() {
               {view === 'month' && shownMonth ? (
                 <GoodTimeMonth
                   yearMonth={shownMonth}
-                  thisMonth={today ? yearMonthOf(today) : undefined}
                   activity={activity}
                   otherText={otherText}
-                  onMonthChange={(next) => update({ month: formatYearMonth(next) })}
+                  nakshatra={nakshatra}
                   onSelectDay={selectDay}
                 />
               ) : (
@@ -184,7 +254,12 @@ export function GoodTimePage() {
                 />
               )}
             </div>
-            <BestGoodTimes activity={activity} otherText={otherText} onSelectDay={selectDay} />
+            <BestGoodTimes
+              activity={activity}
+              otherText={otherText}
+              nakshatra={nakshatra}
+              onSelectDay={selectDay}
+            />
           </div>
         </>
       )}

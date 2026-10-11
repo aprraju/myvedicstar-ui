@@ -20,6 +20,50 @@ const NO_GOOD_TIME =
 
 /** Fixtures: real API responses for Austin, Telugu tradition (see packages/testing). */
 describe('Find a Good Time', () => {
+  it('sends the selected birth star to each evaluation and omits it for None', async () => {
+    storeSelectedLocation();
+    const user = userEvent.setup();
+    renderRoute('/good-time', { auth: signedIn() });
+    const selector = await screen.findByRole('combobox', {
+      name: 'Select your birth star to get more accurate results',
+    });
+    await waitFor(() => expect(selector).toBeEnabled());
+    await screen.findByText(NO_GOOD_TIME);
+    expect(goodTimeRequests().every((url) => !url.searchParams.has('nakshatra'))).toBe(true);
+    await user.selectOptions(selector, 'Ashwini');
+    for (const endpoint of ['good-times', 'good-times/explanation', 'good-times/best']) {
+      await waitFor(() =>
+        expect(
+          apiRequests.some(
+            (url) =>
+              url.pathname.endsWith(`/muhurta/${endpoint}`) &&
+              url.searchParams.get('nakshatra') === 'Ashwini',
+          ),
+        ).toBe(true),
+      );
+    }
+    await user.click(screen.getByRole('radio', { name: 'Month' }));
+    await waitFor(() =>
+      expect(
+        apiRequests.some(
+          (url) =>
+            url.pathname.endsWith('/muhurta/day-summaries') &&
+            url.searchParams.get('nakshatra') === 'Ashwini',
+        ),
+      ).toBe(true),
+    );
+    apiRequests.length = 0;
+    await user.selectOptions(selector, '');
+    await waitFor(() =>
+      expect(
+        apiRequests.some(
+          (url) => url.pathname.endsWith('/muhurta/day-summaries') && !url.searchParams.has('nakshatra'),
+        ),
+      ).toBe(true),
+    );
+    expect(apiRequests.every((url) => !url.searchParams.has('nakshatra'))).toBe(true);
+  });
+
   it('offers the eleven activities as an accessible radio group with General selected by default', async () => {
     storeSelectedLocation();
     const { container } = renderRoute('/good-time', { auth: signedIn() });

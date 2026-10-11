@@ -45,6 +45,12 @@ export const handlers = [
       isHyderabad(url) ? fixtures.location.hyderabadCoordinates : fixtures.location.austin,
     );
   }),
+  http.get(api('/muhurta/nakshatras'), () =>
+    HttpResponse.json([
+      { key: 'Ashwini', name: 'Ashwini', order: 1 },
+      { key: 'Bharani', name: 'Bharani', order: 2 },
+    ]),
+  ),
   http.get(api('/muhurta/activities'), ({ request }) => {
     apiRequests.push(new URL(request.url));
     return HttpResponse.json(fixtures.muhurta.activities);

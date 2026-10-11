@@ -1,10 +1,11 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
-import { apiRequests, scenarios } from '../../test/msw/handlers';
+import { apiRequests, scenarios, TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
 import { renderRoute } from '../../test/render';
 
@@ -35,6 +36,59 @@ describe('Profile menu', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Open account menu' }));
     await userEvent.click(screen.getByRole('button', { name: 'Open account menu' }));
     expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(1);
+  });
+
+  it('reuses userinfo across page navigation', async () => {
+    const { router } = renderRoute('/about', { auth: signedIn() });
+    await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
+    await screen.findByText('Asha Rao');
+    await act(() => router.navigate('/contact'));
+    await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
+    await act(() => router.navigate('/dashboard'));
+    await screen.findByText(/Namaste, Asha/);
+    expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(1);
+  });
+
+  it('does not retry a failed login POST when another page mounts', async () => {
+    let calls = 0;
+    server.use(
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () => {
+        calls += 1;
+        return HttpResponse.json({ message: 'Unavailable' }, { status: 500 });
+      }),
+    );
+    const { router, services } = renderRoute('/about', { auth: signedIn() });
+    await waitFor(() =>
+      expect(services.queryClient.getQueryState(['auth', 'userinfo', 'u1'])?.status).toBe('error'),
+    );
+    await act(() => router.navigate('/contact'));
+    await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
+    await waitFor(() => expect(services.queryClient.isFetching()).toBe(0));
+    expect(calls).toBe(1);
+  });
+
+  it('requests userinfo again for a new login and a full app refresh', async () => {
+    const auth = createInMemoryAuthClient({ user: { id: 'mock-user' } });
+    const first = renderRoute('/about', { auth });
+    await waitFor(() =>
+      expect(first.services.queryClient.getQueryState(['auth', 'userinfo', 'mock-user'])?.status).toBe(
+        'success',
+      ),
+    );
+    await act(() => auth.signOut());
+    await act(() => auth.signIn({ returnTo: '/about', intent: 'login' }));
+    await waitFor(() =>
+      expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(2),
+    );
+    await waitFor(() => expect(first.services.queryClient.isFetching()).toBe(0));
+    first.unmount();
+    const refreshed = renderRoute('/about', { auth });
+    await waitFor(() =>
+      expect(refreshed.services.queryClient.getQueryState(['auth', 'userinfo', 'mock-user'])?.status).toBe(
+        'success',
+      ),
+    );
+    expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(3);
   });
 
   it('logs out from the menu', async () => {

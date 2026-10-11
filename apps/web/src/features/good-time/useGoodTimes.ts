@@ -22,6 +22,7 @@ interface GoodTimeSelection {
   date?: string | undefined;
   activity: string;
   otherText?: string | undefined;
+  nakshatra?: string | undefined;
 }
 
 /** The activity cards (`/muhurta/activities`) in the UI language, with the tradition's regional names. */
@@ -32,6 +33,15 @@ export function useMuhurtaActivities() {
   return useQuery({
     queryKey: queryKeys.muhurta.activities(tradition, language),
     queryFn: ({ signal }) => api.muhurta.activities({ tradition, language }, { signal }),
+    staleTime: 60 * 60_000,
+  });
+}
+
+export function useMuhurtaNakshatras() {
+  const { api } = useServices();
+  return useQuery({
+    queryKey: queryKeys.muhurta.nakshatras,
+    queryFn: ({ signal }) => api.muhurta.nakshatras({ signal }),
     staleTime: 60 * 60_000,
   });
 }
@@ -47,7 +57,13 @@ function useGoodTimeParams(selection: GoodTimeSelection | null): GoodTimesParams
     // Other needs a description before anything can be evaluated.
     if (settled.activity === 'other' && !settled.otherText?.trim()) return null;
     const base: PanchangParams = { location: panchangLocationParams(location), tradition, language };
-    return { ...base, date: settled.date, activity: settled.activity, otherText: settled.otherText };
+    return {
+      ...base,
+      date: settled.date,
+      activity: settled.activity,
+      nakshatra: settled.nakshatra,
+      otherText: settled.otherText,
+    };
   }, [location, tradition, language, settled]);
 }
 
@@ -96,7 +112,12 @@ const isComplete = (activity: string, otherText: string | undefined) =>
 
 /** The backend's status of every day of a month for an activity (`/muhurta/day-summaries`). */
 export function useGoodTimeMonth(
-  selection: { yearMonth: YearMonth; activity: string; otherText?: string | undefined } | null,
+  selection: {
+    yearMonth: YearMonth;
+    activity: string;
+    otherText?: string | undefined;
+    nakshatra?: string | undefined;
+  } | null,
 ) {
   const { api } = useServices();
   const base = useBaseParams();
@@ -104,7 +125,16 @@ export function useGoodTimeMonth(
   const request = useMemo(() => {
     if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
     const { start, days } = monthRange(settled.yearMonth);
-    return { start, days, params: { ...base, activity: settled.activity, otherText: settled.otherText } };
+    return {
+      start,
+      days,
+      params: {
+        ...base,
+        activity: settled.activity,
+        nakshatra: settled.nakshatra,
+        otherText: settled.otherText,
+      },
+    };
   }, [base, settled]);
 
   return useQuery({
@@ -121,13 +151,21 @@ export function useGoodTimeMonth(
 }
 
 /** The next best Good Times for an activity (`/muhurta/good-times/best`): one per day, best first. */
-export function useBestGoodTimes(selection: { activity: string; otherText?: string | undefined } | null) {
+export function useBestGoodTimes(
+  selection: { activity: string; otherText?: string | undefined; nakshatra?: string | undefined } | null,
+) {
   const { api } = useServices();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params: BestGoodTimesParams | null = useMemo(() => {
     if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
-    return { ...base, activity: settled.activity, otherText: settled.otherText, count: BEST_COUNT };
+    return {
+      ...base,
+      activity: settled.activity,
+      nakshatra: settled.nakshatra,
+      otherText: settled.otherText,
+      count: BEST_COUNT,
+    };
   }, [base, settled]);
 
   return useQuery({

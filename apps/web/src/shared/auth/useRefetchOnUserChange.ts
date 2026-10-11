@@ -17,6 +17,11 @@ export function useRefetchOnUserChange() {
   useEffect(() => {
     if (userId === undefined) return; // session still being restored
     if (previous.current !== undefined && previous.current !== userId) {
+      // A later login, even to the same account, must complete sign-in again.
+      // Remove only the previous session's profile; leave the new user's in-flight request alone.
+      if (previous.current !== null) {
+        queryClient.removeQueries({ queryKey: ['auth', 'userinfo', previous.current], exact: true });
+      }
       // Cancel first: a first load still in flight was started without the token, and invalidation alone would reuse
       // its result instead of requesting again.
       // The user's own profile (`['auth', 'userinfo', userId]`) is excluded: it is keyed by user, and re-sending that POST

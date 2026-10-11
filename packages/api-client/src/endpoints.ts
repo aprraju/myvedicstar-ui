@@ -30,6 +30,7 @@ export const defaultApiEndpoints = {
   festivalsUpcoming: '/festivals/upcoming',
   /** GetMuhurtaActivities */
   muhurtaActivities: '/muhurta/activities',
+  muhurtaNakshatras: '/muhurta/nakshatras',
   /** GetGoodTimes */
   muhurtaGoodTimes: '/muhurta/good-times',
   /** GetGoodTimesExplanation */
@@ -65,6 +66,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   locationsResolve: [],
   festivalsUpcoming: [],
   muhurtaActivities: [],
+  muhurtaNakshatras: [],
   muhurtaGoodTimes: [],
   muhurtaExplanation: [],
   muhurtaDaySummaries: [],

@@ -9,6 +9,7 @@ import {
   goodTimesResponseSchema,
   locationSchema,
   muhurtaActivitiesResponseSchema,
+  muhurtaNakshatrasResponseSchema,
   panchangResponseSchema,
   panchangTraditionsResponseSchema,
   traditionsResponseSchema,
@@ -54,6 +55,8 @@ export interface GoodTimesParams extends PanchangParams {
   activity?: string | undefined;
   /** Required with `activity: 'other'`. */
   otherText?: string | undefined;
+  /** Optional birth star name from the Nakshatra catalog. */
+  nakshatra?: string | undefined;
 }
 
 /** What to search in "Next best times". */
@@ -62,6 +65,8 @@ export interface BestGoodTimesParams extends PanchangParams {
   activity?: string | undefined;
   /** Required with `activity: 'other'`. */
   otherText?: string | undefined;
+  /** Optional birth star name from the Nakshatra catalog. */
+  nakshatra?: string | undefined;
   /** Number of options, 1–10; 3 when omitted. */
   count?: number | undefined;
   /** Days searched from today at the location, 1–90; 30 when omitted. */
@@ -73,6 +78,8 @@ export interface DaySummariesParams extends PanchangParams {
   activity?: string | undefined;
   /** Required with `activity: 'other'`. */
   otherText?: string | undefined;
+  /** Optional birth star name from the Nakshatra catalog. */
+  nakshatra?: string | undefined;
 }
 
 export interface CallOptions {
@@ -115,6 +122,7 @@ export function createApiClient(options: ApiClientOptions) {
     date: params.date,
     activity: params.activity,
     otherText: otherTextFor(params.activity, params.otherText),
+    nakshatra: params.nakshatra?.trim() || undefined,
   });
 
   const otherTextFor = (activity: string | undefined, otherText: string | undefined) =>
@@ -201,6 +209,14 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     muhurta: {
+      nakshatras: (call?: CallOptions) =>
+        transport.request({
+          operation: 'muhurta.nakshatras',
+          path: path('muhurtaNakshatras'),
+          schema: muhurtaNakshatrasResponseSchema,
+          signal: call?.signal,
+          auth: 'optional',
+        }),
       /** The activity cards for "What are you planning?", in display order. */
       activities: (
         params: { tradition?: string | undefined; language?: string | undefined } = {},
@@ -245,6 +261,7 @@ export function createApiClient(options: ApiClientOptions) {
             days,
             activity: params.activity,
             otherText: otherTextFor(params.activity, params.otherText),
+            nakshatra: params.nakshatra?.trim() || undefined,
           },
           schema: daySummariesResponseSchema,
           signal: call?.signal,
@@ -259,6 +276,7 @@ export function createApiClient(options: ApiClientOptions) {
             ...panchangQuery(params),
             activity: params.activity,
             otherText: otherTextFor(params.activity, params.otherText),
+            nakshatra: params.nakshatra?.trim() || undefined,
             count: params.count,
             days: params.days,
           },

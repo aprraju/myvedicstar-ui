@@ -27,6 +27,14 @@ export type KnownActivityKey =
   | 'general'
   | 'other';
 
+export const muhurtaNakshatrasResponseSchema = z.array(
+  z.object({
+    key: z.string(),
+    name: z.string(),
+    order: z.number().int(),
+  }),
+);
+
 export const muhurtaActivitySchema = z.object({
   key: z.string(),
   name: z.string(),

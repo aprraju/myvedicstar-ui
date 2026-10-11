@@ -34,6 +34,7 @@ export const queryKeys = {
       ['festivals', 'upcoming', days, normalize(params)] as const,
   },
   muhurta: {
+    nakshatras: ['muhurta', 'nakshatras'] as const,
     activities: (tradition: string | undefined, language: string | undefined) =>
       ['muhurta', 'activities', tradition ?? null, language ?? null] as const,
     /** Location, tradition, language, date, activity and (for Other) the text are all part of the key. */
@@ -47,6 +48,7 @@ export const queryKeys = {
         days,
         params.activity ?? null,
         otherTextKey(params.activity, params.otherText),
+        params.nakshatra?.trim().toLowerCase() || null,
         normalize(params),
       ] as const,
     bestGoodTimes: (params: BestGoodTimesParams) =>
@@ -57,6 +59,7 @@ export const queryKeys = {
           ...normalize(params),
           activity: params.activity ?? null,
           otherText: otherTextKey(params.activity, params.otherText),
+          nakshatra: params.nakshatra?.trim().toLowerCase() || null,
           count: params.count ?? null,
           days: params.days ?? null,
         },
@@ -78,6 +81,7 @@ function goodTimesKey(params: GoodTimesParams) {
     date: params.date ?? null,
     activity: params.activity ?? null,
     otherText: otherTextKey(params.activity, params.otherText),
+    nakshatra: params.nakshatra?.trim().toLowerCase() || null,
   };
 }
 

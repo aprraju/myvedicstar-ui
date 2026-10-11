@@ -21,13 +21,19 @@ const REASONS_SHOWN = 2;
 export function BestGoodTimes({
   activity,
   otherText,
+  nakshatra,
   onSelectDay,
-}: Readonly<{ activity: string; otherText: string | undefined; onSelectDay: (date: LocalDate) => void }>) {
+}: Readonly<{
+  activity: string;
+  otherText: string | undefined;
+  nakshatra?: string | undefined;
+  onSelectDay: (date: LocalDate) => void;
+}>) {
   const { t } = useTranslation();
   const format = useFormatters();
   const titleId = useId();
   const awaitingDescription = activity === 'other' && !otherText?.trim();
-  const query = useBestGoodTimes(awaitingDescription ? null : { activity, otherText });
+  const query = useBestGoodTimes(awaitingDescription ? null : { activity, otherText, nakshatra });
   const response = query.data;
   const items = useMemo(() => buildBestGoodTimes(response), [response]);
 

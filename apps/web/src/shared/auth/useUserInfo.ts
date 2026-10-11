@@ -20,6 +20,8 @@ export function useUserInfo(): { userInfo: UserInfo | undefined; loading: boolea
     staleTime: Infinity,
     gcTime: Infinity,
     retry: false,
+    retryOnMount: false,
+    refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
