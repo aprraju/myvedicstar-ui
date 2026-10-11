@@ -208,24 +208,34 @@ describe('render.ts', () => {
 });
 
 /** Serves staged content the way Azure Static Web Apps does with the generated staticwebapp.config.json. */
-async function staticWebApp(stage: string, options: { dropHeader?: string } = {}): Promise<string> {
+type SiteOptions = { dropHeader?: string; assetStatuses?: number[]; immutableAfter?: number };
+
+async function staticWebApp(stage: string, options: SiteOptions = {}): Promise<string> {
   const swa = JSON.parse(readFileSync(join(stage, 'staticwebapp.config.json'), 'utf8')) as {
     globalHeaders: Record<string, string>;
   };
   // The deployed release: fixed at "deploy" time, like the real site.
   const deployedIndex = readFileSync(join(stage, 'index.html'));
+  let assetRequests = 0;
   const server = createServer((request, response) => {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname;
     for (const [name, value] of Object.entries(swa.globalHeaders)) {
       if (name !== options.dropHeader) response.setHeader(name, value);
     }
     if (path.endsWith('.map')) return response.writeHead(404).end();
+    if (path.startsWith('/assets/')) {
+      const attempt = assetRequests++;
+      const status = options.assetStatuses?.[Math.min(attempt, options.assetStatuses.length - 1)] ?? 200;
+      if (status !== 200) return response.writeHead(status).end();
+    }
     if (path.startsWith('/assets/') || extname(path)) {
       try {
         const body = readFileSync(join(stage, path));
         response.setHeader(
           'Cache-Control',
-          path.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'no-store',
+          path.startsWith('/assets/') && assetRequests > (options.immutableAfter ?? 0)
+            ? 'public, max-age=31536000, immutable'
+            : 'no-store',
         );
         return response.writeHead(200).end(body);
       } catch {
@@ -241,7 +251,7 @@ async function staticWebApp(stage: string, options: { dropHeader?: string } = {}
   return `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 }
 
-async function stagedSite(options: { dropHeader?: string } = {}) {
+async function stagedSite(options: SiteOptions = {}) {
   const stage = goodBuild();
   // The site URL is only known once the server listens; render with a placeholder origin, then serve.
   const rendered = await runScript('render.ts', ['--out', stage], siteEnv('http://127.0.0.1'));
@@ -250,6 +260,51 @@ async function stagedSite(options: { dropHeader?: string } = {}) {
 }
 
 describe('smoke-test.ts', () => {
+  it(
+    'waits for entry script and immutable caching after HTML has propagated',
+    async () => {
+      const { stage, siteUrl } = await stagedSite({ assetStatuses: [404, 200], immutableAfter: 2 });
+      const { code, output } = await runScript('smoke-test.ts', [
+        '--site-url',
+        siteUrl,
+        '--staged',
+        stage,
+        '--skip-cors',
+        '--timeout-s',
+        '40',
+      ]);
+      expect(output).toContain('waiting for release assets');
+      expect(output).toContain('HTTP 404');
+      expect(output).toContain('Cache-Control no-store');
+      expect(output).toContain('Smoke test passed.');
+      expect(code).toBe(0);
+    },
+    TIMEOUT,
+  );
+
+  it.each([
+    { assetStatuses: [404], problem: 'HTTP 404' },
+    { immutableAfter: 100, problem: 'Cache-Control no-store' },
+  ])(
+    'fails when entry assets never become ready: $problem',
+    async (options) => {
+      const { stage, siteUrl } = await stagedSite(options);
+      const { code, output } = await runScript('smoke-test.ts', [
+        '--site-url',
+        siteUrl,
+        '--staged',
+        stage,
+        '--skip-cors',
+        '--timeout-s',
+        '1',
+      ]);
+      expect(code).toBe(1);
+      expect(output).toContain(options.problem);
+      expect(output).toContain('the deployed content never became visible');
+    },
+    TIMEOUT,
+  );
+
   it.each([
     [200, true, 0],
     [401, false, 1],

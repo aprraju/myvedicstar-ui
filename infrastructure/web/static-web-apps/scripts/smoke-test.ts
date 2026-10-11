@@ -3,7 +3,7 @@
  *
  *   tsx smoke-test.ts --site-url https://www.example.com --staged <staged-dir> [--skip-cors] [--timeout-s 300]
  *
- * Waits until the edge serves the new release (index.html and config.json identical to the staged copies), then checks:
+ * Waits until the edge serves matching index.html/config.json and the entry script with immutable caching, then checks:
  * - HTTPS: HTTP redirects to HTTPS and HSTS is sent;
  * - security headers: the CSP and other headers equal staticwebapp.config.json's globalHeaders;
  * - caching: hashed assets immutable, config.json and HTML revalidated; source maps not served;
@@ -35,6 +35,7 @@ if (!siteUrl || !staged) {
 }
 
 const stagedIndex = readFileSync(join(staged, 'index.html'), 'utf8');
+const entry = /<script[^>]+src="(\/assets\/[^"]+\.js)"/.exec(stagedIndex)?.[1];
 const stagedConfig = JSON.parse(readFileSync(join(staged, 'config.json'), 'utf8')) as unknown;
 const swaConfig = JSON.parse(readFileSync(join(staged, 'staticwebapp.config.json'), 'utf8')) as {
   globalHeaders: Record<string, string>;
@@ -71,6 +72,7 @@ async function get(path: string, init: RequestInit = {}): Promise<Response> {
 const deadline = Date.now() + Number(values['timeout-s']) * 1000;
 let live = false;
 let lastProblem = '';
+let readyEntry: Response | undefined;
 while (Date.now() < deadline) {
   try {
     const [index, runtime] = await Promise.all([get('/'), get(`/config.json?smoke=${Date.now()}`)]);
@@ -81,14 +83,29 @@ while (Date.now() < deadline) {
       indexText === stagedIndex &&
       JSON.stringify(runtimeJson) === JSON.stringify(stagedConfig)
     ) {
-      live = true;
-      break;
+      if (entry) {
+        const asset = await get(entry);
+        const cacheControl = asset.headers.get('cache-control') ?? '';
+        await asset.body?.cancel();
+        if (asset.status !== 200 || !/immutable/.test(cacheControl)) {
+          lastProblem = `entry script ${entry}: HTTP ${asset.status}, Cache-Control ${cacheControl || 'missing'}`;
+          console.log(`  waiting for release assets: ${lastProblem}`);
+        } else {
+          readyEntry = asset;
+          live = true;
+          break;
+        }
+      } else {
+        live = true;
+        break;
+      }
+    } else {
+      lastProblem = `index ${index.status}${indexText === stagedIndex ? '' : ' (previous release)'}, config.json ${runtime.status}`;
     }
-    lastProblem = `index ${index.status}${indexText === stagedIndex ? '' : ' (previous release)'}, config.json ${runtime.status}`;
   } catch (error) {
     lastProblem = error instanceof Error ? error.message : String(error);
   }
-  await new Promise((resolve) => setTimeout(resolve, 10_000));
+  await new Promise((resolve) => setTimeout(resolve, Math.max(0, Math.min(10_000, deadline - Date.now()))));
 }
 console.log(`Smoke test ${siteUrl}`);
 check(
@@ -127,10 +144,9 @@ async function runChecks(siteUrl: string): Promise<void> {
   }
 
   // 4. Caching, source maps and SPA routing.
-  const entry = /<script[^>]+src="(\/assets\/[^"]+\.js)"/.exec(stagedIndex)?.[1];
   if (entry) {
-    const asset = await get(entry);
-    check(asset.status === 200, `entry script ${entry} served`);
+    const asset = readyEntry ?? (await get(entry));
+    check(asset.status === 200, `entry script ${entry} served (${asset.status})`);
     check(
       /immutable/.test(asset.headers.get('cache-control') ?? ''),
       'hashed assets are cached as immutable',
