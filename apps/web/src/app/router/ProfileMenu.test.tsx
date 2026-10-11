@@ -12,6 +12,25 @@ import { renderRoute } from '../../test/render';
 const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Token Name' } });
 
 describe('Profile menu', () => {
+  it('keeps the identity-provider email visible when userinfo has no name or email', async () => {
+    server.use(
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
+        HttpResponse.json({
+          id: 'u1',
+          name: null,
+          givenName: null,
+          surname: null,
+          email: null,
+        }),
+      ),
+    );
+    const auth = createInMemoryAuthClient({ user: { id: 'u1', email: 'asha.rao@example.com' } });
+    renderRoute('/about', { auth });
+    await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
+    expect(await screen.findByText('asha.rao@example.com')).toBeInTheDocument();
+    expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
+  });
+
   it.each([null, '', '   ', 'Unknown'])('shows only email when the profile name is %s', async (name) => {
     server.use(
       http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>

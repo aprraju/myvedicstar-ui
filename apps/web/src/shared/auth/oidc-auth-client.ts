@@ -13,7 +13,7 @@ type OidcConfig = Extract<AuthConfig, { mode: 'oidc' }>;
 type EntraConfig = Extract<AuthConfig, { mode: 'entra-external-id' }>;
 
 /** Scopes every session needs: identity (`openid`, `profile`) and a refresh token for renewal without iframes. */
-const BASE_SCOPES = ['openid', 'profile', 'offline_access'];
+const BASE_SCOPES = ['openid', 'profile', 'email', 'offline_access'];
 /** Renew the access token when it has less than this many seconds left. */
 const RENEW_BEFORE_EXPIRY_SECONDS = 60;
 const CANCELLED_ERRORS = new Set([
@@ -187,7 +187,17 @@ function createClient(settings: OidcClientSettings): AuthClient {
 
 function toAuthUser(user: User) {
   const name = user.profile.name ?? user.profile.given_name;
-  return { id: user.profile.sub, displayName: typeof name === 'string' ? name : undefined };
+  const emails = user.profile.emails;
+  const email = [
+    user.profile.email,
+    ...(Array.isArray(emails) ? emails : []),
+    user.profile.preferred_username,
+  ].find((value): value is string => typeof value === 'string' && /^[^\s@]+@[^\s@]+$/.test(value.trim()));
+  return {
+    id: user.profile.sub,
+    displayName: typeof name === 'string' ? name : undefined,
+    ...(typeof email === 'string' && email.trim() ? { email: email.trim() } : {}),
+  };
 }
 
 function readReturnTo(state: unknown): string | undefined {

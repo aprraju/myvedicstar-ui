@@ -4,6 +4,7 @@ import type { AuthConfig, IdentityProvider } from '@myvedicstar/config';
 export interface AuthUser {
   id: string;
   displayName?: string | undefined;
+  email?: string | undefined;
 }
 
 /** `loading` while a stored session is being restored (e.g. after a page reload). */

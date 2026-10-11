@@ -40,7 +40,7 @@ export function ProfileMenu() {
   }, [open]);
 
   const candidate = displayNameOf(userInfo, userInfo ? undefined : user?.displayName);
-  const email = userInfo?.email?.trim() || undefined;
+  const email = userInfo?.email?.trim() || user?.email?.trim() || undefined;
   const name =
     candidate &&
     !['unknown', t('profile.unknownName').toLowerCase(), email?.toLowerCase()].includes(

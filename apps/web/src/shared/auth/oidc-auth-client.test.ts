@@ -92,7 +92,7 @@ describe('createOidcAuthClient', () => {
       response_type: 'code',
       redirect_uri: 'https://www.myvedicstar.example/auth/callback',
       post_logout_redirect_uri: 'https://www.myvedicstar.example/',
-      scope: 'openid profile offline_access api://myvedicday/Panchang.Read',
+      scope: 'openid profile email offline_access api://myvedicday/Panchang.Read',
       monitorSession: false,
     });
     expect(settings.userStore.options.store).toBe(window.sessionStorage);
@@ -114,6 +114,18 @@ describe('createOidcAuthClient', () => {
       expect(client.getState()).toEqual({ status: 'ready', user: { id: 'user-1', displayName: 'Asha' } }),
     );
     expect(await client.getAccessToken()).toBe('access-123');
+  });
+
+  it.each([
+    { email: 'asha@example.com' },
+    { emails: ['asha@example.com'] },
+    { preferred_username: 'asha@example.com' },
+  ])('retains an identity email for the profile menu: %j', async (claims) => {
+    mocks.manager.getUser.mockResolvedValue(user({ profile: { sub: 'user-1', ...claims } }));
+    const client = createOidcAuthClient(config, 'https://x.example');
+    await vi.waitFor(() =>
+      expect(client.getState().user).toMatchObject({ id: 'user-1', email: 'asha@example.com' }),
+    );
   });
 
   it('treats an expired session as signed out', async () => {
@@ -254,7 +266,7 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
       response_type: 'code',
       redirect_uri: 'http://localhost:5173/auth/callback',
       post_logout_redirect_uri: 'http://localhost:5173/',
-      scope: 'openid profile offline_access api://api-client-id/access_as_user',
+      scope: 'openid profile email offline_access api://api-client-id/access_as_user',
       automaticSilentRenew: true,
     });
     // Tokens in memory; only the one-redirect PKCE/state record uses sessionStorage.
