@@ -30,12 +30,18 @@ function render(env: Record<string, string>) {
 
 describe('runtime config from environment variables', () => {
   it('validates and renders cache and location search configuration', () => {
-    const result = render({ ...production, MVS_CACHE: '{"persist":true,"rulesVersion":"rules-v2"}', MVS_LOCATION_SEARCH: '{"enabled":true,"debounceMs":350}' });
+    const result = render({
+      ...production,
+      MVS_CACHE: '{"persist":true,"rulesVersion":"rules-v2"}',
+      MVS_LOCATION_SEARCH: '{"enabled":true,"debounceMs":350}',
+    });
     expect(result.config.cache.persist).toBe(true);
     expect(result.config.cache.rulesVersion).toBe('rules-v2');
     expect(result.config.locationSearch.enabled).toBe(true);
     expect(renderRuntimeConfig({ ...production, MVS_CACHE: '{bad' }).ok).toBe(false);
-    expect(renderRuntimeConfig({ ...production, MVS_LOCATION_SEARCH: '{"username":"should-not-be-public"}' }).ok).toBe(false);
+    expect(
+      renderRuntimeConfig({ ...production, MVS_LOCATION_SEARCH: '{"username":"should-not-be-public"}' }).ok,
+    ).toBe(false);
   });
   it('renders a complete production config with derived Entra values', () => {
     const { raw, config } = render(production);

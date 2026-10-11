@@ -167,7 +167,12 @@ export function useToday(context: CalculationContext) {
     queryFn: async ({ signal }) => {
       const data = await api.panchang.today(params as PanchangParams, { signal });
       // A response crossing midnight must never populate the new date's cache or be shown as Today.
-      if (data.localToday !== date || data.days.length !== 1 || data.days[0]?.date !== date || data.location.timeZone !== timeZone) {
+      if (
+        data.localToday !== date ||
+        data.days.length !== 1 ||
+        data.days[0]?.date !== date ||
+        data.location.timeZone !== timeZone
+      ) {
         throw new ApiError({ kind: 'validation' });
       }
       if (!signal.aborted) seedPanchangDays(client, data, params as PanchangParams, userId, settings);

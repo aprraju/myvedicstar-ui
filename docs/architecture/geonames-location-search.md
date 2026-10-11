@@ -69,12 +69,12 @@ builder.Services.AddGeoNamesLocationSearch(builder.Configuration);
 The existing `app.MapControllers()` discovers the added controller through `AddApplicationPart`. The four additive
 anonymous routes use the same `public-read` policy as the existing anonymous location resolver:
 
-| Route under `/api/v1` | Query inputs | Response |
-| --- | --- | --- |
-| `/locations/search` | `text`, optional `country`, `language`, `maxRows` (1–8) | `{ "results": [...] }` |
-| `/locations/postal` | `text`, optional `country`, `maxRows` | `{ "results": [...] }` |
-| `/locations/reverse` | Required `latitude`, `longitude`, optional `language` | `{ "place": suggestionOrNull }` |
-| `/locations/timezone` | Required `latitude`, `longitude` | `{ "timeZone": "America/Chicago" }` |
+| Route under `/api/v1` | Query inputs                                            | Response                            |
+| --------------------- | ------------------------------------------------------- | ----------------------------------- |
+| `/locations/search`   | `text`, optional `country`, `language`, `maxRows` (1–8) | `{ "results": [...] }`              |
+| `/locations/postal`   | `text`, optional `country`, `maxRows`                   | `{ "results": [...] }`              |
+| `/locations/reverse`  | Required `latitude`, `longitude`, optional `language`   | `{ "place": suggestionOrNull }`     |
+| `/locations/timezone` | Required `latitude`, `longitude`                        | `{ "timeZone": "America/Chicago" }` |
 
 Expose those routes through the current APIM API/operation configuration using its existing backend and abuse
 protection. No direct GeoNames CSP origin is needed. Keep any gateway subscription/security requirements in place.

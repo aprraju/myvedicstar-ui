@@ -9,21 +9,43 @@ import { createTestConfig, renderWithProviders } from '../../test/render';
 import { LocationAutocomplete } from './LocationAutocomplete';
 
 const base = 'https://api.test.myvedicstar.example/api/v1';
-const india = { id: '1269843', city: 'Hyderabad', region: 'Telangana', country: 'India', countryCode: 'IN', postalCode: null, latitude: 17.385, longitude: 78.4867, source: 'city' };
+const india = {
+  id: '1269843',
+  city: 'Hyderabad',
+  region: 'Telangana',
+  country: 'India',
+  countryCode: 'IN',
+  postalCode: null,
+  latitude: 17.385,
+  longitude: 78.4867,
+  source: 'city',
+};
 const pakistan = { ...india, id: '1176734', region: 'Sindh', country: 'Pakistan', countryCode: 'PK' };
 
 function setup() {
   const onChoose = vi.fn();
   const calls: URL[] = [];
   server.use(
-    http.get(`${base}/locations/search`, ({ request }) => { calls.push(new URL(request.url)); return HttpResponse.json({ results: [india, pakistan] }); }),
-    http.get(`${base}/locations/postal`, ({ request }) => { calls.push(new URL(request.url)); return HttpResponse.json({ results: [{ ...india, source: 'postal', postalCode: '110001' }] }); }),
-    http.get(`${base}/locations/timezone`, ({ request }) => { calls.push(new URL(request.url)); return HttpResponse.json({ timeZone: 'Asia/Kolkata' }); }),
+    http.get(`${base}/locations/search`, ({ request }) => {
+      calls.push(new URL(request.url));
+      return HttpResponse.json({ results: [india, pakistan] });
+    }),
+    http.get(`${base}/locations/postal`, ({ request }) => {
+      calls.push(new URL(request.url));
+      return HttpResponse.json({ results: [{ ...india, source: 'postal', postalCode: '110001' }] });
+    }),
+    http.get(`${base}/locations/timezone`, ({ request }) => {
+      calls.push(new URL(request.url));
+      return HttpResponse.json({ timeZone: 'Asia/Kolkata' });
+    }),
     http.get(`${base}/locations/reverse`, () => HttpResponse.json({ place: india })),
   );
-  const rendered = renderWithProviders(<LocationAutocomplete onChoose={onChoose} onSearchChange={() => undefined} />, {
-    config: createTestConfig({ locationSearch: { enabled: true, debounceMs: 200 } }),
-  });
+  const rendered = renderWithProviders(
+    <LocationAutocomplete onChoose={onChoose} onSearchChange={() => undefined} />,
+    {
+      config: createTestConfig({ locationSearch: { enabled: true, debounceMs: 200 } }),
+    },
+  );
   return { ...rendered, onChoose, calls };
 }
 
@@ -39,7 +61,11 @@ describe('GeoNames location autocomplete', () => {
     expect(onChoose).not.toHaveBeenCalled();
     expect(await axeViolations(container)).toEqual([]);
     await user.keyboard('{ArrowDown}{Enter}');
-    await waitFor(() => expect(onChoose).toHaveBeenCalledWith(expect.objectContaining({ latitude: 17.385, longitude: 78.4867, timeZone: 'Asia/Kolkata' })));
+    await waitFor(() =>
+      expect(onChoose).toHaveBeenCalledWith(
+        expect.objectContaining({ latitude: 17.385, longitude: 78.4867, timeZone: 'Asia/Kolkata' }),
+      ),
+    );
   });
 
   it('debounces requests, closes with Escape, clears input, and reuses cached results', async () => {
@@ -70,12 +96,18 @@ describe('GeoNames location autocomplete', () => {
     await user.type(input, '17.385012, 78.486712');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     await user.click(await screen.findByRole('button', { name: 'Use this location' }));
-    expect(onChoose).toHaveBeenCalledWith(expect.objectContaining({ latitude: 17.385012, longitude: 78.486712 }));
+    expect(onChoose).toHaveBeenCalledWith(
+      expect.objectContaining({ latitude: 17.385012, longitude: 78.486712 }),
+    );
   });
 
   it('keeps selection unchanged on provider quota errors and offers retry', async () => {
     const { onChoose } = setup();
-    server.use(http.get(`${base}/locations/search`, () => HttpResponse.json({ status: 429, title: 'Rate limited' }, { status: 429 })));
+    server.use(
+      http.get(`${base}/locations/search`, () =>
+        HttpResponse.json({ status: 429, title: 'Rate limited' }, { status: 429 }),
+      ),
+    );
     const user = userEvent.setup();
     await user.type(screen.getByRole('combobox', { name: 'City, ZIP code or coordinates' }), 'Austin');
     expect(await screen.findByRole('button', { name: 'Try again' })).toBeInTheDocument();

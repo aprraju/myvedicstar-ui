@@ -30,8 +30,14 @@ export function useCalendarMonth(yearMonth: YearMonth) {
   );
   const { year, month } = yearMonth;
 
-  const query = useQuery(panchangMonthOptions({ api, params, userId: user?.id ?? null,
-    enabled: isAuthenticated && !loading, settings: config.cache }, client, year, month));
+  const query = useQuery(
+    panchangMonthOptions(
+      { api, params, userId: user?.id ?? null, enabled: isAuthenticated && !loading, settings: config.cache },
+      client,
+      year,
+      month,
+    ),
+  );
 
   const calendar = useMemo(
     () => buildCalendarMonth(query.data, { year, month }, now),

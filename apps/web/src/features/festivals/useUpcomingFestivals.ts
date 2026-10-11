@@ -28,9 +28,13 @@ export function useUpcomingFestivals(days: number) {
   );
 
   const query = useQuery({
-    queryKey: scopedKey(params
-      ? [...queryKeys.festivals.upcoming(params, days), today]
-      : ['festivals', 'upcoming', days, 'no-location'], user?.id ?? null, config.cache),
+    queryKey: scopedKey(
+      params
+        ? [...queryKeys.festivals.upcoming(params, days), today]
+        : ['festivals', 'upcoming', days, 'no-location'],
+      user?.id ?? null,
+      config.cache,
+    ),
     queryFn: ({ signal }) => api.festivals.upcoming({ ...(params as PanchangParams), days }, { signal }),
     enabled: params !== null && isAuthenticated && !loading,
   });

@@ -122,9 +122,20 @@ describe('shared web and mobile cache', () => {
     const response = fixtures.panchang.austinTelugu;
     const day = response.days[0]!;
     seedPanchangDays(cache, { ...response, days: [day, { ...day, date: '2026-09-30' }] }, params, 'u1');
-    expect(cachedPanchangRange(cache, params, 'u1', defaultCacheSettings, '2026-09-29', 2)?.data.days).toHaveLength(2);
+    expect(
+      cachedPanchangRange(cache, params, 'u1', defaultCacheSettings, '2026-09-29', 2)?.data.days,
+    ).toHaveLength(2);
     expect(cachedPanchangRange(cache, params, 'u1', defaultCacheSettings, '2026-09-29', 3)).toBeUndefined();
-    expect(cachedPanchangRange(cache, { ...params, tradition: 'tamil' }, 'u1', defaultCacheSettings, '2026-09-29', 2)).toBeUndefined();
+    expect(
+      cachedPanchangRange(
+        cache,
+        { ...params, tradition: 'tamil' },
+        'u1',
+        defaultCacheSettings,
+        '2026-09-29',
+        2,
+      ),
+    ).toBeUndefined();
   });
 
   it('checks the date on resume and reconnect', () => {

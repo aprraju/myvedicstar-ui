@@ -9,7 +9,8 @@ export function useRefreshAtWindowEnd(
 ) {
   useEffect(() => {
     const now = Date.now();
-    const upcomingEnds = data?.options.map((option) => Date.parse(option.segment.end)).filter((end) => end > now) ?? [];
+    const upcomingEnds =
+      data?.options.map((option) => Date.parse(option.segment.end)).filter((end) => end > now) ?? [];
     const expiresAt = upcomingEnds.length ? Math.min(...upcomingEnds) : undefined;
     if (!enabled || expiresAt === undefined) return;
     const delay = expiresAt - Date.now();

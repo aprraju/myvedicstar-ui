@@ -38,20 +38,20 @@ Endpoint factories remain in `@myvedicstar/api-client`. `scopedKey` adds account
 versions. Keys never contain access tokens. Calculation keys use the resolved coordinates and IANA timezone, rather
 than a city label. Independent contexts switch keys and retain useful earlier results instead of clearing the cache.
 
-| Query | Inputs included |
-| --- | --- |
-| Today | Resolved local date, latitude, longitude, timezone, tradition, language, account and versions |
-| Panchang date / Tomorrow | Explicit date plus the same calculation context |
-| Panchang range / next ten days | Start date, number of days plus calculation context |
-| Panchang month | Year, month plus calculation context |
-| Good Time / explanation | Resolved or explicit date, activity, optional Nakshatra, Other activity text plus calculation context |
-| Good Time month / selected-date best windows | Start date, range length, activity, Nakshatra, Other text plus calculation context |
-| Next best times | Location's current date, activity, Nakshatra, Other text, result count, search length plus calculation context |
-| Festivals | Location's current date, range length plus calculation context |
-| Catalogs | Language, tradition when accepted by the endpoint, account and versions |
-| Profile | Signed-in user ID; memory only |
-| Autocomplete | Normalized Unicode search text, country, language and result limit |
-| Reverse / timezone | Exact coordinates; reverse language when used |
+| Query                                        | Inputs included                                                                                                |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Today                                        | Resolved local date, latitude, longitude, timezone, tradition, language, account and versions                  |
+| Panchang date / Tomorrow                     | Explicit date plus the same calculation context                                                                |
+| Panchang range / next ten days               | Start date, number of days plus calculation context                                                            |
+| Panchang month                               | Year, month plus calculation context                                                                           |
+| Good Time / explanation                      | Resolved or explicit date, activity, optional Nakshatra, Other activity text plus calculation context          |
+| Good Time month / selected-date best windows | Start date, range length, activity, Nakshatra, Other text plus calculation context                             |
+| Next best times                              | Location's current date, activity, Nakshatra, Other text, result count, search length plus calculation context |
+| Festivals                                    | Location's current date, range length plus calculation context                                                 |
+| Catalogs                                     | Language, tradition when accepted by the endpoint, account and versions                                        |
+| Profile                                      | Signed-in user ID; memory only                                                                                 |
+| Autocomplete                                 | Normalized Unicode search text, country, language and result limit                                             |
+| Reverse / timezone                           | Exact coordinates; reverse language when used                                                                  |
 
 The current calculation API has no selected clock-time, calendar-settings or calculation-mode input. No fictional
 request parameters are introduced. Time-dependent Today/relative searches are anchored to the selected location's
@@ -70,16 +70,16 @@ distinct where request behavior differs.
 
 Policies are centralized in `packages/query-cache/src/policies.ts` and individual queries override defaults.
 
-| Data | Freshness | Unused retention |
-| --- | --- | --- |
-| Default reads | 5 minutes | 6 hours |
-| Today | Until the next local midnight | 24 hours |
-| Panchang dates / ranges / month | 12 hours | 24 hours |
-| Good Time, explanation, month summaries | 1 hour | 6 hours |
-| Live next-best search | 5 minutes; refresh at a window end | 6 hours |
-| Catalogs | 24 hours | 24 hours |
-| Location autocomplete | Configurable; default 24 hours | At most 1 hour |
-| Reverse / timezone | Configurable; default 7 days | At most 24 hours |
+| Data                                    | Freshness                          | Unused retention |
+| --------------------------------------- | ---------------------------------- | ---------------- |
+| Default reads                           | 5 minutes                          | 6 hours          |
+| Today                                   | Until the next local midnight      | 24 hours         |
+| Panchang dates / ranges / month         | 12 hours                           | 24 hours         |
+| Good Time, explanation, month summaries | 1 hour                             | 6 hours          |
+| Live next-best search                   | 5 minutes; refresh at a window end | 6 hours          |
+| Catalogs                                | 24 hours                           | 24 hours         |
+| Location autocomplete                   | Configurable; default 24 hours     | At most 1 hour   |
+| Reverse / timezone                      | Configurable; default 7 days       | At most 24 hours |
 
 `staleTime` controls eligibility for refresh; `gcTime` controls unused memory retention. Neither replaces the
 24-hour persistence restoration maximum age. Browser focus and reconnect refetch stale reads, not fresh reads.

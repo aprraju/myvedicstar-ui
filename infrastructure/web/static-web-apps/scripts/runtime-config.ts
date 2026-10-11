@@ -91,11 +91,17 @@ export function renderRuntimeConfig(env: Env): RenderResult {
 
   const timeout = read(env, 'MVS_API_TIMEOUT_MS');
   if (timeout) raw.apiTimeoutMs = Number(timeout);
-  for (const [variable, field] of [['MVS_CACHE', 'cache'], ['MVS_LOCATION_SEARCH', 'locationSearch']] as const) {
+  for (const [variable, field] of [
+    ['MVS_CACHE', 'cache'],
+    ['MVS_LOCATION_SEARCH', 'locationSearch'],
+  ] as const) {
     const value = read(env, variable);
     if (!value) continue;
-    try { raw[field] = JSON.parse(value); }
-    catch { issues.push(`${variable}: not valid JSON`); }
+    try {
+      raw[field] = JSON.parse(value);
+    } catch {
+      issues.push(`${variable}: not valid JSON`);
+    }
   }
 
   // A gateway route prefix (e.g. API Management `/<api>/v1`) applies to every default endpoint; MVS_API_ENDPOINTS then

@@ -133,7 +133,11 @@ export async function renderApp(
   routes: Record<string, ComponentType>,
   { auth, geolocation, fetchOverride, initialUrl = '/', configOverrides = {} }: AppRenderOptions = {},
 ) {
-  const result = parseAppConfig({ environment: 'test', apiBaseUrl: 'https://api.test.example/api/v1', ...configOverrides });
+  const result = parseAppConfig({
+    environment: 'test',
+    apiBaseUrl: 'https://api.test.example/api/v1',
+    ...configOverrides,
+  });
   if (!result.ok) throw new Error(result.issues.join());
   const services = createMobileServices(result.config, {
     sinks: [createMemorySink()],
