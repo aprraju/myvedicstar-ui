@@ -6,13 +6,13 @@ import { expect, test, withSavedLocation } from './fixtures';
 const card = (page: Page) => page.getByRole('region', { name: "Today's summary" });
 
 test.describe('public home', () => {
-  test('shows today for the saved location: day, good time, next caution', async ({ page }) => {
+  test('shows today for the saved location: day, good time, next caution', async ({ page, apiRequests }) => {
     await withSavedLocation(page);
     await page.goto('/');
     await expect(card(page).getByText('Mixed day')).toBeVisible();
     await expect(card(page)).toContainText('Tuesday, September 29');
-    // The backend's General evaluation has no Good Time on the fixture day: its message, nothing promoted.
-    await expect(card(page)).toContainText('No strongly favorable time was found for this activity today.');
+    // Today's embedded evaluation has no Good Time; no separate evaluation is requested.
+    await expect(card(page)).toContainText('No more recommended times today');
     await expect(card(page)).toContainText(/Use caution now\s*Durmuhurtham/);
     await expect(card(page)).toContainText('All times shown in local time — Austin, Texas');
 
@@ -20,6 +20,8 @@ test.describe('public home', () => {
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
+    expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
+    await expect(page.getByRole('button', { name: 'Register' })).toHaveCount(0);
   });
 
   test('uses the current location when the browser allows it', async ({ page, context }) => {
@@ -56,9 +58,9 @@ test.describe('public home', () => {
 
     await expect(dialog).toBeHidden();
     await expect(card(page)).toContainText('All times shown in local time — Hyderabad, Telangana');
-    // 10:00 in Austin is 20:30 in Hyderabad: the backend's General evaluation has no Good Time, and times are shown in the
+    // 10:00 in Austin is 20:30 in Hyderabad: today's embedded evaluation has no Good Time, and times are shown in the
     // selected location's zone (IST), not the browser's.
-    await expect(card(page)).toContainText('No strongly favorable time was found for this activity today.');
+    await expect(card(page)).toContainText('No more recommended times today');
     await expect(card(page)).toContainText(/Next caution period\s*Dur Muhurtam 10:54\sPM – 11:42\sPM/);
     expect(
       apiRequests.some(
@@ -117,9 +119,9 @@ test.describe('sign-in journeys (mock identity provider)', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
   });
 
-  test('Home → Register → Dashboard', async ({ page }) => {
+  test('Help → Register → Dashboard', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/');
+    await page.goto('/help');
     await page.getByRole('banner').getByRole('button', { name: 'Register' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await expect(page).toHaveURL(/\/dashboard$/);

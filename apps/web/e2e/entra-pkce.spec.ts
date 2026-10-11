@@ -188,7 +188,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     baseURL,
   }) => {
     const entra = await simulateEntra(page, baseURL!);
-    await page.goto('/');
+    await page.goto('/help');
     await page.getByRole('banner').getByRole('button', { name: 'Register' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     expect(entra.authorize[0]!.get('prompt')).toBe('create');

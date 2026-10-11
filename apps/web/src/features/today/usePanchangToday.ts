@@ -69,7 +69,10 @@ export function useDaySummary(todayOnly = false) {
       goodTime: goodTime
         ? windowStatus(goodTime.bestGoodTime ? [goodTime.bestGoodTime] : [], reference)
         : { status: 'unavailable' as const },
-      noGoodTimeMessage: goodTime?.noGoodTimeReason ?? undefined,
+      noGoodTimeMessage:
+        goodTime?.noGoodTimeReason && !/^[A-Z][A-Z0-9_]*$/.test(goodTime.noGoodTimeReason)
+          ? goodTime.noGoodTimeReason
+          : undefined,
     };
   }, [query.data, now, goodTimes.data, todayOnly]);
   return { query, goodTimes, location, summary, glossary: query.data?.glossary };

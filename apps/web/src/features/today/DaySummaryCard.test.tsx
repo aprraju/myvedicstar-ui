@@ -55,6 +55,22 @@ describe('DaySummaryCard', () => {
     expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
   });
 
+  it('shows a readable fallback for a Today no-good-time reason code', async () => {
+    await atInstant('2026-09-29T10:00:00-05:00');
+    const response = structuredClone(fixtures.panchang.austinTelugu);
+    response.days[0]!.goodTime = {
+      ...response.days[0]!.goodTime!,
+      bestGoodTime: null,
+      goodTimeCount: 0,
+      noGoodTimeReason: 'NO_QUALIFYING_PERIOD',
+    };
+    server.use(scenarios.json('/panchang/today', response));
+    storeSelectedLocation();
+    renderWithProviders(<DaySummaryCard todayOnly />);
+    expect(await screen.findByText('No more recommended times today')).toBeInTheDocument();
+    expect(card()).not.toHaveTextContent('NO_QUALIFYING_PERIOD');
+  });
+
   it('answers how today is, whether now is good and the next caution period', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();

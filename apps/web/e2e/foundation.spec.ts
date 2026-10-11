@@ -79,7 +79,8 @@ test.describe('responsive layout', () => {
     await expect(banner.getByRole('link', { name: 'About' })).toBeHidden();
     await banner.getByRole('button', { name: 'Open menu' }).click();
     await expect(banner.getByRole('link', { name: 'About' })).toBeVisible();
-    await expect(banner.getByRole('button', { name: 'Register' })).toBeVisible();
+    await expect(banner.getByRole('button', { name: 'Login' })).toBeVisible();
+    await expect(banner.getByRole('button', { name: 'Register' })).toHaveCount(0);
   });
 
   test('header shows navigation, location, tradition and sign-in on wide windows', async ({ page }) => {
