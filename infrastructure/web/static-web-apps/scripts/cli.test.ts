@@ -264,7 +264,15 @@ describe('smoke-test.ts', () => {
           response.setHeader('Access-Control-Allow-Origin', siteUrl);
           return response.writeHead(200).end();
         }
-        expect(request.url).toContain('language=en');
+        const url = new URL(request.url!, 'http://localhost');
+        expect(url.pathname).toBe('/api/v1/panchang/today');
+        expect(Object.fromEntries(url.searchParams)).toEqual({
+          latitude: '30.63',
+          longitude: '-97.68',
+          timeZone: 'America/Chicago',
+          tradition: 'all',
+          language: 'en',
+        });
         expect(request.headers.origin).toBe(siteUrl);
         if (cors) response.setHeader('Access-Control-Allow-Origin', siteUrl);
         return response.writeHead(status).end('{}');
@@ -277,7 +285,7 @@ describe('smoke-test.ts', () => {
       writeFileSync(configPath, JSON.stringify(config));
       const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage]);
       expect(output).toContain('API GET CORS allows');
-      expect(output).toContain(`public traditions endpoint succeeds without sign-in (${status})`);
+      expect(output).toContain(`public today endpoint succeeds without sign-in (${status})`);
       expect(code).toBe(expectedCode);
     },
     TIMEOUT,

@@ -45,6 +45,17 @@ if (!parsed.ok) {
   process.exit(1);
 }
 const config = parsed.config;
+// Today is an explicitly anonymous APIM operation; the traditions catalog requires sign-in.
+const publicApiUrl = new URL(`${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.panchangToday}`);
+for (const [name, value] of Object.entries({
+  latitude: '30.63',
+  longitude: '-97.68',
+  timeZone: 'America/Chicago',
+  tradition: 'all',
+  language: 'en',
+})) {
+  publicApiUrl.searchParams.set(name, value);
+}
 
 const failures: string[] = [];
 const check = (ok: boolean, message: string) => {
@@ -138,10 +149,9 @@ async function runChecks(siteUrl: string): Promise<void> {
 
   // 5. Backend CORS for this origin.
   if (!values['skip-cors']) {
-    // A public, parameterless endpoint: the preflight must succeed before any sign-in.
-    const apiUrl = `${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.traditions}`;
+    // The home page's public endpoint must allow preflight before any sign-in.
     try {
-      const preflight = await fetch(apiUrl, {
+      const preflight = await fetch(publicApiUrl, {
         method: 'OPTIONS',
         redirect: 'manual',
         headers: {
@@ -165,10 +175,8 @@ async function runChecks(siteUrl: string): Promise<void> {
 
   // A successful preflight does not guarantee CORS headers on the actual response, especially a 401.
   if (!values['skip-cors']) {
-    const apiUrl = new URL(`${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.traditions}`);
-    apiUrl.searchParams.set('language', 'en');
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(publicApiUrl, {
         redirect: 'manual',
         headers: { Origin: site.origin },
       });
@@ -177,7 +185,7 @@ async function runChecks(siteUrl: string): Promise<void> {
         allowed === site.origin || allowed === '*',
         `API GET CORS allows ${site.origin} (status ${response.status}, got ${allowed ?? 'none'})`,
       );
-      check(response.ok, `public traditions endpoint succeeds without sign-in (${response.status})`);
+      check(response.ok, `public today endpoint succeeds without sign-in (${response.status})`);
       await response.body?.cancel();
     } catch (error) {
       check(false, `API GET reachable (${error instanceof Error ? error.message : String(error)})`);
