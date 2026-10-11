@@ -12,6 +12,25 @@ import { renderRoute } from '../../test/render';
 const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Token Name' } });
 
 describe('Profile menu', () => {
+  it.each([null, '', '   ', 'Unknown'])('shows only email when the profile name is %s', async (name) => {
+    server.use(
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
+        HttpResponse.json({
+          id: 'u1',
+          name,
+          givenName: null,
+          surname: null,
+          email: 'asha.rao@example.com',
+        }),
+      ),
+    );
+    renderRoute('/about', { auth: signedIn() });
+    await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
+    await screen.findByText('asha.rao@example.com');
+    expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
+    expect(screen.queryByText('Token Name')).not.toBeInTheDocument();
+  });
+
   it('replaces Sign out with a profile icon that shows name, email, Settings and Log out from userinfo', async () => {
     const { container } = renderRoute('/about', { auth: signedIn() });
     const banner = await screen.findByRole('banner');

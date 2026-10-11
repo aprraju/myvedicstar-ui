@@ -39,8 +39,15 @@ export function ProfileMenu() {
     };
   }, [open]);
 
-  const name = displayNameOf(userInfo, user?.displayName) ?? t('profile.unknownName');
-  const email = userInfo?.email ?? undefined;
+  const candidate = displayNameOf(userInfo, userInfo ? undefined : user?.displayName);
+  const email = userInfo?.email?.trim() || undefined;
+  const name =
+    candidate &&
+    !['unknown', t('profile.unknownName').toLowerCase(), email?.toLowerCase()].includes(
+      candidate.toLowerCase(),
+    )
+      ? candidate
+      : undefined;
 
   return (
     <div ref={rootRef} className={styles.root}>
@@ -58,8 +65,8 @@ export function ProfileMenu() {
       <div id={panelId} className={styles.panel} hidden={!open}>
         <div className={styles.identity}>
           <span className="visually-hidden">{t('profile.signedInAs')} </span>
-          <p className={styles.name}>{name}</p>
-          {email && <p className={styles.email}>{email}</p>}
+          {name && <p className={styles.name}>{name}</p>}
+          {email && <p className={name ? styles.email : styles.name}>{email}</p>}
         </div>
         <ul className={styles.options}>
           <li>

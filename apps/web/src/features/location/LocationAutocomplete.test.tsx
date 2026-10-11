@@ -50,6 +50,59 @@ function setup() {
 }
 
 describe('GeoNames location autocomplete', () => {
+  it('cancels obsolete requests and never displays their results after the input changes', async () => {
+    setup();
+    let started = false;
+    let aborted = false;
+    let release: () => void = () => undefined;
+    const pending = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get(`${base}/locations/search`, async ({ request }) => {
+        if (new URL(request.url).searchParams.get('text') === 'Hyderabad') {
+          started = true;
+          request.signal.addEventListener('abort', () => {
+            aborted = true;
+          });
+          await pending;
+          return HttpResponse.json({ results: [india] });
+        }
+        return HttpResponse.json({ results: [{ ...pakistan, city: 'London' }] });
+      }),
+    );
+    const user = userEvent.setup();
+    const input = screen.getByRole('combobox', { name: 'City, ZIP code or coordinates' });
+    try {
+      await user.type(input, 'Hyderabad');
+      await waitFor(() => expect(started).toBe(true));
+      await user.clear(input);
+      await user.type(input, 'London');
+      await waitFor(() => expect(aborted).toBe(true));
+      await screen.findByRole('option', { name: 'London, Sindh, Pakistan' });
+      expect(screen.queryByRole('option', { name: 'Hyderabad, Telangana, India' })).not.toBeInTheDocument();
+    } finally {
+      release();
+    }
+  });
+
+  it('starts at the last suggestion with ArrowUp and wraps to the first with ArrowDown', async () => {
+    setup();
+    const user = userEvent.setup();
+    await user.type(screen.getByRole('combobox', { name: 'City, ZIP code or coordinates' }), 'Hyderabad');
+    await screen.findByRole('listbox');
+    await user.keyboard('{ArrowUp}');
+    expect(screen.getByRole('option', { name: 'Hyderabad, Sindh, Pakistan' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('option', { name: 'Hyderabad, Telangana, India' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
   it('shows distinct suggestions, supports arrow keys and Enter, and resolves timezone only on selection', async () => {
     const { onChoose, calls, container } = setup();
     const user = userEvent.setup();

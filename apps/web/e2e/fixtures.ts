@@ -83,7 +83,15 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
       await page.route('**/config.json', async (route) => {
         const response = await route.fetch();
         const config = (await response.json()) as Record<string, unknown>;
-        await route.fulfill({ response, json: { ...config, environment: 'test', auth: { mode: 'mock' } } });
+        await route.fulfill({
+          response,
+          json: {
+            ...config,
+            environment: 'test',
+            auth: { mode: 'mock' },
+            locationSearch: { enabled: false },
+          },
+        });
       });
       await page.route(`${API_ORIGIN}/api/v1/**`, (route) => {
         const url = new URL(route.request().url());

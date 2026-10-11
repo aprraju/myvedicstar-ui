@@ -3,11 +3,11 @@ import { parseLocationInput } from '@myvedicstar/validation';
 import { z } from 'zod';
 
 /**
- * A location the user chose. Coordinates are stored at the precision the backend uses (2 decimals ≈ 1 km) — never
- * more — because location is privacy-sensitive and this may be persisted on the device.
+ * A location the user chose. Legacy resolution rounds coordinates; the GeoNames workflow preserves the final
+ * coordinates supplied by the user or device. Location preferences stay on the device.
  */
 export interface SelectedLocation {
-  /** Stable id for de-duplication (rounded coordinates). */
+  /** Stable coordinate identity for de-duplication. */
   id: string;
   /** Short label, e.g. "Austin, Texas". */
   label: string;
@@ -19,6 +19,8 @@ export interface SelectedLocation {
   timeZone: string;
   countryCode: string | undefined;
   source: 'current' | 'search' | 'coordinates';
+  /** Provider result kind without changing the existing source contract. */
+  selectionKind?: 'city' | 'postal' | undefined;
   geonameId?: string | undefined;
   postalCode?: string | undefined;
   city?: string | undefined;
@@ -118,7 +120,7 @@ export async function searchLocation(
 
 /**
  * Stored locations are user-controlled input (device storage can be edited): validate on every read.
- * Only 2-decimal coordinates are ever stored.
+ * Exact GeoNames coordinates and legacy rounded coordinates are both supported.
  */
 export const selectedLocationSchema = z.object({
   id: z.string().max(40),
@@ -129,6 +131,7 @@ export const selectedLocationSchema = z.object({
   timeZone: z.string().regex(/^[A-Za-z0-9_+\-/]{1,64}$/),
   countryCode: z.string().max(3).optional(),
   source: z.enum(['current', 'search', 'coordinates']),
+  selectionKind: z.enum(['city', 'postal']).optional(),
   geonameId: z.string().max(160).optional(),
   postalCode: z.string().max(20).optional(),
   city: z.string().max(160).optional(),

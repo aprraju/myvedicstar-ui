@@ -291,6 +291,14 @@
   font: inherit;
   text-align: start;
   cursor: pointer;
+  min-block-size: var(--touch-target-minimum);
+  overflow-wrap: anywhere;
+}
+
+.match {
+  background: transparent;
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
 }
 
 .suggestion:hover,

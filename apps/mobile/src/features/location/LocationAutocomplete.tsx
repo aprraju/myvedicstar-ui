@@ -32,12 +32,13 @@ export function LocationAutocomplete({
   const invalidCountry = country.trim() !== '' && !countryCode;
   const suggestions = useLocationAutocomplete(
     locationSearch,
-    { ...config.locationSearch, enabled: !invalidCountry },
+    { ...config.locationSearch, enabled: config.locationSearch.enabled && !invalidCountry },
     text,
     countryCode,
     locale.split('-')[0] ?? 'en',
   );
   const resolution = useLocationResolution(locationSearch, onChoose);
+  const parsedInput = parseLocationInput(text);
   const countryOptions = useMemo(
     () =>
       country.trim() && !countryCode
@@ -88,6 +89,7 @@ export function LocationAutocomplete({
         onPress={submit}
       />
       {suggestions.isFetching && <ActivityIndicator accessibilityLabel={t('location.locating')} />}
+      {(suggestions.isPaused || resolution.isPaused) && <Notice>{t('states.offline')}</Notice>}
       {suggestions.data?.map((place) => (
         <Pressable
           key={place.id}
@@ -126,7 +128,10 @@ export function LocationAutocomplete({
           key={item.code}
           variant="ghost"
           label={`${item.name} (${item.code})`}
-          onPress={() => setCountry(item.code)}
+          onPress={() => {
+            resolution.reset();
+            setCountry(item.code);
+          }}
         />
       ))}
       {text && <Button variant="ghost" label={t('locationSearch.clear')} onPress={() => change('')} />}
@@ -151,7 +156,7 @@ export function LocationAutocomplete({
           />
         </View>
       )}
-      {parseLocationInput(text).ok && /\d/.test(text) && (
+      {parsedInput.ok && parsedInput.value.kind === 'postalCode' && (
         <AppText variant="secondary">{t('locationSearch.postalCoverage')}</AppText>
       )}
     </View>

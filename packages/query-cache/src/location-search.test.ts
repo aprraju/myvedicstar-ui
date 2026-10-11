@@ -157,7 +157,14 @@ describe('worldwide location search', () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     const selected = await service.select(india);
     expect(selected.geonameId).toBe(india.id);
+    expect(selected.selectionKind).toBe('city');
     expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retains postal selection metadata without changing the existing source contract', async () => {
+    const { service } = setup();
+    const selected = await service.select({ ...india, source: 'postal', postalCode: '110001' });
+    expect(selected).toMatchObject({ source: 'search', selectionKind: 'postal', postalCode: '110001' });
   });
 
   it('never caches provider errors as successful results', async () => {

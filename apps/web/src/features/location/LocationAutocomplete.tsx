@@ -1,7 +1,7 @@
 import { countries, type SelectedLocation, suggestionLabel } from '@myvedicstar/domain-models';
 import { useLocationAutocomplete, useLocationResolution } from '@myvedicstar/query-cache';
 import { parseLocationInput } from '@myvedicstar/validation';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { Button } from '../../shared/components/Button';
 import { ErrorState } from '../../shared/components/states';
@@ -24,6 +24,7 @@ export function LocationAutocomplete({
   const [active, setActive] = useState(-1);
   const [error, setError] = useState<string | undefined>();
   const id = useId();
+  const list = useRef<HTMLUListElement>(null);
   const options = useMemo(() => countries(locale), [locale]);
   const search = useLocationAutocomplete(
     locationSearch,
@@ -34,7 +35,12 @@ export function LocationAutocomplete({
   );
   const resolve = useLocationResolution(locationSearch, onChoose);
   const suggestions = search.data ?? [];
+  const parsedInput = parseLocationInput(text);
   const expanded = open && suggestions.length > 0 && Boolean(text.trim());
+  useEffect(() => {
+    if (expanded && active >= 0)
+      list.current?.querySelectorAll('button')[active]?.scrollIntoView?.({ block: 'nearest' });
+  }, [active, expanded]);
   const reset = () => {
     resolve.reset();
     setError(undefined);
@@ -99,10 +105,13 @@ export function LocationAutocomplete({
                 event.preventDefault();
                 setOpen(true);
                 if (suggestions.length)
-                  setActive(
-                    (current) =>
-                      (current + (event.key === 'ArrowDown' ? 1 : -1) + suggestions.length) %
-                      suggestions.length,
+                  setActive((current) =>
+                    current < 0
+                      ? event.key === 'ArrowDown'
+                        ? 0
+                        : suggestions.length - 1
+                      : (current + (event.key === 'ArrowDown' ? 1 : -1) + suggestions.length) %
+                        suggestions.length,
                   );
               }
               if (event.key === 'Enter' && expanded && active >= 0 && suggestions[active]) {
@@ -121,6 +130,7 @@ export function LocationAutocomplete({
         </p>
         {expanded && (
           <ul
+            ref={list}
             id={`${id}-list`}
             className={styles.suggestions}
             role="listbox"
@@ -141,7 +151,7 @@ export function LocationAutocomplete({
                     setOpen(false);
                   }}
                 >
-                  {suggestionLabel(suggestion)}
+                  <SuggestionLabel label={suggestionLabel(suggestion)} text={text} />
                 </button>
               </li>
             ))}
@@ -177,12 +187,17 @@ export function LocationAutocomplete({
           {t('location.locating')}
         </p>
       )}
+      {(search.isPaused || resolve.isPaused) && (
+        <p role="status" className={styles.hint}>
+          {t('states.offline')}
+        </p>
+      )}
       {search.isSuccess && suggestions.length === 0 && text.trim() && (
         <p role="status" className={styles.hint}>
           {t('locationSearch.noResults')}
         </p>
       )}
-      {parseLocationInput(text).ok && /\d/.test(text) && (
+      {parsedInput.ok && parsedInput.value.kind === 'postalCode' && (
         <p className={styles.hint}>{t('locationSearch.postalCoverage')}</p>
       )}
       {error && (
@@ -208,5 +223,18 @@ export function LocationAutocomplete({
         </div>
       )}
     </div>
+  );
+}
+
+function SuggestionLabel({ label, text }: { label: string; text: string }) {
+  const query = text.trim().normalize('NFC');
+  const start = label.toLocaleLowerCase().indexOf(query.toLocaleLowerCase());
+  if (!query || start < 0) return <>{label}</>;
+  return (
+    <>
+      {label.slice(0, start)}
+      <mark className={styles.match}>{label.slice(start, start + query.length)}</mark>
+      {label.slice(start + query.length)}
+    </>
   );
 }

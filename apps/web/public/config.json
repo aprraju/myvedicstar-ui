@@ -12,10 +12,17 @@
     "panchangMonth": "/panchang/month/{year}/{month}",
     "panchangYear": "/panchang/year/{year}",
     "panchangDate": "/panchang/{date}",
-    "locationsResolve": "/locations/resolve"
+    "locationsResolve": "/locations/resolve",
+    "locationsSearch": "/locations/search",
+    "locationsPostal": "/locations/postal",
+    "locationsReverse": "/locations/reverse",
+    "locationsTimezone": "/locations/timezone"
   },
   "apiTimeoutMs": 15000,
   "defaultTradition": "all",
+  "locationSearch": {
+    "enabled": true
+  },
   "auth": {
     "mode": "disabled"
   },

@@ -37,6 +37,7 @@ export function toPreciseSelectedLocation(
         : `${exact.latitude}, ${exact.longitude}`),
     fullName: label ?? resolved.place?.displayName,
     geonameId: suggestion?.source === 'city' ? suggestion.id : undefined,
+    selectionKind: suggestion?.source,
     postalCode: suggestion?.postalCode ?? undefined,
     city: suggestion?.city ?? resolved.place?.city,
     region: suggestion?.region ?? resolved.place?.state ?? undefined,

@@ -116,6 +116,22 @@ Today caching. Provider failures never silently choose another place or timezone
 
 ## Verification
 
+The full worldwide-search prompt is implemented through the existing location state and UI. The shared service
+classifies city, international postal and coordinate input; autocomplete uses normalized, country/language-specific
+query keys, cancellation, debounce and bounded retention. Timezone and reverse lookups use exact final coordinates.
+Web suggestions highlight matching text safely, scroll the focused keyboard option into view, and support Enter,
+Escape, click and clearing. Native uses the same service with tap selection and keyboard-aware scrolling. Optional
+`selectionKind` retains city versus postal provenance while preserving the existing `source` values and contracts.
+
+The location state persists selected/recent locations locally and feeds Today, Good Time and Calendar through existing
+coordinate/timezone query keys. Existing date-time tests cover daylight-saving transitions. The GeoNames workflow
+requests GPS only after a user action and ignores late GPS results after manual selection.
+
+`apps/web/e2e/geonames.spec.ts` exercises the chooser at 344px, 768px and 884px in desktop and mobile Chromium, checking
+overflow, selection and exact-coordinate persistence with mocked APIs. This viewport coverage does not replace
+physical Android/iOS keyboard, tablet or foldable-device verification. Live account access, production gateway routing
+and account-specific quota capacity must still be checked in the deployed environment.
+
 In the `myvedicstar` backend, run `dotnet test tests/GeoNames.Tests/GeoNames.Tests.csproj` for provider and configuration
 checks, and `dotnet test tests/MyVedicDay.Api.Tests.Integration/MyVedicDay.Api.Tests.Integration.csproj` for HTTP route
 contracts, validation, anonymous access, quota errors and OpenAPI examples.
