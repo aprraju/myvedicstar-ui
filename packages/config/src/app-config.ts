@@ -208,6 +208,13 @@ export const appConfigSchema = z
     apiBaseUrl: z.url(),
     endpoints: endpointsSchema,
     apiTimeoutMs: z.number().int().min(1000).max(120_000).default(15_000),
+    cache: z.object({
+      enabled: z.boolean().default(true),
+      persist: z.boolean().default(false),
+      prefetchTomorrow: z.boolean().default(false),
+      schemaVersion: z.string().min(1).max(80).default('1'),
+      rulesVersion: z.string().min(1).max(80).default('1'),
+    }).strict().default({ enabled: true, persist: false, prefetchTomorrow: false, schemaVersion: '1', rulesVersion: '1' }),
     defaultTradition: z.string().default('all'),
     auth: authSchema.default({ mode: 'disabled' }),
     featureFlags: featureFlagsSchema.default(

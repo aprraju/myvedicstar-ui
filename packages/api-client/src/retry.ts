@@ -6,7 +6,7 @@ import type { HttpMethod } from './transport';
  * applies this policy to idempotent reads only. Mutations must not be retried automatically.
  */
 export const MAX_RETRIES = 2;
-const RETRYABLE_KINDS: ReadonlySet<ApiErrorKind> = new Set(['network', 'timeout', 'rateLimit']);
+const RETRYABLE_KINDS: ReadonlySet<ApiErrorKind> = new Set(['network', 'timeout']);
 const RETRYABLE_SERVER_STATUSES: ReadonlySet<number> = new Set([502, 503, 504]);
 
 export function isIdempotent(method: HttpMethod): boolean {
@@ -15,6 +15,8 @@ export function isIdempotent(method: HttpMethod): boolean {
 
 export function isRetryableError(error: unknown): boolean {
   if (!isApiError(error)) return false;
+  // Without a server-provided delay, leave rate-limit retries to the explicit UI retry action.
+  if (error.kind === 'rateLimit') return error.retryAfterMs !== undefined && error.retryAfterMs > 0;
   if (RETRYABLE_KINDS.has(error.kind)) return true;
   return error.kind === 'server' && error.status !== undefined && RETRYABLE_SERVER_STATUSES.has(error.status);
 }
@@ -30,7 +32,7 @@ export function retryDelayMs(
   error: unknown,
   random: () => number = Math.random,
 ): number {
-  if (isApiError(error) && error.retryAfterMs !== undefined) return Math.min(error.retryAfterMs, 30_000);
+  if (isApiError(error) && error.retryAfterMs !== undefined) return error.retryAfterMs;
   const base = Math.min(500 * 2 ** failureCount, 8_000);
   return Math.round(base / 2 + random() * (base / 2));
 }

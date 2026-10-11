@@ -28,6 +28,8 @@ export function readMobileConfig(env: Record<string, string | undefined> = readE
   if (auth === INVALID_JSON) {
     return { ok: false, issues: ['auth: EXPO_PUBLIC_AUTH is not valid JSON'] };
   }
+  const cache = parseJson(env.EXPO_PUBLIC_CACHE ?? '{}');
+  if (cache === INVALID_JSON) return { ok: false, issues: ['cache: EXPO_PUBLIC_CACHE is not valid JSON'] };
 
   return parseAppConfig({
     environment,
@@ -37,6 +39,7 @@ export function readMobileConfig(env: Record<string, string | undefined> = readE
     endpoints,
     featureFlags,
     auth,
+    cache,
   });
 }
 
@@ -57,5 +60,6 @@ function readEnv(): Record<string, string | undefined> {
     EXPO_PUBLIC_FEATURE_FLAGS: process.env.EXPO_PUBLIC_FEATURE_FLAGS,
     EXPO_PUBLIC_API_ENDPOINTS: process.env.EXPO_PUBLIC_API_ENDPOINTS,
     EXPO_PUBLIC_AUTH: process.env.EXPO_PUBLIC_AUTH,
+    EXPO_PUBLIC_CACHE: process.env.EXPO_PUBLIC_CACHE,
   };
 }

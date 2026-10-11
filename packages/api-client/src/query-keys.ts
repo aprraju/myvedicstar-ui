@@ -13,9 +13,12 @@ import type {
 export const queryKeys = {
   panchang: {
     all: ['panchang'] as const,
-    today: (params: PanchangParams) => ['panchang', 'today', normalize(params)] as const,
+    today: (params: PanchangParams, localDate?: string) =>
+      ['panchang', 'today', normalize(params), localDate ?? null] as const,
     date: (date: string, params: PanchangParams) => ['panchang', 'date', date, normalize(params)] as const,
     tenDays: (params: PanchangParams) => ['panchang', 'ten-days', normalize(params)] as const,
+    range: (start: string, days: number, params: PanchangParams) =>
+      ['panchang', 'range', start, days, normalize(params)] as const,
     month: (year: number, month: number, params: PanchangParams) =>
       ['panchang', 'month', year, month, normalize(params)] as const,
     year: (year: number, params: PanchangParams) => ['panchang', 'year', year, normalize(params)] as const,
@@ -94,6 +97,6 @@ function normalizeLocation(location: LocationParams) {
     place: location.place?.trim().toLowerCase() ?? null,
     latitude: location.latitude ?? null,
     longitude: location.longitude ?? null,
-    timeZone: location.timeZone ?? null,
+    timeZone: location.timeZone?.trim() ?? null,
   };
 }

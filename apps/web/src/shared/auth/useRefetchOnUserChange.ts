@@ -1,4 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { removeUserCache } from '@myvedicstar/query-cache';
 import { useEffect, useRef } from 'react';
 
 import { useAuth } from './useAuth';
@@ -20,16 +21,12 @@ export function useRefetchOnUserChange() {
       // A later login, even to the same account, must complete sign-in again.
       // Remove only the previous session's profile; leave the new user's in-flight request alone.
       if (previous.current !== null) {
-        queryClient.removeQueries({ queryKey: ['auth', 'userinfo', previous.current], exact: true });
+        void removeUserCache(queryClient, previous.current);
       }
       // Cancel first: a first load still in flight was started without the token, and invalidation alone would reuse
       // its result instead of requesting again.
       // The user's own profile (`['auth', 'userinfo', userId]`) is excluded: it is keyed by user, and re-sending that POST
       // would record the login twice.
-      const filters = {
-        predicate: (query: { queryKey: readonly unknown[] }) => query.queryKey[0] !== 'auth',
-      };
-      void queryClient.cancelQueries(filters).then(() => queryClient.invalidateQueries(filters));
     }
     previous.current = userId;
   }, [userId, queryClient]);

@@ -5,7 +5,8 @@ import {
   queryKeys,
 } from '@myvedicstar/api-client';
 import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { scopedKey, useGoodTime, useLocalDate } from '@myvedicstar/query-cache';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { useAuth } from '../../shared/auth';
@@ -28,25 +29,23 @@ interface GoodTimeSelection {
 
 /** The activity cards (`/muhurta/activities`) in the UI language, with the tradition's regional names. */
 export function useMuhurtaActivities() {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const { tradition } = useTradition();
   const { language } = useTranslation();
   return useQuery({
-    queryKey: queryKeys.muhurta.activities(tradition, language),
+    queryKey: scopedKey(queryKeys.muhurta.activities(tradition, language), user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.activities({ tradition, language }, { signal }),
-    staleTime: 60 * 60_000,
     enabled: isAuthenticated && !loading,
   });
 }
 
 export function useMuhurtaNakshatras() {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   return useQuery({
-    queryKey: queryKeys.muhurta.nakshatras,
+    queryKey: scopedKey(queryKeys.muhurta.nakshatras, user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.nakshatras({ signal }),
-    staleTime: 60 * 60_000,
     enabled: isAuthenticated && !loading,
   });
 }
@@ -55,7 +54,7 @@ function useGoodTimeParams(selection: GoodTimeSelection | null): GoodTimesParams
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
-  const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
+  const settled = selection;
 
   return useMemo(() => {
     if (!location || !settled) return null;
@@ -78,24 +77,23 @@ function useGoodTimeParams(selection: GoodTimeSelection | null): GoodTimesParams
  * updating) while a new selection loads, so the page never blanks out.
  */
 export function useGoodTimes(selection: GoodTimeSelection | null) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
+  const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params = useGoodTimeParams(selection);
-  const query = useQuery({
-    queryKey: params ? queryKeys.muhurta.goodTimes(params) : ['muhurta', 'good-times', 'idle'],
-    queryFn: ({ signal }) => api.muhurta.goodTimes(params as GoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
-  });
+  const query = useGoodTime({ api, params, userId: user?.id ?? null, settings: config.cache,
+    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled) });
   return { query, params };
 }
 
 /** The "In brief" narrative for the same evaluation (`/muhurta/good-times/explanation`). Optional: never blocks. */
 export function useGoodTimeExplanation(params: GoodTimesParams | null, enabled: boolean) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
+  const today = useLocalDate(params?.location.timeZone);
+  const resolved = params ? { ...params, date: params.date ?? today } : null;
   return useQuery({
-    queryKey: params ? queryKeys.muhurta.explanation(params) : ['muhurta', 'explanation', 'idle'],
+    queryKey: scopedKey(resolved ? queryKeys.muhurta.explanation(resolved) : ['muhurta', 'explanation', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.explanation(params as GoodTimesParams, { signal }),
     enabled: enabled && params !== null && isAuthenticated && !loading,
     retry: false,
@@ -126,35 +124,34 @@ export function useGoodTimeMonth(
     nakshatra?: string | undefined;
   } | null,
 ) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const request = useMemo(() => {
-    if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
-    const { start, days } = monthRange(settled.yearMonth);
+    if (!base || !selection || !isComplete(selection.activity, selection.otherText)) return null;
+    const { start, days } = monthRange(selection.yearMonth);
     return {
       start,
       days,
       params: {
         ...base,
-        activity: settled.activity,
-        nakshatra: settled.nakshatra,
-        otherText: settled.otherText,
+        activity: selection.activity,
+        nakshatra: selection.nakshatra,
+        otherText: selection.otherText,
       },
     };
-  }, [base, settled]);
+  }, [base, selection]);
 
   return useQuery({
-    queryKey: request
+    queryKey: scopedKey(request
       ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
-      : ['muhurta', 'day-summaries', 'idle'],
+      : ['muhurta', 'day-summaries', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => {
       const { start, days, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, days, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
+    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
 }
 
@@ -162,26 +159,26 @@ export function useGoodTimeMonth(
 export function useBestGoodTimes(
   selection: { activity: string; otherText?: string | undefined; nakshatra?: string | undefined } | null,
 ) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
+  const today = useLocalDate(base?.location.timeZone);
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params: BestGoodTimesParams | null = useMemo(() => {
-    if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
+    if (!base || !selection || !isComplete(selection.activity, selection.otherText)) return null;
     return {
       ...base,
-      activity: settled.activity,
-      nakshatra: settled.nakshatra,
-      otherText: settled.otherText,
+      activity: selection.activity,
+      nakshatra: selection.nakshatra,
+      otherText: selection.otherText,
       count: BEST_COUNT,
     };
-  }, [base, settled]);
+  }, [base, selection]);
 
   return useQuery({
-    queryKey: params ? queryKeys.muhurta.bestGoodTimes(params) : ['muhurta', 'best', 'idle'],
+    queryKey: scopedKey(params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.bestGoodTimes(params as BestGoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
+    enabled: params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
 }
 
@@ -197,34 +194,34 @@ export function useBestGoodTimeWindows(
     nakshatra?: string | undefined;
   } | null,
 ) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const request = useMemo(
     () =>
-      base && settled && isComplete(settled.activity, settled.otherText)
+      base && selection && isComplete(selection.activity, selection.otherText)
         ? {
-            start: settled.date,
+            start: selection.date,
             params: {
               ...base,
-              activity: settled.activity,
-              otherText: settled.otherText,
-              nakshatra: settled.nakshatra,
+              activity: selection.activity,
+              otherText: selection.otherText,
+              nakshatra: selection.nakshatra,
             },
           }
         : null,
-    [base, settled],
+    [base, selection],
   );
   const query = useQuery({
-    queryKey: request
+    queryKey: scopedKey(request
       ? queryKeys.muhurta.daySummaries(request.start, 30, request.params)
-      : ['muhurta', 'date-best', 'idle'],
+      : ['muhurta', 'date-best', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => {
       const { start, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, 30, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading,
+    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
   return { query, start: request?.start };
 }

@@ -1,4 +1,4 @@
-import { QueryClientProvider } from '@tanstack/react-query';
+import { CacheProvider } from '@myvedicstar/query-cache';
 import { type ReactNode, useState } from 'react';
 import { RouterProvider } from 'react-router';
 
@@ -41,7 +41,7 @@ export function AppProviders({
 }) {
   return (
     <ServicesProvider services={services}>
-      <QueryClientProvider client={services.queryClient}>
+      <CacheProvider client={services.queryClient} settings={services.config.cache} persister={services.cachePersister}>
         <RefetchOnUserChange />
         <I18nProvider {...(language ? { language } : {})}>
           <ThemeProvider>
@@ -53,7 +53,7 @@ export function AppProviders({
             </TraditionStateProvider>
           </ThemeProvider>
         </I18nProvider>
-      </QueryClientProvider>
+      </CacheProvider>
     </ServicesProvider>
   );
 }

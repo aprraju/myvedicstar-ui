@@ -14,6 +14,8 @@
     "doctor": "expo-doctor"
   },
   "dependencies": {
+    "@myvedicstar/query-cache": "0.1.0",
+    "@react-native-community/netinfo": "12.0.1",
     "@expo/vector-icons": "15.1.1",
     "@myvedicstar/analytics": "0.1.0",
     "@myvedicstar/api-client": "0.1.0",

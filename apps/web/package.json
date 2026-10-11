@@ -16,6 +16,7 @@
     "e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
+    "@myvedicstar/query-cache": "0.1.0",
     "@hookform/resolvers": "5.9.1",
     "@myvedicstar/analytics": "0.1.0",
     "@myvedicstar/api-client": "0.1.0",

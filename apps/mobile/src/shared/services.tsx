@@ -5,9 +5,12 @@ import {
   type TelemetryClient,
   type TelemetrySink,
 } from '@myvedicstar/analytics';
-import { type ApiClient, createApiClient, retryDelayMs, shouldRetryQuery } from '@myvedicstar/api-client';
+import { type ApiClient, createApiClient } from '@myvedicstar/api-client';
 import type { AppConfig } from '@myvedicstar/config';
-import { QueryClient } from '@tanstack/react-query';
+import { type CacheReporter, createCachePersister, createCachingClient } from '@myvedicstar/query-cache';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { QueryClient } from '@tanstack/react-query';
+import type { Persister } from '@tanstack/react-query-persist-client';
 import Constants from 'expo-constants';
 import { createContext, type ReactNode, useContext } from 'react';
 import { Platform } from 'react-native';
@@ -22,6 +25,7 @@ export interface MobileServices {
   analytics: AnalyticsClient;
   telemetry: TelemetryClient;
   queryClient: QueryClient;
+  cachePersister?: Persister | undefined;
 }
 
 export function createMobileServices(
@@ -55,19 +59,15 @@ export function createMobileServices(
       }),
   });
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: shouldRetryQuery,
-        retryDelay: retryDelayMs,
-        staleTime: 5 * 60_000,
-        gcTime: 30 * 60_000,
-      },
-      mutations: { retry: false },
-    },
-  });
+  const report: CacheReporter = config.environment === 'local' || config.environment === 'test'
+    ? (event) => telemetry.trackMetric(`cache.${event.event}`, event.value ?? 1, { family: event.family })
+    : () => undefined;
+  const queryClient = createCachingClient(config.cache, report);
+  const cachePersister = config.cache.enabled && config.cache.persist
+    ? createCachePersister(AsyncStorage, config.cache, report)
+    : undefined;
 
-  return { config, api, auth, analytics, telemetry, queryClient };
+  return { config, api, auth, analytics, telemetry, queryClient, cachePersister };
 }
 
 const ServicesContext = createContext<MobileServices | null>(null);

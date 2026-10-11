@@ -1,7 +1,6 @@
-import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
-import { msUntilNextLocalDay, todayIn } from '@myvedicstar/date-time';
+import { type PanchangParams } from '@myvedicstar/api-client';
 import { buildDaySummary, panchangLocationParams, windowStatus } from '@myvedicstar/domain-models';
-import { useQuery } from '@tanstack/react-query';
+import { useToday } from '@myvedicstar/query-cache';
 import { useEffect, useMemo, useState } from 'react';
 import { AppState } from 'react-native';
 
@@ -14,7 +13,8 @@ import { useTradition } from '../tradition/TraditionProvider';
 
 /** Today's Panchang for the selected location, tradition and language (all part of the query key). */
 export function usePanchangToday() {
-  const { api } = useServices();
+  const { api, config } = useServices();
+  const { user, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { locale } = useTranslation();
@@ -25,28 +25,7 @@ export function usePanchangToday() {
     [location, tradition, language],
   );
 
-  const query = useQuery({
-    queryKey: params ? queryKeys.panchang.today(params) : ['panchang', 'today', 'no-location'],
-    queryFn: ({ signal }) => api.panchang.today(params as PanchangParams, { signal }),
-    enabled: params !== null,
-  });
-
-  // Refetch when the location's day changes (app left open overnight, or resumed on a new day).
-  const timeZone = location?.timeZone;
-  const { refetch, data } = query;
-  useEffect(() => {
-    if (!timeZone || !data) return;
-    const checkDay = () => {
-      if (data.localToday !== todayIn(timeZone)) void refetch();
-    };
-    checkDay();
-    const timer = setTimeout(() => void refetch(), msUntilNextLocalDay(timeZone) + 1_000);
-    const subscription = AppState.addEventListener('change', (state) => state === 'active' && checkDay());
-    return () => {
-      clearTimeout(timer);
-      subscription.remove();
-    };
-  }, [timeZone, data, refetch]);
+  const query = useToday({ api, params, userId: user?.id ?? null, enabled: !loading, settings: config.cache });
 
   return { query, location };
 }

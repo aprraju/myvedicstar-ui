@@ -1,6 +1,7 @@
-import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
+import { type PanchangParams } from '@myvedicstar/api-client';
 import { buildCalendarMonth, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { useQuery } from '@tanstack/react-query';
+import { panchangMonthOptions } from '@myvedicstar/query-cache';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { useAuth } from '../../shared/auth';
@@ -15,8 +16,9 @@ import { useTradition } from '../tradition';
  * out as a calendar. The query key includes all of them, so another month or context never shows stale data as current.
  */
 export function useCalendarMonth(yearMonth: YearMonth) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
+  const client = useQueryClient();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
@@ -28,13 +30,8 @@ export function useCalendarMonth(yearMonth: YearMonth) {
   );
   const { year, month } = yearMonth;
 
-  const query = useQuery({
-    queryKey: params
-      ? queryKeys.panchang.month(year, month, params)
-      : ['panchang', 'month', year, month, 'no-location'],
-    queryFn: ({ signal }) => api.panchang.month(year, month, params as PanchangParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading,
-  });
+  const query = useQuery(panchangMonthOptions({ api, params, userId: user?.id ?? null,
+    enabled: isAuthenticated && !loading, settings: config.cache }, client, year, month));
 
   const calendar = useMemo(
     () => buildCalendarMonth(query.data, { year, month }, now),

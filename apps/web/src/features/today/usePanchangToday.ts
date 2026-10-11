@@ -1,10 +1,10 @@
-import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
-import { msUntilNextLocalDay, todayIn } from '@myvedicstar/date-time';
+import { type PanchangParams } from '@myvedicstar/api-client';
 import { buildDaySummary, panchangLocationParams, windowStatus } from '@myvedicstar/domain-models';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useToday } from '@myvedicstar/query-cache';
+import { useMemo } from 'react';
 
 import { useNow } from '../../shared/hooks/useNow';
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { useGoodTimes } from '../good-time/useGoodTimes';
@@ -16,7 +16,8 @@ import { useTradition } from '../tradition';
  * so changing any of them fetches the right data and never shows another context's data as current.
  */
 export function usePanchangToday() {
-  const { api } = useServices();
+  const { api, config } = useServices();
+  const { user, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
@@ -26,24 +27,7 @@ export function usePanchangToday() {
     [location, tradition, language],
   );
 
-  const query = useQuery({
-    queryKey: params ? queryKeys.panchang.today(params) : ['panchang', 'today', 'no-location'],
-    queryFn: ({ signal }) => api.panchang.today(params as PanchangParams, { signal }),
-    enabled: params !== null,
-  });
-
-  // When the location's day changes while the page stays open, fetch the new day.
-  const timeZone = location?.timeZone;
-  const { refetch, data } = query;
-  useEffect(() => {
-    if (!timeZone || !data) return;
-    if (data.localToday !== todayIn(timeZone)) {
-      void refetch();
-      return;
-    }
-    const timer = setTimeout(() => void refetch(), msUntilNextLocalDay(timeZone) + 1_000);
-    return () => clearTimeout(timer);
-  }, [timeZone, data, refetch]);
+  const query = useToday({ api, params, userId: user?.id ?? null, enabled: !loading, settings: config.cache });
 
   return { query, location };
 }
