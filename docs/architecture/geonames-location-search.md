@@ -7,10 +7,11 @@ contracts remain intact. GeoNames is accessed through API proxy routes, never di
 
 ## Current integration status
 
-The frontend and a tested .NET integration library are in this repository. The library is staged under
-`infrastructure/location-search-proxy`; it is not installed into either neighboring backend checkout. The active
-backend checkout and a dedicated GeoNames account still need to be identified. `locationSearch.enabled` defaults to
-false until those endpoints are available. No new Azure service, backend deployment or GeoNames account was created.
+The frontend is in this repository. The integrated backend library is `src/GeoNames/GeoNames.csproj` in the neighboring
+`myvedicstar` checkout, registered by `MyVedicDayApiModule` for both standalone and combined API hosts. The original
+`infrastructure/location-search-proxy` remains a reference implementation. Server configuration defaults to disabled;
+set `GeoNames__Enabled=true` and `GeoNames__Username` to a dedicated account before enabling frontend
+`locationSearch.enabled`. No backend deployment or live account verification has been performed.
 
 ## Frontend configuration
 
@@ -54,14 +55,13 @@ calculation/coordinate-normalization policy remains authoritative and has not be
 
 ## Install the proxy in the existing .NET API
 
-Reference the library project from the active `MyVedicDay.Api` project, or move its source into the existing backend
-location integration/API layers. It targets .NET 10 and uses only the existing ASP.NET framework; no NuGet provider SDK
-or additional Azure resource is required.
+The `myvedicstar` API already references the `GeoNames` library. It targets .NET 10 and uses only the existing ASP.NET
+framework; no NuGet provider SDK or additional Azure resource is required. Other hosts can register it as follows.
 
 After the host registers its existing `public-read` rate-limit policy, register:
 
 ```csharp
-using MyVedicStar.LocationSearch;
+using GeoNames;
 
 builder.Services.AddGeoNamesLocationSearch(builder.Configuration);
 ```
@@ -89,9 +89,10 @@ existing telemetry redaction for dependency URL query strings.
 ## Account setup and coverage
 
 Register a dedicated account on [GeoNames](https://www.geonames.org/login), enable its web services in the account
-settings, and configure the existing API process with `GeoNames__Username`. Do not use the demo account. Optional
+settings, and configure the existing API process with `GeoNames__Enabled=true` and `GeoNames__Username`. Do not use the demo account. Optional
 server settings are `GeoNames__TimeoutSeconds`, `GeoNames__SearchCacheHours`, and `GeoNames__CoordinateCacheDays`.
-Username validation runs at registration/startup; missing or demo usernames are rejected. No username is hardcoded.
+Username validation runs at startup when enabled; missing or demo usernames are rejected. Disabled lookups return 503.
+No username is hardcoded.
 
 After a real username is provided, verify city, postal, nearby-place and timezone requests against
 `https://secure.geonames.org` through the proxy in the target environment before enabling the frontend. Account-specific
@@ -114,6 +115,10 @@ recent locations stay on-device. Search-history query caches are bounded, memory
 Today caching. Provider failures never silently choose another place or timezone.
 
 ## Verification
+
+In the `myvedicstar` backend, run `dotnet test tests/GeoNames.Tests/GeoNames.Tests.csproj` for provider and configuration
+checks, and `dotnet test tests/MyVedicDay.Api.Tests.Integration/MyVedicDay.Api.Tests.Integration.csproj` for HTTP route
+contracts, validation, anonymous access, quota errors and OpenAPI examples.
 
 `npm run location:proxy:test` builds and tests the provider with mocked HTTP responses, without GeoNames credentials
 or live requests. Shared tests cover international postal formats, ambiguity, Unicode/country keys, coordinate precision,
