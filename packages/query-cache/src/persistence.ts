@@ -10,8 +10,8 @@ import { cachePolicies, type CacheSettings } from './policies';
 
 export interface CacheStorage {
   getItem(key: string): Promise<string | null>;
-  setItem(key: string, value: string): Promise<unknown>;
-  removeItem(key: string): Promise<unknown>;
+  setItem(key: string, value: string): Promise<void>;
+  removeItem(key: string): Promise<void>;
 }
 
 export function persistenceBuster(settings: CacheSettings): string {

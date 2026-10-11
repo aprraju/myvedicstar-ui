@@ -1,4 +1,5 @@
 import { queryKeys } from '@myvedicstar/api-client';
+import { scopedKey } from '@myvedicstar/query-cache';
 import { traditionKeySchema } from '@myvedicstar/validation';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
@@ -40,13 +41,12 @@ export function useTradition(): TraditionContextValue {
 
 /** The traditions the backend offers, in display order, in the UI language. Rarely changes: cached for a day. */
 export function useTraditions() {
-  const { isAuthenticated, loading } = useAuth();
-  const { api } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
   const { language } = useTranslation();
   return useQuery({
-    queryKey: queryKeys.traditions.list(language),
+    queryKey: scopedKey(queryKeys.traditions.list(language), user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.traditions.list(language, { signal }),
-    staleTime: 24 * 60 * 60_000,
     enabled: isAuthenticated && !loading,
   });
 }

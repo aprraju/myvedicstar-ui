@@ -22,7 +22,7 @@ export function createIndexedDbCacheStorage(): CacheStorage {
     });
   return {
     getItem: async (key) => (await run<string | undefined>('readonly', (store) => store.get(key))) ?? null,
-    setItem: (key, value) => run('readwrite', (store) => store.put(value, key)),
-    removeItem: (key) => run('readwrite', (store) => store.delete(key)),
+    setItem: async (key, value) => { await run('readwrite', (store) => store.put(value, key)); },
+    removeItem: async (key) => { await run('readwrite', (store) => store.delete(key)); },
   };
 }

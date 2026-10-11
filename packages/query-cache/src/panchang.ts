@@ -98,7 +98,7 @@ export function useToday(context: CalculationContext) {
   const key = scopedKey(params ? queryKeys.panchang.today(params, date) : ['panchang', 'today', 'idle'], userId, settings);
   const dayKey = params && date ? scopedKey(queryKeys.panchang.date(date, params), userId, settings) : undefined;
   const cachedDay = settings.enabled && dayKey ? client.getQueryState<PanchangResponse>(dayKey) : undefined;
-  const query = useQuery({
+  const query = useQuery<PanchangResponse>({
     queryKey: key,
     queryFn: async ({ signal }) => {
       const data = await api.panchang.today(params as PanchangParams, { signal });
@@ -110,8 +110,8 @@ export function useToday(context: CalculationContext) {
       return data;
     },
     enabled: enabled && params !== null && date !== undefined,
-    initialData: cachedDay?.data?.localToday === date ? cachedDay.data : undefined,
-    initialDataUpdatedAt: cachedDay?.dataUpdatedAt,
+    initialData: () => cachedDay?.data && cachedDay.data.localToday === date ? cachedDay.data : undefined,
+    initialDataUpdatedAt: () => cachedDay?.dataUpdatedAt,
     gcTime: settings.enabled ? cachePolicies.today.gcTime : 0,
     staleTime: settings.enabled && date && timeZone
       ? (query) => Math.max(0, startOfLocalDate(addDays(date, 1), timeZone) - query.state.dataUpdatedAt)

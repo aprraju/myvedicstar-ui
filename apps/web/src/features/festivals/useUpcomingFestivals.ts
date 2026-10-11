@@ -1,5 +1,6 @@
 import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
 import { panchangLocationParams } from '@myvedicstar/domain-models';
+import { scopedKey, useLocalDate } from '@myvedicstar/query-cache';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
@@ -14,11 +15,12 @@ import { useTradition } from '../tradition';
  * tradition's regional names in the UI language. Location, tradition, language and range are all in the query key.
  */
 export function useUpcomingFestivals(days: number) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
+  const today = useLocalDate(location?.timeZone);
 
   const params: PanchangParams | null = useMemo(
     () => (location ? { location: panchangLocationParams(location), tradition, language } : null),
@@ -26,9 +28,9 @@ export function useUpcomingFestivals(days: number) {
   );
 
   const query = useQuery({
-    queryKey: params
-      ? queryKeys.festivals.upcoming(params, days)
-      : ['festivals', 'upcoming', days, 'no-location'],
+    queryKey: scopedKey(params
+      ? [...queryKeys.festivals.upcoming(params, days), today]
+      : ['festivals', 'upcoming', days, 'no-location'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.festivals.upcoming({ ...(params as PanchangParams), days }, { signal }),
     enabled: params !== null && isAuthenticated && !loading,
   });

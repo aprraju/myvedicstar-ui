@@ -5,7 +5,8 @@ import {
   queryKeys,
 } from '@myvedicstar/api-client';
 import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { scopedKey, useGoodTime, useLocalDate } from '@myvedicstar/query-cache';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useAuth } from '../../shared/auth';
@@ -21,6 +22,7 @@ export interface GoodTimeSelection {
   date?: string | undefined;
   activity: string;
   otherText?: string | undefined;
+  nakshatra?: string | undefined;
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number): T {
@@ -39,14 +41,13 @@ function useLanguage() {
 
 /** The activity cards (`/muhurta/activities`), same as web. */
 export function useMuhurtaActivities() {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const { tradition } = useTradition();
   const language = useLanguage();
   return useQuery({
-    queryKey: queryKeys.muhurta.activities(tradition, language),
+    queryKey: scopedKey(queryKeys.muhurta.activities(tradition, language), user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.activities({ tradition, language }, { signal }),
-    staleTime: 60 * 60_000,
     enabled: isAuthenticated && !loading,
   });
 }
@@ -56,26 +57,22 @@ export function useMuhurtaActivities() {
  * date, activity and Other text; the previous result stays visible while a new selection loads.
  */
 export function useGoodTimes(selection: GoodTimeSelection | null) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const language = useLanguage();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
 
   const params: GoodTimesParams | null = useMemo(() => {
-    if (!location || !settled) return null;
-    if (settled.activity === 'other' && !settled.otherText?.trim()) return null;
+    if (!location || !selection) return null;
+    if (selection.activity === 'other' && !selection.otherText?.trim()) return null;
     const base: PanchangParams = { location: panchangLocationParams(location), tradition, language };
-    return { ...base, date: settled.date, activity: settled.activity, otherText: settled.otherText };
-  }, [location, tradition, language, settled]);
+    return { ...base, date: selection.date, activity: selection.activity, otherText: selection.otherText, nakshatra: selection.nakshatra };
+  }, [location, tradition, language, selection]);
 
-  const query = useQuery({
-    queryKey: params ? queryKeys.muhurta.goodTimes(params) : ['muhurta', 'good-times', 'idle'],
-    queryFn: ({ signal }) => api.muhurta.goodTimes(params as GoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
-  });
+  const query = useGoodTime({ api, params, userId: user?.id ?? null, settings: config.cache,
+    enabled: isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled) });
   return { query, params };
 }
 
@@ -101,44 +98,43 @@ const isComplete = (activity: string, otherText: string | undefined) =>
 export function useGoodTimeMonth(
   selection: { yearMonth: YearMonth; activity: string; otherText?: string | undefined } | null,
 ) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const request = useMemo(() => {
-    if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
-    const { start, days } = monthRange(settled.yearMonth);
-    return { start, days, params: { ...base, activity: settled.activity, otherText: settled.otherText } };
-  }, [base, settled]);
+    if (!base || !selection || !isComplete(selection.activity, selection.otherText)) return null;
+    const { start, days } = monthRange(selection.yearMonth);
+    return { start, days, params: { ...base, activity: selection.activity, otherText: selection.otherText } };
+  }, [base, selection]);
 
   return useQuery({
-    queryKey: request
+    queryKey: scopedKey(request
       ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
-      : ['muhurta', 'day-summaries', 'idle'],
+      : ['muhurta', 'day-summaries', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => {
       const { start, days, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, days, params, { signal });
     },
-    enabled: request !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
+    enabled: request !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
 }
 
 /** The next best Good Times for an activity (`/muhurta/good-times/best`), same as web. */
 export function useBestGoodTimes(selection: { activity: string; otherText?: string | undefined } | null) {
-  const { api } = useServices();
-  const { isAuthenticated, loading } = useAuth();
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
+  const today = useLocalDate(base?.location.timeZone);
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params: BestGoodTimesParams | null = useMemo(() => {
-    if (!base || !settled || !isComplete(settled.activity, settled.otherText)) return null;
-    return { ...base, activity: settled.activity, otherText: settled.otherText, count: BEST_COUNT };
-  }, [base, settled]);
+    if (!base || !selection || !isComplete(selection.activity, selection.otherText)) return null;
+    return { ...base, activity: selection.activity, otherText: selection.otherText, count: BEST_COUNT };
+  }, [base, selection]);
 
   return useQuery({
-    queryKey: params ? queryKeys.muhurta.bestGoodTimes(params) : ['muhurta', 'best', 'idle'],
+    queryKey: scopedKey(params ? [...queryKeys.muhurta.bestGoodTimes(params), today] : ['muhurta', 'best', 'idle'], user?.id ?? null, config.cache),
     queryFn: ({ signal }) => api.muhurta.bestGoodTimes(params as BestGoodTimesParams, { signal }),
-    enabled: params !== null && isAuthenticated && !loading,
-    placeholderData: keepPreviousData,
+    enabled: params !== null && isAuthenticated && !loading && JSON.stringify(selection) === JSON.stringify(settled),
   });
 }

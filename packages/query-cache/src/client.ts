@@ -50,7 +50,7 @@ export function createCachingClient(
       if (event.type === 'removed') started.delete(query.queryHash);
     }
     if (event.type === 'observerAdded') {
-      report({ event: query.state.data !== undefined && !query.isStaleByTime(query.options.staleTime) ? 'hit' : 'miss', family });
+      report({ event: query.state.data !== undefined && !query.isStale() ? 'hit' : 'miss', family });
     }
     if (event.type !== 'updated') return;
     if (event.action.type === 'fetch') started.set(query.queryHash, Date.now());
