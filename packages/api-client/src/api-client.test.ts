@@ -18,6 +18,7 @@ function setup(fetchImpl: typeof fetch, extra: Partial<Parameters<typeof createA
   const client = createApiClient({
     baseUrl: `${BASE_URL}/`,
     fetchImpl,
+    getAccessToken: async () => 'test-access-token',
     createCorrelationId: () => 'corr-123',
     onRequestComplete: (m) => metrics.push(m),
     ...extra,
@@ -133,18 +134,62 @@ describe('createApiClient', () => {
       (client: ReturnType<typeof setup>['client']) => client.locations.resolve({ place: 'Austin, TX' }),
       fixtures.location.austin,
     ],
-  ] as const)(
-    '%s sends the access token when signed in and none when signed out',
-    async (_name, call, body) => {
-      const signedIn = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
-      await call(setup(signedIn, { getAccessToken: async () => 'token-1' }).client);
-      expect(new Headers(signedIn.mock.calls[0]![1]?.headers).get('Authorization')).toBe('Bearer token-1');
+  ] as const)('%s follows its authentication policy', async (name, call, body) => {
+    const signedIn = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
+    await call(setup(signedIn, { getAccessToken: async () => 'token-1' }).client);
+    expect(new Headers(signedIn.mock.calls[0]![1]?.headers).get('Authorization')).toBe('Bearer token-1');
 
-      const signedOut = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
-      await call(setup(signedOut, { getAccessToken: async () => null }).client);
+    const signedOut = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
+    const client = setup(signedOut, { getAccessToken: async () => null }).client;
+    if (name === 'locations.resolve') {
+      await call(client);
       expect(new Headers(signedOut.mock.calls[0]![1]?.headers).has('Authorization')).toBe(false);
-    },
-  );
+    } else {
+      await expect(call(client)).rejects.toMatchObject({ kind: 'authentication' });
+      expect(signedOut).not.toHaveBeenCalled();
+    }
+  });
+
+  it('never sends protected requests without a token, while today and resolve stay public', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.panchang.austinTelugu));
+    const { client } = setup(fetchImpl, { getAccessToken: async () => null });
+    const params = { location: { place: 'Austin, TX' } };
+    const calls = [
+      () => client.traditions.list(),
+      () => client.panchang.traditions(),
+      () => client.panchang.glossary(),
+      () => client.panchang.tomorrow(params),
+      () => client.panchang.tenDays(params),
+      () => client.panchang.date('2026-10-11', params),
+      () => client.panchang.range('2026-10-11', 3, params),
+      () => client.panchang.month(2026, 10, params),
+      () => client.panchang.year(2026, params),
+      () => client.festivals.upcoming(params),
+      () => client.muhurta.activities(),
+      () => client.muhurta.nakshatras(),
+      () => client.muhurta.goodTimes(params),
+      () => client.muhurta.explanation(params),
+      () => client.muhurta.daySummaries('2026-10-11', 3, params),
+      () => client.muhurta.bestGoodTimes(params),
+      () => client.auth.userInfo(),
+      () =>
+        client.contact.submit({
+          name: 'Asha',
+          email: 'asha@example.com',
+          reason: 'other',
+          message: 'Please contact me.',
+        }),
+    ];
+    for (const call of calls) await expect(call()).rejects.toMatchObject({ kind: 'authentication' });
+    expect(fetchImpl).not.toHaveBeenCalled();
+    await client.panchang.today(params);
+    fetchImpl.mockResolvedValueOnce(jsonResponse(fixtures.location.austin));
+    await client.locations.resolve(params.location);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(fetchImpl.mock.calls.every(([, init]) => !new Headers(init?.headers).has('Authorization'))).toBe(
+      true,
+    );
+  });
 
   it('requests upcoming festivals for the location, tradition, language and day count, with the token', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.festivals));

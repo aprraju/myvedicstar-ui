@@ -1,8 +1,14 @@
 import { fixtures } from '@myvedicstar/testing';
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
-import { apiRequests, atInstant, renderApp, storeLocation } from '../../test/render';
+import { createInMemoryAuthClient } from '../../shared/auth';
+import { apiRequests, atInstant, renderApp as renderTestApp, storeLocation } from '../../test/render';
 import { GoodTimeScreen } from './GoodTimeScreen';
+
+const renderApp = (
+  routes: Parameters<typeof renderTestApp>[0],
+  options: Parameters<typeof renderTestApp>[1] = {},
+) => renderTestApp(routes, { ...options, auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
 
 const NO_GOOD_TIME =
   'No strongly favorable time was found for this activity today. Please choose another date.';

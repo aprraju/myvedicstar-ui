@@ -6,8 +6,8 @@
   min-inline-size: 0;
 }
 
-/* Results (day or month) with the "Next best times" tile: stacked, tile first, on narrow screens; side by side from
-   64rem with the tile beside the results. */
+/* On narrow screens the month calendar comes first; day view keeps the best-times tile first.
+   From 64rem, the tile sits beside the results. */
 .body {
   display: grid;
   gap: var(--space-lg);
@@ -31,7 +31,7 @@
 }
 
 @media (max-width: 63.99rem) {
-  .body > aside {
+  .body[data-view='day'] > aside {
     order: -1;
   }
 }

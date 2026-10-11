@@ -3,6 +3,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
 import { atInstant, austin, storeSelectedLocation } from '../../test/location-fixtures';
 import { apiRequests, scenarios } from '../../test/msw/handlers';
@@ -74,7 +75,9 @@ describe('DaySummaryCard', () => {
   it('answers how today is, whether now is good and the next caution period', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
-    const { container } = renderWithProviders(<DaySummaryCard />);
+    const { container } = renderWithProviders(<DaySummaryCard />, {
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
 
     // Headline from the backend's General day status (Mixed); the description is the day-factor summary.
     expect(await screen.findByText('Mixed day')).toBeInTheDocument();
@@ -116,7 +119,7 @@ describe('DaySummaryCard', () => {
       await atInstant('2026-04-28T07:00:00-05:00');
       favorableDay();
       storeSelectedLocation();
-      renderWithProviders(<DaySummaryCard />);
+      renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       expect(await screen.findByText('Good time now')).toBeInTheDocument();
       expect(card()).toHaveTextContent(/until 8:23\sAM/);
     });
@@ -125,7 +128,7 @@ describe('DaySummaryCard', () => {
       await atInstant('2026-04-28T10:00:00-05:00');
       favorableDay();
       storeSelectedLocation();
-      renderWithProviders(<DaySummaryCard />);
+      renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       expect(await screen.findByText('Next good time')).toBeInTheDocument();
       expect(card()).toHaveTextContent(/Next good time\s*12:06\sPM – 1:02\sPM/);
     });
@@ -134,7 +137,7 @@ describe('DaySummaryCard', () => {
   it('marks periods that end after midnight', async () => {
     await atInstant('2026-09-29T20:00:00-05:00');
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(
       await screen.findByText(
         'No strongly favorable time was found for this activity today. Please choose another date.',
@@ -152,7 +155,7 @@ describe('DaySummaryCard', () => {
     async (fixture, headline, tone) => {
       server.use(scenarios.json('/panchang/today', fixtures.panchang[fixture]));
       storeSelectedLocation();
-      renderWithProviders(<DaySummaryCard />);
+      renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
       const text = await screen.findByText(headline);
       const badge = text.closest('[data-status-tone]')!;
       expect(badge).toHaveAttribute('data-status-tone', tone);
@@ -164,7 +167,7 @@ describe('DaySummaryCard', () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     // The day has a "best window" 11:51–13:20, but the General evaluation found no Good Time.
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(
       await screen.findByText(
         'No strongly favorable time was found for this activity today. Please choose another date.',
@@ -180,7 +183,7 @@ describe('DaySummaryCard', () => {
       scenarios.slow('/muhurta/good-times', fixtures.muhurta.goodTimes.austinFavorableDay, 300),
     );
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByText('Checking good times…')).toBeInTheDocument();
     expect(await screen.findByText(/12:06\sPM – 1:02\sPM/)).toBeInTheDocument();
   });
@@ -198,7 +201,7 @@ describe('DaySummaryCard', () => {
       }),
     );
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     const list = await screen.findByRole('list', { name: 'Festivals & observances' });
     expect(list).toHaveTextContent('Sample Festival');
   });
@@ -206,7 +209,7 @@ describe('DaySummaryCard', () => {
   it('shows a skeleton while loading, then the content', async () => {
     server.use(scenarios.slow('/panchang/today', fixtures.panchang.austinTelugu, 200));
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(within(card()).getByRole('status')).toHaveTextContent('Loading…');
     expect(await screen.findByText('Mixed day')).toBeInTheDocument();
   });
@@ -214,7 +217,7 @@ describe('DaySummaryCard', () => {
   it('shows a friendly error with retry', async () => {
     server.use(scenarios.serverError('/panchang/today'));
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByText("We couldn't load today's Panchang.")).toBeInTheDocument();
     expect(screen.getByRole('alert')).not.toHaveTextContent('corr-500');
 
@@ -224,7 +227,10 @@ describe('DaySummaryCard', () => {
   });
 
   it('asks for a location when none is known', async () => {
-    renderWithProviders(<DaySummaryCard />, { geolocation: fakeGeolocation({ permission: 'unsupported' }) });
+    renderWithProviders(<DaySummaryCard />, {
+      geolocation: fakeGeolocation({ permission: 'unsupported' }),
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     expect(await screen.findByText('Choose a location to see today’s Panchang')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use my current location' })).toBeInTheDocument();
     expect(apiRequests.filter((u) => u.pathname.includes('/panchang'))).toHaveLength(0);
@@ -233,7 +239,7 @@ describe('DaySummaryCard', () => {
   it('requests Panchang for the selected location, tradition and language', async () => {
     storeSelectedLocation(austin);
     window.localStorage.setItem('mvs.tradition', '"telugu"');
-    renderWithProviders(<DaySummaryCard />);
+    renderWithProviders(<DaySummaryCard />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByText('Mixed day');
     const request = apiRequests.find((u) => u.pathname.endsWith('/panchang/today'))!;
     expect(Object.fromEntries(request.searchParams)).toEqual({

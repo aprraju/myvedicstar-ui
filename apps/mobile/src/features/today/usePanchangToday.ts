@@ -1,10 +1,11 @@
 import { type PanchangParams, queryKeys } from '@myvedicstar/api-client';
 import { msUntilNextLocalDay, todayIn } from '@myvedicstar/date-time';
-import { buildDaySummary, panchangLocationParams } from '@myvedicstar/domain-models';
+import { buildDaySummary, panchangLocationParams, windowStatus } from '@myvedicstar/domain-models';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { AppState } from 'react-native';
 
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n';
 import { useServices } from '../../shared/services';
 import { useGoodTimes } from '../good-time/useGoodTimes';
@@ -67,14 +68,31 @@ export function useNow(): number {
   return now;
 }
 
-/** The day summary; its Good Time comes from the backend's General evaluation of today, never from Panchang periods. */
+/** Visitors use Today's embedded evaluation; signed-in users can load the full General evaluation. */
 export function useDaySummary() {
   const { query, location } = usePanchangToday();
-  const { query: goodTimes } = useGoodTimes(location ? { activity: 'general' } : null);
+  const { isAuthenticated } = useAuth();
+  const { query: goodTimes } = useGoodTimes(isAuthenticated && location ? { activity: 'general' } : null);
   const now = useNow();
-  const summary = useMemo(
-    () => (query.data ? buildDaySummary(query.data, now, goodTimes.data) : undefined),
-    [query.data, now, goodTimes.data],
-  );
+  const summary = useMemo(() => {
+    if (!query.data) return undefined;
+    const result = buildDaySummary(query.data, now, isAuthenticated ? goodTimes.data : undefined);
+    if (isAuthenticated || !result) return result;
+    const day = query.data.days[0];
+    if (!day) return result;
+    const evaluation = day.goodTime;
+    const reference = result.isToday ? now : Date.parse(day.sunrise);
+    return {
+      ...result,
+      goodTime: evaluation
+        ? windowStatus(evaluation.bestGoodTime ? [evaluation.bestGoodTime] : [], reference)
+        : { status: 'unavailable' as const },
+      noGoodTimeMessage:
+        evaluation?.noGoodTimeReason && !/^[A-Z][A-Z0-9_]*$/.test(evaluation.noGoodTimeReason)
+          ? evaluation.noGoodTimeReason
+          : undefined,
+    };
+  }, [query.data, now, goodTimes.data, isAuthenticated]);
+
   return { query, location, summary, glossary: query.data?.glossary };
 }

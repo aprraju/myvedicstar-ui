@@ -3,6 +3,7 @@ import { traditionKeySchema } from '@myvedicstar/validation';
 import { useQuery } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useMemo, useState } from 'react';
 
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { preferenceStorage } from '../../shared/storage/preference-storage';
@@ -39,11 +40,13 @@ export function useTradition(): TraditionContextValue {
 
 /** The traditions the backend offers, in display order, in the UI language. Rarely changes: cached for a day. */
 export function useTraditions() {
+  const { isAuthenticated, loading } = useAuth();
   const { api } = useServices();
   const { language } = useTranslation();
   return useQuery({
     queryKey: queryKeys.traditions.list(language),
     queryFn: ({ signal }) => api.traditions.list(language, { signal }),
     staleTime: 24 * 60 * 60_000,
+    enabled: isAuthenticated && !loading,
   });
 }

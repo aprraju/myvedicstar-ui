@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
@@ -23,8 +23,9 @@ const fill = async (fields: { name?: string; email?: string; reason?: string; me
 };
 
 describe('Contact Us', () => {
+  beforeEach(() => server.use(scenarios.serverError('/auth/userinfo', 'post')));
   it('offers name, email, reason (with the seven reasons) and message', async () => {
-    const { container } = renderRoute('/contact');
+    const { container } = renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByRole('heading', { level: 1, name: 'Contact Us' })).toBeInTheDocument();
     const reasons = within(screen.getByRole('combobox', { name: 'Reason' }))
       .getAllByRole('option')
@@ -43,7 +44,7 @@ describe('Contact Us', () => {
   });
 
   it('explains each missing or invalid field', async () => {
-    renderRoute('/contact');
+    renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
     await fill({ email: 'not-an-email', message: 'short' });
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
@@ -63,7 +64,7 @@ describe('Contact Us', () => {
         return new HttpResponse(null, { status: 202 });
       }),
     );
-    renderRoute('/contact');
+    renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
     await fill({
       name: 'Asha',
@@ -87,11 +88,22 @@ describe('Contact Us', () => {
   });
 
   it('Report an Issue preselects Technical Issue', async () => {
-    renderRoute('/contact?reason=technical');
+    renderRoute('/contact?reason=technical', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByRole('combobox', { name: 'Reason' })).toHaveValue('technical');
   });
 
   it('prefills the signed-in user’s name and email from their profile', async () => {
+    server.use(
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
+        HttpResponse.json({
+          id: 'u1',
+          name: 'Asha Rao',
+          givenName: 'Asha',
+          surname: 'Rao',
+          email: 'asha.rao@example.com',
+        }),
+      ),
+    );
     renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Asha Rao'));
     expect(screen.getByRole('textbox', { name: 'Email' })).toHaveValue('asha.rao@example.com');
@@ -99,7 +111,7 @@ describe('Contact Us', () => {
 
   it('keeps the message and explains when sending fails', async () => {
     server.use(scenarios.serverError('/contact', 'post'));
-    renderRoute('/contact');
+    renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
     await fill({ name: 'Asha', email: 'asha@example.com', reason: 'other', message: 'Please call me back.' });
     await userEvent.click(screen.getByRole('button', { name: 'Submit' }));

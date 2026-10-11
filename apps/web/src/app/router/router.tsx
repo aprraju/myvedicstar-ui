@@ -81,7 +81,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: routes.contact,
         handle: handle('Contact', 'pages.contact.title'),
-        lazy: async () => ({ Component: (await import('../../features/contact')).ContactPage }),
+        lazy: protectedPage(async () => (await import('../../features/contact')).ContactPage),
       },
       {
         path: routes.help,

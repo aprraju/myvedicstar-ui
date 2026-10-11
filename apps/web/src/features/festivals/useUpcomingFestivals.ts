@@ -3,6 +3,7 @@ import { panchangLocationParams } from '@myvedicstar/domain-models';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { useLocationState } from '../location';
@@ -14,6 +15,7 @@ import { useTradition } from '../tradition';
  */
 export function useUpcomingFestivals(days: number) {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
@@ -28,7 +30,7 @@ export function useUpcomingFestivals(days: number) {
       ? queryKeys.festivals.upcoming(params, days)
       : ['festivals', 'upcoming', days, 'no-location'],
     queryFn: ({ signal }) => api.festivals.upcoming({ ...(params as PanchangParams), days }, { signal }),
-    enabled: params !== null,
+    enabled: params !== null && isAuthenticated && !loading,
   });
   return { query, location };
 }

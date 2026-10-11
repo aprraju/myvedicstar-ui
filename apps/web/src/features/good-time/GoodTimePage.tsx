@@ -84,9 +84,12 @@ export function GoodTimePage() {
   const shownMonth =
     parseYearMonth(searchParams.get('month')) ?? (shownDate ? yearMonthOf(shownDate) : undefined);
 
-  /** Opens a date in the day view (from the month grid or a best time). */
+  /** Selects a date without changing the user's Day/Month choice. */
   const selectDay = (day: LocalDate) =>
-    update({ view: undefined, month: undefined, date: day === today ? undefined : day });
+    update({
+      date: day === today ? undefined : day,
+      ...(view === 'month' ? { month: formatYearMonth(yearMonthOf(day)) } : {}),
+    });
 
   return (
     <section className={styles.page} aria-labelledby="good-time-title">
@@ -194,7 +197,7 @@ export function GoodTimePage() {
             </div>
           </div>
 
-          <div className={styles.body}>
+          <div className={styles.body} data-view={view}>
             <div className={styles.main}>
               {view === 'month' && shownMonth ? (
                 <GoodTimeMonth

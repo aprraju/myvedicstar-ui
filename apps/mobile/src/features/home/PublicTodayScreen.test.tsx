@@ -31,12 +31,13 @@ describe('public Today (mobile)', () => {
     expect(await screen.findByText('Mixed day')).toBeTruthy();
     expect(screen.getByText('Tuesday, September 29')).toBeTruthy();
     expect(screen.getByText('Krishna Paksha · Krishna Chaturthi')).toBeTruthy();
-    // The backend's General evaluation has no Good Time today: its message, never a promoted period.
+    // Signed-out visitors use only today's embedded evaluation.
+    expect(await screen.findByLabelText(/No more recommended times today/)).toBeTruthy();
     expect(
-      await screen.findByLabelText(
-        /No strongly favorable time was found for this activity today\. Please choose another date\./,
+      apiRequests.every(
+        (url) => url.pathname.endsWith('/panchang/today') || url.pathname.endsWith('/locations/resolve'),
       ),
-    ).toBeTruthy();
+    ).toBe(true);
     expect(
       screen.getByLabelText(/Use caution now\. Durmuhurtham 9:46\sAM – 10:34\sAM\. Unfavorable Muhurta/),
     ).toBeTruthy();
@@ -146,7 +147,7 @@ describe('location sheet (mobile)', () => {
 describe('tradition (mobile)', () => {
   it('changes tradition independently of location and reloads the Panchang', async () => {
     await storeLocation();
-    await renderApp(routes);
+    await renderApp(routes, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByText('Mixed day');
     await fireEvent.press(screen.getByRole('button', { name: /^Tradition: / }));
     await fireEvent.press(await screen.findByRole('radio', { name: /Tamil/ }));

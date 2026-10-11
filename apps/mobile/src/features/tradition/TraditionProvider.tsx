@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { useAuth } from '../../shared/auth';
 import { AppText, Notice, Sheet } from '../../shared/components';
 import { useTranslation } from '../../shared/i18n';
 import { useServices } from '../../shared/services';
@@ -51,6 +52,7 @@ export function useTradition(): TraditionContextValue {
 }
 
 export function useTraditions() {
+  const { isAuthenticated, loading } = useAuth();
   const { api } = useServices();
   const { locale } = useTranslation();
   const language = locale.split('-')[0];
@@ -58,6 +60,7 @@ export function useTraditions() {
     queryKey: queryKeys.traditions.list(language),
     queryFn: ({ signal }) => api.traditions.list(language, { signal }),
     staleTime: 24 * 60 * 60_000,
+    enabled: isAuthenticated && !loading,
   });
 }
 

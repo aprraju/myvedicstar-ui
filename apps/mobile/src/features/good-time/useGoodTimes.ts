@@ -8,6 +8,7 @@ import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n';
 import { useServices } from '../../shared/services';
 import { useLocationState } from '../location/LocationProvider';
@@ -39,12 +40,14 @@ function useLanguage() {
 /** The activity cards (`/muhurta/activities`), same as web. */
 export function useMuhurtaActivities() {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const { tradition } = useTradition();
   const language = useLanguage();
   return useQuery({
     queryKey: queryKeys.muhurta.activities(tradition, language),
     queryFn: ({ signal }) => api.muhurta.activities({ tradition, language }, { signal }),
     staleTime: 60 * 60_000,
+    enabled: isAuthenticated && !loading,
   });
 }
 
@@ -54,6 +57,7 @@ export function useMuhurtaActivities() {
  */
 export function useGoodTimes(selection: GoodTimeSelection | null) {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const language = useLanguage();
@@ -69,7 +73,7 @@ export function useGoodTimes(selection: GoodTimeSelection | null) {
   const query = useQuery({
     queryKey: params ? queryKeys.muhurta.goodTimes(params) : ['muhurta', 'good-times', 'idle'],
     queryFn: ({ signal }) => api.muhurta.goodTimes(params as GoodTimesParams, { signal }),
-    enabled: params !== null,
+    enabled: params !== null && isAuthenticated && !loading,
     placeholderData: keepPreviousData,
   });
   return { query, params };
@@ -98,6 +102,7 @@ export function useGoodTimeMonth(
   selection: { yearMonth: YearMonth; activity: string; otherText?: string | undefined } | null,
 ) {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const request = useMemo(() => {
@@ -114,7 +119,7 @@ export function useGoodTimeMonth(
       const { start, days, params } = request as NonNullable<typeof request>;
       return api.muhurta.daySummaries(start, days, params, { signal });
     },
-    enabled: request !== null,
+    enabled: request !== null && isAuthenticated && !loading,
     placeholderData: keepPreviousData,
   });
 }
@@ -122,6 +127,7 @@ export function useGoodTimeMonth(
 /** The next best Good Times for an activity (`/muhurta/good-times/best`), same as web. */
 export function useBestGoodTimes(selection: { activity: string; otherText?: string | undefined } | null) {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const base = useBaseParams();
   const settled = useDebouncedValue(selection, SELECTION_SETTLE_MS);
   const params: BestGoodTimesParams | null = useMemo(() => {
@@ -132,7 +138,7 @@ export function useBestGoodTimes(selection: { activity: string; otherText?: stri
   return useQuery({
     queryKey: params ? queryKeys.muhurta.bestGoodTimes(params) : ['muhurta', 'best', 'idle'],
     queryFn: ({ signal }) => api.muhurta.bestGoodTimes(params as BestGoodTimesParams, { signal }),
-    enabled: params !== null,
+    enabled: params !== null && isAuthenticated && !loading,
     placeholderData: keepPreviousData,
   });
 }

@@ -289,7 +289,7 @@ describe('Find a Good Time', () => {
   describe('month view', () => {
     const grid = () => screen.getByRole('group', { name: 'Days of October 2026' });
 
-    it("shows each day's status for the activity, and opens a day in the day view", async () => {
+    it("shows each day's status and stays in month view until Day is selected", async () => {
       storeSelectedLocation();
       const { router, container } = renderRoute('/good-time?activity=business&view=month&month=2026-10', {
         auth: signedIn(),
@@ -315,8 +315,19 @@ describe('Find a Good Time', () => {
 
       await userEvent.click(days[3]!);
       await waitFor(() => expect(router.state.location.search).toContain('date=2026-10-04'));
-      expect(router.state.location.search).not.toContain('view=month');
+      expect(router.state.location.search).toContain('view=month');
+      expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
+      expect(grid()).toBeInTheDocument();
+      const best = screen.getByRole('complementary', { name: 'Next best times' });
+      await userEvent.click(within(best).getByRole('button', { name: /View .*October 12/ }));
+      expect(router.state.location.search).toContain('date=2026-10-12');
+      expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
+      await userEvent.click(screen.getByRole('radio', { name: 'Day' }));
       expect(screen.getByRole('radio', { name: 'Day' })).toBeChecked();
+      expect(router.state.location.search).not.toContain('view=month');
+      await waitFor(() =>
+        expect(goodTimeRequests().some((url) => url.searchParams.get('date') === '2026-10-12')).toBe(true),
+      );
     });
 
     it('switches between day and month and moves between months', async () => {

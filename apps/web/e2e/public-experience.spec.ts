@@ -20,7 +20,11 @@ test.describe('public home', () => {
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
       .analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
-    expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
+    expect(
+      apiRequests.every(
+        (u) => u.pathname.endsWith('/panchang/today') || u.pathname.endsWith('/locations/resolve'),
+      ),
+    ).toBe(true);
     await expect(page.getByRole('button', { name: 'Register' })).toHaveCount(0);
   });
 
@@ -82,9 +86,11 @@ test.describe('public home', () => {
   test('change tradition → Panchang requested for the new tradition', async ({ page, apiRequests }) => {
     // The tradition selector is not shown on the home page; choose it elsewhere, then return home.
     await withSavedLocation(page);
-    await page.goto('/help');
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await page.getByRole('link', { name: 'Help / FAQ', exact: true }).click();
     await page.getByRole('combobox', { name: 'Tradition' }).selectOption('tamil');
-    await page.goto('/');
+    await page.getByRole('link', { name: "Today's Panchang", exact: true }).click();
     await expect(card(page).getByText('Mixed day')).toBeVisible();
     await expect
       .poll(() =>
@@ -93,7 +99,7 @@ test.describe('public home', () => {
         ),
       )
       .toBe(true);
-    await page.goto('/help');
+    await page.getByRole('link', { name: 'Help / FAQ', exact: true }).click();
     await expect(page.getByRole('combobox', { name: 'Tradition' })).toHaveValue('tamil');
   });
 
@@ -193,9 +199,7 @@ test.describe('calendar (signed in)', () => {
 });
 
 test.describe('find a good time (signed in)', () => {
-  test('month view and next best times: accessible, no horizontal scroll, a day opens from either', async ({
-    page,
-  }) => {
+  test('month view stays selected and precedes other cards on mobile', async ({ page }) => {
     await withSavedLocation(page);
     await page.goto('/good-time?activity=business&view=month&month=2026-10');
     await expect(page.getByRole('heading', { level: 2, name: 'October 2026' })).toBeVisible();
@@ -213,10 +217,20 @@ test.describe('find a good time (signed in)', () => {
 
     await grid.getByRole('button', { name: /^Sunday, October 4,/ }).click();
     await expect(page).toHaveURL(/date=2026-10-04/);
-    await expect(page.getByRole('radio', { name: 'Day' })).toBeChecked();
+    await expect(page.getByRole('radio', { name: 'Month' })).toBeChecked();
+    if (page.viewportSize()!.width < 1024) {
+      const calendarBounds = await page
+        .getByRole('heading', { level: 2, name: 'October 2026' })
+        .boundingBox();
+      const tileBounds = await tile.boundingBox();
+      expect(calendarBounds!.y).toBeLessThan(tileBounds!.y);
+    }
 
     await tile.getByRole('button', { name: /View .*October 12/ }).click();
     await expect(page).toHaveURL(/date=2026-10-12/);
+    await expect(page.getByRole('radio', { name: 'Month' })).toBeChecked();
+    await page.getByRole('radio', { name: 'Day' }).click();
+    await expect(page.getByRole('radio', { name: 'Day' })).toBeChecked();
   });
 });
 

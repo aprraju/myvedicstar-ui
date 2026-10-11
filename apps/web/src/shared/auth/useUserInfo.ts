@@ -12,11 +12,11 @@ import { useAuth } from './useAuth';
  */
 export function useUserInfo(): { userInfo: UserInfo | undefined; loading: boolean } {
   const { api } = useServices();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const query = useQuery({
     queryKey: queryKeys.auth.userInfo(user?.id ?? 'signed-out'),
     queryFn: ({ signal }) => api.auth.userInfo({ signal }),
-    enabled: user !== null,
+    enabled: user !== null && !loading,
     staleTime: Infinity,
     gcTime: Infinity,
     retry: false,

@@ -21,7 +21,7 @@ const TONES: readonly StatusTone[] = ['highly-favorable', 'favorable', 'mixed', 
 
 /**
  * Month view of Find a Good Time: the backend's status of every day for the selected activity, with the best Good
- * Time where there is one (`/muhurta/day-summaries`). Choosing a day opens it in the day view.
+ * Time where there is one (`/muhurta/day-summaries`). Choosing a day preserves the selected planning view.
  */
 export function GoodTimeMonth({
   yearMonth,

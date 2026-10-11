@@ -1,5 +1,6 @@
 import { useId } from 'react';
 
+import { useAuth } from '../../shared/auth';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import styles from './TraditionSelector.module.css';
 import { useTradition, useTraditions } from './TraditionStateProvider';
@@ -10,8 +11,9 @@ import { useTradition, useTraditions } from './TraditionStateProvider';
  */
 export function TraditionSelector({ showHint = false }: { showHint?: boolean }) {
   const { t } = useTranslation();
+  const { isAuthenticated, loading } = useAuth();
   const { tradition, setTradition } = useTradition();
-  const { data, isError, isPending } = useTraditions();
+  const { data, isError, isFetching } = useTraditions();
   const id = useId();
   const hintId = useId();
 
@@ -29,7 +31,8 @@ export function TraditionSelector({ showHint = false }: { showHint?: boolean }) 
         value={tradition}
         onChange={(event) => setTradition(event.target.value)}
         aria-describedby={showHint || isError ? hintId : undefined}
-        aria-busy={isPending || undefined}
+        disabled={!isAuthenticated || loading}
+        aria-busy={isFetching || undefined}
       >
         {!hasCurrent && <option value={tradition}>{tradition}</option>}
         {options.map((option) => (

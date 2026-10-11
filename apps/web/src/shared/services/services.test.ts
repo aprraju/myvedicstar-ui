@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { scenarios } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
 import { createTestConfig, createTestServices } from '../../test/render';
-import { createDisabledAuthClient } from '../auth';
+import { createDisabledAuthClient, createInMemoryAuthClient } from '../auth';
 import { installGlobalErrorHandlers } from '../errors/global-error-handlers';
 import { createServices } from './services';
 
@@ -36,7 +36,7 @@ describe('app services', () => {
 
   it('normalize server failures into application errors', async () => {
     server.use(scenarios.serverError('/traditions'));
-    const { services } = createTestServices();
+    const { services } = createTestServices({ auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     const error = await services.api.traditions.list().catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ApiError);
     expect(error).toMatchObject({ kind: 'server', status: 500, correlationId: 'corr-500' });
@@ -44,7 +44,7 @@ describe('app services', () => {
 
   it('normalize network failures', async () => {
     server.use(scenarios.networkError('/traditions'));
-    const { services } = createTestServices();
+    const { services } = createTestServices({ auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await expect(services.api.traditions.list()).rejects.toMatchObject({ kind: 'network' });
   });
 });

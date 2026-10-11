@@ -3,6 +3,7 @@ import { buildCalendarMonth, panchangLocationParams, type YearMonth } from '@myv
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import { useAuth } from '../../shared/auth';
 import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
@@ -15,6 +16,7 @@ import { useTradition } from '../tradition';
  */
 export function useCalendarMonth(yearMonth: YearMonth) {
   const { api } = useServices();
+  const { isAuthenticated, loading } = useAuth();
   const { location } = useLocationState();
   const { tradition } = useTradition();
   const { language } = useTranslation();
@@ -31,7 +33,7 @@ export function useCalendarMonth(yearMonth: YearMonth) {
       ? queryKeys.panchang.month(year, month, params)
       : ['panchang', 'month', year, month, 'no-location'],
     queryFn: ({ signal }) => api.panchang.month(year, month, params as PanchangParams, { signal }),
-    enabled: params !== null,
+    enabled: params !== null && isAuthenticated && !loading,
   });
 
   const calendar = useMemo(

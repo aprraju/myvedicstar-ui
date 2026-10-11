@@ -100,7 +100,7 @@ export type ApiClient = ReturnType<typeof createApiClient>;
 
 /**
  * Typed endpoints of the MyVedicDay API. Every endpoint sends the signed-in user's access token
- * (`Authorization: Bearer …`) when one is available (`auth: 'optional'`); signed-out visitors call them anonymously.
+ * Only today's Panchang and location resolve allow anonymous requests; all other endpoints require a token.
  * `baseUrl` includes the API version prefix, e.g. `https://api.example.com/api/v1`;
  * endpoint paths come from configuration (see ./endpoints.ts). UI code reaches the backend only through this client.
  */
@@ -141,7 +141,7 @@ export function createApiClient(options: ApiClientOptions) {
       query: { ...panchangQuery(params), ...extra },
       schema: panchangResponseSchema,
       signal: call?.signal,
-      auth: 'optional',
+      auth: operation === 'panchang.today' ? 'optional' : 'required',
     });
 
   return {
@@ -169,7 +169,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { language },
           schema: panchangTraditionsResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** Glossary for a tradition (regional period names) in a language. */
       glossary: (
@@ -182,7 +182,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { tradition: params.tradition, language: params.language },
           schema: glossaryResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
     locations: {
@@ -205,7 +205,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { ...panchangQuery(params), days: params.days },
           schema: festivalsResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
     muhurta: {
@@ -215,7 +215,7 @@ export function createApiClient(options: ApiClientOptions) {
           path: path('muhurtaNakshatras'),
           schema: muhurtaNakshatrasResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** The activity cards for "What are you planning?", in display order. */
       activities: (
@@ -228,7 +228,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { tradition: params.tradition, language: params.language },
           schema: muhurtaActivitiesResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** One day evaluated for an activity. Statuses and Good Times are authoritative: render them as given. */
       goodTimes: (params: GoodTimesParams, call?: CallOptions) =>
@@ -238,7 +238,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: goodTimesQuery(params),
           schema: goodTimesResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** "Why this time?" narrative for the same evaluation (AI when enabled and valid, else template). */
       explanation: (params: GoodTimesParams, call?: CallOptions) =>
@@ -248,7 +248,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: goodTimesQuery(params),
           schema: goodTimeExplanationResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** Day status per date (calendar tiles); `days` 1–366 from `start`. */
       daySummaries: (start: string, days: number, params: DaySummariesParams, call?: CallOptions) =>
@@ -265,7 +265,7 @@ export function createApiClient(options: ApiClientOptions) {
           },
           schema: daySummariesResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       /** The next best Good Times (one per day, best first). Only Good Times: render them as given. */
       bestGoodTimes: (params: BestGoodTimesParams, call?: CallOptions) =>
@@ -282,7 +282,7 @@ export function createApiClient(options: ApiClientOptions) {
           },
           schema: bestGoodTimesResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
     auth: {
@@ -312,7 +312,7 @@ export function createApiClient(options: ApiClientOptions) {
           body: request,
           schema: contactResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
     traditions: {
@@ -323,7 +323,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { language },
           schema: traditionsResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
   };
