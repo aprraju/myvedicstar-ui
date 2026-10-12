@@ -18,6 +18,7 @@ import {
   traditionsResponseSchema,
   userInfoSchema,
 } from '@myvedicstar/contracts';
+import { z } from 'zod';
 
 import {
   type ApiEndpointName,
@@ -332,9 +333,30 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     auth: {
+      /** Records a login audit event using the current account's access token. */
+      login: (call?: CallOptions) =>
+        transport.request({
+          operation: 'auth.login',
+          method: 'POST',
+          path: path('authLogin'),
+          body: {},
+          schema: z.unknown(),
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /** Records logout before the current account's token is discarded. */
+      logout: (call?: CallOptions) =>
+        transport.request({
+          operation: 'auth.logout',
+          method: 'POST',
+          path: path('authLogout'),
+          body: {},
+          schema: z.unknown(),
+          signal: call?.signal,
+          auth: 'required',
+        }),
       /**
-       * Completes sign-in on the Authorize API and returns the signed-in user's profile. A POST because the backend
-       * updates the user record and writes a login audit entry; call it once per session. Requires the access token.
+       * Refreshes and returns the signed-in user's profile; call it once per session. Requires the access token.
        */
       userInfo: (call?: CallOptions) =>
         transport.request({

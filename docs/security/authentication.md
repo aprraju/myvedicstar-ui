@@ -124,6 +124,18 @@ Logout  ──►  local session cleared, then Entra end-session endpoint  ─�
 
 ## Return path safety
 
+The web app attempts `POST /api/v1/auth/login` once when an account session starts and awaits
+`POST /api/v1/auth/logout` before clearing the session and redirecting to the provider. Both requests
+use the active account's bearer token and an empty JSON body. Failed audit requests are reported as
+`auth.auditFailed` metrics without blocking sign-out; they are not retried automatically.
+The profile request remains separate (`POST /api/v1/auth/userinfo`).
+
+The app holds one active account and ignores additional sign-in requests while signed in. Entra
+logout sends the ID token and the token's optional `login_hint` claim as `logout_hint`. Configure
+the `login_hint` optional ID-token claim on the Entra client app registration to suppress the
+provider's account selection prompt, as described in
+[Microsoft's logout guidance](https://learn.microsoft.com/en-us/troubleshoot/entra/entra-id/app-integration/sign-out-of-openid-connect-oauth2-applications-without-user-selection-prompt).
+
 `returnTo` is accepted only as a same-origin relative path (`sanitizeReturnPath`: rejects absolute URLs, `//`,
 backslashes, schemes and control characters). It is validated before starting sign-in **and** again after the
 provider redirects back.

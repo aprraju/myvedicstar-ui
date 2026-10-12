@@ -167,6 +167,16 @@ describe('createOidcAuthClient', () => {
     expect(await client.completeSignIn()).toEqual({ ok: false, reason, returnTo });
   });
 
+  it('passes the active account hint to bypass the logout account chooser', async () => {
+    mocks.manager.getUser.mockResolvedValue(user({ profile: { sub: 'user-1', login_hint: 'opaque-hint' } }));
+    const client = createOidcAuthClient(config, 'https://x.example');
+    await client.signOut();
+    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({
+      id_token_hint: 'id-123',
+      extraQueryParams: { logout_hint: 'opaque-hint' },
+    });
+  });
+
   it('clears the local session and signs out at the provider', async () => {
     mocks.manager.getUser.mockResolvedValue(user());
     const client = createOidcAuthClient(config, 'https://x.example');
@@ -286,6 +296,6 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
   it('ends the Entra session on logout even when no ID token is held', async () => {
     const client = createEntraAuthClient(entra);
     await client.signOut();
-    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith(undefined);
+    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({});
   });
 });

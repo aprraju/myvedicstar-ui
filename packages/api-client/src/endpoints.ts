@@ -48,6 +48,8 @@ export const defaultApiEndpoints = {
    * routes it (development: the Vite dev server proxies `/api/v1/auth` to the Authorize API).
    */
   authUserInfo: '/auth/userinfo',
+  authLogin: '/auth/login',
+  authLogout: '/auth/logout',
   /** Contact Us form submission (POST). */
   contactSubmit: '/contact',
 } as const;
@@ -80,6 +82,8 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   muhurtaDaySummaries: [],
   muhurtaBestGoodTimes: [],
   authUserInfo: [],
+  authLogin: [],
+  authLogout: [],
   contactSubmit: [],
 };
 

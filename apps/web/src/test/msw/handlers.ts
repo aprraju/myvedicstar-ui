@@ -122,6 +122,8 @@ export const handlers = [
     apiRequests.push(new URL(request.url));
     return HttpResponse.json(fixtures.festivals);
   }),
+  http.post(api('/auth/login'), () => new HttpResponse(null, { status: 204 })),
+  http.post(api('/auth/logout'), () => new HttpResponse(null, { status: 204 })),
   http.post(api('/auth/userinfo'), ({ request }) => {
     apiRequests.push(new URL(request.url));
     if (!request.headers.get('Authorization')?.startsWith('Bearer ')) {

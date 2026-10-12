@@ -6,9 +6,9 @@ import { useServices } from '../services/ServicesContext';
 import { useAuth } from './useAuth';
 
 /**
- * The signed-in user's profile from the Authorize API (`POST /auth/userinfo`). The call also completes sign-in on the
- * backend (profile refresh, login audit), so it runs once per signed-in user and session: cached indefinitely, never
- * retried automatically. Undefined while signed out, loading, or if the service is unavailable.
+ * The signed-in user's profile from the Authorize API (`POST /auth/userinfo`), fetched once per signed-in user and
+ * session: cached indefinitely, never retried automatically. Login/logout audits are handled by the auth client.
+ * Undefined while signed out, loading, or if the service is unavailable.
  */
 export function useUserInfo(): { userInfo: UserInfo | undefined; loading: boolean } {
   const { api } = useServices();

@@ -150,6 +150,7 @@ function createClient(settings: OidcClientSettings): AuthClient {
       return renewed && !renewed.expired ? renewed.access_token : null;
     },
     async signIn({ returnTo, intent, provider, loginHint }) {
+      if (state.user) return;
       await manager.signinRedirect({
         state: { returnTo },
         ...(loginHint ? { login_hint: loginHint } : {}),
@@ -177,7 +178,13 @@ function createClient(settings: OidcClientSettings): AuthClient {
       const user = await manager.getUser();
       await endSession();
       // Ends the provider session too, then returns to the post-logout page.
-      await manager.signoutRedirect(user?.id_token ? { id_token_hint: user.id_token } : undefined);
+      const logoutHint = user?.profile.login_hint;
+      await manager.signoutRedirect({
+        ...(user?.id_token ? { id_token_hint: user.id_token } : {}),
+        ...(typeof logoutHint === 'string' && logoutHint
+          ? { extraQueryParams: { logout_hint: logoutHint } }
+          : {}),
+      });
     },
     handleUnauthorized() {
       void endSession();

@@ -18,6 +18,7 @@ import {
 import type { QueryClient } from '@tanstack/react-query';
 import type { Persister } from '@tanstack/react-query-persist-client';
 
+import { withAuthAudit } from '../auth/audited-auth-client';
 import { type AuthClient, createAuthClient } from '../auth/auth-client';
 import { createIndexedDbCacheStorage } from './cache-storage';
 import { createQueryClient } from './query-client';
@@ -109,5 +110,17 @@ export function createServices(config: AppConfig, overrides: ServiceOverrides = 
       ? createCachePersister(createIndexedDbCacheStorage(), config.cache, report)
       : undefined;
   const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
-  return { config, api, auth, analytics, telemetry, queryClient, cachePersister, locationSearch };
+  const auditedAuth = withAuthAudit(auth, api, (operation) =>
+    telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+  );
+  return {
+    config,
+    api,
+    auth: auditedAuth,
+    analytics,
+    telemetry,
+    queryClient,
+    cachePersister,
+    locationSearch,
+  };
 }
