@@ -115,6 +115,12 @@ CORS preflight and rejection of an unauthenticated Today GET request from the si
 - Deep links return `index.html` with 200; missing assets return real 404s; source maps are never published.
 - Built-in Static Web Apps sign-in routes (`/.auth/login/*`) are closed.
 
+Smoke HTTP requests have a 10-second timeout and up to three attempts for network failures, HTTP 429, and
+HTTP 5xx responses. Other HTTP statuses and security/authentication assertions are not bypassed. GitHub Actions
+uploads the verification-only `web-smoke-<run ID>` artifact and adds failed checks to error annotations. The
+summary "FAILED during: Smoke test" identifies the step; the smoke log contains the actual failed assertions.
+A smoke failure occurs after upload, so it does not mean Azure rejected the deployment.
+
 ## Troubleshooting API CORS
 
 A passing OPTIONS preflight is insufficient: the actual API response must also include

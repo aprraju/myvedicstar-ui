@@ -212,9 +212,20 @@ jobs:
 
       - name: Validate, deploy and smoke test
         id: deploy
+        env:
+          WEB_SMOKE_LOG_PATH: web-smoke.log
         run: >-
           bash infrastructure/web/static-web-apps/scripts/deploy.sh --environment "$TARGET_ENVIRONMENT"
           --dist apps/web/dist --env-file "$SETTINGS_FILE"
+
+      - name: Upload smoke verification log
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: web-smoke-${{ github.run_id }}
+          path: web-smoke.log
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Rollback instructions
         if: failure()

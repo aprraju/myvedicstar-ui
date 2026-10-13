@@ -17,6 +17,8 @@ import { parseArgs } from 'node:util';
 
 import { entraIssuer, parseAppConfig } from '@myvedicstar/config';
 
+import { fetchForSmoke } from './smoke-http';
+
 const { values } = parseArgs({
   options: {
     'site-url': { type: 'string' },
@@ -46,8 +48,8 @@ if (!parsed.ok) {
   process.exit(1);
 }
 const config = parsed.config;
-// Today is an explicitly anonymous APIM operation; the traditions catalog requires sign-in.
-const publicApiUrl = new URL(`${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.panchangToday}`);
+// Every application endpoint requires a token; probe rejection without one.
+const protectedApiUrl = new URL(`${config.apiBaseUrl.replace(/\/+$/, '')}${config.endpoints.panchangToday}`);
 for (const [name, value] of Object.entries({
   latitude: '30.63',
   longitude: '-97.68',
@@ -55,7 +57,7 @@ for (const [name, value] of Object.entries({
   tradition: 'all',
   language: 'en',
 })) {
-  publicApiUrl.searchParams.set(name, value);
+  protectedApiUrl.searchParams.set(name, value);
 }
 
 const failures: string[] = [];
@@ -65,7 +67,7 @@ const check = (ok: boolean, message: string) => {
 };
 
 async function get(path: string, init: RequestInit = {}): Promise<Response> {
-  return fetch(`${siteUrl}${path}`, { redirect: 'manual', cache: 'no-store', ...init });
+  return fetchForSmoke(`${siteUrl}${path}`, { redirect: 'manual', cache: 'no-store', ...init });
 }
 
 // 1. Wait for the new release to be served (Static Web Apps propagates content to its edge within a few minutes).
@@ -115,7 +117,12 @@ check(
 // After network calls the script sets process.exitCode and ends normally: process.exit() with fetch connections still
 // open can crash Node on Windows instead of returning the exit code.
 if (live) {
-  await runChecks(siteUrl);
+  try {
+    await runChecks(siteUrl);
+  } catch (error) {
+    console.error(`Smoke test failed: ${error instanceof Error ? error.message : String(error)}`);
+    process.exitCode = 1;
+  }
 } else {
   console.error('Smoke test failed: the deployed content never became visible.');
   process.exitCode = 1;
@@ -126,7 +133,7 @@ async function runChecks(siteUrl: string): Promise<void> {
   const site = new URL(siteUrl);
   if (site.protocol === 'https:') {
     try {
-      const insecure = await fetch(`http://${site.host}/`, { redirect: 'manual' });
+      const insecure = await fetchForSmoke(`http://${site.host}/`, { redirect: 'manual' });
       const location = insecure.headers.get('location') ?? '';
       check(
         [301, 302, 307, 308].includes(insecure.status) && location.startsWith('https://'),
@@ -165,9 +172,9 @@ async function runChecks(siteUrl: string): Promise<void> {
 
   // 5. Backend CORS for this origin.
   if (!values['skip-cors']) {
-    // The home page's public endpoint must allow preflight before any sign-in.
+    // Preflight must succeed without a token so the browser can send authenticated requests.
     try {
-      const preflight = await fetch(publicApiUrl, {
+      const preflight = await fetchForSmoke(protectedApiUrl, {
         method: 'OPTIONS',
         redirect: 'manual',
         headers: {
@@ -192,7 +199,7 @@ async function runChecks(siteUrl: string): Promise<void> {
   // A successful preflight does not guarantee CORS headers on the actual response, especially a 401.
   if (!values['skip-cors']) {
     try {
-      const response = await fetch(publicApiUrl, {
+      const response = await fetchForSmoke(protectedApiUrl, {
         redirect: 'manual',
         headers: { Origin: site.origin },
       });
@@ -212,7 +219,7 @@ async function runChecks(siteUrl: string): Promise<void> {
   if (config.auth.mode === 'entra-external-id') {
     const discovery = `${entraIssuer(config.auth)}/.well-known/openid-configuration`;
     try {
-      const response = await fetch(discovery);
+      const response = await fetchForSmoke(discovery);
       check(response.ok, `Entra External ID discovery document reachable (${response.status})`);
     } catch (error) {
       check(false, `Entra External ID discovery (${error instanceof Error ? error.message : String(error)})`);

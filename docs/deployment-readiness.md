@@ -8,7 +8,7 @@ The web and native applications provide Profile, Settings, and Logout navigation
 
 | Check                                                      | Result                                                                             |
 | ---------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| Frontend shared packages, web, native and deployment tests | 671 passed                                                                         |
+| Frontend shared packages, web, native and deployment tests | 682 passed                                                                         |
 | Web component tests                                        | 229 passed, included above                                                         |
 | Native component tests                                     | 41 passed, included above                                                          |
 | MyVedicStar solution                                       | 182 passed; PostgreSQL tests enabled                                               |
@@ -43,3 +43,35 @@ All application requests now require a signed-in access token, including Today a
 The public site currently links to `/favicon.svg`, which returns HTTP 200. No application source constructs the reported nested External ID favicon URL; the initiating request remains unconfirmed.
 
 Follow-up verification passed: 10 Profile/Settings web tests, 48 API-client tests, 65 header/provider regression tests, two native Settings tests, and six browser checks including narrow layouts and saved defaults in the header. Guest `/?sid=...` navigation has a no-API regression case; the reported localhost HTTPS error text is still unknown.
+
+## Post-deployment smoke correction
+
+The supplied full failure log establishes the cause: an unauthenticated Today request returned HTTP 200,
+while the security gate correctly required 401. That deployment had an authorization mismatch; retrying a
+200 response or accepting it would not fix the requirement. The source Today controller requires authorization,
+and the APIM policy validates JWTs unconditionally with anonymous operations disabled.
+
+A subsequent read-only check of production returned 401 with the required CORS header and passed the full
+smoke test (`.verification/auth-mismatch-live.log`). Two transient network retries occurred before that
+successful response, independently confirming the usefulness of the bounded retry handling. The supplied
+log does not identify whether the earlier 200 originated from an outdated gateway policy, backend release,
+or another serving layer.
+
+Roll out the backend and APIM authorization changes before the web deployment. Keep the smoke requirement
+at 401; do not disable it or accept 200. Confirm the missing-token check on the deployed API before retrying
+a web release.
+
+Smoke requests now use bounded 10-second timeouts and retry network errors, 429, and 5xx responses up to three
+times. Permanent HTTP failures and security/authentication assertions still fail. Exhausted retries identify
+the endpoint without logging query values. The workflow retains a verification-only smoke artifact and the
+deployment wrapper annotates failed checks explicitly. A stubbed upload test verified failure exit status,
+annotations, retained output, and rollback guidance without Azure calls.
+
+Verification logs for this correction are under `.verification/smoke-fix-*`: all 52 deployment tests, all 630
+application/shared frontend tests, and 91 browser cases passed (five intentional PKCE skips). One browser
+worker failed before starting a test; that case passed with one worker. Deployment CLI tests require local
+subprocess/OS access: the restricted run failed to launch those scripts, and the unrestricted rerun passed.
+The final complete `npm run check` passed with the required subprocess access; its log is
+`.verification/smoke-fix-final-check.log`. The unused-code check also passed. The production deployment
+command passed its dry run. No upload or infrastructure apply was performed by
+this correction; the existing live release also passed the updated smoke script.

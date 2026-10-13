@@ -49,6 +49,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 CURRENT_STEP="startup"
+SMOKE_LOG=""
 in_ci() { [[ "${GITHUB_ACTIONS:-}" == "true" ]]; }
 step() {
   CURRENT_STEP="$1"
@@ -61,7 +62,12 @@ on_error() {
   echo >&2
   echo "Deployment to '${ENVIRONMENT:-?}' FAILED during: ${CURRENT_STEP} (exit ${code})." >&2
   case "$CURRENT_STEP" in
-    Smoke*) echo "The new release IS deployed but did not verify. Roll back by redeploying the last good build:" >&2
+    Smoke*) if [[ -n "$SMOKE_LOG" && -f "$SMOKE_LOG" ]]; then
+              while IFS= read -r problem; do
+                if in_ci; then echo "::error title=Smoke verification::$problem"; else echo "$problem" >&2; fi
+              done < <(grep -E '^  FAIL|^Smoke test failed' "$SMOKE_LOG" || true)
+            fi
+            echo "The new release IS deployed but did not verify. Roll back by redeploying the last good build:" >&2
             echo "  GitHub → Actions → 'Web' → Run workflow (main, artifact run ID of the last good run)." >&2 ;;
     Deploy*) echo "The previous release is still being served (Static Web Apps switches content atomically)." >&2 ;;
     *) echo "Nothing was deployed." >&2 ;;
@@ -94,7 +100,11 @@ fi
 
 STAGE="$(mktemp -d)"
 DEPLOY_LOG=""
-trap 'rm -rf "$STAGE" "$DEPLOY_LOG"' EXIT
+cleanup() {
+  rm -rf "$STAGE" "$DEPLOY_LOG"
+  if [[ -z "${WEB_SMOKE_LOG_PATH:-}" && -n "$SMOKE_LOG" ]]; then rm -f "$SMOKE_LOG"; fi
+}
+trap cleanup EXIT
 
 step "Validate build artifact ($DIST)"
 npx --no-install tsx "$SCRIPT_DIR/validate-build.ts" "$DIST"
@@ -174,7 +184,9 @@ if [[ "$SMOKE_TEST" == "true" ]]; then
   step "Smoke test ${MVS_SITE_URL}"
   smoke_args=(--site-url "$MVS_SITE_URL" --staged "$STAGE")
   [[ "$CORS_CHECK" == "true" ]] || smoke_args+=(--skip-cors)
-  npx --no-install tsx "$SCRIPT_DIR/smoke-test.ts" "${smoke_args[@]}"
+  # Keep only verification output: deployment credentials never enter this diagnostic artifact.
+  SMOKE_LOG="${WEB_SMOKE_LOG_PATH:-$(mktemp)}"
+  npx --no-install tsx "$SCRIPT_DIR/smoke-test.ts" "${smoke_args[@]}" 2>&1 | tee "$SMOKE_LOG"
   end_step
 fi
 
