@@ -12,6 +12,28 @@ import { renderRoute } from '../../test/render';
 const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Token Name' } });
 
 describe('Profile menu', () => {
+  it('uses the minimal userinfo response for two profile lines and the dashboard greeting', async () => {
+    server.use(
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
+        HttpResponse.json({
+          id: '30b36ac7-c687-452a-b5f6-06f62139dbca',
+          name: 'Raju,Bhupathi',
+          email: 'aprraju@gmail.com',
+        }),
+      ),
+    );
+    renderRoute('/dashboard', { auth: signedIn() });
+    expect(await screen.findByText('Namaste, Raju,Bhupathi')).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
+    const banner = within(screen.getByRole('banner'));
+    const name = await banner.findByText('Raju,Bhupathi');
+    const email = banner.getByText('aprraju@gmail.com');
+    expect(name.tagName).toBe('P');
+    expect(email.tagName).toBe('P');
+    expect(name.nextElementSibling).toBe(email);
+    expect(banner.queryByText('Token Name')).not.toBeInTheDocument();
+  });
+
   it('keeps the identity-provider email visible when userinfo has no name or email', async () => {
     server.use(
       http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
