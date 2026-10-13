@@ -21,6 +21,31 @@ function setup() {
 }
 
 describe('authentication audits', () => {
+  it('fails the callback when the login API rejects the token instead of restarting sign-in', async () => {
+    const client = createInMemoryAuthClient();
+    client.completeSignIn = async () => {
+      await client.signIn({ intent: 'login', returnTo: '/dashboard' });
+      return { ok: true, returnTo: '/dashboard' };
+    };
+    const api = createApiClient({
+      baseUrl: 'https://api.example/api/v1',
+      getAccessToken: client.getAccessToken,
+      onUnauthorized: client.handleUnauthorized,
+      fetchImpl: vi.fn(async () => new Response(null, { status: 401 })),
+    });
+    const failure = vi.fn();
+    const auth = withAuthAudit(client, api, failure);
+
+    expect(await auth.completeSignIn()).toEqual({
+      ok: false,
+      reason: 'failed',
+      returnTo: '/dashboard',
+    });
+    expect(auth.getState().user).toBeNull();
+    expect(failure).toHaveBeenCalledWith('login');
+    expect(client.requests).toHaveLength(1);
+  });
+
   it('audits each login once and logs out with a token before clearing the account', async () => {
     const { auth, requests } = setup();
     await auth.signIn({ intent: 'login', returnTo: '/' });

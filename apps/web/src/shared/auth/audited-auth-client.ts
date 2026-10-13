@@ -32,7 +32,14 @@ export function withAuthAudit(
     },
     async completeSignIn() {
       const result = await client.completeSignIn();
-      if (result.ok) await login;
+      if (result.ok) {
+        await login;
+        // A rejected API token can clear the session during the login audit.
+        // Do not enter a protected route, which would immediately start another redirect.
+        if (!client.getState().user) {
+          return { ok: false, reason: 'failed', returnTo: result.returnTo };
+        }
+      }
       return result;
     },
     signOut() {
