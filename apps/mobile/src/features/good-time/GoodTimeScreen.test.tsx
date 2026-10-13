@@ -71,7 +71,7 @@ describe('Find a Good Time (mobile)', () => {
     expect(first).toBeTruthy();
     expect(screen.getByLabelText(/^Option 2\. .*October 4/)).toBeTruthy();
     expect(screen.getByLabelText(/^Option 3\. .*October 12/)).toBeTruthy();
-    const best = apiRequests.find((url) => url.pathname.endsWith('/muhurta/good-times/best'))!;
+    const best = apiRequests.filter((url) => url.pathname.endsWith('/muhurta/good-times/best')).at(-1)!;
     expect(best.searchParams.get('activity')).toBe('business');
 
     await fireEvent.press(screen.getByRole('button', { name: /View .*October 4/ }));

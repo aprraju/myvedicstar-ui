@@ -1,10 +1,8 @@
-import type { MessageKey } from '@myvedicstar/localization';
 import type { ComponentType } from 'react';
 import { createBrowserRouter, type RouteObject } from 'react-router';
 
 import type { RouteHandle } from '../../shared/accessibility/usePageTitle';
 import { routes } from '../../shared/routing/paths';
-import { ComingSoonPage } from '../pages/ComingSoonPage';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { RouteErrorPage } from '../pages/RouteErrorPage';
 import { StartupFallback } from '../pages/StartupFallback';
@@ -23,8 +21,6 @@ const protectedPage = (load: () => Promise<ComponentType>) => async () => {
     ),
   };
 };
-
-const comingSoon = (titleKey: MessageKey) => async () => () => <ComingSoonPage titleKey={titleKey} />;
 
 /**
  * Route table. Each page is a lazily loaded chunk, so the first load only downloads the shell and the current page.
@@ -107,7 +103,12 @@ export const appRoutes: RouteObject[] = [
         // Opened from the account menu; settings ship in Phase 5.
         path: routes.settings,
         handle: handle('Settings', 'nav.settings'),
-        lazy: protectedPage(comingSoon('nav.settings')),
+        lazy: protectedPage(async () => (await import('../../features/settings/SettingsPage')).SettingsPage),
+      },
+      {
+        path: routes.profile,
+        handle: handle('Profile', 'nav.profile'),
+        lazy: protectedPage(async () => (await import('../../features/profile/ProfilePage')).ProfilePage),
       },
       {
         path: routes.festivals,

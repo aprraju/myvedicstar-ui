@@ -9,6 +9,7 @@ import tseslint from 'typescript-eslint';
 export default tseslint.config(
   {
     ignores: [
+      '.verification/**',
       '**/node_modules/**',
       '**/dist/**',
       '**/coverage/**',

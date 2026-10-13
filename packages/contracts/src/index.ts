@@ -6,4 +6,6 @@ export * from './muhurta';
 export * from './panchang';
 export * from './primitives';
 export * from './problem-details';
+export * from './profile';
+export * from './settings';
 export * from './traditions';

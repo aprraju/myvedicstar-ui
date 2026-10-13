@@ -70,6 +70,12 @@ export function ProfileMenu() {
         </div>
         <ul className={styles.options}>
           <li>
+            <Link to={routes.profile} className={styles.option} onClick={() => setOpen(false)}>
+              <Icon name="user" size={18} />
+              {t('nav.profile')}
+            </Link>
+          </li>
+          <li>
             <Link to={routes.settings} className={styles.option} onClick={() => setOpen(false)}>
               <Icon name="settings" size={18} />
               {t('profile.settings')}

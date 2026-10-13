@@ -1,0 +1,70 @@
+.page {
+  max-inline-size: 52rem;
+  margin-inline: auto;
+  padding: var(--space-lg);
+}
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  display: grid;
+  gap: var(--space-lg);
+}
+.fields {
+  border: 0;
+  padding: 0;
+  margin: 0 0 var(--space-lg);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+.field {
+  display: grid;
+  align-content: start;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+}
+.field label {
+  font-weight: var(--font-weight-semibold);
+}
+.field input,
+.field select {
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  padding: var(--space-sm);
+  font: inherit;
+}
+.field [aria-invalid='true'] {
+  border-color: var(--color-error);
+}
+.field p {
+  color: var(--color-error);
+}
+.suggestions {
+  display: grid;
+  gap: var(--space-xs);
+}
+.suggestions button {
+  text-align: start;
+  padding: var(--space-sm);
+  min-block-size: 2.75rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+@media (max-width: 40rem) {
+  .fields {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: var(--space-md);
+  }
+}

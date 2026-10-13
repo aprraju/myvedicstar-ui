@@ -13,6 +13,9 @@ describe('toSelectedLocation', () => {
       longitude: -97.74,
       timeZone: 'America/Chicago',
       countryCode: 'US',
+      city: 'Austin',
+      region: 'Texas',
+      country: 'United States',
       source: 'search',
     });
   });

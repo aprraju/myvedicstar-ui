@@ -5,7 +5,7 @@ import {
   type TelemetryClient,
   type TelemetrySink,
 } from '@myvedicstar/analytics';
-import { type ApiClient, createApiClient } from '@myvedicstar/api-client';
+import { type ApiClient, createApiClient, createSessionAudit } from '@myvedicstar/api-client';
 import type { AppConfig } from '@myvedicstar/config';
 import {
   type CacheReporter,
@@ -78,7 +78,38 @@ export function createMobileServices(
       : undefined;
 
   const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
-  return { config, api, auth, analytics, telemetry, queryClient, cachePersister, locationSearch };
+  const audit = createSessionAudit(auth, api, (operation) =>
+    telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+  );
+  let signingOut: Promise<void> | null = null;
+  const auditedAuth: AuthClient = {
+    ...auth,
+    getState: audit.getState,
+    subscribe: audit.subscribe,
+    async signIn(request) {
+      await auth.signIn(request);
+      await audit.waitForLogin();
+    },
+    signOut() {
+      signingOut ??= (async () => {
+        await audit.auditLogout();
+        await auth.signOut();
+      })().finally(() => {
+        signingOut = null;
+      });
+      return signingOut;
+    },
+  };
+  return {
+    config,
+    api,
+    auth: auditedAuth,
+    analytics,
+    telemetry,
+    queryClient,
+    cachePersister,
+    locationSearch,
+  };
 }
 
 const ServicesContext = createContext<MobileServices | null>(null);

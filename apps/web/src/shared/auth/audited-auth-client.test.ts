@@ -21,6 +21,22 @@ function setup() {
 }
 
 describe('authentication audits', () => {
+  it('keeps account consumers loading until backend registration completes', async () => {
+    const { auth, fetchImpl } = setup();
+    let finish!: (response: Response) => void;
+    fetchImpl.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const signingIn = auth.signIn({ intent: 'login', returnTo: '/settings' });
+    await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1));
+    expect(auth.getState()).toEqual({ status: 'loading', user: null });
+    finish(new Response(null, { status: 204 }));
+    await signingIn;
+    expect(auth.getState()).toMatchObject({ status: 'ready', user: { id: 'mock-user' } });
+  });
   it('fails the callback when the login API rejects the token instead of restarting sign-in', async () => {
     const client = createInMemoryAuthClient();
     client.completeSignIn = async () => {

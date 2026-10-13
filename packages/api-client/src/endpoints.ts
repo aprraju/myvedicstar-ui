@@ -30,6 +30,9 @@ export const defaultApiEndpoints = {
   locationsPostal: '/locations/postal',
   locationsReverse: '/locations/reverse',
   locationsTimezone: '/locations/timezone',
+  locationsCountries: '/locations/countries',
+  locationsRegions: '/locations/regions',
+  locationsAddressCities: '/locations/address-cities',
   /** GetUpcomingFestivals */
   festivalsUpcoming: '/festivals/upcoming',
   /** GetMuhurtaActivities */
@@ -50,6 +53,11 @@ export const defaultApiEndpoints = {
   authUserInfo: '/auth/userinfo',
   authLogin: '/auth/login',
   authLogout: '/auth/logout',
+  authProfile: '/auth/profile',
+  authProfileSync: '/auth/profile/sync',
+  userSettings: '/settings',
+  savedLocations: '/settings/locations',
+  savedLocation: '/settings/locations/{locationId}',
   /** Contact Us form submission (POST). */
   contactSubmit: '/contact',
 } as const;
@@ -74,6 +82,9 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   locationsPostal: [],
   locationsReverse: [],
   locationsTimezone: [],
+  locationsCountries: [],
+  locationsRegions: [],
+  locationsAddressCities: [],
   festivalsUpcoming: [],
   muhurtaActivities: [],
   muhurtaNakshatras: [],
@@ -84,6 +95,11 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   authUserInfo: [],
   authLogin: [],
   authLogout: [],
+  authProfile: [],
+  authProfileSync: [],
+  userSettings: [],
+  savedLocations: [],
+  savedLocation: ['locationId'],
   contactSubmit: [],
 };
 

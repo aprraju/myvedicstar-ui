@@ -124,6 +124,15 @@ export const handlers = [
   }),
   http.post(api('/auth/login'), () => new HttpResponse(null, { status: 204 })),
   http.post(api('/auth/logout'), () => new HttpResponse(null, { status: 204 })),
+  http.get(api('/settings'), () =>
+    HttpResponse.json({
+      defaultTradition: null,
+      defaultLocationId: null,
+      defaultLocation: null,
+      revision: 0,
+    }),
+  ),
+  http.get(api('/settings/locations'), () => HttpResponse.json([])),
   http.post(api('/auth/userinfo'), ({ request }) => {
     apiRequests.push(new URL(request.url));
     if (!request.headers.get('Authorization')?.startsWith('Bearer ')) {

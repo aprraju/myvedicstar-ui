@@ -49,41 +49,50 @@ export function fakeFetch(override?: Responder): typeof fetch {
       /hyderabad/i.test(url.searchParams.get('place') ?? '');
     const response =
       override?.(url) ??
-      (url.pathname.endsWith('/muhurta/activities')
-        ? { status: 200, body: fixtures.muhurta.activities }
-        : url.pathname.endsWith('/muhurta/good-times/best')
-          ? {
-              status: 200,
-              body:
-                url.searchParams.get('activity') === 'other'
-                  ? fixtures.muhurta.best.austinOther
-                  : fixtures.muhurta.best.austinBusiness,
-            }
-          : url.pathname.endsWith('/muhurta/day-summaries')
-            ? {
-                status: 200,
-                body:
-                  url.searchParams.get('activity') === 'general'
-                    ? fixtures.muhurta.daySummaries
-                    : fixtures.muhurta.daySummariesBusiness,
-              }
-            : url.pathname.endsWith('/muhurta/good-times')
-              ? { status: 200, body: goodTimesFor(url, Boolean(hyderabadRequested)) }
-              : url.pathname.endsWith('/traditions')
-                ? { status: 200, body: fixtures.traditions }
-                : url.pathname.endsWith('/locations/resolve')
+      (url.pathname.endsWith('/settings')
+        ? {
+            status: 200,
+            body: { defaultTradition: null, defaultLocationId: null, defaultLocation: null, revision: 0 },
+          }
+        : url.pathname.endsWith('/settings/locations')
+          ? { status: 200, body: [] }
+          : url.pathname.endsWith('/auth/userinfo')
+            ? { status: 200, body: fixtures.userInfo }
+            : url.pathname.endsWith('/muhurta/activities')
+              ? { status: 200, body: fixtures.muhurta.activities }
+              : url.pathname.endsWith('/muhurta/good-times/best')
+                ? {
+                    status: 200,
+                    body:
+                      url.searchParams.get('activity') === 'other'
+                        ? fixtures.muhurta.best.austinOther
+                        : fixtures.muhurta.best.austinBusiness,
+                  }
+                : url.pathname.endsWith('/muhurta/day-summaries')
                   ? {
                       status: 200,
-                      body: hyderabadRequested
-                        ? fixtures.location.hyderabadCoordinates
-                        : fixtures.location.austin,
+                      body:
+                        url.searchParams.get('activity') === 'general'
+                          ? fixtures.muhurta.daySummaries
+                          : fixtures.muhurta.daySummariesBusiness,
                     }
-                  : {
-                      status: 200,
-                      body: hyderabadRequested
-                        ? fixtures.panchang.hyderabadAll
-                        : fixtures.panchang.austinTelugu,
-                    });
+                  : url.pathname.endsWith('/muhurta/good-times')
+                    ? { status: 200, body: goodTimesFor(url, Boolean(hyderabadRequested)) }
+                    : url.pathname.endsWith('/traditions')
+                      ? { status: 200, body: fixtures.traditions }
+                      : url.pathname.endsWith('/locations/resolve')
+                        ? {
+                            status: 200,
+                            body: hyderabadRequested
+                              ? fixtures.location.hyderabadCoordinates
+                              : fixtures.location.austin,
+                          }
+                        : {
+                            status: 200,
+                            body: hyderabadRequested
+                              ? fixtures.panchang.hyderabadAll
+                              : fixtures.panchang.austinTelugu,
+                          });
     return new Response(JSON.stringify(response.body), {
       status: response.status,
       headers: { 'Content-Type': response.status >= 400 ? 'application/problem+json' : 'application/json' },

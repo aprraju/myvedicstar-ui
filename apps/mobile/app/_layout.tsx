@@ -43,6 +43,8 @@ function ThemedStack() {
         }}
       >
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="profile" options={{ headerShown: true, title: t('nav.profile') }} />
+        <Stack.Screen name="settings" options={{ headerShown: true, title: t('nav.settings') }} />
         <Stack.Screen
           name="login"
           options={{ presentation: 'modal', headerShown: true, title: t('auth.login') }}

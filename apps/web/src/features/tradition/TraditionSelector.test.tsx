@@ -30,11 +30,13 @@ describe('TraditionSelector', () => {
     expect(select).toHaveAccessibleDescription(/doesn’t depend on where you are/);
   });
 
-  it('remembers the choice', async () => {
+  it('keeps signed-in choices temporary until Settings is saved', async () => {
     renderWithProviders(<TraditionSelector />, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(8));
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Tradition' }), 'tamil');
-    expect(window.localStorage.getItem('mvs.tradition')).toBe('"tamil"');
+    expect(screen.getByRole('combobox', { name: 'Tradition' })).toHaveValue('tamil');
+    expect(window.localStorage.getItem('mvs.tradition')).toBeNull();
+    expect(apiRequests.some((url) => url.pathname.endsWith('/settings') && url.search)).toBe(false);
   });
 
   it('keeps working when the list cannot be loaded', async () => {

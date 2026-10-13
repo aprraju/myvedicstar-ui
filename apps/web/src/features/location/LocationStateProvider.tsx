@@ -6,6 +6,7 @@ import {
   type SelectedLocation,
   selectedLocationSchema,
 } from '@myvedicstar/domain-models';
+import { toAccountLocation, useAccountSettings, useSavedLocations } from '@myvedicstar/query-cache';
 import {
   createContext,
   type ReactNode,
@@ -18,6 +19,7 @@ import {
 } from 'react';
 import { z } from 'zod';
 
+import { useAuth } from '../../shared/auth';
 import { useServices } from '../../shared/services/ServicesContext';
 import { preferenceStorage } from '../../shared/storage/preference-storage';
 import {
@@ -43,6 +45,9 @@ interface LocationContextValue {
   detecting: boolean;
   detectError: DetectError | null;
   select(location: SelectedLocation): void;
+  applyDefault(location: SelectedLocation | null): void;
+  savingError: boolean;
+  retrySave(): void;
   removeRecent(id: string): void;
   detectCurrentLocation(): Promise<boolean>;
   dialogOpen: boolean;
@@ -67,6 +72,14 @@ export function LocationStateProvider({
   geolocation?: GeolocationProvider;
 }) {
   const { api, config, locationSearch } = useServices();
+  const { user } = useAuth();
+  const userId = user?.id;
+  const { query: accountSettings } = useAccountSettings(api, userId);
+  const saved = useSavedLocations(api, userId);
+  const addSaved = saved.add.mutate;
+  const deleteSaved = saved.remove.mutate;
+  const defaultsApplied = useRef<string | undefined>(undefined);
+  const anonymous = useRef<SelectedLocation | null>(readStored(KEYS.selected));
   const [location, setLocation] = useState<SelectedLocation | null>(() => readStored(KEYS.selected));
   const [recent, setRecent] = useState<SelectedLocation[]>(
     () =>
@@ -82,6 +95,13 @@ export function LocationStateProvider({
     (next: SelectedLocation) => {
       choice.current += 1;
       setLocation(next);
+      if (userId) {
+        defaultsApplied.current = userId;
+        addSaved(next);
+        setDetectError(null);
+        return;
+      }
+      anonymous.current = next;
       setDetectError(null);
       preferenceStorage.write(KEYS.selected, next);
       setRecent((current) => {
@@ -90,16 +110,27 @@ export function LocationStateProvider({
         return updated;
       });
     },
-    [config.locationSearch.recentLimit],
+    [config.locationSearch.recentLimit, userId, addSaved],
   );
 
-  const removeRecent = useCallback((id: string) => {
-    setRecent((current) => {
-      const updated = current.filter((l) => l.id !== id);
-      preferenceStorage.write(KEYS.recent, updated);
-      return updated;
-    });
-  }, []);
+  const removeRecent = useCallback(
+    (id: string) => {
+      if (userId) {
+        deleteSaved(id, {
+          onSuccess: () => {
+            if (accountSettings.data?.defaultLocationId === id) setLocation(anonymous.current);
+          },
+        });
+        return;
+      }
+      setRecent((current) => {
+        const updated = current.filter((l) => l.id !== id);
+        preferenceStorage.write(KEYS.recent, updated);
+        return updated;
+      });
+    },
+    [userId, deleteSaved, accountSettings.data?.defaultLocationId],
+  );
 
   const detect = useCallback(
     async (automatic: boolean): Promise<boolean> => {
@@ -150,10 +181,48 @@ export function LocationStateProvider({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!userId) {
+      if (defaultsApplied.current) setLocation(anonymous.current);
+      defaultsApplied.current = undefined;
+      return;
+    }
+    if (defaultsApplied.current === userId || !accountSettings.isSuccess) return;
+    defaultsApplied.current = userId;
+    if (accountSettings.data.defaultLocation)
+      setLocation(toAccountLocation(accountSettings.data.defaultLocation));
+  }, [userId, accountSettings.isSuccess, accountSettings.data]);
+
+  const accountRecent = userId ? (saved.query.data ?? []).map(toAccountLocation) : recent;
+  const applyDefault = useCallback(
+    (next: SelectedLocation | null) => {
+      defaultsApplied.current = userId;
+      setLocation(next);
+    },
+    [userId],
+  );
+  const savingError = saved.add.isError || saved.remove.isError || (!!userId && saved.query.isError);
+  const retrySave = useCallback(() => {
+    if (saved.add.isError && saved.add.variables) addSaved(saved.add.variables);
+    else if (saved.remove.isError && saved.remove.variables) deleteSaved(saved.remove.variables);
+    else void saved.query.refetch();
+  }, [
+    saved.add.isError,
+    saved.add.variables,
+    saved.remove.isError,
+    saved.remove.variables,
+    saved.query,
+    addSaved,
+    deleteSaved,
+  ]);
+
   const value = useMemo<LocationContextValue>(
     () => ({
       location,
-      recent,
+      recent: accountRecent,
+      applyDefault,
+      savingError,
+      retrySave,
       detecting,
       detectError,
       select,
@@ -163,7 +232,19 @@ export function LocationStateProvider({
       openDialog: () => setDialogOpen(true),
       closeDialog: () => setDialogOpen(false),
     }),
-    [location, recent, detecting, detectError, select, removeRecent, detect, dialogOpen],
+    [
+      location,
+      accountRecent,
+      applyDefault,
+      savingError,
+      retrySave,
+      detecting,
+      detectError,
+      select,
+      removeRecent,
+      detect,
+      dialogOpen,
+    ],
   );
 
   return <LocationContext.Provider value={value}>{children}</LocationContext.Provider>;

@@ -54,6 +54,9 @@ export function toSelectedLocation(
     longitude,
     timeZone: resolved.timeZone,
     countryCode: place?.countryCode,
+    city: place?.city,
+    region: place?.state ?? undefined,
+    country: place?.country,
     source,
   };
 }

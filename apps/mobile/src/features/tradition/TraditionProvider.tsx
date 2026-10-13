@@ -1,9 +1,19 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { queryKeys } from '@myvedicstar/api-client';
+import { useAccountSettings } from '@myvedicstar/query-cache';
 import { scopedKey } from '@myvedicstar/query-cache';
 import { traditionKeySchema } from '@myvedicstar/validation';
 import { useQuery } from '@tanstack/react-query';
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useAuth } from '../../shared/auth';
@@ -19,12 +29,18 @@ interface TraditionContextValue {
   /** Tradition key sent to the backend. Independent of location — never inferred from GPS. */
   tradition: string;
   setTradition(key: string): void;
+  applyDefault(key: string): void;
 }
 
 const TraditionContext = createContext<TraditionContextValue | null>(null);
 
 export function TraditionProvider({ children }: { children: ReactNode }) {
-  const { config } = useServices();
+  const { config, api } = useServices();
+  const { user } = useAuth();
+  const userId = user?.id;
+  const { query: defaults } = useAccountSettings(api, userId);
+  const applied = useRef<string | undefined>(undefined);
+  const anonymous = useRef(config.defaultTradition);
   const [tradition, setState] = useState(config.defaultTradition);
 
   useEffect(() => {
@@ -33,16 +49,48 @@ export function TraditionProvider({ children }: { children: ReactNode }) {
         const parsed = traditionKeySchema.safeParse(v);
         return parsed.success ? parsed.data : undefined;
       })
-      .then((stored) => stored && setState(stored));
+      .then((stored) => {
+        if (stored) {
+          anonymous.current = stored;
+          if (!applied.current) setState(stored);
+        }
+      });
   }, []);
 
-  const setTradition = useCallback((key: string) => {
-    if (!traditionKeySchema.safeParse(key).success) return;
-    setState(key);
-    void preferenceStorage.write(STORAGE_KEY, key);
-  }, []);
-
-  const value = useMemo(() => ({ tradition, setTradition }), [tradition, setTradition]);
+  const setTradition = useCallback(
+    (key: string) => {
+      if (!traditionKeySchema.safeParse(key).success) return;
+      setState(key);
+      if (userId) {
+        applied.current = userId;
+        return;
+      }
+      anonymous.current = key;
+      void preferenceStorage.write(STORAGE_KEY, key);
+    },
+    [userId],
+  );
+  useEffect(() => {
+    if (!userId) {
+      if (applied.current) setState(anonymous.current);
+      applied.current = undefined;
+      return;
+    }
+    if (applied.current === userId || !defaults.isSuccess) return;
+    applied.current = userId;
+    if (defaults.data.defaultTradition) setState(defaults.data.defaultTradition);
+  }, [userId, defaults.isSuccess, defaults.data]);
+  const applyDefault = useCallback(
+    (key: string) => {
+      applied.current = userId;
+      setState(key);
+    },
+    [userId],
+  );
+  const value = useMemo(
+    () => ({ tradition, setTradition, applyDefault }),
+    [tradition, setTradition, applyDefault],
+  );
   return <TraditionContext.Provider value={value}>{children}</TraditionContext.Provider>;
 }
 

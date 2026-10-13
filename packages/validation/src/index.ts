@@ -7,3 +7,4 @@ export * from './contact';
 export * from './identity';
 export * from './location';
 export * from './preferences';
+export * from './profile';

@@ -1,4 +1,4 @@
-import type { ApiClient } from '@myvedicstar/api-client';
+import { type ApiClient, createSessionAudit } from '@myvedicstar/api-client';
 
 import type { AuthClient } from './auth-client';
 
@@ -8,32 +8,23 @@ export function withAuthAudit(
   api: ApiClient,
   reportFailure: (operation: 'login' | 'logout') => void,
 ): AuthClient {
-  let accountId: string | null = null;
-  let login: Promise<unknown> = Promise.resolve();
+  const audit = createSessionAudit(client, api, reportFailure);
   let signingOut: Promise<void> | null = null;
-  const auditLogin = () => {
-    const state = client.getState();
-    if (state.status === 'loading') return;
-    const nextId = state.user?.id ?? null;
-    if (nextId === accountId) return;
-    accountId = nextId;
-    if (nextId) login = api.auth.login().catch(() => reportFailure('login'));
-  };
-  client.subscribe(auditLogin);
-  auditLogin();
 
   return {
     ...client,
+    getState: audit.getState,
+    subscribe: audit.subscribe,
     async signIn(request) {
       // The app holds a single active account. Switching requires signing out first.
       if (client.getState().user) return;
       await client.signIn(request);
-      await login;
+      await audit.waitForLogin();
     },
     async completeSignIn() {
       const result = await client.completeSignIn();
       if (result.ok) {
-        await login;
+        await audit.waitForLogin();
         // A rejected API token can clear the session during the login audit.
         // Do not enter a protected route, which would immediately start another redirect.
         if (!client.getState().user) {
@@ -45,14 +36,7 @@ export function withAuthAudit(
     signOut() {
       if (signingOut) return signingOut;
       signingOut = (async () => {
-        await login;
-        if (client.getState().user) {
-          try {
-            await api.auth.logout();
-          } catch {
-            reportFailure('logout');
-          }
-        }
+        await audit.auditLogout();
         await client.signOut();
       })().finally(() => {
         signingOut = null;

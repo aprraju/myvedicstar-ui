@@ -37,7 +37,7 @@ export function LocationSheet() {
     setHasSearch(false);
     closeSheet();
   };
-  const { sheetOpen, closeSheet, select } = useLocationState();
+  const { sheetOpen, closeSheet, select, savingError, retrySave } = useLocationState();
   const choose = (location: SelectedLocation) => {
     select(location);
     close();
@@ -55,6 +55,14 @@ export function LocationSheet() {
       )}
       {sheetOpen && <Coordinates onChoose={choose} />}
       {!hasSearch && <Recent onChoose={choose} />}
+      {savingError && (
+        <>
+          <Notice tone="error">
+            Saved locations could not be updated. Your current selection is still available.
+          </Notice>
+          <Button label="Retry saved locations" onPress={retrySave} />
+        </>
+      )}
     </Sheet>
   );
 }

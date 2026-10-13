@@ -22,7 +22,7 @@ import { type DetectError, useLocationState } from './LocationStateProvider';
 export function LocationDialog() {
   const { t } = useTranslation();
   const { config } = useServices();
-  const { dialogOpen, closeDialog } = useLocationState();
+  const { dialogOpen, closeDialog, savingError, retrySave } = useLocationState();
   return (
     <Dialog
       open={dialogOpen}
@@ -31,6 +31,12 @@ export function LocationDialog() {
       description={t(config.locationSearch.enabled ? 'locationSearch.privacy' : 'location.privacy')}
     >
       <LocationDialogContent onDone={closeDialog} />
+      {savingError && (
+        <div role="alert">
+          <p>Saved locations could not be updated. Your current selection is still available.</p>
+          <Button onClick={retrySave}>Retry saved locations</Button>
+        </div>
+      )}
     </Dialog>
   );
 }

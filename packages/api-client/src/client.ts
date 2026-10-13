@@ -1,9 +1,11 @@
 import {
+  type AddSavedLocation,
   bestGoodTimesResponseSchema,
   type ContactRequest,
   contactResponseSchema,
   daySummariesResponseSchema,
   festivalsResponseSchema,
+  geographyOptionsSchema,
   glossaryResponseSchema,
   goodTimeExplanationResponseSchema,
   goodTimesResponseSchema,
@@ -15,8 +17,13 @@ import {
   muhurtaNakshatrasResponseSchema,
   panchangResponseSchema,
   panchangTraditionsResponseSchema,
+  type ProfileUpdate,
+  savedLocationSchema,
+  type SaveSettings,
   traditionsResponseSchema,
   userInfoSchema,
+  userProfileSchema,
+  userSettingsSchema,
 } from '@myvedicstar/contracts';
 import { z } from 'zod';
 
@@ -197,6 +204,34 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     locations: {
+      countries: (call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.countries',
+          path: path('locationsCountries'),
+          schema: geographyOptionsSchema,
+          signal: call?.signal,
+        }),
+      regions: (country: string, call?: CallOptions) =>
+        transport.request({
+          operation: 'locations.regions',
+          path: path('locationsRegions'),
+          query: { country },
+          schema: geographyOptionsSchema,
+          signal: call?.signal,
+        }),
+      addressCities: (
+        text: string,
+        country: string | undefined,
+        region: string | undefined,
+        call?: CallOptions,
+      ) =>
+        transport.request({
+          operation: 'locations.addressCities',
+          path: path('locationsAddressCities'),
+          query: { text, country, region },
+          schema: locationSearchResponseSchema,
+          signal: call?.signal,
+        }),
       search: (params: LocationSearchParams, call?: CallOptions) =>
         transport.request({
           operation: 'locations.search',
@@ -333,6 +368,34 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     auth: {
+      profile: (call?: CallOptions) =>
+        transport.request({
+          operation: 'auth.profile',
+          path: path('authProfile'),
+          schema: userProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      updateProfile: (request: ProfileUpdate, call?: CallOptions) =>
+        transport.request({
+          operation: 'auth.updateProfile',
+          method: 'PATCH',
+          path: path('authProfile'),
+          body: request,
+          schema: userProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      retryProfileSync: (call?: CallOptions) =>
+        transport.request({
+          operation: 'auth.profileSync',
+          method: 'POST',
+          path: path('authProfileSync'),
+          body: {},
+          schema: userProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
       /** Records a login audit event using the current account's access token. */
       login: (call?: CallOptions) =>
         transport.request({
@@ -371,6 +434,7 @@ export function createApiClient(options: ApiClientOptions) {
         }),
     },
     contact: {
+      // Contact operations remain separate from authenticated preference operations.
       /** Sends the Contact Us form. The access token is attached when the visitor is signed in. */
       submit: (request: ContactRequest, call?: CallOptions) =>
         transport.request({
@@ -390,6 +454,53 @@ export function createApiClient(options: ApiClientOptions) {
           path: path('traditions'),
           query: { language },
           schema: traditionsResponseSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+    },
+    settings: {
+      get: (call?: CallOptions) =>
+        transport.request({
+          operation: 'settings.get',
+          path: path('userSettings'),
+          schema: userSettingsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      save: (request: SaveSettings, call?: CallOptions) =>
+        transport.request({
+          operation: 'settings.save',
+          method: 'PUT',
+          path: path('userSettings'),
+          body: request,
+          schema: userSettingsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      locations: (call?: CallOptions) =>
+        transport.request({
+          operation: 'settings.locations',
+          path: path('savedLocations'),
+          schema: z.array(savedLocationSchema),
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      addLocation: (request: AddSavedLocation, call?: CallOptions) =>
+        transport.request({
+          operation: 'settings.addLocation',
+          method: 'POST',
+          path: path('savedLocations'),
+          body: request,
+          schema: savedLocationSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      deleteLocation: (locationId: string, call?: CallOptions) =>
+        transport.request({
+          operation: 'settings.deleteLocation',
+          method: 'DELETE',
+          path: path('savedLocation', { locationId }),
+          schema: userSettingsSchema,
           signal: call?.signal,
           auth: 'required',
         }),

@@ -33,3 +33,6 @@ apps/web/.certs/
 
 # Local, uncommitted overrides of deployment settings
 infrastructure/web/static-web-apps/environments/*.local.env
+
+# Local verification artifacts and isolated PostgreSQL test data
+.verification/

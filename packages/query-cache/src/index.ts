@@ -27,4 +27,6 @@ export type { CacheStorage } from './persistence';
 export { createCachePersister, persistenceBuster, shouldPersistQuery } from './persistence';
 export type { CacheSettings } from './policies';
 export { cachePolicies, defaultCacheSettings } from './policies';
+export { useProfileEditor, useProfileGeography } from './profile';
 export { CacheProvider, useCacheOnline } from './provider';
+export { toAccountLocation, useAccountSettings, useSavedLocations } from './settings';
