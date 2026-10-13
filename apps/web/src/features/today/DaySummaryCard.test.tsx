@@ -14,7 +14,7 @@ import { DaySummaryCard } from './DaySummaryCard';
 const card = () => screen.getByRole('region', { name: "Today's summary" });
 
 describe('DaySummaryCard', () => {
-  it('uses only Today data for the public home tile', async () => {
+  it('uses only Today data for the Today-only tile', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     const response = structuredClone(fixtures.panchang.austinTelugu);
     response.days[0]!.goodTime = {
@@ -33,7 +33,9 @@ describe('DaySummaryCard', () => {
     };
     server.use(scenarios.json('/panchang/today', response));
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard todayOnly />);
+    renderWithProviders(<DaySummaryCard todayOnly />, {
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     expect(await screen.findByText('Favorable day')).toBeInTheDocument();
     expect(card()).toHaveTextContent(/11:00\sAM.*12:00\sPM/);
     expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
@@ -51,7 +53,9 @@ describe('DaySummaryCard', () => {
     };
     server.use(scenarios.json('/panchang/today', response));
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard todayOnly />);
+    renderWithProviders(<DaySummaryCard todayOnly />, {
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     expect(await screen.findByText('No good time is available today.')).toBeInTheDocument();
     expect(apiRequests.some((u) => u.pathname.includes('/muhurta/'))).toBe(false);
   });
@@ -67,7 +71,9 @@ describe('DaySummaryCard', () => {
     };
     server.use(scenarios.json('/panchang/today', response));
     storeSelectedLocation();
-    renderWithProviders(<DaySummaryCard todayOnly />);
+    renderWithProviders(<DaySummaryCard todayOnly />, {
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     expect(await screen.findByText('No more recommended times today')).toBeInTheDocument();
     expect(card()).not.toHaveTextContent('NO_QUALIFYING_PERIOD');
   });

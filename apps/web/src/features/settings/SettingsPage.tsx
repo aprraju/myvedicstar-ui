@@ -8,6 +8,7 @@ import { useLocationState } from '../location';
 import styles from '../profile/ProfilePage.module.css';
 import { useTradition } from '../tradition';
 import { useTraditions } from '../tradition/TraditionStateProvider';
+import settingsStyles from './SettingsPage.module.css';
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -32,7 +33,7 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
         <h1 id="settings-title" className="page-title">
           Settings
         </h1>
-        <p>Save defaults for future sign-ins. Temporary choices elsewhere do not change these preferences.</p>
+        <p>Save defaults to update the site now and use them at future sign-ins.</p>
         {query.isPending && <p role="status">Loading settings…</p>}
         {query.isError && (
           <div role="alert">
@@ -54,7 +55,7 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
                 onSuccess: (result) => {
                   setEdits({});
                   applyTradition(result.defaultTradition ?? config.defaultTradition);
-                  if (result.defaultLocation) applyLocation(toAccountLocation(result.defaultLocation));
+                  applyLocation(result.defaultLocation ? toAccountLocation(result.defaultLocation) : null);
                 },
               },
             );
@@ -126,13 +127,17 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
         {locations.query.isSuccess && locations.query.data.length === 0 && (
           <p>No saved locations yet. Add one using the location selector.</p>
         )}
-        <ul>
+        <ul className={settingsStyles.locations}>
           {locations.query.data?.map((item) => (
             <li key={item.locationId}>
-              {toAccountLocation(item).label}
-              {defaultLocation === item.locationId && (
-                <span> — Default (deleting it restores the fallback)</span>
-              )}
+              <div className={settingsStyles.locationDetails}>
+                <span>{toAccountLocation(item).label}</span>
+                {defaultLocation === item.locationId && (
+                  <span className={settingsStyles.defaultLabel}>
+                    Default (deleting it restores the fallback)
+                  </span>
+                )}
+              </div>
               <Button
                 variant="ghost"
                 disabled={busy}

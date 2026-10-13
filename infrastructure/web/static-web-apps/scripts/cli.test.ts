@@ -306,12 +306,12 @@ describe('smoke-test.ts', () => {
   );
 
   it.each([
-    [200, true, 0],
+    [200, true, 1],
     [401, false, 1],
-    [401, true, 1],
+    [401, true, 0],
     [200, false, 1],
   ])(
-    'checks actual GET CORS and anonymous access (status %s, header %s)',
+    'checks actual GET CORS and required authentication (status %s, header %s)',
     async (status, cors, expectedCode) => {
       const { stage, siteUrl } = await stagedSite();
       const requests: { method: string | undefined; url: URL; origin: string | undefined }[] = [];
@@ -336,7 +336,7 @@ describe('smoke-test.ts', () => {
       writeFileSync(configPath, JSON.stringify(config));
       const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage]);
       expect(output).toContain('API GET CORS allows');
-      expect(output).toContain(`public today endpoint succeeds without sign-in (${status})`);
+      expect(output).toContain(`application API rejects requests without a token (${status})`);
       expect(code).toBe(expectedCode);
       expect(requests.map((request) => request.method)).toEqual(['OPTIONS', 'GET']);
       for (const request of requests) {

@@ -27,6 +27,32 @@ function setup(fetchImpl: typeof fetch, extra: Partial<Parameters<typeof createA
 }
 
 describe('createApiClient', () => {
+  it.each(['countries', 'regions', 'addressCities'] as const)(
+    'authenticates the %s address lookup through APIM',
+    async (operation) => {
+      const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse({ results: [] }));
+      const { client } = setup(fetchImpl);
+      const lookup = () => {
+        if (operation === 'countries') return client.locations.countries();
+        if (operation === 'regions') return client.locations.regions('US');
+        return client.locations.addressCities('Liberty Hill', 'US', undefined);
+      };
+      await lookup();
+      expect(new Headers(fetchImpl.mock.calls[0]![1]?.headers).get('Authorization')).toBe(
+        'Bearer test-access-token',
+      );
+      const anonymous = setup(fetchImpl, { getAccessToken: async () => null }).client;
+      fetchImpl.mockClear();
+      const request =
+        operation === 'countries'
+          ? anonymous.locations.countries()
+          : operation === 'regions'
+            ? anonymous.locations.regions('US')
+            : anonymous.locations.addressCities('Liberty Hill', 'US', undefined);
+      await expect(request).rejects.toMatchObject({ kind: 'authentication' });
+      expect(fetchImpl).not.toHaveBeenCalled();
+    },
+  );
   it.each(['wrapped', 'array'])('loads the %s birth-star catalog in display order', async (shape) => {
     const stars = [
       { key: 'Bharani', name: 'Bharani', order: 2 },
@@ -134,27 +160,31 @@ describe('createApiClient', () => {
       (client: ReturnType<typeof setup>['client']) => client.locations.resolve({ place: 'Austin, TX' }),
       fixtures.location.austin,
     ],
-  ] as const)('%s follows its authentication policy', async (name, call, body) => {
+  ] as const)('%s requires authentication', async (_name, call, body) => {
     const signedIn = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
     await call(setup(signedIn, { getAccessToken: async () => 'token-1' }).client);
     expect(new Headers(signedIn.mock.calls[0]![1]?.headers).get('Authorization')).toBe('Bearer token-1');
 
     const signedOut = vi.fn<typeof fetch>().mockImplementation(async () => jsonResponse(body));
     const client = setup(signedOut, { getAccessToken: async () => null }).client;
-    if (name === 'locations.resolve') {
-      await call(client);
-      expect(new Headers(signedOut.mock.calls[0]![1]?.headers).has('Authorization')).toBe(false);
-    } else {
-      await expect(call(client)).rejects.toMatchObject({ kind: 'authentication' });
-      expect(signedOut).not.toHaveBeenCalled();
-    }
+    await expect(call(client)).rejects.toMatchObject({ kind: 'authentication' });
+    expect(signedOut).not.toHaveBeenCalled();
   });
 
-  it('never sends protected requests without a token, while today and resolve stay public', async () => {
+  it('never sends any application request without a token', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.panchang.austinTelugu));
     const { client } = setup(fetchImpl, { getAccessToken: async () => null });
     const params = { location: { place: 'Austin, TX' } };
     const calls = [
+      () => client.panchang.today(params),
+      () => client.locations.resolve(params.location),
+      () => client.locations.countries(),
+      () => client.locations.regions('US'),
+      () => client.locations.addressCities('Austin', 'US', 'TX'),
+      () => client.locations.search({ text: 'Austin' }),
+      () => client.locations.postal({ text: '78701' }),
+      () => client.locations.reverse(30.27, -97.74),
+      () => client.locations.timezone(30.27, -97.74),
       () => client.traditions.list(),
       () => client.panchang.traditions(),
       () => client.panchang.glossary(),
@@ -182,13 +212,6 @@ describe('createApiClient', () => {
     ];
     for (const call of calls) await expect(call()).rejects.toMatchObject({ kind: 'authentication' });
     expect(fetchImpl).not.toHaveBeenCalled();
-    await client.panchang.today(params);
-    fetchImpl.mockResolvedValueOnce(jsonResponse(fixtures.location.austin));
-    await client.locations.resolve(params.location);
-    expect(fetchImpl).toHaveBeenCalledTimes(2);
-    expect(fetchImpl.mock.calls.every(([, init]) => !new Headers(init?.headers).has('Authorization'))).toBe(
-      true,
-    );
   });
 
   it('requests upcoming festivals for the location, tradition, language and day count, with the token', async () => {

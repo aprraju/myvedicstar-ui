@@ -1,0 +1,41 @@
+.locations {
+  display: grid;
+  gap: var(--space-md);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  min-inline-size: 0;
+}
+
+.locations li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  min-inline-size: 0;
+}
+
+.locationDetails {
+  display: grid;
+  gap: var(--space-xs);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.defaultLabel {
+  font-size: 0.875rem;
+}
+
+@media (max-width: 40rem) {
+  .locations li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .locations button {
+    inline-size: 100%;
+    min-block-size: 2.75rem;
+  }
+}

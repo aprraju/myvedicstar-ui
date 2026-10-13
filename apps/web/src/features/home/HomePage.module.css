@@ -30,7 +30,7 @@
 
 @media (min-width: 840px) {
   .hero {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr);
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-xxl);
     align-items: center;
     min-block-size: 30rem;

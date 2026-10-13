@@ -96,6 +96,8 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
       await page.route(`${API_ORIGIN}/api/v1/**`, (route) => {
         const url = new URL(route.request().url());
         apiRequests.push(url);
+        if (!route.request().headers().authorization?.startsWith('Bearer '))
+          return route.fulfill({ status: 401, json: { title: 'Unauthorized' } });
         if (url.pathname.endsWith('/traditions')) return route.fulfill({ json: fixtures.traditions });
         if (url.pathname.endsWith('/festivals/upcoming')) return route.fulfill({ json: fixtures.festivals });
         if (url.pathname.endsWith('/auth/userinfo')) return route.fulfill({ json: fixtures.userInfo });

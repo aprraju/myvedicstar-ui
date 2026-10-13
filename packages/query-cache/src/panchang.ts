@@ -178,7 +178,7 @@ export function useToday(context: CalculationContext) {
       if (!signal.aborted) seedPanchangDays(client, data, params as PanchangParams, userId, settings);
       return data;
     },
-    enabled: enabled && validCalculationParams(params) && date !== undefined,
+    enabled: enabled && userId !== null && validCalculationParams(params) && date !== undefined,
     initialData: () => (cachedDay?.data && cachedDay.data.localToday === date ? cachedDay.data : undefined),
     initialDataUpdatedAt: () => cachedDay?.dataUpdatedAt,
     gcTime: settings.enabled ? cachePolicies.today.gcTime : 0,

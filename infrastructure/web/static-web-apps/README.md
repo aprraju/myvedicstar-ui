@@ -104,7 +104,7 @@ Azure side (already configured):
 | Smoke test                  | New release live but unverified; job fails                       | Investigate, or roll back (above)                                        |
 
 The smoke test checks: new release live, HTTP→HTTPS, security headers, caching, hidden source maps, deep links, APIM
-CORS preflight and actual public today GET response from the site origin, and the Entra External ID discovery document.
+CORS preflight and rejection of an unauthenticated Today GET request from the site origin, and the Entra External ID discovery document.
 
 ## Hosting behaviour (generated staticwebapp.config.json)
 
@@ -118,11 +118,11 @@ CORS preflight and actual public today GET response from the site origin, and th
 ## Troubleshooting API CORS
 
 A passing OPTIONS preflight is insufficient: the actual API response must also include
-`Access-Control-Allow-Origin` matching the site's origin. The smoke test checks both and requires the public
-`panchang/today` endpoint to succeed without sign-in, using coordinates, a time zone, tradition and language.
-The traditions catalog requires sign-in and is not used as the anonymous probe.
+`Access-Control-Allow-Origin` matching the site's origin. The smoke test checks both and requires a request
+without a token to `panchang/today` to return 401. Every application endpoint requires sign-in; operational
+health/readiness probes remain accessible directly to Container Apps.
 
-If OPTIONS succeeds but GET returns 401 without that header, inspect APIM's effective policy and backend
-authorization for `/myvedicday/api/v1/panchang/today`. This endpoint must allow anonymous access; ensure
-CORS headers are included on error responses too. The API/APIM configuration is owned by the backend and
-`myvedicstar-infra`; adding response headers to Static Web Apps or changing fetch to `no-cors` cannot fix it.
+If OPTIONS succeeds but GET returns 401 without that header, inspect APIM's effective CORS policy for
+`/myvedicday/api/v1/panchang/today`. Include CORS headers on authentication errors. Signed-in requests must
+include a valid bearer access token. API/APIM configuration belongs to the backend and `myvedicstar-infra`;
+adding response headers to Static Web Apps or changing fetch to `no-cors` cannot fix it.

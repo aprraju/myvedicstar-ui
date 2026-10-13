@@ -29,6 +29,28 @@ const profile = {
   nameSyncPending: false,
 };
 
+test('profile fits narrow phones with readable fields and reachable Save', async ({ page }) => {
+  await page.route('**/api/v1/auth/profile', (route) =>
+    route.fulfill({ json: { ...profile, nameSyncPending: true } }),
+  );
+  await page.goto('/profile');
+  await expect(page.getByLabel('First Name', { exact: true })).toHaveValue('Raju');
+  await expect(page.getByRole('button', { name: 'Retry name synchronization' })).toHaveCount(0);
+  for (const width of [320, 375, 640]) {
+    await page.setViewportSize({ width, height: 812 });
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+      .toBe(true);
+    const first = await page.getByLabel('First Name', { exact: true }).boundingBox();
+    const last = await page.getByLabel('Last Name', { exact: true }).boundingBox();
+    expect(last!.y).toBeGreaterThan(first!.y + first!.height);
+    expect(first!.width).toBeGreaterThan(width * 0.6);
+    const save = page.getByRole('button', { name: 'Save', exact: true });
+    await save.scrollIntoViewIfNeeded();
+    await expect(save).toBeInViewport();
+  }
+});
+
 test('profile fields load, save without a page reload, and meet accessibility requirements', async ({
   page,
 }) => {
@@ -52,7 +74,9 @@ test('profile fields load, save without a page reload, and meet accessibility re
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
     .analyze();
   expect(results.violations.map((item) => item.id)).toEqual([]);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
 });
 
 test('settings prefill, explicit save, and default deletion work under production CSP', async ({ page }) => {
@@ -89,9 +113,25 @@ test('settings prefill, explicit save, and default deletion work under productio
   await page.goto('/settings');
   await expect(page.getByLabel('Default Tradition')).toHaveValue('telugu');
   await expect(page.getByLabel('Default Location')).toHaveValue(location.locationId);
+  for (const width of [320, 375, 640]) {
+    await page.setViewportSize({ width, height: 812 });
+    await expect
+      .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+      .toBe(true);
+    const tradition = await page.getByLabel('Default Tradition').boundingBox();
+    const selectedLocation = await page.getByLabel('Default Location').boundingBox();
+    expect(selectedLocation!.y).toBeGreaterThan(tradition!.y + tradition!.height);
+    const remove = page.getByRole('button', { name: 'Delete Austin, Texas, United States' });
+    await remove.scrollIntoViewIfNeeded();
+    await expect(remove).toBeInViewport();
+  }
   await page.getByLabel('Default Tradition').selectOption('tamil');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByText('Your settings have been saved.')).toBeVisible();
+  await expect(page.getByRole('banner').getByRole('combobox', { name: 'Tradition' })).toHaveValue('tamil');
+  await expect(
+    page.getByRole('banner').getByText('Austin, Texas, United States', { exact: true }),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Delete Austin, Texas, United States' }).click();
   await expect(page.getByLabel('Default Location')).toHaveValue('');
   await expect(page.getByText(/No saved locations yet/)).toBeVisible();
@@ -99,5 +139,7 @@ test('settings prefill, explicit save, and default deletion work under productio
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
     .analyze();
   expect(results.violations.map((item) => item.id)).toEqual([]);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await expect
+    .poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth))
+    .toBe(true);
 });

@@ -83,7 +83,7 @@ export function createHttpTransport(options: HttpTransportOptions): HttpTranspor
     };
     if (req.body !== undefined) headers['Content-Type'] = 'application/json';
 
-    const auth = req.auth ?? 'none';
+    const auth = req.auth ?? 'required';
     if (auth !== 'none') {
       const token = (await options.getAccessToken?.()) ?? null;
       if (token) {

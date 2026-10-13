@@ -126,7 +126,7 @@ export function LocationProvider({
 
   const detect = useCallback(
     async (automatic: boolean) => {
-      if (automatic && config.locationSearch.enabled) return false;
+      if (!userId || (automatic && config.locationSearch.enabled)) return false;
       const startedAt = choice.current;
       setDetecting(true);
       setDetectError(null);
@@ -154,7 +154,7 @@ export function LocationProvider({
         setDetecting(false);
       }
     },
-    [api, config.locationSearch.enabled, geolocation, locationSearch, select],
+    [api, config.locationSearch.enabled, geolocation, locationSearch, select, userId],
   );
 
   useEffect(() => {
@@ -170,16 +170,23 @@ export function LocationProvider({
       anonymous.current = stored ?? null;
       if (stored && !defaultsApplied.current) setLocation(stored);
       setReady(true);
-      if (stored || config.locationSearch.enabled) return;
+      if (
+        !userId ||
+        accountSettings.isPending ||
+        accountSettings.data?.defaultLocation ||
+        stored ||
+        config.locationSearch.enabled
+      )
+        return;
       const permission = await geolocation.permission();
       if (active && mayAutoDetect(permission, denied ?? false)) void detect(true);
     })();
     return () => {
       active = false;
     };
-    // Runs once at start-up.
+    // Detect only after account registration and settings have settled.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId, accountSettings.isPending]);
 
   useEffect(() => {
     if (!userId) {
@@ -197,7 +204,7 @@ export function LocationProvider({
   const applyDefault = useCallback(
     (next: SelectedLocation | null) => {
       defaultsApplied.current = userId;
-      setLocation(next);
+      setLocation(next ?? anonymous.current);
     },
     [userId],
   );

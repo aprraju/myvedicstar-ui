@@ -1,5 +1,7 @@
 # User settings management: architecture proposal
 
+Authentication update: [application authorization](../architecture/application-authorization.md) supersedes earlier anonymous selector/API behavior. Guest preferences may remain stored locally, but selectors and API-backed content require sign-in.
+
 Status: implemented in the UI and MyVedicStar backend under the requested repository standards. Deployment verification is recorded in ../deployment-readiness.md.
 
 Governing standards: `../myvedicstar/.github/copilot-instructions.md`. This proposal follows the mandatory public-facade boundary, explicit dependency injection, layer-owned DTOs, existing migration conventions, and architecture approval requirement in section 35.

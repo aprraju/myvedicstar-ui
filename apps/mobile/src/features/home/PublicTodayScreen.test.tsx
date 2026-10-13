@@ -22,22 +22,34 @@ const routes = {
   'good-time': () => <Text accessibilityRole="header">Good Time screen</Text>,
 };
 
+const renderSignedIn = (
+  screens: Parameters<typeof renderApp>[0],
+  options: Parameters<typeof renderApp>[1] = {},
+) => renderApp(screens, { auth: createInMemoryAuthClient({ user: { id: 'today-user' } }), ...options });
+
+describe('signed-out home (mobile)', () => {
+  it('shows no Today card or Register button and makes no API calls', async () => {
+    await storeLocation();
+    await renderApp(routes);
+    expect(await screen.findByText('Find Auspicious Moments for a Happier Life')).toBeTruthy();
+    expect(screen.queryByText('Mixed day')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Register' })).toBeNull();
+    expect(apiRequests).toHaveLength(0);
+  });
+});
+
 describe('public Today (mobile)', () => {
   it('answers how today is, whether now is good, and the next caution period', async () => {
     atInstant('2026-09-29T10:00:00-05:00');
     await storeLocation();
-    await renderApp(routes);
+    await renderSignedIn(routes);
 
     expect(await screen.findByText('Mixed day')).toBeTruthy();
     expect(screen.getByText('Tuesday, September 29')).toBeTruthy();
     expect(screen.getByText('Krishna Paksha · Krishna Chaturthi')).toBeTruthy();
-    // Signed-out visitors use only today's embedded evaluation.
-    expect(await screen.findByLabelText(/No more recommended times today/)).toBeTruthy();
-    expect(
-      apiRequests.every(
-        (url) => url.pathname.endsWith('/panchang/today') || url.pathname.endsWith('/locations/resolve'),
-      ),
-    ).toBe(true);
+    // Signed-in users receive today's embedded evaluation.
+    expect(await screen.findByLabelText(/No strongly favorable time was found/)).toBeTruthy();
+    expect(apiRequests.some((url) => url.pathname.endsWith('/panchang/today'))).toBe(true);
     expect(
       screen.getByLabelText(/Use caution now\. Durmuhurtham 09:46\sAM – 10:34\sAM\. Unfavorable Muhurta/),
     ).toBeTruthy();
@@ -46,7 +58,7 @@ describe('public Today (mobile)', () => {
   });
 
   it('asks for a location when none is known and permission is unavailable', async () => {
-    await renderApp(routes, { geolocation: fakeGeolocation({ permission: 'unsupported' }) });
+    await renderSignedIn(routes, { geolocation: fakeGeolocation({ permission: 'unsupported' }) });
     expect(await screen.findByText('Choose a location to see today’s Panchang')).toBeTruthy();
     expect(apiRequests.some((u) => u.pathname.includes('/panchang'))).toBe(false);
   });
@@ -56,13 +68,13 @@ describe('public Today (mobile)', () => {
       permission: 'granted',
       position: { latitude: 17.385, longitude: 78.4867 },
     });
-    await renderApp(routes, { geolocation });
+    await renderSignedIn(routes, { geolocation });
     expect(await screen.findByText('All times shown in local time — Hyderabad, Telangana')).toBeTruthy();
     expect(geolocation.requests).toBe(1);
   });
 
   it('explains a denied permission and never asks again automatically', async () => {
-    await renderApp(routes, {
+    await renderSignedIn(routes, {
       geolocation: fakeGeolocation({ permission: 'prompt', error: 'permissionDenied' }),
     });
     expect(await screen.findByText(/Location access is turned off/)).toBeTruthy();
@@ -71,7 +83,7 @@ describe('public Today (mobile)', () => {
   it('shows a friendly error with retry', async () => {
     await storeLocation();
     let fail = true;
-    await renderApp(routes, {
+    await renderSignedIn(routes, {
       fetchOverride: (url) =>
         fail && url.pathname.endsWith('/panchang/today')
           ? { status: 503, body: { status: 503, title: 'Unavailable' } }
@@ -93,7 +105,7 @@ describe('public Today (mobile)', () => {
     const date = response.days[0]!.date;
     atInstant(`${date}T12:00:00-05:00`);
     await storeLocation();
-    await renderApp(routes, {
+    await renderSignedIn(routes, {
       fetchOverride: (url) =>
         url.pathname.endsWith('/panchang/today')
           ? { status: 200, body: { ...response, localToday: date } }
@@ -106,7 +118,7 @@ describe('public Today (mobile)', () => {
 describe('location sheet (mobile)', () => {
   it('searches, confirms and switches location', async () => {
     await storeLocation();
-    await renderApp(routes);
+    await renderSignedIn(routes);
     await fireEvent.press(await screen.findByRole('button', { name: 'Change location: Austin, Texas' }));
     await fireEvent.changeText(
       await screen.findByLabelText('City, ZIP code or coordinates'),
@@ -119,7 +131,7 @@ describe('location sheet (mobile)', () => {
 
   it('explains that ZIP codes are not searchable yet', async () => {
     await storeLocation();
-    await renderApp(routes);
+    await renderSignedIn(routes);
     await fireEvent.press(await screen.findByRole('button', { name: 'Change location: Austin, Texas' }));
     await fireEvent.changeText(await screen.findByLabelText('City, ZIP code or coordinates'), '78701');
     await fireEvent.press(screen.getByRole('button', { name: 'Search' }));
@@ -128,7 +140,7 @@ describe('location sheet (mobile)', () => {
 
   it('validates latitude and longitude', async () => {
     await storeLocation();
-    await renderApp(routes);
+    await renderSignedIn(routes);
     await fireEvent.press(await screen.findByRole('button', { name: 'Change location: Austin, Texas' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Enter latitude and longitude' }));
     await fireEvent.changeText(await screen.findByLabelText('Latitude'), '95');
@@ -140,9 +152,29 @@ describe('location sheet (mobile)', () => {
   it('offers recent locations', async () => {
     await storeLocation();
     await AsyncStorage.setItem('mvs.location.recent', JSON.stringify([hyderabad]));
-    await renderApp(routes);
+    await renderSignedIn(routes, {
+      fetchOverride: (url) =>
+        url.pathname.endsWith('/settings/locations')
+          ? {
+              status: 200,
+              body: [
+                {
+                  locationId: 'e96544af-55b1-458b-92e0-33044c47ad28',
+                  city: 'Hyderabad',
+                  state: 'Telangana',
+                  country: null,
+                  countryCode: 'IN',
+                  postalCode: null,
+                  latitude: 17.385,
+                  longitude: 78.4867,
+                  timeZone: 'Asia/Kolkata',
+                },
+              ],
+            }
+          : undefined,
+    });
     await fireEvent.press(await screen.findByRole('button', { name: 'Change location: Austin, Texas' }));
-    await fireEvent.press(await screen.findByText('Hyderabad, Telangana, India'));
+    await fireEvent.press(await screen.findByText('Hyderabad, Telangana'));
     expect(await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' })).toBeTruthy();
   });
 });
@@ -150,7 +182,7 @@ describe('location sheet (mobile)', () => {
 describe('tradition (mobile)', () => {
   it('changes tradition independently of location and reloads the Panchang', async () => {
     await storeLocation();
-    await renderApp(routes, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
+    await renderSignedIn(routes, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     await screen.findByText('Mixed day');
     await fireEvent.press(screen.getByRole('button', { name: /^Tradition: / }));
     await fireEvent.press(await screen.findByRole('radio', { name: /Tamil/ }));

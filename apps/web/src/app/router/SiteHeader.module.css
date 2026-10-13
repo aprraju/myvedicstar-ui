@@ -316,6 +316,14 @@
     min-inline-size: 0;
   }
 
+  .context > button {
+    flex: 1 1 0;
+  }
+
+  .context > :last-child:not(button) {
+    flex: 0 0 auto;
+  }
+
   .context label {
     position: absolute;
     inline-size: 1px;
@@ -326,6 +334,7 @@
   }
 
   .context select {
+    inline-size: 8rem;
     min-inline-size: 8rem;
     max-inline-size: 11rem;
   }

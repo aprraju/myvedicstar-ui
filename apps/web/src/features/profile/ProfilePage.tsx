@@ -104,14 +104,6 @@ function ProfileForm({ userId }: { userId: string | undefined }) {
           {query.data?.nameSyncPending && (
             <div role="status">
               <p>Your profile is saved. Name synchronization with your sign-in account is pending.</p>
-              <Button
-                variant="secondary"
-                loading={editor.sync.isPending}
-                disabled={busy || editor.dirty}
-                onClick={() => editor.sync.mutate()}
-              >
-                Retry name synchronization
-              </Button>
             </div>
           )}
           <Button type="submit" loading={editor.save.isPending} disabled={busy || !query.data}>

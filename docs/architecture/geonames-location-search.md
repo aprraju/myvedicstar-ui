@@ -66,8 +66,8 @@ using GeoNames;
 builder.Services.AddGeoNamesLocationSearch(builder.Configuration);
 ```
 
-The existing `app.MapControllers()` discovers the added controller through `AddApplicationPart`. The four additive
-anonymous routes use the same `public-read` policy as the existing anonymous location resolver:
+The existing `app.MapControllers()` discovers the added controller through `AddApplicationPart`. All location routes require authorization and an access token through APIM and the backend. The existing
+`public-read` rate-limit policy name remains a throttle; it does not grant anonymous access:
 
 | Route under `/api/v1` | Query inputs                                            | Response                            |
 | --------------------- | ------------------------------------------------------- | ----------------------------------- |
@@ -134,7 +134,7 @@ and account-specific quota capacity must still be checked in the deployed enviro
 
 In the `myvedicstar` backend, run `dotnet test tests/GeoNames.Tests/GeoNames.Tests.csproj` for provider and configuration
 checks, and `dotnet test tests/MyVedicDay.Api.Tests.Integration/MyVedicDay.Api.Tests.Integration.csproj` for HTTP route
-contracts, validation, anonymous access, quota errors and OpenAPI examples.
+contracts, validation, anonymous-request rejection, quota errors and OpenAPI examples.
 
 `npm run location:proxy:test` builds and tests the provider with mocked HTTP responses, without GeoNames credentials
 or live requests. Shared tests cover international postal formats, ambiguity, Unicode/country keys, coordinate precision,

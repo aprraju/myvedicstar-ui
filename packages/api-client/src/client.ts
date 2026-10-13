@@ -159,7 +159,7 @@ export function createApiClient(options: ApiClientOptions) {
       query: { ...panchangQuery(params), ...extra },
       schema: panchangResponseSchema,
       signal: call?.signal,
-      auth: operation === 'panchang.today' ? 'optional' : 'required',
+      auth: 'required',
     });
 
   return {
@@ -210,6 +210,7 @@ export function createApiClient(options: ApiClientOptions) {
           path: path('locationsCountries'),
           schema: geographyOptionsSchema,
           signal: call?.signal,
+          auth: 'required',
         }),
       regions: (country: string, call?: CallOptions) =>
         transport.request({
@@ -218,6 +219,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { country },
           schema: geographyOptionsSchema,
           signal: call?.signal,
+          auth: 'required',
         }),
       addressCities: (
         text: string,
@@ -231,6 +233,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { text, country, region },
           schema: locationSearchResponseSchema,
           signal: call?.signal,
+          auth: 'required',
         }),
       search: (params: LocationSearchParams, call?: CallOptions) =>
         transport.request({
@@ -239,7 +242,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { ...params },
           schema: locationSearchResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       postal: (params: LocationSearchParams, call?: CallOptions) =>
         transport.request({
@@ -248,7 +251,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { ...params },
           schema: locationSearchResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       reverse: (latitude: number, longitude: number, language?: string, call?: CallOptions) =>
         transport.request({
@@ -257,7 +260,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { latitude, longitude, language },
           schema: locationReverseResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       timezone: (latitude: number, longitude: number, call?: CallOptions) =>
         transport.request({
@@ -266,7 +269,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: { latitude, longitude },
           schema: locationTimezoneResponseSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
       resolve: (location: LocationParams, call?: CallOptions) =>
         transport.request({
@@ -275,7 +278,7 @@ export function createApiClient(options: ApiClientOptions) {
           query: locationQuery(location, decimals),
           schema: locationSchema,
           signal: call?.signal,
-          auth: 'optional',
+          auth: 'required',
         }),
     },
     festivals: {

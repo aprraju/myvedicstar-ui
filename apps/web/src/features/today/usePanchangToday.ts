@@ -31,7 +31,7 @@ export function usePanchangToday() {
     api,
     params,
     userId: user?.id ?? null,
-    enabled: !loading,
+    enabled: !loading && !!user,
     settings: config.cache,
   });
 

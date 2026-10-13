@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
 import { server } from '../../test/msw/server';
 import { createTestConfig, renderWithProviders } from '../../test/render';
@@ -44,6 +45,7 @@ function setup() {
     <LocationAutocomplete onChoose={onChoose} onSearchChange={() => undefined} />,
     {
       config: createTestConfig({ locationSearch: { enabled: true, debounceMs: 200 } }),
+      auth: createInMemoryAuthClient({ user: { id: 'location-user' } }),
     },
   );
   return { ...rendered, onChoose, calls };
@@ -54,6 +56,17 @@ describe('GeoNames location autocomplete', () => {
     setup();
     let started = false;
     let aborted = false;
+    const fetch = globalThis.fetch;
+    vi.spyOn(globalThis, 'fetch').mockImplementation((input, init) => {
+      if (
+        String(input).includes('/locations/search') &&
+        new URL(String(input)).searchParams.get('text') === 'Hyderabad'
+      )
+        init?.signal?.addEventListener('abort', () => {
+          aborted = true;
+        });
+      return fetch(input, init);
+    });
     let release: () => void = () => undefined;
     const pending = new Promise<void>((resolve) => {
       release = resolve;

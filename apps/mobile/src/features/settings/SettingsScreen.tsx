@@ -98,7 +98,7 @@ function SettingsForm({ userId }: { userId: string }) {
               onSuccess: (result) => {
                 setEdits({});
                 applyTradition(result.defaultTradition ?? config.defaultTradition);
-                if (result.defaultLocation) applyLocation(toAccountLocation(result.defaultLocation));
+                applyLocation(result.defaultLocation ? toAccountLocation(result.defaultLocation) : null);
               },
             },
           );

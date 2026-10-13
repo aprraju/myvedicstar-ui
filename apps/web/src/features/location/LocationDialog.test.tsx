@@ -1,12 +1,20 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
 import { austin, hyderabad, storeSelectedLocation } from '../../test/location-fixtures';
-import { apiRequests, scenarios } from '../../test/msw/handlers';
+import { apiRequests, scenarios, TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
-import { fakeGeolocation, renderRoute } from '../../test/render';
+import { fakeGeolocation, renderRoute as renderTestRoute } from '../../test/render';
+
+const renderRoute = (path: string, options: Parameters<typeof renderTestRoute>[1] = {}) =>
+  renderTestRoute(path === '/' ? '/dashboard' : path, {
+    auth: createInMemoryAuthClient({ user: { id: 'location-user' } }),
+    ...options,
+  });
 
 const openDialog = async () => {
   const banner = await screen.findByRole('banner');
@@ -141,12 +149,34 @@ describe('location selection', () => {
   });
 
   it('lists recent locations and lets the user remove one', async () => {
-    window.localStorage.setItem('mvs.location.recent', JSON.stringify([austin, hyderabad]));
+    let locations = [austin, hyderabad].map((item, index) => ({
+      locationId: index ? 'e96544af-55b1-458b-92e0-33044c47ad28' : 'f85dddfa-2fb8-48c1-a3bf-36310c47f609',
+      city: index ? 'Hyderabad' : 'Austin',
+      state: index ? 'Telangana' : 'Texas',
+      country: null,
+      countryCode: index ? 'IN' : 'US',
+      postalCode: null,
+      latitude: item.latitude,
+      longitude: item.longitude,
+      timeZone: item.timeZone,
+    }));
+    server.use(
+      http.get(`${TEST_API_BASE_URL}/api/v1/settings/locations`, () => HttpResponse.json(locations)),
+      http.delete(`${TEST_API_BASE_URL}/api/v1/settings/locations/:id`, ({ params }) => {
+        locations = locations.filter((item) => item.locationId !== params.id);
+        return HttpResponse.json({
+          defaultTradition: null,
+          defaultLocationId: null,
+          defaultLocation: null,
+          revision: 1,
+        });
+      }),
+    );
     storeSelectedLocation(austin);
     renderRoute('/');
     const dialog = await openDialog();
-    const recent = within(dialog).getByRole('region', { name: 'Recent locations' });
-    await userEvent.click(within(recent).getByRole('button', { name: /Hyderabad, Telangana, India/ }));
+    const recent = await within(dialog).findByRole('region', { name: 'Recent locations' });
+    await userEvent.click(within(recent).getByRole('button', { name: 'Hyderabad, Telangana' }));
     expect(
       await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
     ).toBeInTheDocument();
@@ -155,9 +185,7 @@ describe('location selection', () => {
     await userEvent.click(
       within(reopened).getByRole('button', { name: 'Remove Austin, Texas from recent locations' }),
     );
-    await waitFor(() =>
-      expect(JSON.parse(window.localStorage.getItem('mvs.location.recent')!)).toHaveLength(1),
-    );
+    await waitFor(() => expect(locations).toHaveLength(1));
   });
 
   it('ignores tampered stored locations', async () => {

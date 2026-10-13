@@ -57,7 +57,7 @@ describe('Today cache integration', () => {
         });
       }),
     );
-    renderWithProviders(<Probe />);
+    renderWithProviders(<Probe />, { auth: createInMemoryAuthClient({ user: { id: 'cache-user' } }) });
     await screen.findByText('2026-09-29');
     await atInstant('2026-09-30T00:00:01-05:00');
     await act(async () => {
@@ -80,7 +80,9 @@ describe('Today cache integration', () => {
         return HttpResponse.json(fixtures.panchang.austinTelugu);
       }),
     );
-    const { services } = renderWithProviders(<Probe />);
+    const { services } = renderWithProviders(<Probe />, {
+      auth: createInMemoryAuthClient({ user: { id: 'cache-user' } }),
+    });
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });

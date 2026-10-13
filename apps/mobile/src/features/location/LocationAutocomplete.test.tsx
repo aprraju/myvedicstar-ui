@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 
+import { createInMemoryAuthClient } from '../../shared/auth';
 import { renderApp } from '../../test/render';
 import { LocationAutocomplete } from './LocationAutocomplete';
 
@@ -24,6 +25,7 @@ describe('mobile GeoNames autocomplete', () => {
     await renderApp(
       { index: Screen },
       {
+        auth: createInMemoryAuthClient({ user: { id: 'location-user' } }),
         configOverrides: { locationSearch: { enabled: true, debounceMs: 200 } },
         fetchOverride: (url) => {
           requests.push(url);
@@ -53,6 +55,7 @@ describe('mobile GeoNames autocomplete', () => {
     await renderApp(
       { index: Screen },
       {
+        auth: createInMemoryAuthClient({ user: { id: 'location-user' } }),
         configOverrides: { locationSearch: { enabled: true, debounceMs: 200 } },
         fetchOverride: (url) => {
           requests.push(url);

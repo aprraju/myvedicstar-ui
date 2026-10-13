@@ -21,10 +21,7 @@ const FEATURES: { id: string; icon: IconName }[] = [
   { id: 'traditions', icon: 'book-outline' },
 ];
 
-/**
- * Today tab for visitors: compact header (location, tradition), hero, ONE Panchang card, a short feature overview and
- * Login/Register. Two panes (hero | card) when the window is wide enough — tablets and unfolded foldables.
- */
+/** Informational home for visitors; signed-in users also see Today and location controls. */
 export function PublicTodayScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -45,8 +42,8 @@ export function PublicTodayScreen() {
 
   return (
     <Screen>
-      <ContextBar />
-      {wide ? (
+      {isAuthenticated && <ContextBar />}
+      {wide && isAuthenticated ? (
         <View style={styles.twoPane}>
           <View style={styles.pane}>{hero}</View>
           <View style={styles.pane}>
@@ -56,13 +53,13 @@ export function PublicTodayScreen() {
       ) : (
         <>
           {hero}
-          <DaySummaryCard onFindGoodTime={findGoodTime} />
+          {isAuthenticated && <DaySummaryCard onFindGoodTime={findGoodTime} />}
         </>
       )}
       <Features />
       {!isAuthenticated && (
         <View style={styles.auth}>
-          <Button label={t('auth.register')} onPress={() => router.push('/register' as Href)} />
+          <Button label={t('home.findGoodTime')} onPress={findGoodTime} />
           <Button variant="secondary" label={t('auth.login')} onPress={() => router.push('/login' as Href)} />
         </View>
       )}

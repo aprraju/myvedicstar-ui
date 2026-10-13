@@ -48,25 +48,25 @@ and screen name used for `document.title`, the screen-reader route announcement 
 
 ## Features (Phase 2)
 
-| Feature                | Folder                              | Public API                                                                                              |
-| ---------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Location               | `features/location`                 | `LocationStateProvider`, `useLocationState`, `LocationSelector`, `LocationDialog`, `browserGeolocation` |
-| Tradition              | `features/tradition`                | `TraditionStateProvider`, `useTradition`, `useTraditions`, `TraditionSelector`                          |
-| Today (public summary) | `features/today`                    | `DaySummaryCard`, `usePanchangToday`, `useDaySummary`                                                   |
-| Home, About, Help      | `features/home`, `features/content` | pages                                                                                                   |
-| Dashboard              | `features/dashboard`                | `DashboardPage`, `useDayDashboard` (view model `buildDayDashboard` in `@myvedicstar/domain-models`)     |
-| Calendar               | `features/calendar`                 | `CalendarPage`, `useCalendarMonth` (view model `buildCalendarMonth` in `@myvedicstar/domain-models`)    |
-| Auth                   | `features/auth` + `shared/auth`     | `ProtectedRoute`, `AuthCallbackPage`; `AuthClient`, `useAuth`, `useStartSignIn`                         |
+| Feature           | Folder                              | Public API                                                                                              |
+| ----------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Location          | `features/location`                 | `LocationStateProvider`, `useLocationState`, `LocationSelector`, `LocationDialog`, `browserGeolocation` |
+| Tradition         | `features/tradition`                | `TraditionStateProvider`, `useTradition`, `useTraditions`, `TraditionSelector`                          |
+| Today (signed in) | `features/today`                    | `DaySummaryCard`, `usePanchangToday`, `useDaySummary`                                                   |
+| Home, About, Help | `features/home`, `features/content` | pages                                                                                                   |
+| Dashboard         | `features/dashboard`                | `DashboardPage`, `useDayDashboard` (view model `buildDayDashboard` in `@myvedicstar/domain-models`)     |
+| Calendar          | `features/calendar`                 | `CalendarPage`, `useCalendarMonth` (view model `buildCalendarMonth` in `@myvedicstar/domain-models`)    |
+| Auth              | `features/auth` + `shared/auth`     | `ProtectedRoute`, `AuthCallbackPage`; `AuthClient`, `useAuth`, `useStartSignIn`                         |
 
-Location start-up: saved location → otherwise, if permission is granted or not yet asked, one automatic request →
+Signed-in location start-up: saved account default, otherwise saved location → otherwise, if permission is granted or not yet asked, one automatic request →
 denial remembered, never re-prompted automatically → manual search, coordinates and recent locations always available.
-The header shows brand · Home, Features, About, Help · location · tradition · Login/Register, adapting from one row
+The header shows brand · Home, Features, About, Help · location · tradition · Login, adapting from one row
 (≥ 1200 px) to two rows with a menu (compact).
 
-There are **no login or register pages**. Login/Register (header, Get Started) and `ProtectedRoute` call
+There are **no login or register pages**. Login (header, Get Started) and `ProtectedRoute` call
 `useStartSignIn()`, which goes straight to the identity provider's hosted pages with a `returnTo` validated by
 `sanitizeReturnPath` (same-origin relative paths only) — validated again after the provider redirects back. When sign-in
-is not configured, Login/Register are hidden and protected routes explain that sign-in is unavailable.
+is not configured, Login are hidden and protected routes explain that sign-in is unavailable.
 
 ## Styling
 

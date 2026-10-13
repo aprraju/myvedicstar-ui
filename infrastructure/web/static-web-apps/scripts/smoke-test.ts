@@ -201,7 +201,7 @@ async function runChecks(siteUrl: string): Promise<void> {
         allowed === site.origin || allowed === '*',
         `API GET CORS allows ${site.origin} (status ${response.status}, got ${allowed ?? 'none'})`,
       );
-      check(response.ok, `public today endpoint succeeds without sign-in (${response.status})`);
+      check(response.status === 401, `application API rejects requests without a token (${response.status})`);
       await response.body?.cancel();
     } catch (error) {
       check(false, `API GET reachable (${error instanceof Error ? error.message : String(error)})`);

@@ -7,10 +7,7 @@ import { axeViolations } from '../../test/axe';
 import { renderRoute } from '../../test/render';
 
 describe('sign-in entry points (no login/register pages)', () => {
-  it.each([
-    ['Login', 'login'],
-    ['Register', 'register'],
-  ] as const)(
+  it.each([['Login', 'login']] as const)(
     'header %s starts %s at the identity provider and lands on the dashboard',
     async (name, intent) => {
       const auth = createInMemoryAuthClient();

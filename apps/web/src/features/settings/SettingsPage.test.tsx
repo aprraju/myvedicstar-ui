@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
-import { TEST_API_BASE_URL } from '../../test/msw/handlers';
+import { apiRequests, TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
 import { renderRoute } from '../../test/render';
 
@@ -25,9 +25,19 @@ const initial = {
   defaultLocation: location,
   revision: 2,
 };
+const secondLocation = {
+  ...location,
+  locationId: 'e96544af-55b1-458b-92e0-33044c47ad28',
+  city: 'Liberty Hill',
+  latitude: 30.6649,
+  longitude: -97.9225,
+};
 function backend() {
-  let settings = { ...initial };
-  let locations = [location];
+  let settings: Omit<typeof initial, 'defaultLocation' | 'defaultLocationId'> & {
+    defaultLocation: typeof location | null;
+    defaultLocationId: string | null;
+  } = { ...initial };
+  let locations = [location, secondLocation];
   const saves: unknown[] = [];
   server.use(
     http.get(`${TEST_API_BASE_URL}/api/v1/settings`, () => HttpResponse.json(settings)),
@@ -35,11 +45,16 @@ function backend() {
     http.put(`${TEST_API_BASE_URL}/api/v1/settings`, async ({ request }) => {
       const values = (await request.json()) as typeof initial;
       saves.push(values);
-      settings = { ...settings, ...values, revision: settings.revision + 1 };
+      settings = {
+        ...settings,
+        ...values,
+        defaultLocation: locations.find((item) => item.locationId === values.defaultLocationId) ?? null,
+        revision: settings.revision + 1,
+      };
       return HttpResponse.json(settings);
     }),
-    http.delete(`${TEST_API_BASE_URL}/api/v1/settings/locations/:id`, () => {
-      locations = [];
+    http.delete(`${TEST_API_BASE_URL}/api/v1/settings/locations/:id`, ({ params }) => {
+      locations = locations.filter((item) => item.locationId !== params.id);
       return HttpResponse.json({ ...settings, defaultLocationId: null, defaultLocation: null, revision: 3 });
     }),
   );
@@ -47,6 +62,32 @@ function backend() {
 }
 const auth = () => createInMemoryAuthClient({ user: { id: 'u1' } });
 describe('Settings', () => {
+  it('applies both saved defaults to the header and subsequent Today calculations', async () => {
+    backend();
+    const { router } = renderRoute('/settings', { auth: auth() });
+    await waitFor(() => expect(screen.getByLabelText('Default Tradition')).toHaveValue('telugu'));
+    const header = within(screen.getByRole('banner'));
+    await waitFor(() => expect(header.getByRole('combobox', { name: 'Tradition' })).toHaveValue('telugu'));
+    await userEvent.selectOptions(screen.getByLabelText('Default Tradition'), 'tamil');
+    await userEvent.selectOptions(screen.getByLabelText('Default Location'), secondLocation.locationId);
+    expect(header.getByRole('combobox', { name: 'Tradition' })).toHaveValue('telugu');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await screen.findByText('Your settings have been saved.');
+    expect(header.getByRole('combobox', { name: 'Tradition' })).toHaveValue('tamil');
+    expect(header.getByText('Liberty Hill, Texas, United States')).toBeInTheDocument();
+    await act(() => router.navigate('/dashboard'));
+    await waitFor(() =>
+      expect(
+        apiRequests.some(
+          (url) =>
+            url.pathname.endsWith('/panchang/today') &&
+            url.searchParams.get('tradition') === 'tamil' &&
+            url.searchParams.get('latitude') === '30.66' &&
+            url.searchParams.get('longitude') === '-97.92',
+        ),
+      ).toBe(true),
+    );
+  });
   it('loads existing defaults and saves only when Save is explicitly clicked', async () => {
     const { saves } = backend();
     renderRoute('/settings', { auth: auth() });
@@ -65,7 +106,12 @@ describe('Settings', () => {
     backend();
     renderRoute('/settings', { auth: auth() });
     await userEvent.click(await screen.findByRole('button', { name: 'Delete Austin, Texas, United States' }));
-    expect(await screen.findByText(/No saved locations yet/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Delete Liberty Hill, Texas, United States' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Delete Austin, Texas, United States' }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Default Location' })).toHaveValue('');
   });
   it('puts Profile before Settings and Log out and navigates to Settings', async () => {

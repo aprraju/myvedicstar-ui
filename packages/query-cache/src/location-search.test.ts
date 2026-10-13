@@ -59,6 +59,7 @@ function setup(
   });
   const api = createApiClient({
     baseUrl: 'https://api.test.example/api/v1',
+    getAccessToken: async () => 'test-access-token',
     fetchImpl: fetch,
     coordinateDecimals: false,
   });

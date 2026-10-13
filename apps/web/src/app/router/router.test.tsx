@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { axeViolations } from '../../test/axe';
+import { apiRequests } from '../../test/msw/handlers';
 import { renderRoute } from '../../test/render';
 
 describe('routing', () => {
@@ -16,7 +17,9 @@ describe('routing', () => {
     expect(within(banner).getByRole('link', { name: 'Features' })).toHaveAttribute('href', '/#features');
     expect(within(banner).getByRole('link', { name: 'About' })).toBeInTheDocument();
     expect(within(banner).getByRole('link', { name: 'Help' })).toBeInTheDocument();
-    expect(within(banner).getByRole('button', { name: 'Choose location' })).toBeInTheDocument();
+    expect(within(banner).queryByRole('button', { name: 'Choose location' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: "Today's summary" })).not.toBeInTheDocument();
+    expect(apiRequests).toHaveLength(0);
     expect(within(banner).queryByRole('combobox', { name: 'Tradition' })).not.toBeInTheDocument();
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).not.toHaveTextContent('GeoNames');

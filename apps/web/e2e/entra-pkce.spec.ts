@@ -183,16 +183,15 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(storage).not.toContain(exchange.get('code_verifier')!); // the one-redirect PKCE record is cleaned up
   });
 
-  test('Register opens the Entra sign-up page (prompt=create) and returns signed in', async ({
+  test('does not offer Register on public pages or an authentication callback error', async ({
     page,
     baseURL,
   }) => {
-    const entra = await simulateEntra(page, baseURL!);
-    await page.goto('/help');
-    await page.getByRole('banner').getByRole('button', { name: 'Register' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    expect(entra.authorize[0]!.get('prompt')).toBe('create');
-    expect(entra.authorize[0]!.get('code_challenge_method')).toBe('S256');
+    await simulateEntra(page, baseURL!);
+    await page.goto('/about');
+    await expect(page.getByRole('button', { name: 'Register', exact: true })).toHaveCount(0);
+    await page.goto('/auth/callback?error=access_denied');
+    await expect(page.getByRole('button', { name: 'Register', exact: true })).toHaveCount(0);
   });
 
   test('API calls carry the access token; an expiring token is renewed with the refresh token', async ({

@@ -4,10 +4,8 @@ import { Navigate, useLocation } from 'react-router';
 
 import { useAuth, useStartSignIn } from '../../shared/auth';
 import { Icon, type IconName } from '../../shared/components/Icon';
-import { useWindowClass } from '../../shared/hooks/useWindowClass';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { routes } from '../../shared/routing/paths';
-import { DaySummaryCard } from '../today';
 import styles from './HomePage.module.css';
 
 /** Hero highlights; markers alternate as in the myvedicstar-default theme. */
@@ -31,27 +29,22 @@ const FEATURES: { id: string; icon: IconName; accent: 'orange' | 'teal' | 'pink'
 const BENEFITS = ['registration', 'locations', 'personalized', 'reminders', 'devices'] as const;
 
 /**
- * Public home: intentionally simple — a hero, ONE Panchang card for the selected location, and a short explanation
+ * Public home: intentionally simple — a hero and a short explanation
  * of what the app offers. The full dashboard stays behind sign-in.
- * On phones the Panchang card leads, and the hero heading and intro move down to just above "Get Started".
  * Signed-in users are taken to their dashboard: for them, Home is the dashboard.
  */
 export function HomePage() {
   const { t } = useTranslation();
   const { enabled, isAuthenticated } = useAuth();
   const { start, pending } = useStartSignIn();
-  const compact = useWindowClass() === 'compact';
   useScrollToHash();
 
   if (isAuthenticated) return <Navigate to={routes.dashboard} replace />;
 
   return (
     <div className={styles.page}>
-      <section className={styles.hero} aria-labelledby={compact ? undefined : 'home-title'}>
-        {!compact && <HeroIntro />}
-        <div className={styles.heroCard}>
-          <DaySummaryCard todayOnly />
-        </div>
+      <section className={styles.hero} aria-labelledby="home-title">
+        <HeroIntro />
       </section>
 
       <section id="features" className={styles.features} aria-labelledby="features-title" tabIndex={-1}>
@@ -72,8 +65,6 @@ export function HomePage() {
             </li>
           ))}
         </ul>
-
-        {compact && <HeroIntro />}
 
         {enabled && !isAuthenticated && (
           <section className={styles.getStarted} aria-labelledby="get-started-title">

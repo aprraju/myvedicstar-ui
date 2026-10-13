@@ -121,16 +121,16 @@ export function AuthScreen({ intent }: { intent: 'login' | 'register' }) {
         </View>
       )}
 
-      <View style={styles.switch}>
-        <AppText variant="secondary">{isLogin ? t('auth.noAccount') : t('auth.haveAccount')}</AppText>
-        <Button
-          variant="ghost"
-          label={isLogin ? t('auth.register') : t('auth.login')}
-          onPress={() =>
-            router.replace({ pathname: isLogin ? '/register' : '/login', params: { returnTo } } as Href)
-          }
-        />
-      </View>
+      {!isLogin && (
+        <View style={styles.switch}>
+          <AppText variant="secondary">{t('auth.haveAccount')}</AppText>
+          <Button
+            variant="ghost"
+            label={t('auth.login')}
+            onPress={() => router.replace({ pathname: '/login', params: { returnTo } } as Href)}
+          />
+        </View>
+      )}
     </Screen>
   );
 }

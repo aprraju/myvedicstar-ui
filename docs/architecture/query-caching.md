@@ -108,7 +108,8 @@ storage persister and `PersistQueryClientProvider`, which waits for restore befo
 buster, total age, individual fetch age, Zod schema, account scope and current local date; hashes are recomputed from
 validated keys. Failed storage falls back to normal requests. See [TanStack's persistence lifecycle](https://tanstack.com/query/latest/docs/framework/react/plugins/persistQueryClient).
 
-Only anonymous Today responses are approved for persistence. Authenticated calendar, Good Time, birth-star inputs,
+Today now requires authentication, and signed-out pages do not fetch or display it. The legacy anonymous Today
+persistence allowlist does not permit persisting authenticated responses. Authenticated calendar, Good Time, birth-star inputs,
 Other text, profiles and mutations are excluded. Protected data can be reused in memory only by the same active
 identity. Logout/account switches cancel and remove the previous account's queries without deleting public caches.
 This deliberately avoids restoring data that would bypass a fresh authorization check after app termination.

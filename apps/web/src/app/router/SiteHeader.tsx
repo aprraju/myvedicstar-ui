@@ -27,14 +27,14 @@ const APP_NAV: { to: string; icon: IconName; label: MessageKey; highlight: boole
 const NO_TRADITION_PATHS = new Set<string>([routes.home, routes.authCallback]);
 
 /**
- * Public header: brand · Home, Features, About, Help · location · tradition · Login/Register · swastika mark.
+ * Public header: brand · Home, Features, About, Help · location · tradition · Login · swastika mark.
  * The tradition selector is left out on the home and sign-in pages, which share one header.
  * Layout adapts to the window: one row on wide screens, two rows plus a menu on compact ones (see CSS).
  */
 export function SiteHeader() {
   const { t } = useTranslation();
   const { enabled, isAuthenticated } = useAuth();
-  // Login / Register go straight to the identity provider's hosted pages (no in-app pages); hidden when sign-in is
+  // Login goes straight to the identity provider's hosted pages (no in-app pages); hidden when sign-in is
   // not configured for the environment.
   const { start, pending } = useStartSignIn();
   const showSignIn = enabled && !isAuthenticated;
@@ -43,7 +43,6 @@ export function SiteHeader() {
   const menuId = useId();
   const { pathname, hash } = useLocation();
   const here = `${pathname}${hash}`;
-  const showRegister = pathname !== routes.home;
   const showTradition = !NO_TRADITION_PATHS.has(pathname);
   const menuOpen = openAt === here;
   const setMenuOpen = (open: boolean) => setOpenAt(open ? here : null);
@@ -123,22 +122,17 @@ export function SiteHeader() {
                     {t('auth.login')}
                   </button>
                 </li>
-                {showRegister && (
-                  <li className={styles.compactOnly}>
-                    <button type="button" className={styles.navLink} onClick={() => void start('register')}>
-                      {t('auth.register')}
-                    </button>
-                  </li>
-                )}
               </>
             )}
           </ul>
         </nav>
 
-        <div className={styles.context}>
-          <LocationSelector />
-          {showTradition && <TraditionSelector />}
-        </div>
+        {isAuthenticated && (
+          <div className={styles.context}>
+            <LocationSelector />
+            {showTradition && <TraditionSelector />}
+          </div>
+        )}
 
         <div className={styles.actions}>
           {isAuthenticated ? (
@@ -154,16 +148,6 @@ export function SiteHeader() {
                 >
                   {t('auth.login')}
                 </button>
-                {showRegister && (
-                  <button
-                    type="button"
-                    className={`${styles.cta} ${styles.wideOnly}`}
-                    aria-busy={pending === 'register' || undefined}
-                    onClick={() => void start('register')}
-                  >
-                    {t('auth.register')}
-                  </button>
-                )}
               </>
             )
           )}

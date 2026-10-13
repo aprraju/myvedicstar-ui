@@ -6,81 +6,30 @@ import { expect, test, withSavedLocation } from './fixtures';
 const card = (page: Page) => page.getByRole('region', { name: "Today's summary" });
 
 test.describe('public home', () => {
-  test('shows today for the saved location: day, good time, next caution', async ({ page, apiRequests }) => {
+  test('signed-out home has no Today card or application API calls', async ({
+    page,
+    apiRequests,
+    context,
+  }) => {
     await withSavedLocation(page);
-    await page.goto('/');
-    await expect(card(page).getByText('Mixed day')).toBeVisible();
-    await expect(card(page)).toContainText('Tuesday, September 29');
-    // Today's embedded evaluation has no Good Time; no separate evaluation is requested.
-    await expect(card(page)).toContainText('No more recommended times today');
-    await expect(card(page)).toContainText(/Use caution now\s*Durmuhurtham/);
-    await expect(card(page)).toContainText('All times shown in local time — Austin, Texas');
-
-    const results = await new AxeBuilder({ page })
-      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
-      .analyze();
-    expect(results.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
-    expect(
-      apiRequests.every(
-        (u) => u.pathname.endsWith('/panchang/today') || u.pathname.endsWith('/locations/resolve'),
-      ),
-    ).toBe(true);
-    await expect(page.getByRole('button', { name: 'Register' })).toHaveCount(0);
-  });
-
-  test('uses the current location when the browser allows it', async ({ page, context }) => {
     await context.grantPermissions(['geolocation']);
-    await context.setGeolocation({ latitude: 30.2672, longitude: -97.7431 });
     await page.goto('/');
-    await expect(card(page)).toContainText('All times shown in local time — Austin, Texas');
-    await expect(page.getByRole('button', { name: 'Change location: Austin, Texas' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /find auspicious moments/i })).toBeVisible();
+    await expect(card(page)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Change location/ })).toHaveCount(0);
+    expect(apiRequests).toHaveLength(0);
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations.map((result) => result.id)).toEqual([]);
   });
 
-  test('works without location permission and offers manual search', async ({ page, context }) => {
-    await context.clearPermissions();
-    await page.goto('/');
-    await expect(card(page).getByText('Choose a location to see today’s Panchang')).toBeVisible();
-    await card(page).getByRole('button', { name: 'Choose location' }).click();
-    await expect(page.getByRole('dialog', { name: 'Choose your location' })).toBeVisible();
-  });
-
-  test('change location → Panchang updates', async ({ page, apiRequests }) => {
-    await withSavedLocation(page);
-    await page.goto('/');
-    await expect(card(page).getByText('Mixed day')).toBeVisible();
-
-    await page.getByRole('button', { name: 'Change location: Austin, Texas' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Choose your location' });
-    const results = await new AxeBuilder({ page }).include('dialog').withTags(['wcag2aa']).analyze();
-    expect(results.violations.map((v) => v.id)).toEqual([]);
-
-    await dialog
-      .getByRole('searchbox', { name: 'City, ZIP code or coordinates' })
-      .fill('Hyderabad, Telangana, India');
-    await dialog.getByRole('button', { name: 'Search' }).click();
-    await dialog.getByRole('button', { name: 'Use this location' }).click();
-
-    await expect(dialog).toBeHidden();
-    await expect(card(page)).toContainText('All times shown in local time — Hyderabad, Telangana');
-    // 10:00 in Austin is 20:30 in Hyderabad: today's embedded evaluation has no Good Time, and times are shown in the
-    // selected location's zone (IST), not the browser's.
-    await expect(card(page)).toContainText('No more recommended times today');
-    await expect(card(page)).toContainText(/Next caution period\s*Dur Muhurtam 10:54\sPM – 11:42\sPM/);
-    expect(
-      apiRequests.some(
-        (u) => u.pathname.endsWith('/panchang/today') && u.searchParams.get('latitude') === '17.39',
-      ),
-    ).toBe(true);
-  });
-
-  test('explains an unsupported ZIP search', async ({ page }) => {
-    await withSavedLocation(page);
-    await page.goto('/');
-    await page.getByRole('button', { name: /Change location/ }).click();
-    const dialog = page.getByRole('dialog');
-    await dialog.getByRole('searchbox').fill('78701');
-    await dialog.getByRole('button', { name: 'Search' }).click();
-    await expect(dialog.getByRole('alert')).toContainText('ZIP or postal code isn’t available yet');
+  test('logout return with sid stays on the signed-out landing page without API requests', async ({
+    page,
+    apiRequests,
+  }) => {
+    await page.goto('/?sid=logout-test-session');
+    await expect(page.getByRole('heading', { level: 1, name: /find auspicious moments/i })).toBeVisible();
+    await expect(card(page)).toHaveCount(0);
+    expect(apiRequests).toHaveLength(0);
   });
 
   test('change tradition → Panchang requested for the new tradition', async ({ page, apiRequests }) => {
@@ -128,7 +77,7 @@ test.describe('sign-in journeys (mock identity provider)', () => {
   test('Help → Register → Dashboard', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/help');
-    await page.getByRole('banner').getByRole('button', { name: 'Register' }).click();
+    await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await expect(page).toHaveURL(/\/dashboard$/);
   });
@@ -158,8 +107,7 @@ test.describe('sign-in journeys (mock identity provider)', () => {
 
   test('Find a Good Time → sign in → back to Find a Good Time', async ({ page }) => {
     await withSavedLocation(page);
-    await page.goto('/');
-    await card(page).getByRole('link', { name: 'Find a Good Time' }).click();
+    await page.goto('/good-time');
     await expect(page.getByRole('heading', { level: 1, name: 'Find a Good Time' })).toBeVisible();
     await expect(page).toHaveURL(/\/good-time$/);
   });

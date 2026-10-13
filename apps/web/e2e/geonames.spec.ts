@@ -34,7 +34,14 @@ for (const width of [344, 768, 884]) {
     await page.route('**/locations/timezone?**', (route) =>
       route.fulfill({ json: { timeZone: 'America/Chicago' } }),
     );
-    await page.goto('/');
+    let saved: Record<string, unknown> | undefined;
+    await page.route('**/api/v1/settings/locations', async (route) => {
+      if (route.request().method() !== 'POST') return route.fulfill({ json: [] });
+      expect(route.request().headers().authorization).toMatch(/^Bearer /);
+      saved = route.request().postDataJSON() as Record<string, unknown>;
+      return route.fulfill({ json: { ...saved, locationId: 'e96544af-55b1-458b-92e0-33044c47ad28' } });
+    });
+    await page.goto('/dashboard');
     await page.getByRole('button', { name: 'Change location: Austin, Texas' }).click();
     const dialog = page.getByRole('dialog', { name: 'Choose your location' });
     await dialog.getByRole('combobox', { name: 'City, ZIP code or coordinates' }).fill('Austin');
@@ -46,18 +53,12 @@ for (const width of [344, 768, 884]) {
     );
     await suggestion.click();
     await expect(dialog).toBeHidden();
-    const selected = await page.evaluate(
-      () =>
-        JSON.parse(localStorage.getItem('mvs.location.selected') ?? '{}') as {
-          latitude: number;
-          longitude: number;
-          timeZone: string;
-        },
-    );
-    expect(selected).toMatchObject({
-      latitude: 30.267212,
-      longitude: -97.743112,
-      timeZone: 'America/Chicago',
-    });
+    await expect
+      .poll(() => saved)
+      .toMatchObject({
+        latitude: 30.267212,
+        longitude: -97.743112,
+        timeZone: 'America/Chicago',
+      });
   });
 }

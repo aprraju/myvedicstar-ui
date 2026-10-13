@@ -11,7 +11,7 @@ import { createServices } from './services';
 
 describe('app services', () => {
   it('reach the backend through the typed API client (mocked with MSW)', async () => {
-    const { services } = createTestServices();
+    const { services } = createTestServices({ auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     const today = await services.api.panchang.today({
       location: { place: 'Austin, Texas, USA' },
       tradition: 'telugu',
@@ -21,10 +21,14 @@ describe('app services', () => {
   });
 
   it('record API telemetry without location or credentials', async () => {
-    const { services, telemetry } = createTestServices();
+    const { services, telemetry } = createTestServices({
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     await services.api.panchang.today({ location: { latitude: 30.2672, longitude: -97.7431 } });
 
-    const metric = telemetry.items.find((item) => item.name === 'api.duration');
+    const metric = telemetry.items.find(
+      (item) => item.name === 'api.duration' && item.properties?.operation === 'panchang.today',
+    );
     expect(metric).toMatchObject({
       type: 'metric',
       properties: { operation: 'panchang.today', status: 200, outcome: 'success', platform: 'web' },
@@ -86,7 +90,9 @@ describe('telemetry from runtime configuration', () => {
   });
 
   it('reports errors that escape React', () => {
-    const { services, telemetry } = createTestServices();
+    const { services, telemetry } = createTestServices({
+      auth: createInMemoryAuthClient({ user: { id: 'u1' } }),
+    });
     // A detached target: jsdom would report errors dispatched on the real window as uncaught test errors.
     const target = new EventTarget() as Window;
     const uninstall = installGlobalErrorHandlers(services.telemetry, target);
