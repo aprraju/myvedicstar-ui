@@ -2,6 +2,32 @@ import AxeBuilder from '@axe-core/playwright';
 
 import { expect, panchangMonthFixture, test, withSavedLocation } from './fixtures';
 
+test('Panchang observance badges match the legend on mobile and desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 900 });
+  await withSavedLocation(page);
+  await page.goto('/calendar?month=2026-10&day=2026-10-06');
+  await page.getByRole('button', { name: 'Panchang', exact: true }).click();
+  const month = page.locator('section[aria-labelledby="calendar-title"]');
+  for (const width of [375, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const observance of ['ekadashi', 'purnima', 'amavasya']) {
+      const badge = month
+        .getByRole('group', { name: /Days of/ })
+        .locator(`[data-observance="${observance}"]`)
+        .first();
+      const legend = month
+        .getByRole('list', { name: 'Observances' })
+        .locator(`[data-observance="${observance}"]`);
+      await expect(badge).toBeVisible();
+      const colors = (element: Element) => {
+        const css = getComputedStyle(element);
+        return [css.color, css.backgroundColor];
+      };
+      expect(await badge.evaluate(colors)).toEqual(await legend.evaluate(colors));
+    }
+  }
+});
+
 test('mobile Panchang uses backend tithi abbreviations while desktop keeps full names', async ({ page }) => {
   const response = panchangMonthFixture(2026, 9);
   response.days[0]!.tithis[0]!.shortName = 'Ekad';

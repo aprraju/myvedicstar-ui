@@ -1,14 +1,14 @@
-import { ApiError, queryKeys, retryDelayMs, shouldRetryQuery } from '@myvedicstar/api-client';
+import { type ApiClient, ApiError, queryKeys, retryDelayMs, shouldRetryQuery } from '@myvedicstar/api-client';
 import { msUntilNextLocalDay } from '@myvedicstar/date-time';
 import { fixtures } from '@myvedicstar/testing';
-import { dehydrate, focusManager, onlineManager } from '@tanstack/react-query';
+import { dehydrate, focusManager, onlineManager, QueryObserver } from '@tanstack/react-query';
 import { persistQueryClientRestore, persistQueryClientSave } from '@tanstack/react-query-persist-client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createCachingClient, removeUserCache } from './client';
 import { scopedKey } from './keys';
 import { subscribeLocalDate } from './local-date';
-import { cachedPanchangRange, seedPanchangDays } from './panchang';
+import { cachedPanchangRange, panchangMonthOptions, seedPanchangDays } from './panchang';
 import { createCachePersister, persistenceBuster, shouldPersistQuery } from './persistence';
 import { cachePolicies, defaultCacheSettings } from './policies';
 
@@ -32,6 +32,27 @@ afterEach(() => {
 });
 
 describe('shared web and mobile cache', () => {
+  it('refreshes a fresh legacy calendar response once and then reuses backend short names', async () => {
+    const cache = client();
+    const legacy = structuredClone(fixtures.panchang.austinTelugu);
+    const updated = structuredClone(legacy);
+    for (const tithi of updated.days[0]!.tithis) tithi.shortName = 'Chatur';
+    const month = vi.fn(async () => updated);
+    const api = { panchang: { month } } as unknown as ApiClient;
+    const options = panchangMonthOptions({ api, params, userId: 'u1' }, cache, 2026, 9);
+    cache.setQueryData(options.queryKey, legacy);
+    const observer = new QueryObserver(cache, options);
+    const unsubscribe = observer.subscribe(() => undefined);
+    await vi.waitFor(() =>
+      expect(observer.getCurrentResult().data?.days[0]!.tithis[0]!.shortName).toBe('Chatur'),
+    );
+    unsubscribe();
+    const nextObserver = new QueryObserver(cache, options);
+    const unsubscribeNext = nextObserver.subscribe(() => undefined);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(month).toHaveBeenCalledTimes(1);
+    unsubscribeNext();
+  });
   it('fetches once and avoids 9 repeated API calls while data is fresh', async () => {
     const cache = client();
     const fetch = vi.fn(async () => ({ result: true }));

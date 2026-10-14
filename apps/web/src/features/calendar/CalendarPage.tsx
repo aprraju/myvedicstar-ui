@@ -283,6 +283,11 @@ function MonthGrid({
         const dayFestivals = known ? festivals.festivalsOn(day.date) : [];
         const observance = known ? undefined : day.observance;
         const first = dayFestivals[0];
+        const firstObservance =
+          first?.category === 'observance' &&
+          ['ekadashi', 'purnima', 'amavasya'].includes(first.key.toLowerCase())
+            ? first.key.toLowerCase()
+            : undefined;
         return (
           <button
             key={day.date}
@@ -322,7 +327,11 @@ function MonthGrid({
                   </>
                 )}
                 {first && (
-                  <span className={styles.tag} data-category={first.category}>
+                  <span
+                    className={styles.tag}
+                    data-category={first.category}
+                    data-observance={firstObservance}
+                  >
                     {first.icon && <span aria-hidden="true">{first.icon} </span>}
                     {first.name}
                   </span>

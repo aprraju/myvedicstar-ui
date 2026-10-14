@@ -135,6 +135,12 @@ export function panchangMonthOptions(
       if (!signal.aborted) seedPanchangDays(client, data, params as PanchangParams, userId, settings);
       return data;
     },
+    // Older month responses were cached for 12 hours before abbreviation fields existed.
+    // Refresh them on entry/focus even while fresh, without polling or a render-triggered retry loop.
+    refetchOnMount: (query) =>
+      query.state.data?.days.some((day) => day.tithis.some((tithi) => !tithi.shortName)) ? 'always' : true,
+    refetchOnWindowFocus: (query) =>
+      query.state.data?.days.some((day) => day.tithis.some((tithi) => !tithi.shortName)) ? 'always' : true,
     enabled:
       enabled &&
       validCalculationParams(params) &&

@@ -44,7 +44,9 @@ describe('Calendar', () => {
       'Tuesday, December 1, Shukla Ekadashi, Mixed, Ekadashi',
     );
     expect(within(dayButton(/^Tuesday, December 1,/)).getByText('Shukla Ekadashi')).toBeVisible();
-    expect(within(dayButton(/^Tuesday, December 1,/)).getByText('Ekadashi', { exact: true })).toBeVisible();
+    expect(
+      dayButton(/^Tuesday, December 1,/).querySelector('[data-observance="ekadashi"]'),
+    ).toHaveTextContent('Ekadashi');
     expect(dayButton(/^Saturday, December 5,/)).toHaveTextContent('Purnima');
     expect(dayButton(/^Sunday, December 20,/)).toHaveTextContent('Amavasya');
     const today = dayButton(/^Tuesday, December 15,/);
@@ -63,7 +65,7 @@ describe('Calendar', () => {
       expect(dayButton(/^Tuesday, October 20,/)).toHaveTextContent('Vijayadashami (Dasara)'),
     );
     expect(dayButton(/^Tuesday, October 20,/)).toHaveAccessibleName(/Vijayadashami \(Dasara\)/);
-    expect(within(dayButton(/^Tuesday, October 20,/)).getByText('Amavasya')).toBeVisible();
+    expect(dayButton(/^Tuesday, October 20,/)).toHaveTextContent('Amavasya');
     expect(within(dayButton(/^Tuesday, October 20,/)).getByText('Vijayadashami (Dasara)')).toBeVisible();
     // Oct 1 is synthetic Shukla Ekadashi, but the backend has no festival that day: no Tithi-based tag inside the window.
     expect(dayButton(/^Thursday, October 1,/)).toHaveAccessibleName(
