@@ -10,7 +10,7 @@ import {
 } from '@myvedicstar/domain-models';
 import { fixtures } from '@myvedicstar/testing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { cleanup } from '@testing-library/react-native';
+import { cleanup, configure } from '@testing-library/react-native';
 import { renderRouter } from 'expo-router/testing-library';
 import type { ComponentType } from 'react';
 
@@ -20,6 +20,8 @@ import { createMobileServices } from '../shared/services';
 
 export const austin = toSelectedLocation(fixtures.location.austin, 'search');
 export const hyderabad = toSelectedLocation(fixtures.location.hyderabadCoordinates, 'current');
+// Native routing and debounced searches can exceed the library's one-second default on CI.
+configure({ asyncUtilTimeout: 5000 });
 beforeEach(() => atInstant('2026-09-29T10:00:00-05:00'));
 
 /** Same choice as the web MSW handlers: Other → Business; Business → one Good Time; General today → that date. */

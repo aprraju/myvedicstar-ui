@@ -32,7 +32,7 @@ describe('primary navigation', () => {
   it('offers Today, Calendar, Good Time, Festivals and More with accessible labels', async () => {
     setWindowWidth(390);
     await renderRouter(routes, { initialUrl: '/' });
-    for (const label of ['Today', 'Calendar', 'Good Time', 'Festivals', 'More']) {
+    for (const label of ['Today', 'Panchang', 'Good Time', 'Festivals', 'More']) {
       expect(await screen.findByLabelText(label)).toBeTruthy();
     }
     // Today shows the public summary for visitors.
@@ -44,7 +44,7 @@ describe('primary navigation', () => {
   it('supports deep links to a tab', async () => {
     setWindowWidth(390);
     await renderRouter(routes, { initialUrl: '/calendar' });
-    expect(await screen.findByRole('header', { name: 'Calendar' })).toBeTruthy();
+    expect(await screen.findByRole('header', { name: 'Panchang' })).toBeTruthy();
   });
 
   it('keeps working when the window expands (e.g. a foldable unfolding)', async () => {

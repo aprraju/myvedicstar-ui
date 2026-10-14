@@ -41,16 +41,16 @@ credentials, Key Vault secrets, social-provider secrets. The web and mobile apps
 
 ## 3. Environment matrix
 
-| Setting          | DEV                                                                  | TEST         | UAT          | PROD                                        |
-| ---------------- | -------------------------------------------------------------------- | ------------ | ------------ | ------------------------------------------- |
-| Web URL          | `https://localhost:5173`                                             | configurable | configurable | `https://www.myvedicstar.com`               |
-| Callback         | `https://localhost:5173/auth/callback`                               | configurable | configurable | `https://www.myvedicstar.com/auth/callback` |
-| API URL          | `https://localhost:5173/api/v1` (proxied to `http://localhost:5275`) | placeholder  | placeholder  | placeholder                                 |
-| Authority        | configurable                                                         | configurable | configurable | configurable                                |
-| Web client ID    | configurable                                                         | configurable | configurable | configurable                                |
-| Mobile client ID | configurable                                                         | configurable | configurable | configurable                                |
-| API client ID    | configurable                                                         | configurable | configurable | configurable                                |
-| API scope        | configurable                                                         | configurable | configurable | configurable                                |
+| Setting          | DEV                                                                              | TEST         | UAT          | PROD                                        |
+| ---------------- | -------------------------------------------------------------------------------- | ------------ | ------------ | ------------------------------------------- |
+| Web URL          | `https://localhost:5173`                                                         | configurable | configurable | `https://www.myvedicstar.com`               |
+| Callback         | `https://localhost:5173/auth/callback`                                           | configurable | configurable | `https://www.myvedicstar.com/auth/callback` |
+| API URL          | `https://localhost:5173/api/v1` (proxied to shared host `http://localhost:5289`) | placeholder  | placeholder  | placeholder                                 |
+| Authority        | configurable                                                                     | configurable | configurable | configurable                                |
+| Web client ID    | configurable                                                                     | configurable | configurable | configurable                                |
+| Mobile client ID | configurable                                                                     | configurable | configurable | configurable                                |
+| API client ID    | configurable                                                                     | configurable | configurable | configurable                                |
+| API scope        | configurable                                                                     | configurable | configurable | configurable                                |
 
 `environment` values: `local`, `development`, `test`, `uat`, `staging`, `production`. In `uat`, `staging` and
 `production` every URL must be HTTPS and mock sign-in is rejected at startup.
@@ -97,8 +97,14 @@ All development settings, including the `auth` block, live in
 
 - **Redirect URIs** in the Entra app registration (Single-page application platform) must be the HTTPS ones:
   `https://localhost:5173/auth/callback` and logout `https://localhost:5173/`.
-- **API:** the dev server proxies `/api` to `http://localhost:5275`, so `apiBaseUrl` is
+- **API:** the dev server proxies `/api`, including `/api/v1/auth`, to the combined MyVedicStar host at
+  `http://localhost:5289`, so `apiBaseUrl` is
   `https://localhost:5173/api/v1`. Calls stay same-origin: no CORS change in the backend and no mixed content.
+  The VS Code **Web: debug in Chrome/Edge (starts API + dev server)** configurations start
+  `../myvedicstar/src/MyVedicStar.API` with the `shared` profile. The legacy `../myvedicday` APIs have a different
+  Entra audience and must not be substituted for that host. `MVS_DEV_API_ORIGIN` and
+  `MVS_DEV_AUTH_API_ORIGIN` remain available for explicit custom targets.
+  Debugger browser URLs use HTTPS to match the callback origin and its tab-scoped PKCE state.
 - **CSP:** derived from the config (`connect-src` authority origin), plus `wss://localhost:5173` for hot reload.
 
 ### What the flow does (verified by `apps/web/e2e/entra-pkce.spec.ts` against a simulated tenant)

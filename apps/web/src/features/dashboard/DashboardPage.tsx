@@ -1,3 +1,5 @@
+import { useSyncExternalStore } from 'react';
+
 import { displayNameOf, useAuth, useUserInfo } from '../../shared/auth';
 import { Skeleton } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
@@ -5,6 +7,7 @@ import { useFormatters } from '../../shared/i18n/useFormatters';
 import { DaySummaryCard } from '../today';
 import styles from './DashboardPage.module.css';
 import { DayTimeline } from './DayTimeline';
+import { MobileDashboard } from './MobileDashboard';
 import { PanchangPanel } from './PanchangPanel';
 import { PeriodList } from './PeriodList';
 import { RatingFactors } from './RatingFactors';
@@ -16,7 +19,21 @@ import { useDayDashboard } from './useDayDashboard';
  * and why the day has its rating. Every value comes from the backend for the selected location and tradition; times are
  * shown in the location's time zone.
  */
+function subscribeDashboardWidth(listener: () => void) {
+  window.addEventListener('resize', listener);
+  return () => window.removeEventListener('resize', listener);
+}
+
 export function DashboardPage() {
+  const mobile = useSyncExternalStore(
+    subscribeDashboardWidth,
+    () => window.innerWidth < 1024,
+    () => false,
+  );
+  return mobile ? <MobileDashboard /> : <DesktopDashboard />;
+}
+
+function DesktopDashboard() {
   const { t } = useTranslation();
   const format = useFormatters();
   const { user } = useAuth();

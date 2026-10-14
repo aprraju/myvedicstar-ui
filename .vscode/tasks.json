@@ -17,9 +17,9 @@
       }
     },
     {
-      "label": "api: MyVedicDay (sibling repo, http://localhost:5275)",
+      "label": "api: MyVedicStar shared host (http://localhost:5289)",
       "type": "shell",
-      "command": "dotnet run --project ../MyVedicDay/src/MyVedicDay.Api --launch-profile http",
+      "command": "dotnet run --project ../myvedicstar/src/MyVedicStar.API --launch-profile shared",
       "isBackground": true,
       "problemMatcher": {
         "owner": "dotnet",
@@ -33,7 +33,17 @@
     },
     {
       "label": "web + api",
-      "dependsOn": ["api: MyVedicDay (sibling repo, http://localhost:5275)", "web: dev server"]
+      "dependsOn": ["api: MyVedicStar shared host (http://localhost:5289)", "web: dev server"]
+    },
+    {
+      "label": "mobile: Android emulator (native debug build)",
+      "type": "shell",
+      "command": "npx expo run:android",
+      "options": {
+        "cwd": "${workspaceFolder}/apps/mobile",
+        "env": { "EXPO_PUBLIC_API_BASE_URL": "http://10.0.2.2:5289/api/v1" }
+      },
+      "problemMatcher": []
     },
     {
       "label": "mobile: expo start",

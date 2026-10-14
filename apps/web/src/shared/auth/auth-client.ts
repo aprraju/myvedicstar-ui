@@ -11,6 +11,8 @@ export interface AuthUser {
 export interface AuthState {
   status: 'loading' | 'ready';
   user: AuthUser | null;
+  /** A rejected session requires an explicit retry; protected routes must not start another automatic login. */
+  signInError?: 'failed';
 }
 
 export interface SignInRequest {
@@ -73,8 +75,8 @@ export function createInMemoryAuthClient(
 ): AuthClient & { requests: SignInRequest[] } {
   let state: AuthState = { status: 'ready', user: options.user ?? null };
   const listeners = new Set<() => void>();
-  const set = (user: AuthUser | null) => {
-    state = { status: 'ready', user };
+  const set = (user: AuthUser | null, rejected = false) => {
+    state = { status: 'ready', user, ...(rejected ? { signInError: 'failed' as const } : {}) };
     listeners.forEach((listener) => listener());
   };
   const requests: SignInRequest[] = [];
@@ -95,7 +97,7 @@ export function createInMemoryAuthClient(
     },
     completeSignIn: async () => ({ ok: true, returnTo: undefined }),
     signOut: async () => set(null),
-    handleUnauthorized: () => set(null),
+    handleUnauthorized: () => set(null, true),
   };
 }
 

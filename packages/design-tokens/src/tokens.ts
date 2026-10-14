@@ -6,7 +6,11 @@
  * Every text/background pair is checked for WCAG 2.2 AA contrast in `tokens.test.ts`.
  */
 
+const heroColors = { heroForeground: '#FFFFFF', heroOverlay: '#0D1B2E' };
+
 export interface ColorScheme {
+  heroForeground: string;
+  heroOverlay: string;
   background: string;
   surface: string;
   surfaceElevated: string;
@@ -43,6 +47,7 @@ export interface ColorScheme {
 
 export const colors: { light: ColorScheme; dark: ColorScheme } = {
   light: {
+    ...heroColors,
     background: '#FBFAF7',
     surface: '#FFFEFA',
     surfaceElevated: '#FFFFFF',
@@ -72,6 +77,7 @@ export const colors: { light: ColorScheme; dark: ColorScheme } = {
     errorSurface: '#FCEBEA',
   },
   dark: {
+    ...heroColors,
     background: '#11151C',
     surface: '#1A1F28',
     surfaceElevated: '#222834',

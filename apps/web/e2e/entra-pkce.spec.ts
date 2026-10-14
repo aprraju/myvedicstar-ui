@@ -194,6 +194,32 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     await expect(page.getByRole('button', { name: 'Register', exact: true })).toHaveCount(0);
   });
 
+  for (const endpoint of ['auth/login', 'panchang/today']) {
+    test(`a rejected ${endpoint} token stops login redirects until an explicit retry`, async ({
+      page,
+      baseURL,
+    }) => {
+      const entra = await simulateEntra(page, baseURL!);
+      await withSavedLocation(page);
+      const rejectedEndpoint = `**/api/v1/${endpoint}*`;
+      await page.route(rejectedEndpoint, (route) =>
+        route.fulfill({ status: 401, json: { title: 'Unauthorized' } }),
+      );
+      await page.goto('/dashboard');
+      await expect(page.getByRole('alert')).toContainText("We couldn't sign you in");
+      await expect(page).toHaveURL(/\/auth\/callback\?signin_error=failed/);
+      expect(entra.authorize).toHaveLength(1);
+      expect(entra.token).toHaveLength(1);
+      await page.unroute(rejectedEndpoint);
+      await page.getByRole('button', { name: 'Try again' }).click();
+      await expect(page).toHaveURL(/\/dashboard$/);
+      await expect(
+        page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true }),
+      ).toBeVisible();
+      expect(entra.authorize).toHaveLength(2);
+    });
+  }
+
   test('API calls carry the access token; an expiring token is renewed with the refresh token', async ({
     page,
     baseURL,
@@ -214,7 +240,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(entra.authorize[0]!.get('code_challenge_method')).toBe('S256');
 
     await page.getByRole('banner').getByRole('link', { name: 'Home', exact: true }).click(); // in-app: memory kept
-    await expect(page.getByRole('region', { name: "Today's summary" }).getByText('Mixed day')).toBeVisible();
+    await expect(page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true })).toBeVisible();
 
     const refresh = entra.token.find((body) => body.get('grant_type') === 'refresh_token');
     expect(refresh?.get('refresh_token')).toBe('refresh-1');

@@ -15,6 +15,21 @@
   gap: var(--space-xl) var(--space-lg);
 }
 
+@media (max-width: 1023px) {
+  .columns,
+  .bottom p:not(:last-child) {
+    display: none;
+  }
+  .footer {
+    padding-block: var(--space-md);
+  }
+  .footer .bottom {
+    margin-block-start: 0;
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+}
+
 @media (min-width: 840px) {
   .columns {
     grid-template-columns: repeat(4, minmax(0, 1fr));

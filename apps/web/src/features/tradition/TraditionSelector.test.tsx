@@ -55,7 +55,7 @@ describe('TraditionSelector', () => {
     await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(8));
     await userEvent.selectOptions(select, 'north-indian');
     await userEvent.click(within(screen.getByRole('banner')).getByRole('link', { name: 'Home' }));
-    await screen.findByText('Mixed day');
+    await screen.findByText('Mixed');
 
     await waitFor(() =>
       expect(

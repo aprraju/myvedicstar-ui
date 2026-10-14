@@ -229,6 +229,27 @@ describe('refresh tokens', () => {
     expect(await client.getAccessToken()).toBeNull();
     expect(mocks.manager.removeUser).toHaveBeenCalled();
     expect(client.getState().user).toBeNull();
+    expect(client.getState().signInError).toBe('failed');
+  });
+
+  it('blocks automatic reauthentication and tokens immediately when an API rejects the session', async () => {
+    mocks.manager.getUser.mockResolvedValue(user());
+    let finishCleanup!: () => void;
+    mocks.manager.removeUser.mockImplementation(
+      () => new Promise<void>((resolve) => (finishCleanup = resolve)),
+    );
+    const client = createOidcAuthClient(config, 'https://x.example');
+    await vi.waitFor(() => expect(client.getState().user).not.toBeNull());
+    client.handleUnauthorized();
+    expect(client.getState()).toEqual({ status: 'ready', user: null, signInError: 'failed' });
+    expect(await client.getAccessToken()).toBeNull();
+    expect(mocks.manager.signinRedirect).not.toHaveBeenCalled();
+    finishCleanup();
+    mocks.manager.removeUser.mockResolvedValue(undefined);
+    await vi.waitFor(() => expect(client.getState().signInError).toBe('failed'));
+    await client.signIn({ intent: 'login', returnTo: '/dashboard' });
+    expect(client.getState().signInError).toBeUndefined();
+    expect(mocks.manager.signinRedirect).toHaveBeenCalledOnce();
   });
 
   it('keeps the session when the refresh fails because the device is offline', async () => {

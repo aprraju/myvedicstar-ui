@@ -88,6 +88,13 @@ precision than the calculation uses.
 in `@myvedicstar/testing` are **captured from the running API** and validated by contract tests — refresh them when
 the backend contract changes (see README).
 
+Panchang elements optionally include `shortName` and `compactName`. Tithi abbreviations are defined in the backend
+`MyVedicDay.Panchang.Data/Content/panchang-content.en.json` catalog and resolve through its normal language and
+tradition fallback. The API carries these fields on each tithi in today, date, month and year responses. Mobile
+Panchang calendar cells display `shortName`; desktop cells and selected-day details retain `name`. Compact forms
+are also returned (P1–P15, with A15 for Amavasya). Older cached responses remain valid and use the previous label
+fallback until refreshed. Deploy or restart the updated backend to serve the new fields.
+
 ## CORS
 
 The backend allows `GET` from configured origins (`Cors:AllowedOrigins`) with any header and exposes

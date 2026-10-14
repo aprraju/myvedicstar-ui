@@ -40,7 +40,7 @@ test.describe('public home', () => {
     await page.getByRole('link', { name: 'Help / FAQ', exact: true }).click();
     await page.getByRole('combobox', { name: 'Tradition' }).selectOption('tamil');
     await page.getByRole('link', { name: "Today's Panchang", exact: true }).click();
-    await expect(card(page).getByText('Mixed day')).toBeVisible();
+    await expect(card(page).getByText('Mixed', { exact: true })).toBeVisible();
     await expect
       .poll(() =>
         apiRequests.some(
@@ -92,7 +92,7 @@ test.describe('sign-in journeys (mock identity provider)', () => {
       }
     });
     await page.goto('/dashboard'); // mock identity provider signs in instantly
-    await expect(page.getByRole('region', { name: 'Times to avoid' })).toBeVisible();
+    await expect(card(page).getByText('Mixed', { exact: true })).toBeVisible();
     await expect
       .poll(() => calls.map((c) => c.path))
       .toEqual(expect.arrayContaining(['/api/v1/panchang/today', '/api/v1/traditions']));

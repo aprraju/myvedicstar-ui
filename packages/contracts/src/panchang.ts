@@ -60,6 +60,9 @@ export const panchangElementSchema = z.object({
   key: z.string(),
   number: z.number().int(),
   name: z.string(),
+  /** Backend content labels; optional for cached responses from earlier API versions. */
+  shortName: z.string().nullable().optional(),
+  compactName: z.string().nullable().optional(),
   start: isoInstant,
   end: isoInstant,
   startDisplay: z.string(),

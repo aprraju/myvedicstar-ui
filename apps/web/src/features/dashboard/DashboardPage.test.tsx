@@ -87,7 +87,8 @@ describe('Dashboard (authenticated Today)', () => {
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
     const timeline = await screen.findByRole('region', { name: "Today's timeline" });
-    expect(timeline).toHaveTextContent('All times in local time — Austin, Texas');
+    expect(timeline).toHaveTextContent('Sunrise');
+    expect(timeline).toHaveTextContent('Next sunrise');
   });
 
   it('asks for a location when none is selected', async () => {

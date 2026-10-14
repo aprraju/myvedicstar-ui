@@ -262,3 +262,49 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
+/* Today mobile composition only; all other summary cards retain their existing layout. */
+.mobile.card {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.mobile .facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.mobile .tone {
+  background: var(--tone-surface);
+  padding: var(--space-md);
+}
+.mobile .toneIcon {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+}
+.mobile .headline {
+  font-size: var(--font-size-lg);
+}
+.mobile .fact {
+  padding: var(--space-sm);
+  min-inline-size: 0;
+}
+.mobile .factLabel {
+  flex-wrap: wrap;
+  font-size: var(--font-size-xs);
+}
+.mobile .factValue {
+  overflow-wrap: anywhere;
+  font-size: var(--font-size-md);
+}
+.mobile .factTime {
+  display: block;
+  font-size: clamp(var(--font-size-xs), 3.4vw, var(--font-size-sm));
+  overflow-wrap: normal;
+}
+.mobile .cautionName {
+  font-size: clamp(var(--font-size-xs), 3.4vw, var(--font-size-sm));
+  font-weight: inherit;
+}
+.mobile .footnote {
+  font-size: var(--font-size-xs);
+}

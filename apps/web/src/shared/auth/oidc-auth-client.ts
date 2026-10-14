@@ -100,12 +100,20 @@ function createClient(settings: OidcClientSettings): AuthClient {
   });
 
   let state: AuthState = { status: 'loading', user: null };
+  let sessionRejected = false;
   const listeners = new Set<() => void>();
   const publish = (user: User | null) => {
-    state = { status: 'ready', user: user && !user.expired ? toAuthUser(user) : null };
+    state = {
+      status: 'ready',
+      user: !sessionRejected && user && !user.expired ? toAuthUser(user) : null,
+      ...(sessionRejected ? { signInError: 'failed' as const } : {}),
+    };
     listeners.forEach((listener) => listener());
   };
-  const endSession = async () => {
+  const endSession = async (rejected = false) => {
+    sessionRejected = rejected;
+    // Publish before asynchronous storage removal, so a route cannot redirect during cleanup.
+    publish(null);
     await manager.removeUser();
     publish(null);
   };
@@ -117,7 +125,7 @@ function createClient(settings: OidcClientSettings): AuthClient {
       .signinSilent() // with a refresh token this is the refresh_token grant (no iframe)
       .catch(async (error: unknown) => {
         if (error instanceof TypeError) return null; // offline: keep the session, the request fails normally
-        await endSession(); // refresh token expired or revoked
+        await endSession(true); // refresh token expired or revoked
         return null;
       })
       .finally(() => {
@@ -126,7 +134,7 @@ function createClient(settings: OidcClientSettings): AuthClient {
 
   manager.events.addUserLoaded((user) => publish(user));
   manager.events.addUserUnloaded(() => publish(null));
-  manager.events.addSilentRenewError(() => void endSession());
+  manager.events.addSilentRenewError(() => void endSession(true));
   void manager.getUser().then(publish, () => publish(null));
 
   return {
@@ -138,12 +146,13 @@ function createClient(settings: OidcClientSettings): AuthClient {
       return () => listeners.delete(listener);
     },
     async getAccessToken() {
+      if (sessionRejected) return null;
       const user = await manager.getUser();
-      if (!user) return null;
+      if (!user || sessionRejected) return null;
       const expiring = user.expired || (user.expires_in ?? 0) < RENEW_BEFORE_EXPIRY_SECONDS;
       if (!expiring) return user.access_token;
       if (!user.refresh_token) {
-        if (user.expired) await endSession();
+        if (user.expired) await endSession(true);
         return user.expired ? null : user.access_token;
       }
       const renewed = await refresh();
@@ -151,6 +160,8 @@ function createClient(settings: OidcClientSettings): AuthClient {
     },
     async signIn({ returnTo, intent, provider, loginHint }) {
       if (state.user) return;
+      sessionRejected = false;
+      publish(null);
       await manager.signinRedirect({
         state: { returnTo },
         ...(loginHint ? { login_hint: loginHint } : {}),
@@ -163,6 +174,7 @@ function createClient(settings: OidcClientSettings): AuthClient {
     async completeSignIn(): Promise<SignInCallbackResult> {
       try {
         const user = await manager.signinRedirectCallback();
+        sessionRejected = false;
         publish(user);
         return { ok: true, returnTo: readReturnTo(user.state) };
       } catch (error) {
@@ -187,7 +199,7 @@ function createClient(settings: OidcClientSettings): AuthClient {
       });
     },
     handleUnauthorized() {
-      void endSession();
+      void endSession(true);
     },
   };
 }

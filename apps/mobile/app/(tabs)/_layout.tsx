@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { supportsTwoPanes } from '@myvedicstar/design-tokens';
-import { Tabs } from 'expo-router';
+import { Tabs, usePathname, useRouter } from 'expo-router';
 import type { ComponentProps } from 'react';
 
+import { useAuth } from '../../src/shared/auth';
 import { useTranslation } from '../../src/shared/i18n';
 import { useTheme, useWindowClass } from '../../src/shared/theme';
 
@@ -26,6 +27,9 @@ const tabs: {
  * (tablets, unfolded foldables, landscape) the tabs move to a side rail so content gets the width.
  */
 export default function TabsLayout() {
+  const { isAuthenticated } = useAuth();
+  const today = usePathname() === '/' && isAuthenticated;
+  const router = useRouter();
   const { t } = useTranslation();
   const theme = useTheme();
   const wide = supportsTwoPanes(useWindowClass());
@@ -48,10 +52,37 @@ export default function TabsLayout() {
         <Tabs.Screen
           key={tab.name}
           name={tab.name}
+          listeners={{
+            tabPress: (event) => {
+              if (today && tab.name === 'more') {
+                event.preventDefault();
+                router.push('/profile');
+              }
+            },
+          }}
           options={{
-            title: t(tab.titleKey),
-            tabBarAccessibilityLabel: t(tab.titleKey),
-            tabBarIcon: ({ color, size }) => <Ionicons name={tab.icon} color={color} size={size} />,
+            ...(tab.name === 'index' && isAuthenticated ? { headerShown: false } : {}),
+            title: t(
+              today && tab.name === 'more'
+                ? 'nav.profile'
+                : today && tab.name === 'festivals'
+                  ? 'nav.upcomingEvents'
+                  : tab.titleKey,
+            ),
+            tabBarAccessibilityLabel: t(
+              today && tab.name === 'more'
+                ? 'nav.profile'
+                : today && tab.name === 'festivals'
+                  ? 'nav.upcomingEvents'
+                  : tab.titleKey,
+            ),
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons
+                name={today && tab.name === 'more' ? 'person-outline' : tab.icon}
+                color={color}
+                size={size}
+              />
+            ),
           }}
         />
       ))}

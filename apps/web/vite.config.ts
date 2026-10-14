@@ -18,9 +18,9 @@ const LOCAL_API_ORIGIN = 'http://localhost:5275';
  * Dev server proxy targets (developer machine only; never part of a build). Override when the backends run elsewhere:
  * `MVS_DEV_API_ORIGIN=http://localhost:5000 npm run web:dev`.
  */
-const DEV_API_ORIGIN = process.env.MVS_DEV_API_ORIGIN ?? LOCAL_API_ORIGIN;
-/** MyVedicStar.Authorize.Api (dev server proxy target for `/api/v1/auth`). */
-const DEV_AUTH_API_ORIGIN = process.env.MVS_DEV_AUTH_API_ORIGIN ?? 'https://localhost:7055';
+const DEV_API_ORIGIN = process.env.MVS_DEV_API_ORIGIN ?? 'http://localhost:5289';
+/** Auth is hosted with Star and Day by default; an explicit override supports separate development services. */
+const DEV_AUTH_API_ORIGIN = process.env.MVS_DEV_AUTH_API_ORIGIN ?? DEV_API_ORIGIN;
 /**
  * Simulated Entra External ID authority used only by the E2E sign-in test (e2e/entra-pkce.spec.ts); Playwright answers
  * every request to it, nothing real lives there. Must match E2E_AUTHORITY in that spec.
@@ -140,11 +140,11 @@ export default defineConfig(({ mode, command, isPreview }) => ({
     ...(command === 'serve' && !isPreview && hasTrustedDevCert
       ? { https: { cert: readFileSync(DEV_CERT), key: readFileSync(DEV_CERT_KEY) } }
       : {}),
-    // The page is https://localhost:5173 but the local API is http://localhost:5275, whose development CORS list allows
+    // The page is https://localhost:5173 but the shared API is http://localhost:5289, whose development CORS list allows
     // only http origins. Proxying /api keeps API calls same-origin (no CORS, no mixed content) without changing the
     // backend; config.development.json therefore uses apiBaseUrl https://localhost:5173/api/v1.
     proxy: {
-      // MyVedicStar.Authorize.Api (sign-in completion, user profile). Listed first: the first matching prefix wins.
+      // Sign-in completion and user profile. Listed first to support an explicit separate-auth target override.
       // It does not answer CORS preflights, so the browser must call it same-origin. `secure: false` only skips
       // verifying its local ASP.NET development certificate, on the dev server.
       '/api/v1/auth': { target: DEV_AUTH_API_ORIGIN, changeOrigin: true, secure: false },

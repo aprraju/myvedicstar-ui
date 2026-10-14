@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { useLocation } from 'react-router';
+import { Navigate, useLocation } from 'react-router';
 
 import { useAuth } from '../../shared/auth';
 import { EmptyState, LoadingState } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { paths } from '../../shared/routing/paths';
 import { RedirectToSignIn } from './RedirectToSignIn';
 
 /**
@@ -13,7 +14,7 @@ import { RedirectToSignIn } from './RedirectToSignIn';
  */
 export function ProtectedRoute({ children }: Readonly<{ children: ReactNode }>) {
   const { t } = useTranslation();
-  const { enabled, isAuthenticated, loading } = useAuth();
+  const { enabled, isAuthenticated, loading, signInError } = useAuth();
   const location = useLocation();
 
   if (loading) return <LoadingState />;
@@ -28,7 +29,10 @@ export function ProtectedRoute({ children }: Readonly<{ children: ReactNode }>) 
       </section>
     );
   }
-  return (
-    <RedirectToSignIn intent="login" returnTo={`${location.pathname}${location.search}${location.hash}`} />
+  const returnTo = `${location.pathname}${location.search}${location.hash}`;
+  return signInError ? (
+    <Navigate to={paths.signInError(signInError, returnTo)} replace />
+  ) : (
+    <RedirectToSignIn intent="login" returnTo={returnTo} />
   );
 }

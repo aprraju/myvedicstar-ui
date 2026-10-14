@@ -79,5 +79,5 @@ export function useDaySummary() {
     };
   }, [query.data, now, goodTimes.data, isAuthenticated]);
 
-  return { query, location, summary, glossary: query.data?.glossary };
+  return { query, goodTimes, location, summary, glossary: query.data?.glossary };
 }

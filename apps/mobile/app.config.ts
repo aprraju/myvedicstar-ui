@@ -34,7 +34,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     blockedPermissions: ['android.permission.RECORD_AUDIO', 'android.permission.CAMERA'],
   },
   plugins: [
-    'expo-router',
+    ['expo-router', { root: './app' }],
     'expo-localization',
     'expo-secure-store',
     [

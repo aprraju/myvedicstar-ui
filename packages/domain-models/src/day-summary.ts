@@ -16,8 +16,8 @@ import { type StatusTone, toneForStatus } from './good-time';
  * View model for the "How is today?" card. Everything is derived from the backend response; the only inputs the UI
  * adds are the current instant and simple comparisons (is `now` inside a window, which window comes next).
  *
- * The day status and the Good Time come from the Find a Good Time evaluation (General activity): `goodTime` on the
- * Panchang day and the `good-times` segments. The UI never derives a Good Time from Panchang periods.
+ * The overall rating and label come from Panchang guidance. Recommended windows come from the General good-times
+ * evaluation. The UI never derives a Good Time from Panchang periods.
  */
 
 /** Visual tone of the day: the app-wide status tones. Always rendered with an icon and text, never color alone. */
@@ -41,12 +41,12 @@ export interface DaySummary {
   timeZone: string;
   /** True when the Panchang date is the location's current local date. */
   isToday: boolean;
-  /** Status key the tone comes from: the General day status when present, else the day-factor rating. */
+  /** Panchang guidance rating key used for the visual tone. */
   rating: string;
   tone: DayTone;
   /** The General day status from the backend (`goodTime` on the Panchang day), when present. */
   dayStatus: MuhurtaStatusInfo | undefined;
-  /** Localized day-factor headline from the backend without its emoji, e.g. "Favorable Day". */
+  /** Localized Panchang guidance ratingName from the backend. */
   headline: string;
   /** First sentence of the backend's localized day-factor summary. */
   description: string;
@@ -90,7 +90,7 @@ export function buildDaySummaryForDay(
   // For another date, show that date's first windows instead of "now/next".
   const reference = isToday ? now : toEpochMs(day.sunrise);
   const dayStatus = day.goodTime?.status;
-  const rating = dayStatus?.status ?? guidance.rating;
+  const rating = guidance.rating;
   const evaluation = goodTimes?.date === day.date ? goodTimes : undefined;
 
   const tithi = elementAt(day.tithis, reference);
@@ -101,7 +101,7 @@ export function buildDaySummaryForDay(
     rating,
     tone: toneForStatus(rating),
     dayStatus,
-    headline: stripLeadingIcon(guidance.headline, guidance.icon),
+    headline: guidance.ratingName,
     description: firstSentence(guidance.summary),
     paksha: pakshaOf(tithi?.current ?? day.tithis[0]),
     tithi,

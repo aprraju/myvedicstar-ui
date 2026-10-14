@@ -15,7 +15,7 @@ describe('buildDaySummary', () => {
       isToday: true,
       rating: 'Mixed',
       tone: 'mixed',
-      headline: 'Mixed Day',
+      headline: 'Mixed',
       description: "Today's Panchang factors are mixed; choose timings carefully for important activities.",
       paksha: 'krishna',
     });
@@ -23,10 +23,14 @@ describe('buildDaySummary', () => {
     expect(summary.tithi?.next?.key).toBe('KrishnaPanchami');
   });
 
-  it('takes the day status from the General evaluation and keeps the day-factor headline', () => {
-    const summary = buildDaySummary(austin, at('10:00'))!;
-    expect(summary.dayStatus).toMatchObject({ status: 'Mixed' });
+  it('uses guidance even when the General evaluation disagrees', () => {
+    const response = structuredClone(austin);
+    response.days[0]!.goodTime!.status.status = 'HighlyFavorable';
+    response.days[0]!.goodTime!.status.name = 'Highly Favorable';
+    const summary = buildDaySummary(response, at('10:00'))!;
     expect(summary.rating).toBe('Mixed');
+    expect(summary.headline).toBe(response.days[0]!.guidance.ratingName);
+    expect(summary.tone).toBe('mixed');
   });
 
   it('shows no Good Time until the evaluation has loaded (never derived from Panchang periods)', () => {
@@ -70,11 +74,11 @@ describe('buildDaySummary', () => {
 
   it.each([
     ['austinHighlyFavorable', 'highly-favorable'],
-    ['austinFavorable', 'highly-favorable'],
+    ['austinFavorable', 'favorable'],
     ['austinTelugu', 'mixed'],
-    ['austinCaution', 'mixed'],
+    ['austinCaution', 'caution'],
     ['austinAvoid', 'avoid'],
-  ] as const)('maps the General day status of %s to the %s tone', (name, tone) => {
+  ] as const)('maps the Panchang guidance rating of %s to the %s tone', (name, tone) => {
     expect(buildDaySummary(fixtures.panchang[name])!.tone).toBe(tone);
   });
 

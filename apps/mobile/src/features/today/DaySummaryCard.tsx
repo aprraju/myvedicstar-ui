@@ -17,11 +17,17 @@ import { useDaySummary } from './usePanchangToday';
 const TONE_ICON: Record<DayTone, IconName> = STATUS_ICON;
 
 /** "How is today?" card — the same answers as web: the day, good time now, next caution period. */
-export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void }) {
+export function DaySummaryCard({
+  onFindGoodTime,
+  mobile = false,
+}: {
+  onFindGoodTime: () => void;
+  mobile?: boolean;
+}) {
   const { t, locale } = useTranslation();
   const online = useCacheOnline();
   const theme = useTheme();
-  const { query, location, summary, glossary } = useDaySummary();
+  const { query, goodTimes, location, summary, glossary } = useDaySummary();
   const { ready, detecting } = useLocationState();
 
   let body;
@@ -51,6 +57,8 @@ export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void 
         locationLabel={location.label}
         glossary={glossary}
         onFindGoodTime={onFindGoodTime}
+        mobile={mobile}
+        goodTimeLoading={goodTimes.isPending}
       />
     );
   }
@@ -61,10 +69,11 @@ export function DaySummaryCard({ onFindGoodTime }: { onFindGoodTime: () => void 
       style={[
         styles.card,
         {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.border,
+          backgroundColor: mobile ? 'transparent' : theme.colors.surface,
+          borderColor: mobile ? 'transparent' : theme.colors.border,
+          borderWidth: mobile ? 0 : 1,
           borderRadius: theme.radius.lg,
-          padding: theme.spacing.lg,
+          padding: mobile ? 0 : theme.spacing.lg,
         },
       ]}
     >
@@ -86,11 +95,15 @@ function Content({
   locationLabel,
   glossary,
   onFindGoodTime,
+  mobile,
+  goodTimeLoading,
 }: {
   summary: DaySummary;
   locationLabel: string;
   glossary: Glossary | undefined;
   onFindGoodTime: () => void;
+  mobile: boolean;
+  goodTimeLoading: boolean;
 }) {
   const { t, locale } = useTranslation();
   const theme = useTheme();
@@ -98,25 +111,65 @@ function Content({
 
   return (
     <View style={styles.gap}>
-      <View>
-        <AppText variant="title">{formatLocalDate(summary.date, locale)}</AppText>
-        <AppText variant="secondary">
-          {[summary.paksha && t(`summary.paksha.${summary.paksha}`), summary.tithi?.current.name]
-            .filter(Boolean)
-            .join(' · ')}
-        </AppText>
+      {!mobile && (
+        <View>
+          <AppText variant="title">{formatLocalDate(summary.date, locale)}</AppText>
+          <AppText variant="secondary">
+            {[summary.paksha && t(`summary.paksha.${summary.paksha}`), summary.tithi?.current.name]
+              .filter(Boolean)
+              .join(' · ')}
+          </AppText>
+        </View>
+      )}
+
+      <View
+        style={
+          mobile
+            ? {
+                backgroundColor: tone.bg,
+                padding: theme.spacing.md,
+                borderRadius: theme.radius.md,
+                gap: theme.spacing.xs,
+              }
+            : styles.gap
+        }
+      >
+        <View style={[styles.tone, { backgroundColor: tone.bg }]}>
+          {mobile ? (
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+                backgroundColor: `${tone.fg}20`,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <Ionicons name={TONE_ICON[summary.tone]} size={25} color={tone.fg} />
+            </View>
+          ) : (
+            <Ionicons name={TONE_ICON[summary.tone]} size={20} color={tone.fg} />
+          )}
+          <AppText
+            style={{
+              color: tone.fg,
+              fontWeight: weight(theme.fontWeight.bold),
+              ...(mobile ? { flex: 1, fontSize: theme.fontSize.lg } : {}),
+            }}
+          >
+            {summary.headline}
+          </AppText>
+        </View>
+        <AppText variant="secondary">{summary.description}</AppText>
       </View>
 
-      <View style={[styles.tone, { backgroundColor: tone.bg }]}>
-        <Ionicons name={TONE_ICON[summary.tone]} size={20} color={tone.fg} />
-        <AppText style={{ color: tone.fg, fontWeight: weight(theme.fontWeight.bold) }}>
-          {summary.dayStatus ? t(`summary.dayHeadline.${summary.tone}`) : summary.headline}
-        </AppText>
+      <View
+        style={mobile ? { flexDirection: 'row', gap: theme.spacing.sm, alignItems: 'stretch' } : styles.gap}
+      >
+        <GoodTime summary={summary} compact={mobile} loading={goodTimeLoading} />
+        <Caution status={summary.caution} summary={summary} glossary={glossary} compact={mobile} />
       </View>
-      <AppText variant="secondary">{summary.description}</AppText>
-
-      <GoodTime summary={summary} />
-      <Caution status={summary.caution} summary={summary} glossary={glossary} />
 
       <Button icon="time-outline" label={t('home.findGoodTime')} onPress={onFindGoodTime} />
       <AppText variant="secondary">{t('summary.localTimeNote', { location: locationLabel })}</AppText>
@@ -128,13 +181,21 @@ function Content({
  * Good time now / next from the backend's General evaluation: only segments marked `isGoodTime`. Nothing is shown as
  * a Good Time while it loads; a day without one shows the backend's message.
  */
-function GoodTime({ summary }: { summary: DaySummary }) {
+function GoodTime({
+  summary,
+  compact = false,
+  loading = true,
+}: {
+  summary: DaySummary;
+  compact?: boolean;
+  loading?: boolean;
+}) {
   const { t, locale } = useTranslation();
   const options = { timeZone: summary.timeZone, locale };
   const status = summary.goodTime;
   const value =
     status.status === 'unavailable'
-      ? t('summary.goodTimeChecking')
+      ? t(compact && !loading ? 'dashboard.goodTimeUnavailable' : 'summary.goodTimeChecking')
       : status.status === 'none'
         ? (summary.noGoodTimeMessage ?? t('summary.noGoodTime'))
         : status.status === 'now'
@@ -148,6 +209,7 @@ function GoodTime({ summary }: { summary: DaySummary }) {
             );
   return (
     <Fact
+      compact={compact}
       kind={status.status === 'now' || status.status === 'next' ? 'favorable' : 'caution'}
       label={status.status === 'now' ? t('summary.goodTimeNow') : t('summary.nextGoodTime')}
       value={value}
@@ -159,14 +221,23 @@ function Caution({
   status,
   summary,
   glossary,
+  compact = false,
 }: {
+  compact?: boolean;
   status: WindowStatus<TimePeriod>;
   summary: DaySummary;
   glossary: Glossary | undefined;
 }) {
   const { t, locale } = useTranslation();
   if (status.status === 'none') {
-    return <Fact kind="caution" label={t('summary.nextCaution')} value={t('summary.noCaution')} />;
+    return (
+      <Fact
+        compact={compact}
+        kind="caution"
+        label={t('summary.nextCaution')}
+        value={t('summary.noCaution')}
+      />
+    );
   }
   const period = status.window;
   const range = formatRangeForDay(
@@ -178,6 +249,7 @@ function Caution({
   );
   return (
     <Fact
+      compact={compact}
       kind="caution"
       label={status.status === 'now' ? t('summary.cautionNow') : t('summary.nextCaution')}
       value={`${period.name} ${range}`}
@@ -191,7 +263,9 @@ function Fact({
   label,
   value,
   note,
+  compact = false,
 }: {
+  compact?: boolean;
   kind: 'favorable' | 'warning' | 'caution';
   label: string;
   value: string;
@@ -204,7 +278,16 @@ function Fact({
     <View
       accessible
       accessibilityLabel={[label, value, note].filter(Boolean).join('. ')}
-      style={[styles.fact, { backgroundColor: bg, borderLeftColor: fg, borderRadius: theme.radius.md }]}
+      style={[
+        styles.fact,
+        {
+          flex: compact ? 1 : undefined,
+          minWidth: 0,
+          backgroundColor: bg,
+          borderLeftColor: fg,
+          borderRadius: theme.radius.md,
+        },
+      ]}
     >
       <View style={styles.row}>
         <Ionicons name={kind === 'favorable' ? 'checkmark' : 'alert-circle-outline'} size={18} color={fg} />
@@ -212,7 +295,9 @@ function Fact({
           {label.toUpperCase()}
         </AppText>
       </View>
-      <AppText variant="heading">{value}</AppText>
+      <AppText variant="heading" style={compact ? { fontSize: theme.fontSize.md } : undefined}>
+        {value}
+      </AppText>
       {note && <AppText variant="secondary">{note}</AppText>}
     </View>
   );

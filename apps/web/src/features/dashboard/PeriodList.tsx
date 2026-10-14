@@ -1,6 +1,7 @@
 import type { Glossary } from '@myvedicstar/contracts';
 import type { LocalDate } from '@myvedicstar/date-time';
-import type { PeriodItem } from '@myvedicstar/domain-models';
+import { mobilePeriodOrder, type PeriodItem } from '@myvedicstar/domain-models';
+import { useState } from 'react';
 
 import { Icon } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
@@ -21,6 +22,7 @@ export function PeriodList({
   glossary,
   timeZone,
   date,
+  previewCount,
 }: Readonly<{
   id: string;
   tone: 'favorable' | 'caution';
@@ -30,13 +32,21 @@ export function PeriodList({
   glossary: Glossary | undefined;
   timeZone: string;
   date: LocalDate;
+  previewCount?: number;
 }>) {
   const { t } = useTranslation();
   const format = useFormatters();
+  const [expanded, setExpanded] = useState(false);
+  const ordered = previewCount ? mobilePeriodOrder(items) : items;
+  const visible = previewCount && !expanded ? ordered.slice(0, previewCount) : ordered;
   const headingId = `${id}-title`;
 
   return (
-    <section className={styles.panel} aria-labelledby={headingId}>
+    <section
+      data-compact={previewCount ? true : undefined}
+      className={styles.panel}
+      aria-labelledby={headingId}
+    >
       <div className={styles.sectionTitle} data-tone={tone}>
         <span className={styles.sectionIcon} aria-hidden="true">
           <Icon name={tone === 'favorable' ? 'check' : 'alert'} size={18} />
@@ -47,30 +57,65 @@ export function PeriodList({
           </h2>
           <p className={styles.sectionSubtitle}>{subtitle}</p>
         </div>
+        {previewCount && items.length > 0 && (
+          <button
+            type="button"
+            className={styles.previewAction}
+            aria-expanded={expanded}
+            aria-controls={`${id}-list`}
+            onClick={() => setExpanded(!expanded)}
+          >
+            {t(expanded ? 'dashboard.showLess' : 'dashboard.seeAll')} <Icon name="chevronDown" size={16} />
+          </button>
+        )}
       </div>
       {items.length === 0 ? (
         <p className={styles.empty}>{t('dashboard.noneToday')}</p>
       ) : (
-        <ul className={styles.list}>
-          {items.map(({ period, tone: itemTone, state, overlaps }) => {
+        <ul id={`${id}-list`} className={styles.list}>
+          {visible.map(({ period, tone: itemTone, state, overlaps }) => {
             const message = glossary?.periods?.[period.kind]?.message;
+            const heading = (
+              <>
+                {' '}
+                <span className={styles.listName}>
+                  {period.name}
+                  {(previewCount || state !== 'upcoming') && (
+                    <span className={styles.badge} data-state={state}>
+                      {state === 'now'
+                        ? t('dashboard.now')
+                        : state === 'upcoming'
+                          ? t('dashboard.upcoming')
+                          : t('dashboard.over')}
+                    </span>
+                  )}
+                </span>
+                <span className={styles.listTime}>
+                  {format.range(period.start, period.end, timeZone, date)}
+                </span>
+              </>
+            );
             return (
               <li key={`${period.kind}-${period.start}`} className={styles.listItem} data-state={state}>
                 <span className={styles.listIcon} data-tone={itemTone} aria-hidden="true">
                   <Icon name={itemTone === 'warning' ? 'alert' : 'clock'} size={16} />
                 </span>
                 <div className={styles.listText}>
-                  <span className={styles.listName}>
-                    {period.name}
-                    {state !== 'upcoming' && (
-                      <span className={styles.badge} data-state={state}>
-                        {state === 'now' ? t('dashboard.now') : t('dashboard.over')}
-                      </span>
-                    )}
-                  </span>
-                  <span className={styles.listTime}>
-                    {format.range(period.start, period.end, timeZone, date)}
-                  </span>
+                  {previewCount ? (
+                    <details className={styles.periodDetails}>
+                      <summary aria-label={t('dashboard.periodDetails') + ': ' + period.name}>
+                        {heading}
+                        <span className={styles.periodChevron} aria-hidden="true">
+                          <Icon name="chevronDown" size={18} />
+                        </span>
+                      </summary>
+                      <p className={styles.listNote}>
+                        {glossary?.periods?.[period.kind]?.meaning ?? period.classification}
+                      </p>
+                    </details>
+                  ) : (
+                    heading
+                  )}
                   {overlaps.length === 0 && message && <span className={styles.listNote}>{message}</span>}
                   {overlaps.map((overlap) => (
                     <span key={`${overlap.kind}-${overlap.start}`} className={styles.conflict}>

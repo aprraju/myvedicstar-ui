@@ -1,8 +1,9 @@
 import type { Festival, Glossary } from '@myvedicstar/contracts';
-import { type LocalDate, todayIn } from '@myvedicstar/date-time';
+import { addDays, type LocalDate, todayIn } from '@myvedicstar/date-time';
 import {
   addMonths,
   buildDayDashboardForDay,
+  buildDaySummaryForDay,
   type CalendarDay,
   type DayDashboard,
   formatYearMonth,
@@ -10,7 +11,7 @@ import {
   type YearMonth,
   yearMonthOf,
 } from '@myvedicstar/domain-models';
-import { useMemo } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { Button } from '../../shared/components/Button';
@@ -19,12 +20,25 @@ import { EmptyState, ErrorState, Skeleton } from '../../shared/components/states
 import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
-import { DayTimeline, PanchangPanel, PeriodList } from '../dashboard';
+import {
+  DayBanner,
+  DayTimeline,
+  MobileDayDetails,
+  PanchangPanel,
+  PeriodList,
+  RatingFactors,
+} from '../dashboard';
 import { FestivalChips, type FestivalsByDate, useFestivalsByDate } from '../festivals';
+import { useGoodTimes } from '../good-time';
 import { useLocationState } from '../location';
-import { useDayHeadline } from '../today/useDayHeadline';
+import { SelectedDaySummaryCard } from '../today';
 import styles from './CalendarPage.module.css';
 import { useCalendarMonth } from './useCalendarMonth';
+
+function subscribeWidth(listener: () => void) {
+  window.addEventListener('resize', listener);
+  return () => window.removeEventListener('resize', listener);
+}
 
 /**
  * Month calendar (myvedicstar-default theme): each day shows its Tithi at sunrise, the day's rating and observances
@@ -36,6 +50,7 @@ export function CalendarPage() {
   const { location, openDialog } = useLocationState();
   const [searchParams, setSearchParams] = useSearchParams();
   const now = useNow();
+  const [fullCalendar, setFullCalendar] = useState(false);
 
   const today = todayIn(location?.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone, now);
   const shown: YearMonth = parseYearMonth(searchParams.get('month')) ?? yearMonthOf(today);
@@ -70,7 +85,70 @@ export function CalendarPage() {
   );
 
   return (
-    <div className={styles.layout}>
+    <div
+      className={`${styles.layout} ${fullCalendar || !location || query.isError ? styles.monthMode : styles.dayMode}`}
+    >
+      <div className={styles.mobileDateNavigation}>
+        <div className={styles.dayToolbar}>
+          <Button
+            variant="secondary"
+            aria-label={t('calendar.previousDay')}
+            onClick={() => {
+              const date = addDays(selected?.date ?? today, -1);
+              go(yearMonthOf(date), date);
+            }}
+          >
+            ‹
+          </Button>
+          <div>
+            <h1 id="mobile-calendar-date" tabIndex={-1}>
+              {format.date(selected?.date ?? today)}
+            </h1>
+            <p>{t('calendar.selectedDate')}</p>
+          </div>
+          <Button
+            variant="secondary"
+            aria-label={t('calendar.nextDay')}
+            onClick={() => {
+              const date = addDays(selected?.date ?? today, 1);
+              go(yearMonthOf(date), date);
+            }}
+          >
+            ›
+          </Button>
+        </div>
+        <Button variant="secondary" onClick={() => setFullCalendar(true)}>
+          <Icon name="calendar" />
+          {t('calendar.backToCalendar')}
+        </Button>
+      </div>
+      {selectedDashboard && location && !query.isError && (
+        <div className={styles.banner}>
+          <DayBanner summary={selectedDashboard.summary} location={location} />
+        </div>
+      )}
+      {location && !query.isError && (
+        <aside className={styles.side} aria-live="polite">
+          {query.isPending || !selected ? (
+            <div className={styles.panel} role="status">
+              <span className="visually-hidden">{t('calendar.loadingMonth')}</span>
+              <div className={styles.panelBody}>
+                <Skeleton height="1.5rem" width="60%" />
+                <Skeleton height="4rem" />
+                <Skeleton height="10rem" />
+              </div>
+            </div>
+          ) : (
+            <SelectedDay
+              day={selected}
+              festivals={festivals.festivalsOn(selected.date)}
+              dashboard={selectedDashboard}
+              glossary={glossary}
+              timeZone={location.timeZone}
+            />
+          )}
+        </aside>
+      )}
       <div className={styles.main}>
         <section className={styles.card} aria-labelledby="calendar-title">
           <div className={styles.toolbar}>
@@ -125,7 +203,15 @@ export function CalendarPage() {
               selected={selected?.date}
               loading={query.isPending}
               festivals={festivals}
-              onSelect={(day) => go(shown, day)}
+              onSelect={(day) => {
+                go(shown, day);
+                setFullCalendar(false);
+                if (window.innerWidth < 1024)
+                  requestAnimationFrame(() => {
+                    document.getElementById('mobile-calendar-date')?.focus({ preventScroll: true });
+                    window.scrollTo({ top: 0 });
+                  });
+              }}
             />
           )}
 
@@ -142,28 +228,8 @@ export function CalendarPage() {
           />
         )}
       </div>
-
-      {location && !query.isError && (
-        <aside className={styles.side} aria-live="polite">
-          {query.isPending || !selected ? (
-            <div className={styles.panel} role="status">
-              <span className="visually-hidden">{t('calendar.loadingMonth')}</span>
-              <div className={styles.panelBody}>
-                <Skeleton height="1.5rem" width="60%" />
-                <Skeleton height="4rem" />
-                <Skeleton height="10rem" />
-              </div>
-            </div>
-          ) : (
-            <SelectedDay
-              day={selected}
-              festivals={festivals.festivalsOn(selected.date)}
-              dashboard={selectedDashboard}
-              glossary={glossary}
-              timeZone={location.timeZone}
-            />
-          )}
-        </aside>
+      {selectedDashboard && location && !query.isError && (
+        <SelectedDayDetails dashboard={selectedDashboard} glossary={glossary} timeZone={location.timeZone} />
       )}
     </div>
   );
@@ -247,7 +313,14 @@ function MonthGrid({
               <span className={styles.dayLoading} />
             ) : (
               <>
-                {day.tithi && <span className={styles.tithi}>{day.tithi.name}</span>}
+                {day.tithi && (
+                  <>
+                    <span className={`${styles.tithi} ${styles.desktopTithi}`}>{day.tithi.name}</span>
+                    <span className={`${styles.tithi} ${styles.mobileTithi}`}>
+                      {day.tithi.shortName || day.tithi.name.replace(/^(?:Krishna|Shukla)\s+/i, '')}
+                    </span>
+                  </>
+                )}
                 {first && (
                   <span className={styles.tag} data-category={first.category}>
                     {first.icon && <span aria-hidden="true">{first.icon} </span>}
@@ -313,6 +386,19 @@ function SelectedDay({
 }>) {
   const { t } = useTranslation();
   const format = useFormatters();
+  const { location } = useLocationState();
+  const now = useNow();
+  const { query: goodTimes } = useGoodTimes(
+    dashboard?.summary.isToday ? { activity: 'general', date: day.date } : null,
+  );
+  const summary = day.panchang
+    ? buildDaySummaryForDay(day.panchang, timeZone, now, goodTimes.data)
+    : dashboard?.summary;
+  const mobile = useSyncExternalStore(
+    subscribeWidth,
+    () => window.innerWidth < 1024,
+    () => false,
+  );
 
   return (
     <section className={styles.selected} aria-labelledby="selected-day-title">
@@ -320,7 +406,15 @@ function SelectedDay({
         <h2 id="selected-day-title" className={styles.selectedTitle}>
           {t('calendar.selectedTitle', { date: format.date(day.date) })}
         </h2>
-        {dashboard && <DayStatus summary={dashboard.summary} />}
+        {summary && location && (
+          <SelectedDaySummaryCard
+            summary={summary}
+            location={location}
+            glossary={glossary}
+            mobile={mobile}
+            goodTimeLoading={summary.isToday && goodTimes.isPending}
+          />
+        )}
         {festivals.length > 0 && (
           <div className={styles.dayFestivals}>
             <p className={styles.dayFestivalsLabel}>{t('festivals.onThisDay')}</p>
@@ -342,6 +436,44 @@ function SelectedDay({
             timeZone={timeZone}
             date={day.date}
           />
+        </>
+      )}
+    </section>
+  );
+}
+
+/** The selected day's overall guidance rating, with its matching guidance summary. */
+
+function SelectedDayDetails({
+  dashboard,
+  glossary,
+  timeZone,
+}: {
+  dashboard: DayDashboard;
+  glossary: Glossary | undefined;
+  timeZone: string;
+}) {
+  const { t } = useTranslation();
+  const day = { date: dashboard.summary.date };
+  const mobile = useSyncExternalStore(
+    subscribeWidth,
+    () => window.innerWidth < 1024,
+    () => false,
+  );
+  return (
+    <div className={styles.dayDetails}>
+      {mobile ? (
+        <MobileDayDetails dashboard={dashboard} glossary={glossary} timeZone={timeZone} />
+      ) : (
+        <>
+          {glossary !== undefined && (
+            <PanchangPanel
+              dashboard={dashboard}
+              glossary={glossary}
+              timeZone={timeZone}
+              title={t('calendar.panchangTitle')}
+            />
+          )}
           <PeriodList
             id="calendar-avoid"
             tone="caution"
@@ -352,27 +484,9 @@ function SelectedDay({
             timeZone={timeZone}
             date={day.date}
           />
-          {glossary !== undefined && (
-            <PanchangPanel
-              dashboard={dashboard}
-              glossary={glossary}
-              timeZone={timeZone}
-              title={t('calendar.panchangTitle')}
-            />
-          )}
+          <RatingFactors ratingName={dashboard.ratingName} factors={dashboard.factors} />
         </>
       )}
-    </section>
-  );
-}
-
-/** The selected day's status: the backend General day status headline, with the day-factor summary below it. */
-function DayStatus({ summary }: Readonly<{ summary: DayDashboard['summary'] }>) {
-  const headline = useDayHeadline(summary);
-  return (
-    <div className={styles.status} data-tone={summary.tone} data-status-tone={summary.tone}>
-      <p className={styles.statusHeadline}>{headline}</p>
-      <p className={styles.statusBody}>{summary.description}</p>
     </div>
   );
 }

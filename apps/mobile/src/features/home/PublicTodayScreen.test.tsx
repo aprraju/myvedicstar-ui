@@ -32,7 +32,7 @@ describe('signed-out home (mobile)', () => {
     await storeLocation();
     await renderApp(routes);
     expect(await screen.findByText('Find Auspicious Moments for a Happier Life')).toBeTruthy();
-    expect(screen.queryByText('Mixed day')).toBeNull();
+    expect(screen.queryByText('Mixed')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Register' })).toBeNull();
     expect(apiRequests).toHaveLength(0);
   });
@@ -44,7 +44,7 @@ describe('public Today (mobile)', () => {
     await storeLocation();
     await renderSignedIn(routes);
 
-    expect(await screen.findByText('Mixed day')).toBeTruthy();
+    expect(await screen.findByText('Mixed')).toBeTruthy();
     expect(screen.getByText('Tuesday, September 29')).toBeTruthy();
     expect(screen.getByText('Krishna Paksha · Krishna Chaturthi')).toBeTruthy();
     // Signed-in users receive today's embedded evaluation.
@@ -93,14 +93,14 @@ describe('public Today (mobile)', () => {
     expect(screen.queryByText('Unavailable')).toBeNull();
     fail = false;
     await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('Mixed day')).toBeTruthy();
+    expect(await screen.findByText('Mixed')).toBeTruthy();
   });
 
   it.each([
-    ['austinHighlyFavorable', 'Highly favorable day'],
-    ['austinCaution', 'Mixed day'],
-    ['austinAvoid', 'Traditionally avoided for new beginnings'],
-  ] as const)('shows the General status of %s as the day headline', async (fixture, headline) => {
+    ['austinHighlyFavorable', 'Highly Favorable'],
+    ['austinCaution', 'Caution'],
+    ['austinAvoid', 'Traditionally Avoided'],
+  ] as const)('shows the guidance rating of %s as the day headline', async (fixture, headline) => {
     const response = fixtures.panchang[fixture];
     const date = response.days[0]!.date;
     atInstant(`${date}T12:00:00-05:00`);
@@ -183,7 +183,7 @@ describe('tradition (mobile)', () => {
   it('changes tradition independently of location and reloads the Panchang', async () => {
     await storeLocation();
     await renderSignedIn(routes, { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
-    await screen.findByText('Mixed day');
+    await screen.findByText('Mixed');
     await fireEvent.press(screen.getByRole('button', { name: /^Tradition: / }));
     await fireEvent.press(await screen.findByRole('radio', { name: /Tamil/ }));
     await waitFor(() =>

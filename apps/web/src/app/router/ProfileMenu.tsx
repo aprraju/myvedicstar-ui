@@ -12,7 +12,8 @@ import styles from './ProfileMenu.module.css';
  * `userinfo`), Settings and Log out. A disclosure (button + panel), not an ARIA menu: Tab moves through the options;
  * Escape, an outside click or choosing an option closes it and returns focus to the button.
  */
-export function ProfileMenu() {
+export function ProfileMenu({ placement = 'header' }: { placement?: 'header' | 'bottom-navigation' }) {
+  const bottomNavigation = placement === 'bottom-navigation';
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { userInfo } = useUserInfo();
@@ -50,17 +51,18 @@ export function ProfileMenu() {
       : undefined;
 
   return (
-    <div ref={rootRef} className={styles.root}>
+    <div ref={rootRef} className={`${styles.root} ${bottomNavigation ? styles.bottomNavigation : ''}`}>
       <button
         ref={buttonRef}
         type="button"
         className={styles.trigger}
-        aria-label={t('profile.open')}
+        aria-label={t(bottomNavigation ? 'nav.profile' : 'profile.open')}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen(!open)}
       >
         <Icon name="user" size={22} />
+        {bottomNavigation && <span>{t('nav.profile')}</span>}
       </button>
       <div id={panelId} className={styles.panel} hidden={!open}>
         <div className={styles.identity}>

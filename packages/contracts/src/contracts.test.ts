@@ -16,6 +16,13 @@ import {
 } from './index';
 
 describe('contract schemas accept responses captured from the real API', () => {
+  it('preserves backend-provided tithi short and compact labels', () => {
+    const response = structuredClone(fixtures.panchang.austinTelugu);
+    response.days[0]!.tithis[0]!.shortName = 'Chatur';
+    response.days[0]!.tithis[0]!.compactName = 'P4';
+    const parsed = panchangResponseSchema.parse(response);
+    expect(parsed.days[0]!.tithis[0]).toMatchObject({ shortName: 'Chatur', compactName: 'P4' });
+  });
   it('upcoming festivals', () => {
     expect(festivalsResponseSchema.safeParse(fixtures.festivals).success).toBe(true);
   });

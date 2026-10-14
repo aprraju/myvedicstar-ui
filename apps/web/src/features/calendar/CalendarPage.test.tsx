@@ -18,6 +18,20 @@ const dayButton = (name: RegExp) => within(grid()).getByRole('button', { name })
  * Amavasya. Festivals: the real upcoming-festivals fixture, covering 2026-10-01 → 2026-11-29.
  */
 describe('Calendar', () => {
+  it('shows summary subcards only for the selected location current date', async () => {
+    await atInstant('2026-09-29T10:00:00-05:00');
+    storeSelectedLocation();
+    renderRoute('/calendar?month=2026-09&day=2026-09-29', { auth: signedIn() });
+    await screen.findByRole('region', { name: "Today's summary" });
+    const summary = () => screen.getByRole('region', { name: "Today's summary" });
+    await waitFor(() => expect(within(summary()).getByText('Next good time')).toBeInTheDocument());
+    expect(within(summary()).getByText('Use caution now')).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(dayButton(/September 28/));
+    await waitFor(() => expect(within(summary()).queryByText('Next good time')).not.toBeInTheDocument());
+    expect(within(summary()).queryByText('Use caution now')).not.toBeInTheDocument();
+    expect(within(summary()).getByRole('link', { name: 'Find a Good Time' })).toBeInTheDocument();
+  });
   it('outside the festival window: each day’s Tithi, rating and Tithi-based observances, and today', async () => {
     await atInstant('2026-12-15T12:00:00-06:00');
     storeSelectedLocation();
@@ -78,12 +92,12 @@ describe('Calendar', () => {
     storeSelectedLocation();
     renderRoute('/calendar?month=2026-10&day=2026-10-05', { auth: signedIn() });
     expect(await screen.findByRole('heading', { level: 2, name: 'Monday, October 5' })).toBeInTheDocument();
-    // The General day status (Oct 5: 5 % 3 = 2 → Avoid), not the day-factor rating (Caution).
+    // October 5 uses its guidance rating (Caution), even when the General status is Avoid.
     const status = screen
-      .getAllByText('Traditionally avoided for new beginnings')
+      .getAllByText('Caution')
       .map((element) => element.closest('[data-status-tone]'))
       .find(Boolean);
-    expect(status).toHaveAttribute('data-status-tone', 'avoid');
+    expect(status).toHaveAttribute('data-status-tone', 'caution');
     const panchang = screen.getByRole('region', { name: 'Panchang' });
     expect(panchang).toHaveTextContent('Purnima');
     expect(panchang).toHaveTextContent('Monday');

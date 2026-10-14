@@ -20,3 +20,23 @@
 .main:focus {
   outline: none;
 }
+.mobileNavigation {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .mobileShell {
+    display: block;
+    padding-block-start: var(--today-header-height, 7rem);
+  }
+  .mobileShell > footer {
+    padding-block-end: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+  .mobileNavigation {
+    display: block;
+  }
+  .mobileTodayShell .main {
+    padding: 0;
+    max-inline-size: 840px;
+  }
+}

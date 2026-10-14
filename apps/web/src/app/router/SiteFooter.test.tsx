@@ -34,7 +34,7 @@ describe('Site footer', () => {
     renderRoute('/about', { auth: createInMemoryAuthClient() });
     await screen.findByRole('heading', { level: 1, name: 'About Us' });
     expect(within(footer()).queryByRole('heading', { name: 'Explore' })).not.toBeInTheDocument();
-    expect(within(footer()).queryByRole('link', { name: 'Vedic Calendar' })).not.toBeInTheDocument();
+    expect(within(footer()).queryByRole('link', { name: 'Panchang' })).not.toBeInTheDocument();
   });
 
   it('shows Explore to signed-in users, with future features marked coming soon', async () => {
@@ -49,7 +49,7 @@ describe('Site footer', () => {
       'href',
       '/good-time',
     );
-    expect(within(explore).getByRole('link', { name: 'Vedic Calendar' })).toHaveAttribute(
+    expect(within(explore).getByRole('link', { name: 'Panchang' })).toHaveAttribute(
       'href',
       '/calendar',
     );

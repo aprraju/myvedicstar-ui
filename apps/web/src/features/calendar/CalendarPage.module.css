@@ -4,6 +4,69 @@
   gap: var(--space-lg);
   align-items: start;
 }
+.mobileDateNavigation {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .dayMode .mobileDateNavigation {
+    display: grid;
+    gap: var(--space-xs);
+  }
+  .dayToolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: var(--space-xs);
+    align-items: center;
+    text-align: center;
+  }
+  .dayToolbar h1 {
+    font-size: clamp(var(--font-size-sm), 4.2vw, var(--font-size-md));
+    line-height: 1.3;
+  }
+  .dayToolbar p {
+    margin-block-start: var(--space-xxs);
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+  }
+  .mobileDateNavigation button {
+    border-radius: var(--radius-pill);
+    min-block-size: 44px;
+    padding: var(--space-xxs) var(--space-sm);
+    font-size: var(--font-size-sm);
+    line-height: 1.3;
+  }
+  .dayToolbar > button {
+    inline-size: 44px;
+    block-size: 44px;
+    padding: 0;
+    font-size: var(--font-size-lg);
+  }
+  .mobileDateNavigation > button svg {
+    inline-size: 18px;
+    block-size: 18px;
+  }
+  .monthMode .title {
+    font-size: var(--font-size-lg);
+  }
+  .toolbarActions button {
+    padding-inline: var(--space-xs);
+    padding-block: var(--space-xxs);
+    font-size: var(--font-size-sm);
+  }
+  .dayMode .selectedTitle {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .dayMode .main > section[aria-labelledby='calendar-title'],
+  .monthMode .side,
+  .monthMode .dayDetails,
+  .monthMode .main > section:not([aria-labelledby='calendar-title']) {
+    display: none;
+  }
+}
 
 @media (min-width: 1024px) {
   .layout {
@@ -221,6 +284,17 @@
   border-radius: var(--radius-sm);
   background: var(--color-surface-subtle);
 }
+.mobileTithi {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .desktopTithi {
+    display: none;
+  }
+  .mobileTithi {
+    display: -webkit-box;
+  }
+}
 
 /* Legend */
 .legend {
@@ -266,6 +340,74 @@
 /* Selected day */
 .side {
   min-inline-size: 0;
+  grid-column: 1 / -1;
+}
+.banner {
+  display: none;
+  grid-column: 1 / -1;
+}
+@media (min-width: 1024px) {
+  .banner {
+    display: block;
+  }
+  .layout {
+    grid-template-columns: minmax(20rem, 0.9fr) minmax(0, 1.1fr);
+  }
+  .side {
+    grid-column: 1;
+    grid-row: 2;
+    margin-block-start: -4rem;
+    position: relative;
+    padding-inline-start: var(--space-sm);
+  }
+  .main {
+    display: contents;
+  }
+  .main > section[aria-labelledby='calendar-title'] {
+    grid-column: 2;
+    grid-row: 2;
+    margin-block-start: -4rem;
+    position: relative;
+    margin-inline-end: var(--space-sm);
+  }
+  .main > section:not([aria-labelledby='calendar-title']) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .side .selectedHead {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .selectedTitle {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+
+.main {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 1024px) {
+  .selected {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+  .dayDetails {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.dayDetails {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-md);
+  align-items: start;
 }
 
 .selected {

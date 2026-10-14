@@ -1,5 +1,28 @@
 # Deployment readiness: Profile, Settings and authentication
 
+## Mobile Today dashboard — October 14, 2026
+
+The authenticated mobile Today dashboard is implemented for web and native, following the supplied mockup. Bottom navigation uses **Profile** with a person icon. The desktop screenshot matches the reference captured before these changes. API contracts, authentication requirements, Panchang calculations, and saved-default behavior remain unchanged. See [mobile dashboard design notes](design/mobile-today-dashboard.md).
+
+| Check                               | Result                                                                                 |
+| ----------------------------------- | -------------------------------------------------------------------------------------- |
+| Complete repository check           | Passed: formatting, lint, all type checks, and 694 tests                               |
+| Web component tests                 | 229 passed, included above                                                             |
+| Native tests                        | 44 passed, included above; bounded to two workers                                      |
+| Browser regression suite            | 98 unique cases passed across the full run and corrected reruns; six intentional skips |
+| Responsive and accessibility checks | Passed at 320, 375, 430, 600, and 884 CSS pixels; dark mode and enlarged text passed   |
+| Desktop visual regression           | Passed against the original reference; Windows Chromium visual references              |
+| Production web artifact             | Passed validation and production deployment dry run; JavaScript 235.6 KiB gzip         |
+| Existing production release smoke   | Passed, including unauthenticated application API rejection with HTTP 401              |
+| Android and iOS production bundles  | Exported successfully with the dashboard image and explicit Expo route root            |
+| Unused-code verification            | Passed                                                                                 |
+
+Logs are under `.verification/dashboard-*`. The full browser run initially passed 92 cases; four failures (a missing mobile screenshot reference, an assertion for an expanded avoid list, and two startup timeouts) passed on rerun. The two additional dark-mode cases passed after fixing timeline-label contrast. Final dashboard comparisons passed without updating the references. Native tests initially hit timing limits under high parallelism; the final complete repository check passed with bounded native workers and asynchronous UI deadlines.
+
+No upload or infrastructure apply was performed for this dashboard change. The live smoke check verifies the existing release; the new artifact must run the normal post-deployment smoke check after upload. Native bundling does not verify installation on physical Android or iOS devices.
+
+## Earlier Profile, Settings and authentication verification
+
 Verified on October 13, 2026. Profile and Settings changes exist in both `myvedicstar-ui` and the sibling `myvedicstar` backend. Backend implementation follows `.github/copilot-instructions.md`: controllers delegate to public Business facades, persistence stays in Data, and Graph/GeoNames interactions use Integration boundaries.
 
 The web and native applications provide Profile, Settings, and Logout navigation. Account identity uses the existing minimal userinfo response, with display name and email on separate lines. Profile updates preserve the existing user table; changed names retain durable backend Graph synchronization status. The manual retry control is removed from the UI. Settings use the `myvedicstarsettings` schema, account-scoped defaults and saved locations, and explicit Save. Temporary selections do not overwrite defaults. Deleting the default location clears the stored default atomically.

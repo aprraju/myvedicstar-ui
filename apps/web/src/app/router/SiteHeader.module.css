@@ -361,6 +361,62 @@
   flex: none;
 }
 
+/* The mobile Today header reuses existing branding and context controls, with navigation below the page. */
+@media (max-width: 1023px) {
+  .todayMobile {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 30;
+    max-inline-size: 840px;
+    margin-inline: auto;
+    padding-block-start: env(safe-area-inset-top);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-low);
+  }
+  .todayMobile .inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'brand actions' 'context context';
+  }
+  .todayMobile .nav,
+  .todayMobile .nav[data-open='true'],
+  .todayMobile .menuButton,
+  .todayMobile .actions > div {
+    display: none;
+  }
+  .todayMobile .brand {
+    font-size: clamp(var(--font-size-lg), 5.6vw, var(--font-size-xl));
+  }
+  .todayMobile .brandMark {
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    font-size: 1.75rem;
+  }
+  .todayMobile .context {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-xs);
+    margin-inline-start: 0;
+    padding-block-start: var(--space-xs);
+  }
+  .todayMobile .context button,
+  .todayMobile .context select {
+    min-block-size: 44px;
+  }
+  .todayMobile .context select {
+    min-inline-size: 0;
+    inline-size: clamp(6.5rem, 36vw, 10rem);
+  }
+  .todayMobile .context label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 @media (min-width: 840px) {
   .nav[data-variant='app'] .navList {
     flex-wrap: nowrap;

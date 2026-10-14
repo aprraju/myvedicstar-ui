@@ -21,11 +21,12 @@ function contrast(a: string, b: string): number {
 
 type Key = keyof ColorScheme;
 const TEXT_ON: [Key, Key[]][] = [
+  ['heroForeground', ['heroOverlay']],
   ['textPrimary', ['background', 'surface', 'surfaceElevated', 'surfaceSubtle']],
   ['textSecondary', ['background', 'surface', 'surfaceElevated', 'surfaceSubtle']],
   ['primary', ['background', 'surface']],
   ['secondary', ['background', 'surface']],
-  ['onPrimary', ['primary']],
+  ['onPrimary', ['primary', 'info']],
   ['onSecondary', ['secondary']],
   ['favorable', ['favorableSurface', 'surface', 'background']],
   ['favorableStrong', ['favorableStrongSurface', 'surface', 'background']],

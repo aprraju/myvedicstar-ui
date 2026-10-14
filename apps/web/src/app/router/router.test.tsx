@@ -37,7 +37,7 @@ describe('routing', () => {
     for (const title of [
       "Today's Panchang",
       'Find a Good Time',
-      'Calendar View',
+      'Panchang View',
       'Festivals & Observances',
       'Global Support',
       'Multiple Traditions',
@@ -94,7 +94,7 @@ describe('signed-in home', () => {
       within(nav)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(expect.arrayContaining(['Home', 'Today', 'Calendar', 'Upcoming Events', 'Find Good Time']));
+    ).toEqual(expect.arrayContaining(['Home', 'Today', 'Panchang', 'Upcoming Events', 'Find Good Time']));
   });
 
   it('still shows the public home page to signed-out visitors', async () => {

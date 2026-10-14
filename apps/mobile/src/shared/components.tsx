@@ -23,7 +23,7 @@ export type IconName = ComponentProps<typeof Ionicons>['name'];
  * Screen container: safe areas (notches, gesture bars, insets reported around hinges), scrolling, and a readable max
  * width so content is not stretched edge-to-edge on tablets and unfolded foldables.
  */
-export function Screen({ children }: { children: ReactNode }) {
+export function Screen({ children, padding }: { children: ReactNode; padding?: number }) {
   const theme = useTheme();
   return (
     <SafeAreaView
@@ -31,7 +31,7 @@ export function Screen({ children }: { children: ReactNode }) {
       style={[styles.fill, { backgroundColor: theme.colors.background }]}
     >
       <ScrollView
-        contentContainerStyle={[styles.content, { padding: theme.spacing.lg }]}
+        contentContainerStyle={[styles.content, { padding: padding ?? theme.spacing.lg }]}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.readable}>{children}</View>
@@ -92,6 +92,7 @@ export function Button({
   loading = false,
   disabled = false,
   accessibilityLabel,
+  expanded,
 }: {
   label: string;
   onPress: () => void;
@@ -100,6 +101,7 @@ export function Button({
   loading?: boolean;
   disabled?: boolean;
   accessibilityLabel?: string;
+  expanded?: boolean;
 }) {
   const theme = useTheme();
   const colors = {
@@ -112,7 +114,11 @@ export function Button({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityState={{ disabled: inactive, busy: loading }}
+      accessibilityState={{
+        disabled: inactive,
+        busy: loading,
+        ...(expanded === undefined ? {} : { expanded }),
+      }}
       disabled={inactive}
       onPress={onPress}
       style={({ pressed }) => [

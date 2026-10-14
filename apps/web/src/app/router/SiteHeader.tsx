@@ -31,7 +31,7 @@ const NO_TRADITION_PATHS = new Set<string>([routes.home, routes.authCallback]);
  * The tradition selector is left out on the home and sign-in pages, which share one header.
  * Layout adapts to the window: one row on wide screens, two rows plus a menu on compact ones (see CSS).
  */
-export function SiteHeader() {
+export function SiteHeader({ todayMobile = false }: { todayMobile?: boolean }) {
   const { t } = useTranslation();
   const { enabled, isAuthenticated } = useAuth();
   // Login goes straight to the identity provider's hosted pages (no in-app pages); hidden when sign-in is
@@ -57,7 +57,7 @@ export function SiteHeader() {
     `${styles.navLink}${isActive ? ` ${styles.active}` : ''}`;
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${todayMobile ? styles.todayMobile : ''}`}>
       <div className={styles.inner}>
         <Link to={routes.home} className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">

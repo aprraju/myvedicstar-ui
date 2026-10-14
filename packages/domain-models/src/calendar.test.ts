@@ -17,7 +17,7 @@ describe('buildCalendarMonth', () => {
     expect(month.weeks.at(-1)!.filter(Boolean).at(-1)?.date).toBe('2026-10-31');
   });
 
-  it('gives each day its Tithi at sunrise, General day status and observance from the backend', () => {
+  it('gives each day its Tithi at sunrise, guidance rating and observance from the backend', () => {
     const { days } = buildCalendarMonth(october, { year: 2026, month: 10 });
     expect(days[0]).toMatchObject({
       dayOfMonth: 1,
@@ -29,16 +29,16 @@ describe('buildCalendarMonth', () => {
     expect(days[4]).toMatchObject({ observance: 'purnima' });
     expect(days[15]).toMatchObject({ observance: 'ekadashi' });
     expect(days[19]).toMatchObject({ observance: 'amavasya' });
-    // The tile uses the General day status (goodTime), not the day-factor rating (Favorable / Caution on these days).
+    // Guidance stays authoritative even when the General status disagrees.
     expect(days[2]).toMatchObject({
-      ratingName: 'Highly Favorable',
-      tone: 'highly-favorable',
+      ratingName: 'Favorable',
+      tone: 'favorable',
       observance: undefined,
     });
-    expect(days[1]).toMatchObject({ ratingName: 'Avoid', tone: 'avoid' });
+    expect(days[1]).toMatchObject({ ratingName: 'Caution', tone: 'caution' });
   });
 
-  it('falls back to the day-factor rating for responses without a General day status', () => {
+  it('keeps guidance ratings for responses without a General day status', () => {
     const older = { ...october, days: october.days.map(({ goodTime: _ignored, ...day }) => day) };
     const { days } = buildCalendarMonth(older, { year: 2026, month: 10 });
     expect(days[2]).toMatchObject({ ratingName: 'Favorable', tone: 'favorable' });

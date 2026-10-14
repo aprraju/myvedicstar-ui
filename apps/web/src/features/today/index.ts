@@ -1,2 +1,2 @@
-export { DaySummaryCard } from './DaySummaryCard';
+export { DaySummaryCard, SelectedDaySummaryCard } from './DaySummaryCard';
 export { usePanchangToday } from './usePanchangToday';

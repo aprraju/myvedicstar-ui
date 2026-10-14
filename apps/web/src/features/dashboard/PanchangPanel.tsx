@@ -25,13 +25,6 @@ export function PanchangPanel({
   title,
 }: Readonly<{ dashboard: DayDashboard; glossary: Glossary; timeZone: string; title?: string }>) {
   const { t } = useTranslation();
-  const format = useFormatters();
-  /** Localized label from the backend glossary, falling back to the app catalog. */
-  const label = (section: 'elements' | 'terms', key: string, fallback: MessageKey) =>
-    glossary[section]?.[key]?.name ?? t(fallback);
-  const meaning = (section: 'elements' | 'terms', key: string) =>
-    glossary[section]?.[key]?.meaning ?? undefined;
-
   return (
     <section className={styles.panel} aria-labelledby="panchang-title">
       <div className={styles.panelHead}>
@@ -39,50 +32,73 @@ export function PanchangPanel({
           {title ?? t('dashboard.panchangTitle')}
         </h2>
       </div>
-      <dl className={styles.rows}>
-        {LIMBS.map(({ key, icon, accent }) => (
-          <LimbRow
-            key={key}
-            icon={icon}
-            accent={accent}
-            label={label('elements', key, `dashboard.limbs.${key}`)}
-            hint={meaning('elements', key)}
-            element={dashboard.limbs[key]}
-            timeZone={timeZone}
-          />
-        ))}
-        <Row
-          icon="calendar"
-          accent="green"
-          label={label('terms', 'vara', 'dashboard.limbs.vara')}
-          hint={meaning('terms', 'vara')}
-          value={dashboard.weekdayName}
-        />
-        {dashboard.summary.paksha && (
-          <Row
-            icon="moon"
-            accent="purple"
-            label={t('dashboard.limbs.paksha')}
-            value={t(`summary.paksha.${dashboard.summary.paksha}`)}
-          />
-        )}
-        <Row
-          icon="sun"
-          accent="orange"
-          label={label('terms', 'sunrise', 'dashboard.limbs.sunrise')}
-          hint={meaning('terms', 'sunrise')}
-          value={format.time(dashboard.sunrise, timeZone)}
-        />
-        <Row
-          icon="sun"
-          accent="blue"
-          label={label('terms', 'sunset', 'dashboard.limbs.sunset')}
-          hint={meaning('terms', 'sunset')}
-          value={format.time(dashboard.sunset, timeZone)}
-          detail={`${t('dashboard.nextSunrise')} ${format.time(dashboard.nextSunrise, timeZone)}`}
-        />
-      </dl>
+      <PanchangDetails dashboard={dashboard} glossary={glossary} timeZone={timeZone} />
     </section>
+  );
+}
+
+/** Existing formatted detail rows, reusable inside a card without nesting another card or heading. */
+export function PanchangDetails({
+  dashboard,
+  glossary,
+  timeZone,
+}: Readonly<{
+  dashboard: DayDashboard;
+  glossary: Glossary | undefined;
+  timeZone: string;
+}>) {
+  const { t } = useTranslation();
+  const format = useFormatters();
+  /** Localized label from the backend glossary, falling back to the app catalog. */
+  const label = (section: 'elements' | 'terms', key: string, fallback: MessageKey) =>
+    glossary?.[section]?.[key]?.name ?? t(fallback);
+  const meaning = (section: 'elements' | 'terms', key: string) =>
+    glossary?.[section]?.[key]?.meaning ?? undefined;
+
+  return (
+    <dl className={styles.rows}>
+      {LIMBS.map(({ key, icon, accent }) => (
+        <LimbRow
+          key={key}
+          icon={icon}
+          accent={accent}
+          label={label('elements', key, `dashboard.limbs.${key}`)}
+          hint={meaning('elements', key)}
+          element={dashboard.limbs[key]}
+          timeZone={timeZone}
+        />
+      ))}
+      <Row
+        icon="calendar"
+        accent="green"
+        label={label('terms', 'vara', 'dashboard.limbs.vara')}
+        hint={meaning('terms', 'vara')}
+        value={dashboard.weekdayName}
+      />
+      {dashboard.summary.paksha && (
+        <Row
+          icon="moon"
+          accent="purple"
+          label={t('dashboard.limbs.paksha')}
+          value={t(`summary.paksha.${dashboard.summary.paksha}`)}
+        />
+      )}
+      <Row
+        icon="sun"
+        accent="orange"
+        label={label('terms', 'sunrise', 'dashboard.limbs.sunrise')}
+        hint={meaning('terms', 'sunrise')}
+        value={format.time(dashboard.sunrise, timeZone)}
+      />
+      <Row
+        icon="sun"
+        accent="blue"
+        label={label('terms', 'sunset', 'dashboard.limbs.sunset')}
+        hint={meaning('terms', 'sunset')}
+        value={format.time(dashboard.sunset, timeZone)}
+        detail={`${t('dashboard.nextSunrise')} ${format.time(dashboard.nextSunrise, timeZone)}`}
+      />
+    </dl>
   );
 }
 

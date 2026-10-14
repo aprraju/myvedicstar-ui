@@ -37,6 +37,10 @@ const fixtures = {
   monthBusiness: fixture<DaySummariesResponse>('muhurta-day-summaries-austin-business-2026-10'),
 };
 
+export function panchangMonthFixture(year: number, month: number): PanchangResponse {
+  return buildPanchangMonth(fixtures.austinDay, year, month);
+}
+
 /** Must match public/config.json (the local runtime config shipped in the preview build). */
 const API_ORIGIN = 'http://localhost:5275';
 

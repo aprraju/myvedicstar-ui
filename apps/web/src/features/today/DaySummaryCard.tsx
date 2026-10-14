@@ -32,7 +32,8 @@ const TONE_ICON: Record<DayTone, IconName> = {
 export function DaySummaryCard({
   showDate = true,
   todayOnly = false,
-}: Readonly<{ showDate?: boolean; todayOnly?: boolean }>) {
+  mobile = false,
+}: Readonly<{ showDate?: boolean; todayOnly?: boolean; mobile?: boolean }>) {
   const { t } = useTranslation();
   const online = useCacheOnline();
   const format = useFormatters();
@@ -62,13 +63,14 @@ export function DaySummaryCard({
         todayOnly={todayOnly}
         refreshing={query.isFetching}
         showDate={showDate}
+        mobile={mobile}
       />
     );
   }
 
   return (
     <section
-      className={styles.card}
+      className={`${styles.card} ${mobile ? styles.mobile : ''}`}
       aria-labelledby={titleId}
       aria-busy={query.isFetching || detecting || undefined}
     >
@@ -96,6 +98,7 @@ function SummaryContent({
   todayOnly,
   refreshing,
   showDate,
+  mobile,
 }: {
   summary: DaySummary;
   location: SelectedLocation;
@@ -104,6 +107,7 @@ function SummaryContent({
   todayOnly: boolean;
   refreshing: boolean;
   showDate: boolean;
+  mobile: boolean;
 }) {
   const { t } = useTranslation();
   const format = useFormatters();
@@ -120,7 +124,7 @@ function SummaryContent({
           {tithi && <span>{tithi.name}</span>}
         </p>
       </div>
-      {!todayOnly && <SummaryFestivals date={summary.date} />}
+      {!todayOnly && !mobile && <SummaryFestivals date={summary.date} />}
 
       <div className={styles.tone} data-tone={summary.tone} data-status-tone={summary.tone}>
         <span className={styles.toneIcon}>
@@ -129,13 +133,16 @@ function SummaryContent({
         <div className={styles.toneText}>
           <p className={styles.headline}>{headline}</p>
           <p className={styles.description}>{summary.description}</p>
+          {mobile && !todayOnly && <SummaryFestivals date={summary.date} />}
         </div>
       </div>
 
-      <dl className={styles.facts}>
-        <GoodTime summary={summary} loading={goodTimeLoading} />
-        <Caution status={summary.caution} summary={summary} glossary={glossary} />
-      </dl>
+      {summary.isToday && (
+        <dl className={styles.facts}>
+          <GoodTime summary={summary} loading={goodTimeLoading} showUnavailable={mobile} />
+          <Caution status={summary.caution} summary={summary} glossary={glossary} />
+        </dl>
+      )}
 
       <div className={styles.actions}>
         <Link to={routes.goodTime} className={styles.cta}>
@@ -152,17 +159,60 @@ function SummaryContent({
   );
 }
 
+/** Present a selected calendar day using the same card without fetching today's data. */
+export function SelectedDaySummaryCard({
+  summary,
+  location,
+  glossary,
+  mobile,
+  goodTimeLoading = false,
+}: {
+  summary: DaySummary;
+  location: SelectedLocation;
+  glossary: Glossary | undefined;
+  mobile: boolean;
+  goodTimeLoading?: boolean;
+}) {
+  const { t } = useTranslation();
+  const titleId = useId();
+  return (
+    <section className={`${styles.card} ${mobile ? styles.mobile : ''}`} aria-labelledby={titleId}>
+      <h2 id={titleId} className="visually-hidden">
+        {t('summary.label')}
+      </h2>
+      <SummaryContent
+        summary={summary}
+        location={location}
+        glossary={glossary}
+        mobile={mobile}
+        goodTimeLoading={goodTimeLoading}
+        todayOnly
+        refreshing={false}
+        showDate={false}
+      />
+    </section>
+  );
+}
+
 /**
  * Good time now / next, from the General evaluation: only segments the backend marked `isGoodTime` (conflict-free by
  * construction). Nothing is shown as a Good Time while the evaluation loads or when it failed, and a day without one
  * says so with the backend's message.
  */
-function GoodTime({ summary, loading }: { summary: DaySummary; loading: boolean }) {
+function GoodTime({
+  summary,
+  loading,
+  showUnavailable = false,
+}: {
+  summary: DaySummary;
+  loading: boolean;
+  showUnavailable?: boolean;
+}) {
   const { t } = useTranslation();
   const format = useFormatters();
   const tz = summary.timeZone;
   const status = summary.goodTime;
-  if (status.status === 'unavailable' && !loading) return null;
+  if (status.status === 'unavailable' && !loading && !showUnavailable) return null;
 
   return (
     <div
@@ -173,9 +223,11 @@ function GoodTime({ summary, loading }: { summary: DaySummary; loading: boolean 
         <Icon name={status.status === 'now' || status.status === 'next' ? 'check' : 'info'} size={18} />
         {status.status === 'now' ? t('summary.goodTimeNow') : t('summary.nextGoodTime')}
       </dt>
-      <dd className={styles.factValue}>
+      <dd
+        className={`${styles.factValue} ${status.status === 'now' || status.status === 'next' ? styles.factTime : ''}`}
+      >
         {status.status === 'unavailable'
-          ? t('summary.goodTimeChecking')
+          ? t(loading ? 'summary.goodTimeChecking' : 'dashboard.goodTimeUnavailable')
           : status.status === 'none'
             ? (summary.noGoodTimeMessage ?? t('summary.noGoodTime'))
             : status.status === 'now'
@@ -219,8 +271,10 @@ function Caution({
         {status.status === 'now' ? t('summary.cautionNow') : t('summary.nextCaution')}
       </dt>
       <dd className={styles.factValue}>
-        <strong>{period.name}</strong>{' '}
-        {format.range(period.start, period.end, summary.timeZone, summary.date)}
+        <strong className={styles.cautionName}>{period.name}</strong>{' '}
+        <span className={styles.factTime}>
+          {format.range(period.start, period.end, summary.timeZone, summary.date)}
+        </span>
         {message && <span className={styles.factNote}>{message}</span>}
       </dd>
     </div>

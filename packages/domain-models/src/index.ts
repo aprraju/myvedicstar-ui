@@ -92,3 +92,4 @@ export {
   suggestionLabel,
   toPreciseSelectedLocation,
 } from './location-search';
+export { dashboardFactorReason, dashboardFirstName, mobilePeriodOrder } from './mobile-dashboard';

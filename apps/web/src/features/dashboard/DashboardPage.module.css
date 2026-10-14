@@ -553,3 +553,130 @@
   background: var(--tone-surface);
   color: var(--tone);
 }
+
+/* Used only by the mobile preview variant. */
+.previewAction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  margin-inline-start: auto;
+  min-block-size: 44px;
+  padding: var(--space-xs);
+  border: 0;
+  background: transparent;
+  color: var(--color-info);
+  font-size: var(--font-size-sm);
+}
+.panel[data-compact] .sectionTitle {
+  padding: var(--space-sm);
+  background: var(--color-surface);
+}
+.panel[data-compact] .sectionHeading {
+  color: var(--color-text-primary);
+}
+.panel[data-compact] .sectionIcon,
+.panel[data-compact] .sectionSubtitle {
+  display: none;
+}
+.panel[data-compact] .listItem {
+  padding: var(--space-sm);
+}
+
+.compactTimelineButton {
+  display: block;
+  inline-size: 100%;
+  min-block-size: 44px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-decoration: none;
+}
+.timelinePanel[data-compact] {
+  padding: var(--space-sm);
+}
+.timeline[data-compact] {
+  margin-block-start: 0;
+  padding-block-start: 3rem;
+}
+.timeline[data-compact] .track {
+  block-size: 42px;
+}
+.timeline[data-compact] .nowLabel {
+  color: var(--color-on-primary);
+}
+.timeline[data-compact] .axisMid {
+  display: block;
+  position: static;
+  transform: none;
+  white-space: normal;
+}
+.timelinePanel[data-compact] .axis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-xs);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+.timelinePanel[data-compact] .axis > span {
+  min-inline-size: 0;
+  white-space: normal;
+}
+.timelinePanel[data-compact] .axis > span:nth-child(2) {
+  text-align: center;
+}
+.timelinePanel[data-compact] .axis > span:last-child {
+  text-align: end;
+}
+.timelinePanel[data-compact] .legend {
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  line-height: 1.5;
+}
+.timelinePanel[data-compact] .legend li {
+  gap: var(--space-xxs);
+}
+.timelinePanel[data-compact] .legend li::before {
+  flex: none;
+  inline-size: 0.5rem;
+}
+
+.periodDetails {
+  min-inline-size: 0;
+}
+.periodDetails summary {
+  position: relative;
+  display: grid;
+  gap: var(--space-xxs);
+  min-block-size: 44px;
+  padding-inline-end: var(--space-md);
+  cursor: pointer;
+  list-style: none;
+}
+.periodChevron {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: 0;
+  color: var(--color-text-secondary);
+}
+.periodChevron svg {
+  transform: rotate(-90deg);
+}
+.periodDetails p {
+  margin-block-start: var(--space-xs);
+}
+
+.panel[data-compact] .listItem[data-state='past'] {
+  opacity: 1;
+}
+.panel[data-compact] .listItem[data-state='past'] .listName,
+.panel[data-compact] .listItem[data-state='past'] .listTime {
+  color: var(--color-text-secondary);
+}
+.panel[data-compact] .listItem[data-state='past'] .listIcon:not([data-tone='warning']) {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-secondary);
+}

@@ -17,7 +17,7 @@ describe('buildDayDashboard', () => {
     expect(dashboard.limbs.karana?.current.name).toBe('Balava');
     expect(dashboard.limbs.karana?.next?.name).toBe('Kaulava');
     expect(dashboard.weekdayName).toBe('Tuesday');
-    expect(dashboard.summary.headline).toBe('Mixed Day');
+    expect(dashboard.summary.headline).toBe('Mixed');
   });
 
   it('lists auspicious and avoid periods in time order with their state at the current instant', () => {

@@ -5,7 +5,7 @@
       "name": "Web: debug in Chrome (starts API + dev server)",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:5173",
+      "url": "https://localhost:5173",
       "webRoot": "${workspaceFolder}/apps/web",
       "preLaunchTask": "web + api"
     },
@@ -13,7 +13,7 @@
       "name": "Web: debug in Edge (starts API + dev server)",
       "type": "msedge",
       "request": "launch",
-      "url": "http://localhost:5173",
+      "url": "https://localhost:5173",
       "webRoot": "${workspaceFolder}/apps/web",
       "preLaunchTask": "web + api"
     },
@@ -21,7 +21,7 @@
       "name": "Web: debug in Chrome (dev server only; start the API yourself)",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:5173",
+      "url": "https://localhost:5173",
       "webRoot": "${workspaceFolder}/apps/web",
       "preLaunchTask": "web: dev server"
     },

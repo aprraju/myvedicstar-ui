@@ -7,7 +7,7 @@ import { toneForStatus } from './good-time';
 /**
  * View model for the month calendar. Every value comes from the backend's month response; the UI only lays the days out
  * in weeks and labels well-known observances from the Tithi number the backend returns (a definition, not astronomy).
- * A tile's status is the backend's General day status (`goodTime`), the same as Home and Find a Good Time.
+ * A tile's overall rating comes from Panchang guidance, matching Today and the selected day's details.
  */
 
 /** Observances recognised from the Tithi in force at sunrise (udaya tithi): 11/26 Ekadashi, 15 Purnima, 30 Amavasya. */
@@ -20,7 +20,7 @@ export interface CalendarDay {
   panchang: DailyPanchang | undefined;
   /** Tithi in force at sunrise. */
   tithi: PanchangElement | undefined;
-  /** From the General day status (`goodTime.status`); the day-factor rating only for older responses without it. */
+  /** From Panchang guidance; consistent with the day summary. */
   tone: DayTone | undefined;
   ratingName: string | undefined;
   observance: Observance | undefined;
@@ -74,10 +74,8 @@ export function buildCalendarMonth(
       dayOfMonth: d,
       panchang,
       tithi,
-      tone: panchang
-        ? toneForStatus(panchang.goodTime?.status.status ?? panchang.guidance.rating)
-        : undefined,
-      ratingName: panchang ? (panchang.goodTime?.status.name ?? panchang.guidance.ratingName) : undefined,
+      tone: panchang ? toneForStatus(panchang.guidance.rating) : undefined,
+      ratingName: panchang?.guidance.ratingName,
       observance: observanceOf(tithi),
       isToday: date === today,
     });

@@ -1,5 +1,5 @@
 import type { GuidanceFactor } from '@myvedicstar/contracts';
-import { toneForRating } from '@myvedicstar/domain-models';
+import { dashboardFactorReason, toneForRating } from '@myvedicstar/domain-models';
 
 import { Icon } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
@@ -47,7 +47,7 @@ export function RatingFactors({
                     {factor.ratingName}
                   </span>
                 </span>
-                <span className={styles.listNote}>{reasonText(factor)}</span>
+                <span className={styles.listNote}>{dashboardFactorReason(factor)}</span>
               </div>
             </li>
           );
@@ -55,11 +55,4 @@ export function RatingFactors({
       </ul>
     </section>
   );
-}
-
-/** The backend reason repeats "<Limb> <Name>: <Rating>." before the explanation; show just the explanation. */
-function reasonText(factor: GuidanceFactor): string {
-  const prefix = `${factor.limbName} ${factor.name}: ${factor.ratingName}.`;
-  const reason = factor.reason.trim();
-  return reason.startsWith(prefix) ? reason.slice(prefix.length).trim() || reason : reason;
 }
