@@ -28,7 +28,10 @@ export const contactFormSchema = z.object({
     .trim()
     .min(1, { error: 'contact.subjectRequired' })
     .max(200, { error: 'contact.subjectTooLong' })
-    .refine((value) => !/[\r\n\u0000-\u001f\u007f]/.test(value), { error: 'contact.subjectRequired' }),
+    // One line of plain text: no line breaks or other control characters (code points 0–31 and 127).
+    .refine((value) => ![...value].some((char) => char.charCodeAt(0) < 32 || char.charCodeAt(0) === 127), {
+      error: 'contact.subjectRequired',
+    }),
   phoneNumber: z
     .string()
     .trim()

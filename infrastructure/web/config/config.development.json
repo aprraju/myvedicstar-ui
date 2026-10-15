@@ -16,6 +16,9 @@
   },
   "apiTimeoutMs": 15000,
   "defaultTradition": "all",
+  "locationSearch": {
+    "enabled": true
+  },
   "auth": {
     "mode": "entra-external-id",
     "authority": "https://myvedicstarexternal.ciamlogin.com/",

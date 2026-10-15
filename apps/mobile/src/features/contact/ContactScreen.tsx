@@ -1,7 +1,7 @@
 import { contactFormSchema, type ContactReason } from '@myvedicstar/validation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useAuth } from '../../shared/auth';
 import { AppText, Button, Notice, Screen, TextField } from '../../shared/components';
@@ -11,9 +11,10 @@ export function ContactScreen() {
   const { api } = useServices();
   const { isAuthenticated, user } = useAuth();
   const params = useLocalSearchParams<{ reason?: string }>();
-  const [values, setValues] = useState({
-    name: '',
-    email: '',
+  // Name and email stay undefined until typed, so the profile prefills them (without copying it into state).
+  const [typed, setValues] = useState({
+    name: undefined as string | undefined,
+    email: undefined as string | undefined,
     phoneNumber: '',
     subject: '',
     message: '',
@@ -31,16 +32,13 @@ export function ContactScreen() {
     staleTime: 60000,
     retry: false,
   });
-  useEffect(() => {
-    if (profile.data)
-      setValues((old) => ({
-        ...old,
-        name: old.name || profile.data.name || '',
-        email: old.email || profile.data.email || '',
-      }));
-  }, [profile.data]);
+  const values = {
+    ...typed,
+    name: typed.name ?? profile.data?.name ?? '',
+    email: typed.email ?? profile.data?.email ?? '',
+  };
   const submit = useMutation({ mutationFn: () => api.contact.submit(values) });
-  const change = (key: keyof typeof values, value: string) => setValues((old) => ({ ...old, [key]: value }));
+  const change = (key: keyof typeof typed, value: string) => setValues((old) => ({ ...old, [key]: value }));
   if (submit.isSuccess)
     return (
       <Screen>
