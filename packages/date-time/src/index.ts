@@ -86,6 +86,11 @@ export function formatLocalDate(
   return formatter(locale, options).format(localDateToUtcMs(date));
 }
 
+/** `October 14` — the day in card headings ("Times to avoid on October 14"), on web and mobile alike. */
+export function formatDayMonth(date: LocalDate, locale: string): string {
+  return formatter(locale, { timeZone: 'UTC', month: 'long', day: 'numeric' }).format(localDateToUtcMs(date));
+}
+
 /** True when `now` is within [start, end). */
 export function isWithin(now: Instant, start: Instant, end: Instant): boolean {
   const t = toEpochMs(now);

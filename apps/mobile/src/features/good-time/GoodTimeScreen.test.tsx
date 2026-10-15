@@ -40,7 +40,7 @@ describe('Find a Good Time (mobile)', () => {
     ).toBeTruthy();
     expect(screen.getAllByText('✓ No Rahu Kalam conflict').length).toBeGreaterThan(0);
     // Amrit Kalam overlapping Rahu Kalam is explained, not recommended.
-    expect(screen.getByText('Not recommended')).toBeTruthy();
+    expect(screen.getByText('Not recommended times')).toBeTruthy();
     expect(screen.getAllByText(/⚠ Overlaps Rahu Kalam/).length).toBeGreaterThan(0);
     expect(screen.getByText(fixtures.muhurta.goodTimes.austinBusiness.disclaimer)).toBeTruthy();
   });
@@ -64,7 +64,7 @@ describe('Find a Good Time (mobile)', () => {
     await storeLocation();
     await renderApp({ index: () => <GoodTimeScreen initialActivity="business" /> });
 
-    expect(await screen.findByText('Next best times')).toBeTruthy();
+    expect(await screen.findByText('Next best days')).toBeTruthy();
     const first = await screen.findByLabelText(
       /^Option 1\. .*October 2.*02:30\sPM – 04:17\sPM\. Highly Favorable/,
     );

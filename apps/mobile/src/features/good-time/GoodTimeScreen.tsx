@@ -1,6 +1,13 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import type { MuhurtaActivity } from '@myvedicstar/contracts';
-import { addDays, formatLocalDate, formatRangeForDay, type LocalDate, todayIn } from '@myvedicstar/date-time';
+import {
+  addDays,
+  formatDayMonth,
+  formatLocalDate,
+  formatRangeForDay,
+  type LocalDate,
+  todayIn,
+} from '@myvedicstar/date-time';
 import {
   buildGoodTimeView,
   defaultActivityKey,
@@ -309,7 +316,7 @@ function Results({
   updating: boolean;
   onNextDate: (date: string) => void;
 }>) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const theme = useTheme();
   const now = useNow();
   const view = useMemo(() => buildGoodTimeView(response, now), [response, now]);
@@ -320,7 +327,7 @@ function Results({
       <View style={[styles.pill, { backgroundColor: dayColors.bg }]}>
         <Ionicons name={STATUS_ICON[view.dayTone]} size={18} color={dayColors.fg} />
         <AppText style={{ color: dayColors.fg }}>
-          {t('goodTime.dayStatus')}: {response.dayStatus.name}
+          {t('goodTime.dayStatus', { day: formatDayMonth(response.date, locale) })}: {response.dayStatus.name}
         </AppText>
       </View>
       {response.activity.completeness === 'partial' && (

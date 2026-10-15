@@ -1,4 +1,10 @@
-import { formatLocalDate, formatRangeForDay, formatTime, type LocalDate } from '@myvedicstar/date-time';
+import {
+  formatDayMonth,
+  formatLocalDate,
+  formatRangeForDay,
+  formatTime,
+  type LocalDate,
+} from '@myvedicstar/date-time';
 import { useMemo } from 'react';
 
 import { useTranslation } from './I18nProvider';
@@ -17,10 +23,7 @@ export function useFormatters() {
         formatRangeForDay(start, end, { timeZone, locale }, referenceDate, t('summary.nextDay')),
       date: (date: LocalDate) => formatLocalDate(date, locale),
       /** `October 14` — the day in card headings ("Times to avoid on October 14"). */
-      day: (date: LocalDate) =>
-        new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric', timeZone: 'UTC' }).format(
-          Date.parse(`${date}T00:00:00Z`),
-        ),
+      day: (date: LocalDate) => formatDayMonth(date, locale),
       /** `Oct 5, 3:37 PM` in the given zone — for windows that can span days (festival Tithi, observance). */
       dateTime: (instant: string, timeZone: string) =>
         new Intl.DateTimeFormat(locale, {

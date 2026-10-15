@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { queryKeys } from '@myvedicstar/api-client';
-import { formatLocalDate } from '@myvedicstar/date-time';
+import { formatDayMonth, formatLocalDate } from '@myvedicstar/date-time';
 import {
   buildDayDashboard,
   dashboardFactorReason,
@@ -136,7 +136,7 @@ export function TodayDashboard() {
           <>
             <MobileTimeline dashboard={dashboard} timeZone={location.timeZone} glossary={glossary} />
             <PeriodCard
-              title={t('dashboard.auspiciousTitle')}
+              title={t('dashboard.auspiciousTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
               items={dashboard.auspicious}
               glossary={glossary}
               timeZone={location.timeZone}
@@ -144,16 +144,23 @@ export function TodayDashboard() {
               previewCount={3}
             />
             <PanchangCard dashboard={dashboard} timeZone={location.timeZone} />
-            <Disclosure title={t('dashboard.avoidTitle')}>
+            <Disclosure
+              title={t('dashboard.avoidTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
+            >
               <PeriodCard
-                title={t('dashboard.avoidTitle')}
+                title={t('dashboard.avoidTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
                 items={dashboard.avoid}
                 glossary={glossary}
                 timeZone={location.timeZone}
                 date={dashboard.summary.date}
               />
             </Disclosure>
-            <Disclosure title={t('dashboard.factorsTitle', { rating: dashboard.ratingName })}>
+            <Disclosure
+              title={t('dashboard.factorsTitle', {
+                day: formatDayMonth(dashboard.summary.date, locale),
+                rating: dashboard.ratingName,
+              })}
+            >
               {dashboard.factors.map((factor) => {
                 const colors = statusToneColors(theme, toneForRating(factor.rating));
                 return (

@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { formatTime } from '@myvedicstar/date-time';
+import { formatDayMonth, formatTime } from '@myvedicstar/date-time';
 import type { DayDashboard } from '@myvedicstar/domain-models';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -35,7 +35,7 @@ export function PanchangCard({ dashboard, timeZone }: { dashboard: DayDashboard;
         }}
       >
         <AppText variant="heading" style={{ flex: 1 }}>
-          {t('dashboard.panchangTitle')}
+          {t('dashboard.panchangTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
         </AppText>
         <Button
           variant="ghost"

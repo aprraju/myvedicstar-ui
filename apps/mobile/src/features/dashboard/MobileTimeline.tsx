@@ -1,5 +1,5 @@
 import type { Glossary } from '@myvedicstar/contracts';
-import { formatTime } from '@myvedicstar/date-time';
+import { formatDayMonth, formatTime } from '@myvedicstar/date-time';
 import type { DayDashboard } from '@myvedicstar/domain-models';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
@@ -36,7 +36,9 @@ export function MobileTimeline({
           gap: theme.spacing.sm,
         }}
       >
-        <AppText variant="heading">{t('dashboard.timelineTitle')}</AppText>
+        <AppText variant="heading">
+          {t('dashboard.timelineTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
+        </AppText>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('dashboard.timelineDetails')}
@@ -156,16 +158,20 @@ export function MobileTimeline({
           ))}
         </View>
       </View>
-      <Sheet visible={expanded} title={t('dashboard.timelineTitle')} onClose={() => setExpanded(false)}>
+      <Sheet
+        visible={expanded}
+        title={t('dashboard.timelineTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
+        onClose={() => setExpanded(false)}
+      >
         <PeriodCard
-          title={t('dashboard.auspiciousTitle')}
+          title={t('dashboard.auspiciousTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
           items={dashboard.auspicious}
           glossary={glossary}
           timeZone={timeZone}
           date={dashboard.summary.date}
         />
         <PeriodCard
-          title={t('dashboard.avoidTitle')}
+          title={t('dashboard.avoidTitle', { day: formatDayMonth(dashboard.summary.date, locale) })}
           items={dashboard.avoid}
           glossary={glossary}
           timeZone={timeZone}
