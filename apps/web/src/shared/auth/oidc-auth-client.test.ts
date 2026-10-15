@@ -23,9 +23,12 @@ const mocks = vi.hoisted(() => {
     signinRedirectCallback: vi.fn(),
     removeUser: vi.fn(),
     signoutRedirect: vi.fn(),
+    clearStaleState: vi.fn(async () => undefined),
   };
-  return { manager, ErrorResponse };
+  return { manager, ErrorResponse, replacePage: vi.fn() };
 });
+
+vi.mock('./page-navigation', () => ({ replacePage: mocks.replacePage }));
 
 vi.mock('oidc-client-ts', () => ({
   ErrorResponse: mocks.ErrorResponse,
@@ -167,23 +170,29 @@ describe('createOidcAuthClient', () => {
     expect(await client.completeSignIn()).toEqual({ ok: false, reason, returnTo });
   });
 
-  it('passes the active account hint to bypass the logout account chooser', async () => {
+  it('ends the provider session with the account hint, so Entra signs out without an account picker', async () => {
     mocks.manager.getUser.mockResolvedValue(user({ profile: { sub: 'user-1', login_hint: 'opaque-hint' } }));
     const client = createOidcAuthClient(config, 'https://x.example');
     await client.signOut();
+    expect(mocks.manager.removeUser).toHaveBeenCalled();
+    expect(client.getState().user).toBeNull();
     expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({
       id_token_hint: 'id-123',
       extraQueryParams: { logout_hint: 'opaque-hint' },
     });
+    expect(mocks.replacePage).not.toHaveBeenCalled();
   });
 
-  it('clears the local session and signs out at the provider', async () => {
+  it('without an account hint, logs out silently: local session cleared, post-logout page, no provider page', async () => {
     mocks.manager.getUser.mockResolvedValue(user());
     const client = createOidcAuthClient(config, 'https://x.example');
     await client.signOut();
     expect(mocks.manager.removeUser).toHaveBeenCalled();
-    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({ id_token_hint: 'id-123' });
+    expect(mocks.manager.clearStaleState).toHaveBeenCalled();
     expect(client.getState().user).toBeNull();
+    expect(mocks.manager.signoutRedirect).not.toHaveBeenCalled();
+    const { post_logout_redirect_uri } = mocks.manager.settings as { post_logout_redirect_uri: string };
+    expect(mocks.replacePage).toHaveBeenCalledWith(post_logout_redirect_uri);
   });
 });
 
@@ -314,9 +323,10 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
     });
   });
 
-  it('ends the Entra session on logout even when no ID token is held', async () => {
+  it('logs out of Entra silently when no ID token (so no account hint) is held', async () => {
     const client = createEntraAuthClient(entra);
     await client.signOut();
-    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({});
+    expect(mocks.manager.signoutRedirect).not.toHaveBeenCalled();
+    expect(mocks.replacePage).toHaveBeenCalledWith(entra.postLogoutRedirectUri);
   });
 });

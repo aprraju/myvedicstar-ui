@@ -8,6 +8,7 @@ import {
 } from 'oidc-client-ts';
 
 import type { AuthClient, AuthState, SignInCallbackResult } from './auth-client';
+import { replacePage } from './page-navigation';
 
 type OidcConfig = Extract<AuthConfig, { mode: 'oidc' }>;
 type EntraConfig = Extract<AuthConfig, { mode: 'entra-external-id' }>;
@@ -189,14 +190,21 @@ function createClient(settings: OidcClientSettings): AuthClient {
     async signOut() {
       const user = await manager.getUser();
       await endSession();
-      // Ends the provider session too, then returns to the post-logout page.
+      // With the ID token's `login_hint` claim (an Entra optional claim), the provider session ends too: `logout_hint`
+      // names the account, so the end-session page signs it out without an account picker and returns to the
+      // post-logout page.
       const logoutHint = user?.profile.login_hint;
-      await manager.signoutRedirect({
-        ...(user?.id_token ? { id_token_hint: user.id_token } : {}),
-        ...(typeof logoutHint === 'string' && logoutHint
-          ? { extraQueryParams: { logout_hint: logoutHint } }
-          : {}),
-      });
+      if (typeof logoutHint === 'string' && logoutHint) {
+        await manager.signoutRedirect({
+          ...(user?.id_token ? { id_token_hint: user.id_token } : {}),
+          extraQueryParams: { logout_hint: logoutHint },
+        });
+        return;
+      }
+      // Without the claim the end-session page would ask "Pick an account", so log out locally and silently instead:
+      // the tokens (memory only) and any leftover redirect state are cleared, then the post-logout page opens.
+      await manager.clearStaleState().catch(() => undefined);
+      replacePage(settings.postLogoutRedirectUri);
     },
     handleUnauthorized() {
       void endSession(true);

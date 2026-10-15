@@ -21,7 +21,7 @@ const API_SCOPE = 'api://e2e-api/access_as_user';
 const base64url = (input: Buffer | string) => Buffer.from(input).toString('base64url');
 
 /** Unsigned test ID token (the browser never validates signatures; the API validates access tokens). */
-function idToken(nonce?: string) {
+function idToken(nonce?: string, loginHint?: string) {
   const now = Math.floor(FIXED_NOW.getTime() / 1000);
   const claims = {
     iss: ISSUER,
@@ -31,6 +31,8 @@ function idToken(nonce?: string) {
     iat: now,
     exp: now + 3600,
     nonce,
+    // Entra's optional `login_hint` claim (configured on the app registration).
+    ...(loginHint ? { login_hint: loginHint } : {}),
   };
   return `${base64url(JSON.stringify({ alg: 'none', typ: 'JWT' }))}.${base64url(JSON.stringify(claims))}.sig`;
 }
@@ -45,7 +47,11 @@ interface EntraRecord {
  * Simulated tenant: discovery, /authorize (redirects back with a code), /token (authorization_code and refresh_token
  * grants, verifying PKCE) and /logout. `accessTokenLifetime` lets a test force refresh-token renewal.
  */
-async function simulateEntra(page: Page, baseURL: string, { accessTokenLifetime = 3600 } = {}) {
+async function simulateEntra(
+  page: Page,
+  baseURL: string,
+  { accessTokenLifetime = 3600, loginHint }: { accessTokenLifetime?: number; loginHint?: string } = {},
+) {
   const record: EntraRecord = { authorize: [], token: [], endSession: [] };
   let issued = 0;
   const cors = { 'Access-Control-Allow-Origin': baseURL };
@@ -114,7 +120,7 @@ async function simulateEntra(page: Page, baseURL: string, { accessTokenLifetime 
           scope: `openid profile offline_access ${API_SCOPE}`,
           access_token: `access-${issued}`,
           refresh_token: `refresh-${issued}`,
-          id_token: idToken(record.authorize.at(-1)?.get('nonce') ?? undefined),
+          id_token: idToken(record.authorize.at(-1)?.get('nonce') ?? undefined, loginHint),
           expires_in: issued === 1 ? accessTokenLifetime : 3600,
         },
       });
@@ -208,7 +214,8 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
         route.fulfill({ status: 401, json: { title: 'Unauthorized' } }),
       );
       await page.goto('/calendar');
-      await expect(page.getByRole('alert')).toContainText("We couldn't sign you in");
+      // The sign-in round trip (code exchange) comes first, then the page's API request is rejected.
+      await expect(page.getByRole('alert')).toContainText("We couldn't sign you in", { timeout: 15_000 });
       await expect(page).toHaveURL(/\/auth\/callback\?signin_error=failed/);
       expect(entra.authorize).toHaveLength(1);
       expect(entra.token).toHaveLength(1);
@@ -252,11 +259,11 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(authorization).not.toContain('Bearer access-1');
   });
 
-  test('Logout clears the session and ends the Entra session at the end-session endpoint', async ({
+  test('Logout ends the Entra session with logout_hint (no account picker), on wide and phone windows', async ({
     page,
     baseURL,
   }) => {
-    const entra = await simulateEntra(page, baseURL!);
+    const entra = await simulateEntra(page, baseURL!, { loginHint: 'opaque-login-hint' });
     await page.goto('/');
     await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
@@ -265,10 +272,36 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(`${baseURL}/`);
     await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
+    expect(entra.endSession).toHaveLength(1);
+    expect(entra.endSession[0]!.get('logout_hint')).toBe('opaque-login-hint');
+    expect(entra.endSession[0]!.get('id_token_hint')).toBeTruthy();
+    expect(entra.endSession[0]!.get('post_logout_redirect_uri')).toBe(`${baseURL}/`);
 
-    const endSession = entra.endSession[0]!;
-    expect(endSession.get('id_token_hint')).toBeTruthy();
-    expect(endSession.get('post_logout_redirect_uri')).toBe(`${baseURL}/`);
+    // Phones: Log out from the "Your Account" sheet behaves the same.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/settings'); // signs in again (simulated Entra)
+    await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+    await page.getByRole('banner').getByRole('button', { name: 'Your account' }).click();
+    await page.getByRole('dialog', { name: 'Your Account' }).getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(`${baseURL}/`);
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
+    expect(entra.endSession).toHaveLength(2);
+    expect(entra.endSession[1]!.get('logout_hint')).toBe('opaque-login-hint');
+  });
+
+  test('Logout without a login_hint claim is local and silent: no Entra account picker', async ({
+    page,
+    baseURL,
+  }) => {
+    const entra = await simulateEntra(page, baseURL!);
+    await page.goto('/');
+    await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    await page.getByRole('banner').getByRole('button', { name: 'Open account menu' }).click();
+    await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(`${baseURL}/`);
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
+    expect(entra.endSession).toHaveLength(0);
   });
 
   test('a cancelled sign-in shows a friendly error with Try again (no provider text)', async ({

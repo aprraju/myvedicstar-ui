@@ -41,8 +41,15 @@ Login / Register buttons (header, Get Started)  ──►  Entra-hosted page (fu
    Forgot password: link on the Entra sign-in page (email OTP → new password) — no app or backend endpoint
                   ◄── /auth/callback (code + PKCE verifier exchanged at the token endpoint) ──► validated returnTo
 Protected route while signed out  ──►  straight to Entra, then back to the requested route (default /dashboard)
-Logout  ──►  local session cleared, then Entra end-session endpoint  ──►  postLogoutRedirectUri
+Logout  ──►  local session cleared, then Entra end-session endpoint with logout_hint  ──►  postLogoutRedirectUri
 ```
+
+- The web SPA registration emits the `login_hint` optional claim in the ID token. Logout sends it to Entra's
+  end-session endpoint as `logout_hint` (with `id_token_hint`), so Entra ends the session for that account without the
+  "Pick an account" chooser and returns to the post-logout page.
+- If an ID token has no `login_hint` (e.g. the claim is removed from the registration), logout is local and silent
+  instead: tokens (memory only) are dropped and the post-logout page replaces the current one. The Entra browser
+  session then remains until it expires, so the next Login may continue without asking for a password.
 
 - There are no in-app login or register pages. Sign-in errors (`?error=cancelled|network|failed` on
   `/auth/callback`) show a friendly message with "Try again" and "Home", so a failure never loops.
