@@ -89,7 +89,7 @@ const GEO_MESSAGES: Record<Extract<DetectError, { kind: 'geolocation' }>['reason
   timeout: 'location.errors.timeout',
 };
 
-export function LocationPermissionMessage({ error }: { error: DetectError }) {
+function LocationPermissionMessage({ error }: { error: DetectError }) {
   const { t } = useTranslation();
   if (error.kind === 'api') return <ErrorState error={error.error} />;
   return (

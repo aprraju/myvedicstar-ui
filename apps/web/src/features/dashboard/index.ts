@@ -1,4 +1,3 @@
-export { DashboardPage } from './DashboardPage';
 export { DayBanner } from './DayBanner';
 export { DayTimeline } from './DayTimeline';
 export { MobileDayDetails } from './MobileDashboard';

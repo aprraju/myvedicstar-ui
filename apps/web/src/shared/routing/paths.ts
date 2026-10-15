@@ -27,7 +27,8 @@ export const routes = {
   profile: '/profile',
 } as const;
 
-export const DEFAULT_AUTHENTICATED_PATH = routes.dashboard;
+/** Signed-in Home: the Panchang page. Sign-in, the signed-in `/` and the old `/dashboard` all land here. */
+export const DEFAULT_AUTHENTICATED_PATH = routes.calendar;
 
 type SignInErrorReason = 'cancelled' | 'network' | 'failed';
 export const SIGN_IN_ERROR_PARAM = 'signin_error';

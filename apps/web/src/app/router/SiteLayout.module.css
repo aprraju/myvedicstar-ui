@@ -35,10 +35,6 @@
   .mobileNavigation {
     display: block;
   }
-  .mobileTodayShell .main {
-    padding: 0;
-    max-inline-size: 840px;
-  }
 }
 
 /* Phones, signed out: room for the taller menu bar; on the home page the menu and footer are part of the page. */

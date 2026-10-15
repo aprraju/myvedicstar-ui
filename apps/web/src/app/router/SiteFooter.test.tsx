@@ -44,7 +44,7 @@ describe('Site footer', () => {
     const explore = within(footer()).getByRole('region', { name: 'Explore' });
     expect(within(explore).getByRole('link', { name: "Today's Panchang" })).toHaveAttribute(
       'href',
-      '/dashboard',
+      '/calendar',
     );
     expect(within(explore).getByRole('link', { name: 'Find a Good Time' })).toHaveAttribute(
       'href',

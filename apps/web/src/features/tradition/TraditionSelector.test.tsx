@@ -48,23 +48,21 @@ describe('TraditionSelector', () => {
   });
 
   it('reloads the Panchang when the tradition changes, independent of location', async () => {
-    // The selector is not shown on the home page: choose on another page, then open Home.
+    // The selector is not shown on the public home page: choose on another page, then open Home (the Panchang page).
     storeSelectedLocation();
     renderRoute('/help', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     const select = await screen.findByRole('combobox', { name: 'Tradition' });
     await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(8));
     await userEvent.selectOptions(select, 'north-indian');
     await userEvent.click(within(screen.getByRole('banner')).getByRole('link', { name: 'Home' }));
-    await screen.findByText('Mixed');
 
+    const month = (u: URL) => /\/panchang\/month\//.test(u.pathname);
     await waitFor(() =>
-      expect(
-        apiRequests.some(
-          (u) => u.pathname.endsWith('/panchang/today') && u.searchParams.get('tradition') === 'north-indian',
-        ),
-      ).toBe(true),
+      expect(apiRequests.some((u) => month(u) && u.searchParams.get('tradition') === 'north-indian')).toBe(
+        true,
+      ),
     );
-    const last = apiRequests.filter((u) => u.pathname.endsWith('/panchang/today')).at(-1)!;
+    const last = apiRequests.filter(month).at(-1)!;
     expect(last.searchParams.get('latitude')).toBe('30.27');
   });
 });

@@ -498,7 +498,7 @@ export const en = {
     periodDetails: 'Period details',
     timelineCompactSubtitle: 'Sunrise to next sunrise',
     completePanchang: 'Complete Panchang',
-    mobileNavigation: 'Today navigation',
+    mobileNavigation: 'App navigation',
     greeting: 'Namaste, {name}',
     greetingAnonymous: 'Namaste',
     panchangTitle: '{day} Panchang',

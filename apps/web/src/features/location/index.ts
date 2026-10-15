@@ -4,6 +4,6 @@ export {
   type GeolocationProvider,
   type PermissionStatus,
 } from './geolocation';
-export { LocationDialog, LocationPermissionMessage } from './LocationDialog';
+export { LocationDialog } from './LocationDialog';
 export { LocationSelector } from './LocationSelector';
 export { LocationStateProvider, useLocationState } from './LocationStateProvider';

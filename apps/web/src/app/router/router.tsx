@@ -1,8 +1,8 @@
 import type { ComponentType } from 'react';
-import { createBrowserRouter, type RouteObject } from 'react-router';
+import { createBrowserRouter, Navigate, type RouteObject } from 'react-router';
 
 import type { RouteHandle } from '../../shared/accessibility/usePageTitle';
-import { routes } from '../../shared/routing/paths';
+import { DEFAULT_AUTHENTICATED_PATH, routes } from '../../shared/routing/paths';
 import { NotFoundPage } from '../pages/NotFoundPage';
 import { RouteErrorPage } from '../pages/RouteErrorPage';
 import { StartupFallback } from '../pages/StartupFallback';
@@ -90,9 +90,9 @@ export const appRoutes: RouteObject[] = [
         lazy: async () => ({ Component: (await import('../../features/auth')).AuthCallbackPage }),
       },
       {
+        // The old Today page: links and bookmarks open Home (the Panchang page).
         path: routes.dashboard,
-        handle: handle('Dashboard', 'pages.dashboard.title'),
-        lazy: protectedPage(async () => (await import('../../features/dashboard')).DashboardPage),
+        element: <Navigate to={DEFAULT_AUTHENTICATED_PATH} replace />,
       },
       {
         path: routes.calendar,

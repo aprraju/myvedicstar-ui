@@ -1,7 +1,7 @@
 import { todayIn } from '@myvedicstar/date-time';
 import { fixtures } from '@myvedicstar/testing';
 import { focusManager } from '@tanstack/react-query';
-import { act, screen } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -23,19 +23,21 @@ describe('Today cache integration', () => {
   it('reuses Today when returning from Calendar without another Today request', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
-    const { router } = renderRoute('/dashboard', {
+    // Upcoming Events loads Today (its day banner).
+    const { router } = renderRoute('/festivals', {
       auth: createInMemoryAuthClient({ user: { id: 'cache-user' } }),
     });
-    await screen.findByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
-    expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1);
+    await waitFor(() =>
+      expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1),
+    );
     await act(async () => {
       await router.navigate('/calendar');
     });
     await screen.findByRole('heading', { name: 'September 2026' });
     await act(async () => {
-      await router.navigate('/dashboard');
+      await router.navigate('/festivals');
     });
-    await screen.findByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
+    await screen.findByRole('heading', { level: 1, name: 'Festivals & Observances' });
     expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1);
   });
 

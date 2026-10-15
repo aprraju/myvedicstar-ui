@@ -37,9 +37,12 @@ test.describe('foundation', () => {
   });
 
   test('protected routes sign in at the identity provider and keep the destination', async ({ page }) => {
+    await page.goto('/festivals');
+    await expect(page.getByRole('heading', { level: 1, name: 'Festivals & Observances' })).toBeVisible();
+    await expect(page).toHaveURL(/\/festivals$/);
+    // The old Today address opens Home: the Panchang page.
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page).toHaveURL(/\/calendar$/);
   });
 
   test('there are no login or register pages', async ({ page }) => {
@@ -86,7 +89,7 @@ test.describe('responsive layout', () => {
       await expect(banner.getByRole('button', { name: 'Login' })).toBeVisible();
       await expect(banner.getByRole('button', { name: 'Register' })).toHaveCount(0);
       // The app's sections need sign-in, so signed-out visitors get a bottom bar of features that sign in first.
-      await expect(page.getByRole('navigation', { name: 'Today navigation' })).toHaveCount(0);
+      await expect(page.getByRole('navigation', { name: 'App navigation' })).toHaveCount(0);
       // The home page's menu, fixed at the bottom: features (sign in first) and Privacy · Terms · Help · Contact.
       const bar = page.getByRole('list', { name: 'What you can do' });
       await expect(bar.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
@@ -141,11 +144,12 @@ test.describe('responsive layout', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Find a Good Time' })).toHaveCount(1);
   });
 
-  test('phones: Login / Sign Up on the home page signs in to the dashboard', async ({ page }) => {
+  test('phones: Login / Sign Up on the home page signs in to Home (the Panchang page)', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto('/');
     await page.getByRole('button', { name: 'Login / Sign Up' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await expect(page).toHaveURL(/\/calendar$/);
+    await expect(page.getByRole('navigation', { name: 'App navigation' })).toBeVisible();
   });
 
   test('guest header shows navigation and sign-in on wide windows', async ({ page }) => {

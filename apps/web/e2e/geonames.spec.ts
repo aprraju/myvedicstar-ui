@@ -41,7 +41,7 @@ for (const width of [344, 768, 884]) {
       saved = route.request().postDataJSON() as Record<string, unknown>;
       return route.fulfill({ json: { ...saved, locationId: 'e96544af-55b1-458b-92e0-33044c47ad28' } });
     });
-    await page.goto('/dashboard');
+    await page.goto('/calendar');
     await page.getByRole('button', { name: 'Change location: Austin, Texas' }).click();
     const dialog = page.getByRole('dialog', { name: 'Choose your location' });
     await dialog.getByRole('combobox', { name: 'City, ZIP code or coordinates' }).fill('Austin');

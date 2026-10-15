@@ -62,7 +62,7 @@ function backend() {
 }
 const auth = () => createInMemoryAuthClient({ user: { id: 'u1' } });
 describe('Settings', () => {
-  it('applies both saved defaults to the header and subsequent Today calculations', async () => {
+  it("applies both saved defaults to the header and subsequent today's Panchang requests", async () => {
     backend();
     const { router } = renderRoute('/settings', { auth: auth() });
     await waitFor(() => expect(screen.getByLabelText('Default Tradition')).toHaveValue('telugu'));
@@ -75,7 +75,7 @@ describe('Settings', () => {
     await screen.findByText('Your settings have been saved.');
     expect(header.getByRole('combobox', { name: 'Tradition' })).toHaveValue('tamil');
     expect(header.getByText('Liberty Hill, Texas, United States')).toBeInTheDocument();
-    await act(() => router.navigate('/dashboard'));
+    await act(() => router.navigate('/festivals'));
     await waitFor(() =>
       expect(
         apiRequests.some(
@@ -132,7 +132,7 @@ describe('Settings', () => {
   });
   it('applies defaults to calculations after login without saving settings', async () => {
     const { saves } = backend();
-    const { services } = renderRoute('/dashboard', { auth: auth() });
+    const { services } = renderRoute('/calendar', { auth: auth() });
     await waitFor(() =>
       expect(services.queryClient.getQueryData(['auth', 'settings', 'u1'])).toMatchObject(initial),
     );
@@ -145,7 +145,7 @@ describe('Settings', () => {
     const { saves } = backend();
     const { router } = renderRoute('/settings', { auth: auth() });
     await screen.findByText(/deleting it restores the fallback/);
-    await act(() => router.navigate('/dashboard'));
+    await act(() => router.navigate('/calendar'));
     await userEvent.selectOptions(await screen.findByRole('combobox', { name: 'Tradition' }), 'tamil');
     expect(saves).toHaveLength(0);
     await act(() => router.navigate('/settings'));

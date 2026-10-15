@@ -14,7 +14,7 @@ const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName:
 // The header and the mobile bottom navigation each render a ProfileMenu (CSS shows one per window size; jsdom has no
 // CSS), so lookups that expect exactly one match are scoped to the header (banner).
 describe('Profile menu', () => {
-  it('uses the minimal userinfo response for two profile lines and the dashboard greeting', async () => {
+  it('uses the minimal userinfo response for two profile lines', async () => {
     server.use(
       http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
         HttpResponse.json({
@@ -24,8 +24,7 @@ describe('Profile menu', () => {
         }),
       ),
     );
-    renderRoute('/dashboard', { auth: signedIn() });
-    expect(await screen.findByText('Namaste, Raju,Bhupathi')).toBeInTheDocument();
+    renderRoute('/calendar', { auth: signedIn() });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
     const banner = within(screen.getByRole('banner'));
     const name = await banner.findByText('Raju,Bhupathi');
@@ -106,8 +105,9 @@ describe('Profile menu', () => {
     await within(screen.getByRole('banner')).findByText('Asha Rao');
     await act(() => router.navigate('/contact'));
     await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
-    await act(() => router.navigate('/dashboard'));
-    await screen.findByText(/Namaste, Asha/);
+    await act(() => router.navigate('/calendar'));
+    await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
+    await within(screen.getByRole('banner')).findByText('Asha Rao');
     expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(1);
   });
 

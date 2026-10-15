@@ -11,7 +11,7 @@ import { server } from '../../test/msw/server';
 import { fakeGeolocation, renderRoute as renderTestRoute } from '../../test/render';
 
 const renderRoute = (path: string, options: Parameters<typeof renderTestRoute>[1] = {}) =>
-  renderTestRoute(path === '/' ? '/dashboard' : path, {
+  renderTestRoute(path === '/' ? '/calendar' : path, {
     auth: createInMemoryAuthClient({ user: { id: 'location-user' } }),
     ...options,
   });
@@ -109,9 +109,10 @@ describe('location selection', () => {
 
   it('explains a denied permission and remembers it', async () => {
     renderRoute('/', { geolocation: fakeGeolocation({ permission: 'prompt', error: 'permissionDenied' }) });
-    expect(await screen.findByText(/Location access is turned off/)).toBeInTheDocument();
-    expect(window.localStorage.getItem('mvs.location.permissionDenied')).toBe('true');
-    expect(screen.getByRole('button', { name: 'Use my current location' })).toBeInTheDocument();
+    await waitFor(() => expect(window.localStorage.getItem('mvs.location.permissionDenied')).toBe('true'));
+    const dialog = await openDialog();
+    expect(within(dialog).getByText(/Location access is turned off/)).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Use my current location' })).toBeInTheDocument();
   });
 
   it('never asks again automatically after a denial', async () => {
@@ -202,8 +203,9 @@ describe('location selection', () => {
     renderRoute('/', {
       geolocation: fakeGeolocation({ permission: 'granted', position: { latitude: 1, longitude: 1 } }),
     });
+    const dialog = await openDialog();
     expect(
-      await screen.findByText("We couldn't load this right now. Please try again in a moment."),
+      await within(dialog).findByText("We couldn't load this right now. Please try again in a moment."),
     ).toBeInTheDocument();
   });
 });

@@ -37,16 +37,17 @@ test.describe('public home', () => {
     // Uses the wide-window header links (phones have no Help link in the header).
     await page.setViewportSize({ width: 1280, height: 800 });
     await withSavedLocation(page);
-    await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await page.goto('/calendar');
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
     await page.getByRole('link', { name: 'Help / FAQ', exact: true }).click();
     await page.getByRole('combobox', { name: 'Tradition' }).selectOption('tamil');
-    await page.getByRole('link', { name: "Today's Panchang", exact: true }).click();
-    await expect(card(page).getByText('Mixed', { exact: true })).toBeVisible();
+    // Home is the Panchang page for signed-in users.
+    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' }).click();
+    await expect(page).toHaveURL(/\/calendar$/);
     await expect
       .poll(() =>
         apiRequests.some(
-          (u) => u.pathname.endsWith('/panchang/today') && u.searchParams.get('tradition') === 'tamil',
+          (u) => u.pathname.includes('/panchang/month/') && u.searchParams.get('tradition') === 'tamil',
         ),
       )
       .toBe(true);
@@ -63,27 +64,27 @@ test.describe('public home', () => {
 });
 
 test.describe('sign-in journeys (mock identity provider)', () => {
-  test('Home → Login → Dashboard', async ({ page }) => {
+  test('Home → Login → Home (the Panchang page)', async ({ page }) => {
     // Header Login is a wide-window control; phones sign in through the bottom navigation's Profile.
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const banner = page.getByRole('banner');
-    // Login goes straight to the identity provider (mock: signs in instantly), then to the dashboard.
+    // Login goes straight to the identity provider (mock: signs in instantly), then to Home: the Panchang page.
     await banner.getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    await expect(page).toHaveURL(/\/calendar$/);
   });
 
-  test('Help → Register → Dashboard', async ({ page }) => {
+  test('Help → Login → Home (the Panchang page)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/help');
     await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    await expect(page).toHaveURL(/\/calendar$/);
   });
 
-  test('every API call made by the dashboard carries the access token', async ({ page }) => {
+  test('every API call made by the Panchang page carries the access token', async ({ page }) => {
     await withSavedLocation(page);
     const calls: { path: string; authorization: string | undefined }[] = [];
     page.on('request', (request) => {
@@ -92,11 +93,10 @@ test.describe('sign-in journeys (mock identity provider)', () => {
         calls.push({ path: url.pathname, authorization: request.headers()['authorization'] });
       }
     });
-    await page.goto('/dashboard'); // mock identity provider signs in instantly
-    await expect(card(page).getByText('Mixed', { exact: true })).toBeVisible();
+    await page.goto('/calendar'); // mock identity provider signs in instantly
     await expect
       .poll(() => calls.map((c) => c.path))
-      .toEqual(expect.arrayContaining(['/api/v1/panchang/today', '/api/v1/traditions']));
+      .toEqual(expect.arrayContaining(['/api/v1/panchang/month/2026/9', '/api/v1/traditions']));
     // Once signed in, every endpoint is (re)requested with the token: the latest call to each carries it.
     await expect
       .poll(() => {

@@ -147,15 +147,15 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     void page;
   });
 
-  test('Login: PKCE S256 authorize request, verified code exchange, dashboard, tokens in memory only', async ({
+  test('Login: PKCE S256 authorize request, verified code exchange, Home, tokens in memory only', async ({
     page,
     baseURL,
   }) => {
     const entra = await simulateEntra(page, baseURL!);
     await page.goto('/');
     await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    await expect(page).toHaveURL(/\/calendar$/);
 
     const authorize = entra.authorize[0]!;
     expect(authorize.get('response_type')).toBe('code');
@@ -194,28 +194,28 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     await expect(page.getByRole('button', { name: 'Register', exact: true })).toHaveCount(0);
   });
 
-  for (const endpoint of ['auth/login', 'panchang/today']) {
+  for (const [endpoint, rejectedEndpoint] of [
+    ['auth/login', '**/api/v1/auth/login*'],
+    ['panchang/month', '**/api/v1/panchang/month/**'],
+  ] as const) {
     test(`a rejected ${endpoint} token stops login redirects until an explicit retry`, async ({
       page,
       baseURL,
     }) => {
       const entra = await simulateEntra(page, baseURL!);
       await withSavedLocation(page);
-      const rejectedEndpoint = `**/api/v1/${endpoint}*`;
       await page.route(rejectedEndpoint, (route) =>
         route.fulfill({ status: 401, json: { title: 'Unauthorized' } }),
       );
-      await page.goto('/dashboard');
+      await page.goto('/calendar');
       await expect(page.getByRole('alert')).toContainText("We couldn't sign you in");
       await expect(page).toHaveURL(/\/auth\/callback\?signin_error=failed/);
       expect(entra.authorize).toHaveLength(1);
       expect(entra.token).toHaveLength(1);
       await page.unroute(rejectedEndpoint);
       await page.getByRole('button', { name: 'Try again' }).click();
-      await expect(page).toHaveURL(/\/dashboard$/);
-      await expect(
-        page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true }),
-      ).toBeVisible();
+      await expect(page).toHaveURL(/\/calendar$/);
+      await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
       expect(entra.authorize).toHaveLength(2);
     });
   }
@@ -242,11 +242,8 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(entra.authorize[0]!.get('code_challenge_method')).toBe('S256');
 
     await page.getByRole('banner').getByRole('link', { name: 'Home', exact: true }).click(); // in-app: memory kept
-    // The day's rating can come from the month the previous page loaded (shared cache; the synthetic test month
-    // rates days differently from the single-day fixture), so check the day itself rather than its rating.
-    await expect(
-      page.getByRole('region', { name: "Today's summary" }).getByText('Tuesday, September 29'),
-    ).toBeVisible();
+    await expect(page).toHaveURL(/\/calendar$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
 
     const refresh = entra.token.find((body) => body.get('grant_type') === 'refresh_token');
     expect(refresh?.get('refresh_token')).toBe('refresh-1');
@@ -262,7 +259,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     const entra = await simulateEntra(page, baseURL!);
     await page.goto('/');
     await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
 
     await page.getByRole('banner').getByRole('button', { name: 'Open account menu' }).click();
     await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click();

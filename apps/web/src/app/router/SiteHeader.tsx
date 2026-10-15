@@ -7,18 +7,17 @@ import { TraditionSelector } from '../../features/tradition';
 import { useAuth, useStartSignIn } from '../../shared/auth';
 import { Icon, type IconName } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
-import { routes } from '../../shared/routing/paths';
+import { DEFAULT_AUTHENTICATED_PATH, routes } from '../../shared/routing/paths';
 import { MobileAccountMenu } from './MobileAccountMenu';
 import { ProfileMenu } from './ProfileMenu';
 import styles from './SiteHeader.module.css';
 
 /**
- * Signed-in navigation (myvedicstar-default theme): icon above label. For signed-in users Home is the dashboard, and
- * Today shows the dashboard too for now; only Today is highlighted there so two items are never active together.
+ * Signed-in navigation (myvedicstar-default theme): icon above label. For signed-in users Home is the Panchang page;
+ * only Panchang is highlighted there so two items are never active together.
  */
 const APP_NAV: { to: string; icon: IconName; label: MessageKey; highlight: boolean }[] = [
-  { to: routes.dashboard, icon: 'home', label: 'nav.home', highlight: false },
-  { to: routes.dashboard, icon: 'sun', label: 'nav.today', highlight: true },
+  { to: DEFAULT_AUTHENTICATED_PATH, icon: 'home', label: 'nav.home', highlight: false },
   { to: routes.calendar, icon: 'calendar', label: 'nav.calendar', highlight: true },
   { to: routes.festivals, icon: 'flower', label: 'nav.upcomingEvents', highlight: true },
   { to: routes.goodTime, icon: 'clock', label: 'nav.findGoodTime', highlight: true },

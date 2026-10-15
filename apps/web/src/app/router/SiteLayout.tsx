@@ -15,7 +15,6 @@ import styles from './SiteLayout.module.css';
 /** Page chrome shared by all pages: skip link, header, main landmark, footer, route announcements. */
 export function SiteLayout() {
   const { pathname } = useLocation();
-  const today = pathname === '/dashboard' || pathname === '/today';
   const { isAuthenticated } = useAuth();
   // Phones, signed-out home: its menu and footer are on the page (other public pages keep the bottom bar).
   const guestHome = pathname === '/' && !isAuthenticated;
@@ -50,7 +49,7 @@ export function SiteLayout() {
   return (
     <div
       ref={shellRef}
-      className={`${styles.shell} ${styles.mobileShell} ${today ? styles.mobileTodayShell : ''} ${guest ? styles.guest : ''} ${guestHome ? styles.guestHome : ''}`}
+      className={`${styles.shell} ${styles.mobileShell} ${guest ? styles.guest : ''} ${guestHome ? styles.guestHome : ''}`}
     >
       <SkipLink />
       <SiteHeader todayMobile />

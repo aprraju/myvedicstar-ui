@@ -6,22 +6,14 @@ test('tablet portrait: full-width fixed header and bottom bar on every page', as
   test.setTimeout(120_000);
   await page.setViewportSize({ width: 960, height: 1440 });
   await withSavedLocation(page);
-  for (const path of [
-    '/dashboard',
-    '/calendar',
-    '/good-time',
-    '/festivals',
-    '/settings',
-    '/profile',
-    '/about',
-  ]) {
+  for (const path of ['/calendar', '/good-time', '/festivals', '/settings', '/profile', '/about']) {
     await page.goto(path);
     const header = page.getByRole('banner');
     await expect(header).toBeVisible();
     await expect.poll(async () => (await header.boundingBox())?.width).toBe(960);
     expect((await header.boundingBox())!.x).toBe(0);
     const bar = page
-      .getByRole('navigation', { name: 'Today navigation' })
+      .getByRole('navigation', { name: 'App navigation' })
       .or(page.getByRole('list', { name: 'What you can do' }));
     await expect(bar).toBeVisible();
     const heading = (await page.locator('main h1:visible, main h2:visible').first().boundingBox())!;

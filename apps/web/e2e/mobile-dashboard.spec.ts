@@ -75,7 +75,7 @@ test('mobile pages share fixed header, bottom navigation and decision notice', a
     // Signed in: the app's bottom bar; signed out (a public page after a reload): the sign-in features bar.
     await expect(
       page
-        .getByRole('navigation', { name: 'Today navigation' })
+        .getByRole('navigation', { name: 'App navigation' })
         .or(page.getByRole('list', { name: 'What you can do' })),
     ).toBeVisible();
     await page.evaluate(() => scrollTo(0, 500));
@@ -99,9 +99,10 @@ test('mobile pages share fixed header, bottom navigation and decision notice', a
       await expect(page).toHaveURL(/day=2026-09-02/);
       await page.getByRole('button', { name: 'Previous day', exact: true }).click();
       await expect(page).toHaveURL(/day=2026-09-01/);
+      // The Panchang card opens showing every element.
       const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
-      await panchang.getByRole('button', { name: 'See all' }).click();
       await expect(panchang).toContainText('Yoga');
+      await expect(panchang.getByRole('button', { name: 'Show less' })).toBeVisible();
       await expect(panchang.getByRole('heading')).toHaveCount(1);
       await page.locator('details > summary').filter({ hasText: 'Times to avoid' }).click();
       await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).toBeVisible();
@@ -124,131 +125,60 @@ test('mobile pages share fixed header, bottom navigation and decision notice', a
   }
 });
 
-test('desktop Today preserves its approved layout', async ({ page }, info) => {
-  test.setTimeout(60000);
-  test.skip(info.project.name !== 'desktop-chromium', 'Desktop visual reference.');
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await withSavedLocation(page);
-  await page.goto('/dashboard');
-  await expect(page.getByText('Namaste, Asha Rao')).toBeVisible();
-  await expect(
-    page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).toBeVisible();
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
-  // Font rasterization differs by OS; this reviewed baseline was captured on Windows.
-  if (process.platform === 'win32')
-    await expect(page).toHaveScreenshot('desktop-today.png', { fullPage: true });
-  await expect(page.getByRole('navigation', { name: 'Today navigation' })).toHaveCount(0);
-});
-
-test('mobile Today follows the mockup order and fits phones, tablets and unfolded windows', async ({
+test('signed-in Home is the Panchang page: no Today item, and the old Today address opens it', async ({
   page,
-  apiRequests,
 }) => {
-  test.setTimeout(60000);
   await page.setViewportSize({ width: 375, height: 900 });
   await withSavedLocation(page);
   await page.goto('/dashboard');
-  await expect(page.getByRole('banner').getByRole('combobox', { name: 'Tradition' })).toBeVisible();
-  await expect(page.getByText('Namaste, Asha', { exact: true })).toHaveCount(0);
-  const header = page.getByRole('banner');
-  await expect(header.getByRole('button', { name: 'Open account menu' })).toBeHidden();
-  await page.evaluate(() => scrollTo(0, 500));
-  expect((await header.boundingBox())!.y).toBe(0);
-  await page.evaluate(() => scrollTo(0, 0));
-  const summary = page.getByRole('region', { name: "Today's summary" });
-  await expect(summary.getByText('Mixed', { exact: true })).toBeVisible();
-  await expect(
-    page
-      .getByRole('contentinfo')
-      .getByText('Important decisions should not rely solely on information provided by MyVedicStar.'),
-  ).toBeVisible();
-  await expect(page.getByRole('contentinfo').getByRole('navigation')).toBeHidden();
-  await expect(page.locator('[class*="dayDate"]')).toBeVisible();
-  await expect(page.locator('[class*="dayContext"]')).toContainText('Paksha');
-  const timeline = page.getByRole('region', { name: /^\w+ \d{1,2} timeline$/ });
-  const auspicious = page.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
-  const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
-  for (const width of [320, 375, 430, 600, 884]) {
-    await page.setViewportSize({ width, height: 900 });
-    await expect
-      .poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth))
-      .toBeLessThanOrEqual(0);
-    const facts = await summary.locator('dl > div').all();
-    expect(facts).toHaveLength(2);
-    const [left, right] = await Promise.all(facts.map((fact) => fact.boundingBox()));
-    expect(Math.abs(left!.height - right!.height)).toBeLessThanOrEqual(1);
-    expect(Math.abs(left!.y - right!.y)).toBeLessThanOrEqual(1);
-    const boxes = await Promise.all(
-      [summary, timeline, auspicious, panchang].map((section) => section.boundingBox()),
-    );
-    expect(boxes.map((box) => box!.y)).toEqual([...boxes.map((box) => box!.y)].sort((a, b) => a - b));
-    const header = await page.getByRole('banner').boundingBox();
-    expect(header!.y).toBe(0);
-    expect(boxes[0]!.y).toBeGreaterThanOrEqual(header!.height);
-    const subtitle = await timeline.getByRole('heading').boundingBox();
-    const now = await timeline.getByText('Now', { exact: true }).boundingBox();
-    expect(now!.y).toBeGreaterThanOrEqual(subtitle!.y + subtitle!.height + 4);
-  }
-  await page.setViewportSize({ width: 375, height: 900 });
-  const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
-  expect(result.violations).toEqual([]);
-  expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1);
-  if (process.platform === 'win32')
-    await expect(page).toHaveScreenshot('mobile-today.png', { fullPage: true });
+  await expect(page).toHaveURL(/\/calendar$/);
+  const navigation = page.getByRole('navigation', { name: 'App navigation' });
+  await expect(navigation.getByRole('link')).toHaveText(['Home', 'Panchang', 'Good Time', 'Upcoming Events']);
+  await expect(navigation.getByRole('link', { name: 'Today' })).toHaveCount(0);
+  await expect(navigation.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/calendar');
+  await navigation.getByRole('link', { name: 'Good Time' }).click();
+  await expect(page).toHaveURL(/\/good-time/);
+  await navigation.getByRole('link', { name: 'Home' }).click();
+  await expect(page).toHaveURL(/\/calendar$/);
+  // Only Panchang is highlighted on Home, so two items are never active together.
+  await expect(navigation.locator('[aria-current="page"]')).toHaveText(['Panchang']);
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  const primary = page.getByRole('navigation', { name: 'Primary' });
+  await expect(primary.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/calendar');
+  await expect(primary.getByRole('link', { name: 'Today' })).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: 'App navigation' })).toBeHidden();
 });
 
-test('mobile Today remains accessible in dark mode with enlarged text', async ({ page }) => {
+test('mobile Panchang remains accessible in dark mode with enlarged text', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await page.emulateMedia({ colorScheme: 'dark' });
   await withSavedLocation(page);
-  await page.goto('/dashboard');
-  await expect(
-    page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true }),
-  ).toBeVisible();
+  await page.goto('/calendar');
+  await expect(page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ })).toContainText('Yoga');
   await page.evaluate(() => (document.documentElement.style.fontSize = '20px'));
   await expect
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth - innerWidth))
     .toBeLessThanOrEqual(0);
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
   expect(result.violations).toEqual([]);
-  await expect(page.getByRole('navigation', { name: 'Today navigation' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'App navigation' })).toBeVisible();
 });
 
-test('mobile previews retain complete periods, Panchang, explanations and Profile navigation', async ({
-  page,
-}) => {
+test('mobile Panchang card opens in full and folds; the account opens from the header', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 900 });
   await withSavedLocation(page);
-  await page.goto('/dashboard');
+  await page.goto('/calendar');
   const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
-  await panchang.getByRole('button', { name: /^Tithi:/ }).click();
   await expect(panchang).toContainText('Yoga');
   await expect(panchang).toContainText('Karana');
   await expect(panchang.getByRole('heading')).toHaveCount(1);
-  await expect(panchang.locator('dl')).toHaveCount(1);
-  await expect(page.getByRole('region', { name: 'Complete Panchang' })).toHaveCount(0);
   await panchang.getByRole('button', { name: 'Show less' }).click();
+  await expect(panchang).not.toContainText('Karana');
   await panchang.getByRole('button', { name: 'See all' }).click();
-  await expect(panchang).toContainText('Yoga');
-  const auspicious = page.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
-  await expect(auspicious).toContainText('Overlaps with');
-  await auspicious.getByRole('button', { name: 'See all' }).click();
-  await expect(auspicious.getByRole('button', { name: 'Show less' })).toBeVisible();
-  await page.getByRole('button', { name: 'View timeline details' }).click();
-  await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ }).first()).toContainText(
-    'Rahu Kalam',
-  );
-  await page
-    .locator('details > summary')
-    .filter({ hasText: /^Why \w+ \d{1,2} is / })
-    .click();
-  await expect(page.locator('details[open]')).toContainText('Tithi');
+  await expect(panchang).toContainText('Karana');
   // Four app sections in the bottom bar; the account opens from the header's icon as a "Your Account" sheet.
-  const navigation = page.getByRole('navigation', { name: 'Today navigation' });
+  const navigation = page.getByRole('navigation', { name: 'App navigation' });
   await expect(navigation.getByRole('link')).toHaveCount(4);
   await expect(navigation.getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('button', { name: 'Open account menu' })).toBeHidden();

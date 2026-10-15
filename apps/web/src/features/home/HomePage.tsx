@@ -6,7 +6,7 @@ import { useAuth, useStartSignIn } from '../../shared/auth';
 import { GuestMenu } from '../../shared/components/GuestMenu';
 import { Icon, type IconName } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
-import { routes } from '../../shared/routing/paths';
+import { DEFAULT_AUTHENTICATED_PATH } from '../../shared/routing/paths';
 import styles from './HomePage.module.css';
 
 /** Hero highlights; markers alternate as in the myvedicstar-default theme. */
@@ -53,7 +53,7 @@ export function HomePage() {
     () => false,
   );
 
-  if (isAuthenticated) return <Navigate to={routes.dashboard} replace />;
+  if (isAuthenticated) return <Navigate to={DEFAULT_AUTHENTICATED_PATH} replace />;
   if (mobile) return <MobileHome />;
 
   return (

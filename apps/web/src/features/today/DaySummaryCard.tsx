@@ -1,21 +1,16 @@
 import type { Glossary, TimePeriod } from '@myvedicstar/contracts';
 import type { DaySummary, DayTone, WindowStatus } from '@myvedicstar/domain-models';
 import type { SelectedLocation } from '@myvedicstar/domain-models';
-import { useCacheOnline } from '@myvedicstar/query-cache';
 import { useId } from 'react';
 import { Link } from 'react-router';
 
-import { Button } from '../../shared/components/Button';
 import { Icon, type IconName } from '../../shared/components/Icon';
-import { ErrorState, Skeleton } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
 import { routes } from '../../shared/routing/paths';
 import { FestivalChips, useFestivalsByDate } from '../festivals';
-import { LocationPermissionMessage, useLocationState } from '../location';
 import styles from './DaySummaryCard.module.css';
 import { useDayHeadline } from './useDayHeadline';
-import { useDaySummary } from './usePanchangToday';
 
 const TONE_ICON: Record<DayTone, IconName> = {
   'highly-favorable': 'check',
@@ -24,71 +19,6 @@ const TONE_ICON: Record<DayTone, IconName> = {
   caution: 'alert',
   avoid: 'alert',
 };
-
-/**
- * "How is today?" — the one primary Panchang card on the public home page. Answers, at a glance: how is the day, is
- * now a good time, and when is the next caution period. All values come from the backend.
- */
-export function DaySummaryCard({
-  showDate = true,
-  todayOnly = false,
-  mobile = false,
-}: Readonly<{ showDate?: boolean; todayOnly?: boolean; mobile?: boolean }>) {
-  const { t } = useTranslation();
-  const online = useCacheOnline();
-  const format = useFormatters();
-  const { query, goodTimes, location, summary, glossary } = useDaySummary(todayOnly);
-  const { detecting } = useLocationState();
-  const titleId = useId();
-
-  let body;
-  if (!location) {
-    body = detecting ? <CardSkeleton label={t('location.locating')} /> : <ChooseLocation />;
-  } else if (query.isPending) {
-    body = <CardSkeleton label={t(online ? 'states.loading' : 'cache.unavailable')} />;
-  } else if ((query.isError && !query.data) || !summary) {
-    body = (
-      <div className={styles.state}>
-        <p className={styles.stateTitle}>{t('summary.errorTitle')}</p>
-        <ErrorState error={query.error} onRetry={() => void query.refetch()} retrying={query.isFetching} />
-      </div>
-    );
-  } else {
-    body = (
-      <SummaryContent
-        summary={summary}
-        location={location}
-        glossary={glossary}
-        goodTimeLoading={!todayOnly && goodTimes.isPending}
-        todayOnly={todayOnly}
-        refreshing={query.isFetching}
-        showDate={showDate}
-        mobile={mobile}
-      />
-    );
-  }
-
-  return (
-    <section
-      className={`${styles.card} ${mobile ? styles.mobile : ''}`}
-      aria-labelledby={titleId}
-      aria-busy={query.isFetching || detecting || undefined}
-    >
-      <h2 id={titleId} className="visually-hidden">
-        {t('summary.label')}
-      </h2>
-      {body}
-      {!online && query.data && location && (
-        <p role="status" className={styles.cacheNotice}>
-          {t('cache.offline', {
-            time: format.time(new Date(query.dataUpdatedAt).toISOString(), location.timeZone),
-          })}
-        </p>
-      )}
-      {query.isError && query.data && <ErrorState error={query.error} onRetry={() => void query.refetch()} />}
-    </section>
-  );
-}
 
 function SummaryContent({
   summary,
@@ -277,43 +207,6 @@ function Caution({
         </span>
         {message && <span className={styles.factNote}>{message}</span>}
       </dd>
-    </div>
-  );
-}
-
-function ChooseLocation() {
-  const { t } = useTranslation();
-  const { openDialog, detectCurrentLocation, detecting, detectError } = useLocationState();
-  return (
-    <div className={styles.state}>
-      <Icon name="pin" size={28} />
-      <p className={styles.stateTitle}>{t('summary.chooseLocationTitle')}</p>
-      <p className={styles.description}>{t('summary.chooseLocationBody')}</p>
-      {detectError && <LocationPermissionMessage error={detectError} />}
-      <div className={styles.actions}>
-        <Button onClick={() => void detectCurrentLocation()} loading={detecting}>
-          <Icon name="locate" />
-          {t('location.useCurrent')}
-        </Button>
-        <Button variant="secondary" onClick={openDialog}>
-          <Icon name="search" />
-          {t('location.choose')}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function CardSkeleton({ label }: { label: string }) {
-  return (
-    <div role="status" aria-live="polite" className={styles.content}>
-      <span className="visually-hidden">{label}</span>
-      <Skeleton height="1.5rem" width="55%" />
-      <Skeleton height="1rem" width="35%" />
-      <Skeleton height="2.5rem" width="60%" />
-      <Skeleton height="1rem" />
-      <Skeleton height="4.5rem" />
-      <Skeleton height="4.5rem" />
     </div>
   );
 }

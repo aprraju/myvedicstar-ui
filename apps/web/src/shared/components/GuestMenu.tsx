@@ -11,7 +11,7 @@ export const CONTACT_EMAIL = 'contact@myvedicstar.com';
 
 /** The three things the app offers, each opening its page after sign-in. */
 const FEATURES: { id: 'panchang' | 'goodTimes' | 'festivals'; to: string; icon: IconName }[] = [
-  { id: 'panchang', to: routes.dashboard, icon: 'calendar' },
+  { id: 'panchang', to: routes.calendar, icon: 'calendar' },
   { id: 'goodTimes', to: routes.goodTime, icon: 'clock' },
   { id: 'festivals', to: routes.festivals, icon: 'flower' },
 ];

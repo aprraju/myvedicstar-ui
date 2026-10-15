@@ -40,7 +40,7 @@ const COLUMNS: FooterColumn[] = [
     title: 'footer.columns.explore',
     signedInOnly: true,
     links: [
-      { label: 'footer.links.todaysPanchang', to: routes.dashboard },
+      { label: 'footer.links.todaysPanchang', to: routes.calendar },
       { label: 'footer.links.findGoodTime', to: routes.goodTime },
       { label: 'footer.links.calendar', to: routes.calendar },
       { label: 'footer.links.compatibility' },

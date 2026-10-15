@@ -5,92 +5,10 @@ import { useState } from 'react';
 import { Icon } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
-import { DaySummaryCard } from '../today';
-import { DayTimeline } from './DayTimeline';
 import styles from './MobileDashboard.module.css';
 import { PanchangDetails } from './PanchangPanel';
 import { PeriodList } from './PeriodList';
 import { RatingFactors } from './RatingFactors';
-import { useDayDashboard } from './useDayDashboard';
-
-/** Mobile-only composition; the existing desktop dashboard remains a separate tree. */
-export function MobileDashboard() {
-  const { t } = useTranslation();
-  const format = useFormatters();
-  const { dashboard, location, glossary } = useDayDashboard();
-
-  const [fullTimeline, setFullTimeline] = useState(false);
-
-  return (
-    <section className={styles.page} aria-labelledby="mobile-dashboard-title">
-      <h1 id="mobile-dashboard-title" className="visually-hidden">
-        {t('pages.dashboard.title')}
-      </h1>
-
-      <div className={styles.body}>
-        {dashboard && location && (
-          <div className={styles.dayHeading}>
-            <p className={styles.dayDate}>{format.date(dashboard.summary.date)}</p>
-            <p className={styles.dayContext}>
-              {dashboard.summary.paksha && <span>{t(`summary.paksha.${dashboard.summary.paksha}`)}</span>}
-              {dashboard.limbs.tithi && <span>{dashboard.limbs.tithi.current.name}</span>}
-              <span>{location.label}</span>
-            </p>
-          </div>
-        )}
-        <DaySummaryCard showDate={false} mobile />
-        {dashboard && location && (
-          <>
-            <DayTimeline
-              timeline={dashboard.timeline}
-              timeZone={location.timeZone}
-              date={dashboard.summary.date}
-              locationLabel={location.label}
-              compact
-              onExpand={() => setFullTimeline(!fullTimeline)}
-            />
-            {fullTimeline && (
-              <div className={styles.expandedTimeline}>
-                <PeriodList
-                  id="timeline-auspicious"
-                  title={t('dashboard.auspiciousTitle', { day: format.day(dashboard.summary.date) })}
-                  subtitle={t('dashboard.timelineCompactSubtitle')}
-                  tone="favorable"
-                  items={dashboard.auspicious}
-                  glossary={glossary}
-                  timeZone={location.timeZone}
-                  date={dashboard.summary.date}
-                />
-                <PeriodList
-                  id="timeline-avoid"
-                  title={t('dashboard.avoidTitle', { day: format.day(dashboard.summary.date) })}
-                  subtitle={t('dashboard.timelineCompactSubtitle')}
-                  tone="caution"
-                  items={dashboard.avoid}
-                  glossary={glossary}
-                  timeZone={location.timeZone}
-                  date={dashboard.summary.date}
-                />
-              </div>
-            )}
-            <PeriodList
-              id="auspicious"
-              tone="favorable"
-              title={t('dashboard.auspiciousTitle', { day: format.day(dashboard.summary.date) })}
-              subtitle={t('dashboard.auspiciousSubtitle')}
-              items={dashboard.auspicious}
-              glossary={glossary}
-              timeZone={location.timeZone}
-              date={dashboard.summary.date}
-              previewCount={3}
-            />
-            <MobileDayDetails dashboard={dashboard} glossary={glossary} timeZone={location.timeZone} />
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
 
 function PanchangPreview({
   dashboard,
@@ -145,7 +63,8 @@ export function MobileDayDetails({
 }) {
   const { t } = useTranslation();
   const format = useFormatters();
-  const [fullPanchang, setFullPanchang] = useState(false);
+  // The Panchang card opens at "See all" (every element); "Show less" folds it to Tithi and Nakshatra.
+  const [fullPanchang, setFullPanchang] = useState(true);
   return (
     <>
       <section className={styles.panel} aria-labelledby="mobile-panchang-title">

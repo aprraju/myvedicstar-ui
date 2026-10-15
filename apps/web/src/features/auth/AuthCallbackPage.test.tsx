@@ -8,15 +8,15 @@ import { renderRoute } from '../../test/render';
 
 describe('sign-in entry points (no login/register pages)', () => {
   it.each([['Login', 'login']] as const)(
-    'header %s starts %s at the identity provider and lands on the dashboard',
+    'header %s starts %s at the identity provider and lands on Home (the Panchang page)',
     async (name, intent) => {
       const auth = createInMemoryAuthClient();
       const { router } = renderRoute('/about', { auth });
       const banner = await screen.findByRole('banner');
       // Rendered in both the compact menu and the wide header (CSS shows one).
       await userEvent.click(within(banner).getAllByRole('button', { name })[0]!);
-      expect(auth.requests).toEqual([{ intent, returnTo: '/dashboard' }]);
-      await waitFor(() => expect(router.state.location.pathname).toBe('/dashboard'));
+      expect(auth.requests).toEqual([{ intent, returnTo: '/calendar' }]);
+      await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
     },
   );
 
@@ -52,7 +52,7 @@ describe('AuthCallbackPage', () => {
     const auth = createInMemoryAuthClient({ user: { id: 'u1' } });
     auth.completeSignIn = async () => ({ ok: true, returnTo: '//evil.example/steal' });
     const { router } = renderRoute('/auth/callback?code=abc', { auth });
-    await waitFor(() => expect(router.state.location.pathname).toBe('/dashboard'));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
   });
 
   it('replaces the code in the URL with an error code on failure', async () => {

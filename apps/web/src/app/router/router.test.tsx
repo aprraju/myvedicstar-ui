@@ -76,25 +76,31 @@ describe('routing', () => {
 });
 
 describe('signed-in home', () => {
-  it('takes signed-in users from Home (/) to their dashboard', async () => {
+  it('takes signed-in users from Home (/) to the Panchang page', async () => {
     const auth = createInMemoryAuthClient({ user: { id: 'u1' } });
     const { router } = renderRoute('/', { auth });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe('/dashboard');
+    await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
+    expect(await screen.findByRole('navigation', { name: 'Primary' })).toBeInTheDocument();
   });
 
-  it('points the Home navigation item at the dashboard', async () => {
+  it('opens the Panchang page for the old Today address', async () => {
+    const auth = createInMemoryAuthClient({ user: { id: 'u1' } });
+    const { router } = renderRoute('/dashboard', { auth });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
+  });
+
+  it('points the Home navigation item at the Panchang page, with no Today item', async () => {
     const auth = createInMemoryAuthClient({ user: { id: 'u1' } });
     renderRoute('/calendar', { auth });
     const nav = await screen.findByRole('navigation', { name: 'Primary' });
-    expect(within(nav).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/dashboard');
-    // Today (between Home and Calendar) also opens the dashboard for now.
-    expect(within(nav).getByRole('link', { name: 'Today' })).toHaveAttribute('href', '/dashboard');
+    expect(within(nav).getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/calendar');
+    expect(within(nav).queryByRole('link', { name: 'Today' })).not.toBeInTheDocument();
     expect(
       within(nav)
         .getAllByRole('link')
-        .map((link) => link.textContent),
-    ).toEqual(expect.arrayContaining(['Home', 'Today', 'Panchang', 'Upcoming Events', 'Find Good Time']));
+        .map((link) => link.textContent)
+        .slice(0, 4),
+    ).toEqual(['Home', 'Panchang', 'Upcoming Events', 'Find Good Time']);
   });
 
   it('still shows the public home page to signed-out visitors', async () => {
@@ -109,9 +115,9 @@ describe('signed-in home', () => {
 describe('protected routes', () => {
   it('send unauthenticated users straight to the identity provider, preserving the destination', async () => {
     const auth = createInMemoryAuthClient();
-    renderRoute('/dashboard?tab=today', { auth });
+    renderRoute('/festivals?range=60', { auth });
     await waitFor(() =>
-      expect(auth.requests).toEqual([{ intent: 'login', returnTo: '/dashboard?tab=today' }]),
+      expect(auth.requests).toEqual([{ intent: 'login', returnTo: '/festivals?range=60' }]),
     );
   });
 
@@ -123,7 +129,7 @@ describe('protected routes', () => {
   });
 
   it('explain that sign-in is unavailable when it is not configured', async () => {
-    renderRoute('/dashboard');
+    renderRoute('/calendar');
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Please sign in to continue.' }),
     ).toBeInTheDocument();
@@ -142,11 +148,11 @@ describe('protected routes', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeInTheDocument();
   });
 
-  it('let authenticated users reach the dashboard and sign out', async () => {
+  it('let authenticated users reach their pages and sign out', async () => {
     const auth = createInMemoryAuthClient({ user: { id: 'u1' } });
     const signOut = vi.spyOn(auth, 'signOut');
-    renderRoute('/dashboard', { auth });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument();
+    renderRoute('/settings', { auth });
+    expect(await screen.findByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Open account menu' }));
     await userEvent.click(screen.getByRole('button', { name: 'Log out' }));
