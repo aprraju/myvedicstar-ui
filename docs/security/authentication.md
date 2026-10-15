@@ -41,15 +41,17 @@ Login / Register buttons (header, Get Started)  ──►  Entra-hosted page (fu
    Forgot password: link on the Entra sign-in page (email OTP → new password) — no app or backend endpoint
                   ◄── /auth/callback (code + PKCE verifier exchanged at the token endpoint) ──► validated returnTo
 Protected route while signed out  ──►  straight to Entra, then back to the requested route (default /dashboard)
-Logout  ──►  local session cleared, then Entra end-session endpoint with logout_hint  ──►  postLogoutRedirectUri
+Logout  ──►  local session cleared (silent: no Entra page)  ──►  postLogoutRedirectUri
+Next Login after Logout  ──►  Entra with prompt=login (credentials asked again)
 ```
 
-- The web SPA registration emits the `login_hint` optional claim in the ID token. Logout sends it to Entra's
-  end-session endpoint as `logout_hint` (with `id_token_hint`), so Entra ends the session for that account without the
-  "Pick an account" chooser and returns to the post-logout page.
-- If an ID token has no `login_hint` (e.g. the claim is removed from the registration), logout is local and silent
-  instead: tokens (memory only) are dropped and the post-logout page replaces the current one. The Entra browser
-  session then remains until it expires, so the next Login may continue without asking for a password.
+- Logout is local and silent: tokens (memory only) are dropped and the post-logout page replaces the current one. The
+  app does not visit Entra's end-session endpoint, which always shows a page of its own ("Pick an account" without a
+  `logout_hint`, "Hang on a moment while we sign you out" with one).
+- The Entra browser session therefore remains, so Logout sets a flag (`mvs.auth.reauthenticate` in localStorage — no
+  token or identity) and the next sign-in sends `prompt=login`: Entra asks for credentials instead of signing the
+  previous account in silently. The flag is cleared only by a successful sign-in, so cancelling still asks next time.
+  Register keeps `prompt=create`.
 
 - There are no in-app login or register pages. Sign-in errors (`?error=cancelled|network|failed` on
   `/auth/callback`) show a friendly message with "Try again" and "Home", so a failure never loops.

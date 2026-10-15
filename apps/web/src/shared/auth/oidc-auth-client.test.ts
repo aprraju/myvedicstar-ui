@@ -170,21 +170,8 @@ describe('createOidcAuthClient', () => {
     expect(await client.completeSignIn()).toEqual({ ok: false, reason, returnTo });
   });
 
-  it('ends the provider session with the account hint, so Entra signs out without an account picker', async () => {
+  it('logs out silently: local session cleared, post-logout page, no provider page (even with an account hint)', async () => {
     mocks.manager.getUser.mockResolvedValue(user({ profile: { sub: 'user-1', login_hint: 'opaque-hint' } }));
-    const client = createOidcAuthClient(config, 'https://x.example');
-    await client.signOut();
-    expect(mocks.manager.removeUser).toHaveBeenCalled();
-    expect(client.getState().user).toBeNull();
-    expect(mocks.manager.signoutRedirect).toHaveBeenCalledWith({
-      id_token_hint: 'id-123',
-      extraQueryParams: { logout_hint: 'opaque-hint' },
-    });
-    expect(mocks.replacePage).not.toHaveBeenCalled();
-  });
-
-  it('without an account hint, logs out silently: local session cleared, post-logout page, no provider page', async () => {
-    mocks.manager.getUser.mockResolvedValue(user());
     const client = createOidcAuthClient(config, 'https://x.example');
     await client.signOut();
     expect(mocks.manager.removeUser).toHaveBeenCalled();
@@ -323,10 +310,56 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
     });
   });
 
-  it('logs out of Entra silently when no ID token (so no account hint) is held', async () => {
+  it('logs out of Entra silently, without an end-session page', async () => {
     const client = createEntraAuthClient(entra);
     await client.signOut();
     expect(mocks.manager.signoutRedirect).not.toHaveBeenCalled();
     expect(mocks.replacePage).toHaveBeenCalledWith(entra.postLogoutRedirectUri);
+  });
+});
+
+describe('sign-in after Logout', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    window.localStorage.clear();
+    mocks.manager.getUser.mockResolvedValue(null);
+  });
+
+  it('asks for credentials (prompt=login) until a sign-in succeeds', async () => {
+    mocks.manager.getUser.mockResolvedValue(user());
+    const client = createOidcAuthClient(config, 'https://x.example');
+    await client.signOut();
+    mocks.manager.getUser.mockResolvedValue(null);
+
+    await client.signIn({ intent: 'login', returnTo: '/calendar' });
+    expect(mocks.manager.signinRedirect).toHaveBeenLastCalledWith({
+      state: { returnTo: '/calendar' },
+      extraQueryParams: { prompt: 'login' },
+    });
+    // A cancelled attempt still asks next time.
+    await client.signIn({ intent: 'login', returnTo: '/calendar' });
+    expect(mocks.manager.signinRedirect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ extraQueryParams: { prompt: 'login' } }),
+    );
+
+    mocks.manager.signinRedirectCallback.mockResolvedValue(user({ state: { returnTo: '/calendar' } }));
+    await client.completeSignIn();
+    // A later visit (new page load, signed out) signs in normally again.
+    mocks.manager.getUser.mockResolvedValue(null);
+    const later = createOidcAuthClient(config, 'https://x.example');
+    await later.signIn({ intent: 'login', returnTo: '/calendar' });
+    expect(mocks.manager.signinRedirect).toHaveBeenLastCalledWith({
+      state: { returnTo: '/calendar' },
+      extraQueryParams: {},
+    });
+  });
+
+  it('keeps the sign-up page for Register after Logout', async () => {
+    const client = createOidcAuthClient(config, 'https://x.example');
+    await client.signOut();
+    await client.signIn({ intent: 'register', returnTo: '/calendar' });
+    expect(mocks.manager.signinRedirect).toHaveBeenLastCalledWith(
+      expect.objectContaining({ extraQueryParams: expect.not.objectContaining({ prompt: 'login' }) }),
+    );
   });
 });

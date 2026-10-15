@@ -259,7 +259,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(authorization).not.toContain('Bearer access-1');
   });
 
-  test('Logout ends the Entra session with logout_hint (no account picker), on wide and phone windows', async ({
+  test('Logout is silent (no Entra page) and the next Login asks for credentials, on wide and phone windows', async ({
     page,
     baseURL,
   }) => {
@@ -267,41 +267,30 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     await page.goto('/');
     await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    expect(entra.authorize[0]!.get('prompt')).toBeNull();
 
     await page.getByRole('banner').getByRole('button', { name: 'Open account menu' }).click();
     await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(`${baseURL}/`);
     await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
-    expect(entra.endSession).toHaveLength(1);
-    expect(entra.endSession[0]!.get('logout_hint')).toBe('opaque-login-hint');
-    expect(entra.endSession[0]!.get('id_token_hint')).toBeTruthy();
-    expect(entra.endSession[0]!.get('post_logout_redirect_uri')).toBe(`${baseURL}/`);
+    // Never sent to Entra's end-session page ("Pick an account", "Hang on a moment… sign you out").
+    expect(entra.endSession).toHaveLength(0);
+
+    // The next sign-in asks for credentials instead of reusing the Entra session.
+    await page.goto('/settings');
+    await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
+    expect(entra.authorize[1]!.get('prompt')).toBe('login');
 
     // Phones: Log out from the "Your Account" sheet behaves the same.
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/settings'); // signs in again (simulated Entra)
-    await expect(page.getByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
     await page.getByRole('banner').getByRole('button', { name: 'Your account' }).click();
     await page.getByRole('dialog', { name: 'Your Account' }).getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(`${baseURL}/`);
     await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
-    expect(entra.endSession).toHaveLength(2);
-    expect(entra.endSession[1]!.get('logout_hint')).toBe('opaque-login-hint');
-  });
-
-  test('Logout without a login_hint claim is local and silent: no Entra account picker', async ({
-    page,
-    baseURL,
-  }) => {
-    const entra = await simulateEntra(page, baseURL!);
-    await page.goto('/');
-    await page.getByRole('banner').getByRole('button', { name: 'Login' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
-    await page.getByRole('banner').getByRole('button', { name: 'Open account menu' }).click();
-    await page.getByRole('banner').getByRole('button', { name: 'Log out' }).click();
-    await expect(page).toHaveURL(`${baseURL}/`);
-    await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toBeVisible();
     expect(entra.endSession).toHaveLength(0);
+    await page.getByRole('button', { name: 'Login / Sign Up' }).click();
+    await expect(page).toHaveURL(/\/calendar$/);
+    expect(entra.authorize[2]!.get('prompt')).toBe('login');
   });
 
   test('a cancelled sign-in shows a friendly error with Try again (no provider text)', async ({

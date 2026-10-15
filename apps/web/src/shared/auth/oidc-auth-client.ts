@@ -17,6 +17,29 @@ type EntraConfig = Extract<AuthConfig, { mode: 'entra-external-id' }>;
 const BASE_SCOPES = ['openid', 'profile', 'email', 'offline_access'];
 /** Renew the access token when it has less than this many seconds left. */
 const RENEW_BEFORE_EXPIRY_SECONDS = 60;
+/**
+ * Set by Logout, cleared by the next successful sign-in: that sign-in asks for credentials (`prompt=login`) even though
+ * the provider's own session was left in place. A flag only (no token or identity), in localStorage so a reload or a
+ * new tab after Logout still asks.
+ */
+const REAUTHENTICATE_KEY = 'mvs.auth.reauthenticate';
+const reauthenticate = {
+  get: () => {
+    try {
+      return window.localStorage.getItem(REAUTHENTICATE_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  },
+  set: (value: boolean) => {
+    try {
+      if (value) window.localStorage.setItem(REAUTHENTICATE_KEY, 'true');
+      else window.localStorage.removeItem(REAUTHENTICATE_KEY);
+    } catch {
+      // Storage unavailable (private mode): sign-in then follows the provider session.
+    }
+  },
+};
 const CANCELLED_ERRORS = new Set([
   'access_denied',
   'user_cancelled',
@@ -168,13 +191,19 @@ function createClient(settings: OidcClientSettings): AuthClient {
         ...(loginHint ? { login_hint: loginHint } : {}),
         extraQueryParams: {
           ...(provider ? settings.providerParams[provider] : {}),
-          ...(intent === 'register' ? settings.registerParams : {}),
+          // After Logout, ask for credentials rather than reusing the provider session (Register has its own prompt).
+          ...(intent === 'register'
+            ? settings.registerParams
+            : reauthenticate.get()
+              ? { prompt: 'login' }
+              : {}),
         },
       });
     },
     async completeSignIn(): Promise<SignInCallbackResult> {
       try {
         const user = await manager.signinRedirectCallback();
+        reauthenticate.set(false);
         sessionRejected = false;
         publish(user);
         return { ok: true, returnTo: readReturnTo(user.state) };
@@ -188,21 +217,11 @@ function createClient(settings: OidcClientSettings): AuthClient {
       }
     },
     async signOut() {
-      const user = await manager.getUser();
+      // Silent logout: no provider end-session page (Entra shows "Pick an account" or "Hang on a moment… sign you
+      // out"). The tokens (memory only) and any leftover redirect state are cleared and the post-logout page opens;
+      // the next sign-in asks for credentials, so the provider session left in place is never reused silently.
+      reauthenticate.set(true);
       await endSession();
-      // With the ID token's `login_hint` claim (an Entra optional claim), the provider session ends too: `logout_hint`
-      // names the account, so the end-session page signs it out without an account picker and returns to the
-      // post-logout page.
-      const logoutHint = user?.profile.login_hint;
-      if (typeof logoutHint === 'string' && logoutHint) {
-        await manager.signoutRedirect({
-          ...(user?.id_token ? { id_token_hint: user.id_token } : {}),
-          extraQueryParams: { logout_hint: logoutHint },
-        });
-        return;
-      }
-      // Without the claim the end-session page would ask "Pick an account", so log out locally and silently instead:
-      // the tokens (memory only) and any leftover redirect state are cleared, then the post-logout page opens.
       await manager.clearStaleState().catch(() => undefined);
       replacePage(settings.postLogoutRedirectUri);
     },
