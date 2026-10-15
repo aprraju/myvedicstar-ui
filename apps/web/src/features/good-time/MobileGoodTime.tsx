@@ -15,6 +15,7 @@ import { Icon } from '../../shared/components/Icon';
 import { SheetSelect } from '../../shared/components/SheetSelect';
 import { ErrorState, Skeleton } from '../../shared/components/states';
 import { useNow } from '../../shared/hooks/useNow';
+import { useShrinkToFit } from '../../shared/hooks/useShrinkToFit';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
 import { MonthCalendarCard } from '../calendar/MonthCalendar';
@@ -480,9 +481,7 @@ function SearchSummary({
         <div>
           <Icon name={activityIcon(activity?.icon ?? 'sun')} size={22} />
           <dt>{t('goodTime.mobile.activity')}</dt>
-          <dd className={styles.oneLine} title={activityName}>
-            {activityName}
-          </dd>
+          <ShrinkingDd text={activityName} />
         </div>
         <div>
           <Icon name="star" size={22} />
@@ -522,9 +521,20 @@ function shortStarName(name: string) {
   return name.replace(/^(?:Purva|Poorva)\s+/i, 'P. ').replace(/^(?:Uttara|Uthara)\s+/i, 'U. ');
 }
 
+/** One line: shrunk a little to fit, then cut with an ellipsis (the full text is in its title). */
+function ShrinkingDd({ text }: Readonly<{ text: string }>) {
+  const ref = useRef<HTMLElement>(null);
+  useShrinkToFit(ref, text);
+  return (
+    <dd ref={ref} className={styles.oneLine} title={text}>
+      {text}
+    </dd>
+  );
+}
+
 /**
  * The full text when it fits on one line, the short form when it does not (measured, and re-measured when the space
- * changes). Screen readers always get the full text.
+ * changes), shrunk a little if even that overflows. Screen readers always get the full text.
  */
 function FitText({ full, short }: Readonly<{ full: string; short: string }>) {
   const measureRef = useRef<HTMLSpanElement>(null);
@@ -539,22 +549,24 @@ function FitText({ full, short }: Readonly<{ full: string; short: string }>) {
     observer?.observe(container);
     return () => observer?.disconnect();
   }, [full, short]);
+  const shown = useShort ? short : full;
+  const textRef = useRef<HTMLSpanElement>(null);
+  useShrinkToFit(textRef, shown);
   return (
     <span className={styles.fit}>
       {/* An invisible copy of the full text, measured against the available width. */}
       <span ref={measureRef} className={styles.measure} aria-hidden="true">
         {full}
       </span>
-      {useShort ? (
-        <>
-          <span aria-hidden="true" title={full}>
-            {short}
-          </span>
-          <span className="visually-hidden">{full}</span>
-        </>
-      ) : (
-        full
-      )}
+      <span
+        ref={textRef}
+        className={styles.oneLine}
+        aria-hidden={useShort || undefined}
+        title={useShort ? full : undefined}
+      >
+        {shown}
+      </span>
+      {useShort && <span className="visually-hidden">{full}</span>}
     </span>
   );
 }

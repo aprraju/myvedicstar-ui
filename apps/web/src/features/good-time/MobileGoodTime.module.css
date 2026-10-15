@@ -289,6 +289,9 @@
 
 .fit {
   position: relative;
+  display: block;
+  /* Clip the measuring copy, so it never widens the line. */
+  overflow: hidden;
 }
 
 .measure {

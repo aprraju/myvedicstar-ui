@@ -175,6 +175,8 @@
 }
 
 .activityName {
+  /* Stay inside the card (a grid item otherwise grows to its longest word), so an overflowing word can be measured. */
+  min-inline-size: 0;
   font-size: var(--font-size-sm);
   line-height: 1.25;
   overflow-wrap: anywhere;

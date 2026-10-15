@@ -2,6 +2,7 @@ import type { MuhurtaActivity } from '@myvedicstar/contracts';
 import { type KeyboardEvent, useRef } from 'react';
 
 import { Icon } from '../../shared/components/Icon';
+import { useShrinkToFit } from '../../shared/hooks/useShrinkToFit';
 import { activityIcon } from './activityIcons';
 import styles from './GoodTimePage.module.css';
 
@@ -72,7 +73,7 @@ export function ActivityCards({
             <span className={styles.activityIcon}>
               <Icon name={activityIcon(activity.icon)} size={26} />
             </span>
-            <span className={styles.activityName}>{activity.name}</span>
+            <ActivityName name={activity.name} />
             {checked && (
               <span className={styles.activityCheck}>
                 <Icon name="check" size={14} />
@@ -82,5 +83,16 @@ export function ActivityCards({
         );
       })}
     </div>
+  );
+}
+
+/** The card's label, shrunk a little when a long word (e.g. Housewarming) would overflow a narrow card. */
+function ActivityName({ name }: Readonly<{ name: string }>) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useShrinkToFit(ref, name);
+  return (
+    <span ref={ref} className={styles.activityName}>
+      {name}
+    </span>
   );
 }

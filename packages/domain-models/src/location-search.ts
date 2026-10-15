@@ -52,8 +52,10 @@ const COUNTRY_CODES =
   );
 
 export function countries(locale = 'en'): { code: string; name: string }[] {
-  const names = new Intl.DisplayNames([locale], { type: 'region' });
-  return COUNTRY_CODES.map((code) => ({ code, name: names.of(code) ?? code })).sort((a, b) =>
+  // Hermes on Android (React Native) has no Intl.DisplayNames: list the ISO codes there rather than failing.
+  const names =
+    typeof Intl.DisplayNames === 'function' ? new Intl.DisplayNames([locale], { type: 'region' }) : undefined;
+  return COUNTRY_CODES.map((code) => ({ code, name: names?.of(code) ?? code })).sort((a, b) =>
     a.name.localeCompare(b.name, locale),
   );
 }
