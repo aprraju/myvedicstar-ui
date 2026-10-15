@@ -53,7 +53,7 @@ test('desktop Calendar overlaps its banner with summary and calendar columns', a
   const summary = page.getByRole('region', { name: "Today's summary" });
   await expect(summary.getByText('Next good time')).toBeVisible();
   const calendar = page.locator('section[aria-labelledby="calendar-title"]');
-  const auspicious = page.getByRole('region', { name: 'Auspicious times' });
+  const auspicious = page.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
   const banner = page.locator('[class*="banner"] > [class*="hero"]');
   const [s, c, a, b] = await Promise.all(
     [summary, calendar, auspicious, banner].map((item) => item.boundingBox()),
@@ -72,10 +72,16 @@ test('mobile pages share fixed header, bottom navigation and decision notice', a
     await page.goto(route);
     const header = page.getByRole('banner');
     await expect(header).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Today navigation' })).toBeVisible();
+    // Signed in: the app's bottom bar; signed out (a public page after a reload): the sign-in features bar.
+    await expect(
+      page
+        .getByRole('navigation', { name: 'Today navigation' })
+        .or(page.getByRole('list', { name: 'What you can do' })),
+    ).toBeVisible();
     await page.evaluate(() => scrollTo(0, 500));
     expect((await header.boundingBox())!.y).toBe(0);
-    await expect(page.getByRole('contentinfo').getByRole('navigation')).toBeHidden();
+    // The footer's link columns are hidden on phones (signed-out pages keep a short Privacy · Terms · Help row).
+    await expect(page.getByRole('contentinfo').getByRole('navigation', { name: 'Footer' })).toBeHidden();
     await expect(page.getByRole('contentinfo')).toContainText('Important decisions');
     if (route === '/calendar') {
       const month = page.locator('section[aria-labelledby="calendar-title"]');
@@ -93,15 +99,18 @@ test('mobile pages share fixed header, bottom navigation and decision notice', a
       await expect(page).toHaveURL(/day=2026-09-02/);
       await page.getByRole('button', { name: 'Previous day', exact: true }).click();
       await expect(page).toHaveURL(/day=2026-09-01/);
-      const panchang = page.getByRole('region', { name: "Today's Panchang" });
+      const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
       await panchang.getByRole('button', { name: 'See all' }).click();
       await expect(panchang).toContainText('Yoga');
       await expect(panchang.getByRole('heading')).toHaveCount(1);
       await page.locator('details > summary').filter({ hasText: 'Times to avoid' }).click();
-      await expect(page.getByRole('region', { name: 'Times to avoid' })).toBeVisible();
-      await page.locator('details > summary').filter({ hasText: 'Why today' }).click();
-      await expect(page.getByRole('region', { name: /Why today/ })).toBeVisible();
-      const timeline = page.getByRole('region', { name: /^Timeline for/ });
+      await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).toBeVisible();
+      await page
+        .locator('details > summary')
+        .filter({ hasText: /^Why \w+ \d{1,2} is / })
+        .click();
+      await expect(page.getByRole('region', { name: /^Why \w+ \d{1,2} is / })).toBeVisible();
+      const timeline = page.getByRole('region', { name: /^\w+ \d{1,2} timeline$/ });
       const timelineBox = await timeline.boundingBox();
       const panchangBox = await panchang.boundingBox();
       expect(timelineBox!.y + timelineBox!.height).toBeLessThanOrEqual(panchangBox!.y);
@@ -125,7 +134,7 @@ test('desktop Today preserves its approved layout', async ({ page }, info) => {
   await expect(
     page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true }),
   ).toBeVisible();
-  await expect(page.getByRole('region', { name: 'Times to avoid' })).toBeVisible();
+  await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).toBeVisible();
   await page.evaluate(async () => {
     await document.fonts.ready;
   });
@@ -160,9 +169,9 @@ test('mobile Today follows the mockup order and fits phones, tablets and unfolde
   await expect(page.getByRole('contentinfo').getByRole('navigation')).toBeHidden();
   await expect(page.locator('[class*="dayDate"]')).toBeVisible();
   await expect(page.locator('[class*="dayContext"]')).toContainText('Paksha');
-  const timeline = page.getByRole('region', { name: "Today's timeline" });
-  const auspicious = page.getByRole('region', { name: 'Auspicious times' });
-  const panchang = page.getByRole('region', { name: "Today's Panchang" });
+  const timeline = page.getByRole('region', { name: /^\w+ \d{1,2} timeline$/ });
+  const auspicious = page.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
+  const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
   for (const width of [320, 375, 430, 600, 884]) {
     await page.setViewportSize({ width, height: 900 });
     await expect
@@ -215,7 +224,7 @@ test('mobile previews retain complete periods, Panchang, explanations and Profil
   await page.setViewportSize({ width: 375, height: 900 });
   await withSavedLocation(page);
   await page.goto('/dashboard');
-  const panchang = page.getByRole('region', { name: "Today's Panchang" });
+  const panchang = page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
   await panchang.getByRole('button', { name: /^Tithi:/ }).click();
   await expect(panchang).toContainText('Yoga');
   await expect(panchang).toContainText('Karana');
@@ -225,34 +234,37 @@ test('mobile previews retain complete periods, Panchang, explanations and Profil
   await panchang.getByRole('button', { name: 'Show less' }).click();
   await panchang.getByRole('button', { name: 'See all' }).click();
   await expect(panchang).toContainText('Yoga');
-  const auspicious = page.getByRole('region', { name: 'Auspicious times' });
+  const auspicious = page.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
   await expect(auspicious).toContainText('Overlaps with');
   await auspicious.getByRole('button', { name: 'See all' }).click();
   await expect(auspicious.getByRole('button', { name: 'Show less' })).toBeVisible();
   await page.getByRole('button', { name: 'View timeline details' }).click();
-  await expect(page.getByRole('region', { name: 'Times to avoid' }).first()).toContainText('Rahu Kalam');
+  await expect(page.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ }).first()).toContainText(
+    'Rahu Kalam',
+  );
   await page
     .locator('details > summary')
-    .filter({ hasText: /Why today/ })
+    .filter({ hasText: /^Why \w+ \d{1,2} is / })
     .click();
   await expect(page.locator('details[open]')).toContainText('Tithi');
+  // Four app sections in the bottom bar; the account opens from the header's icon as a "Your Account" sheet.
   const navigation = page.getByRole('navigation', { name: 'Today navigation' });
   await expect(navigation.getByRole('link')).toHaveCount(4);
-  await expect(navigation.getByRole('button', { name: 'Profile', exact: true })).toBeVisible();
-  await expect(navigation.getByRole('link', { name: 'Settings' })).toHaveCount(0);
+  await expect(navigation.getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('button', { name: 'Open account menu' })).toBeHidden();
   await expect(page.getByRole('banner').getByRole('button', { name: 'Open menu' })).toBeHidden();
-  await navigation.getByRole('button', { name: 'Profile', exact: true }).click();
-  await expect(navigation).toContainText('Asha Rao');
-  await expect(navigation).toContainText('asha.rao@example.com');
-  await expect(page.getByRole('button', { name: 'Log out' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Settings', exact: true })).toBeVisible();
+  const account = page.getByRole('banner').getByRole('button', { name: 'Your account' });
+  await account.click();
+  const sheet = page.getByRole('dialog', { name: 'Your Account' });
+  await expect(sheet).toContainText('Asha Rao');
+  await expect(sheet).toContainText('asha.rao@example.com');
+  await expect(sheet.getByRole('button', { name: 'Log out' })).toBeVisible();
+  await expect(sheet.getByRole('link', { name: /^Settings/ })).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(navigation.getByRole('button', { name: 'Profile', exact: true })).toHaveAttribute(
-    'aria-expanded',
-    'false',
-  );
-  await navigation.getByRole('button', { name: 'Profile', exact: true }).click();
-  await navigation.getByRole('link', { name: 'Profile', exact: true }).click();
+  await expect(sheet).toBeHidden();
+  await expect(account).toHaveAttribute('aria-expanded', 'false');
+  await expect(account).toBeFocused();
+  await account.click();
+  await sheet.getByRole('link', { name: /^Profile/ }).click();
   await expect(page).toHaveURL(/\/profile$/);
 });

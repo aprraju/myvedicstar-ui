@@ -9,6 +9,168 @@
   font-size: var(--font-size-sm);
 }
 
+/* Beta Feedback · Report an Issue · Contact (signed-in users): highlighted buttons above the menu, a row on wide
+   windows and a stack on phones. */
+.actions {
+  display: grid;
+  gap: var(--space-sm);
+  margin-block-end: var(--space-xl);
+}
+
+@media (min-width: 840px) {
+  .actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 840px) and (max-width: 1023px) {
+  .actions {
+    margin-block-end: var(--space-md);
+  }
+}
+
+.action {
+  --action-tone: var(--color-primary);
+  --action-surface: var(--color-auspicious-surface);
+
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  min-block-size: 64px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--action-tone) 35%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: var(--action-surface);
+  box-shadow: var(--shadow-low);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.action:hover {
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.12);
+  transform: translateY(-1px);
+}
+
+.action:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action {
+    transition: none;
+  }
+  .action:hover {
+    transform: none;
+  }
+}
+
+/* Beta Feedback: the primary, filled button. */
+.action[data-kind='feedback'] {
+  border-color: transparent;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    color-mix(in srgb, var(--color-primary) 70%, #d97706)
+  );
+  color: var(--color-on-primary);
+}
+
+.action[data-kind='issue'] {
+  --action-tone: var(--color-caution);
+  --action-surface: var(--color-caution-surface);
+}
+
+.action[data-kind='contact'] {
+  --action-tone: var(--color-info);
+  --action-surface: var(--color-info-surface);
+}
+
+.actionIcon {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--action-tone) 14%, var(--color-surface));
+  color: var(--action-tone);
+}
+
+.action[data-kind='feedback'] .actionIcon {
+  background: rgb(255 255 255 / 0.2);
+  color: var(--color-on-primary);
+}
+
+.actionText {
+  display: grid;
+  min-inline-size: 0;
+}
+
+.actionLabel {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.actionHint {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.action[data-kind='feedback'] .actionHint {
+  color: color-mix(in srgb, var(--color-on-primary) 85%, transparent);
+}
+
+/* Phones: three small pills in one row — a small icon and a short one-line label, no hint or chevron. */
+.actionShort {
+  display: none;
+}
+
+@media (max-width: 839px) {
+  .actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xs);
+    margin-block-end: var(--space-md);
+  }
+  .action {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xxs);
+    min-block-size: 40px;
+    padding: var(--space-xxs) var(--space-xs);
+    border-radius: 999px;
+    box-shadow: none;
+  }
+  .actionIcon {
+    inline-size: auto;
+    block-size: auto;
+    background: none;
+  }
+  .actionIcon svg {
+    inline-size: 16px;
+    block-size: 16px;
+  }
+  .action[data-kind='feedback'] .actionIcon {
+    background: none;
+  }
+  .actionLabel,
+  .actionHint,
+  .action > svg:last-child {
+    display: none;
+  }
+  .actionShort {
+    display: block;
+    overflow: hidden;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

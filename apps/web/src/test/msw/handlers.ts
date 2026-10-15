@@ -109,7 +109,7 @@ export const handlers = [
       }),
     });
   }),
-  // Next best times: Other → mapped to Business (with its notice); anything else → the Business options.
+  // Next best days: Other → mapped to Business (with its notice); anything else → the Business options.
   http.get(api('/muhurta/good-times/best'), ({ request }) => {
     const url = new URL(request.url);
     apiRequests.push(url);
@@ -140,7 +140,7 @@ export const handlers = [
     }
     return HttpResponse.json(fixtures.userInfo);
   }),
-  http.post(api('/contact'), ({ request }) => {
+  http.post(api('/email/send'), ({ request }) => {
     apiRequests.push(new URL(request.url));
     return new HttpResponse(null, { status: 202 });
   }),

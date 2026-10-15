@@ -1,0 +1,220 @@
+/* Phone picker: a field-like button and a modal bottom sheet (Material 3 bottom sheet / iOS sheet conventions:
+   28px top corners, 32×4 drag handle, 56px rows, scrim, safe-area padding, list scrolls inside the sheet). */
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  min-block-size: 48px;
+  padding-inline: var(--space-md) var(--space-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.trigger[data-size='compact'] {
+  inline-size: auto;
+  min-block-size: 36px;
+  padding-inline: var(--space-sm) var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.trigger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.trigger:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.trigger > svg {
+  flex: none;
+  color: var(--color-text-secondary);
+}
+
+.value {
+  overflow: hidden;
+  min-inline-size: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sheet {
+  position: fixed;
+  inset: auto 0 0;
+  inline-size: 100%;
+  max-inline-size: 40rem;
+  max-block-size: min(85dvh, 40rem);
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.18);
+}
+
+.sheet[open] {
+  display: flex;
+  animation: sheet-up 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sheet::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet[open] {
+    animation: none;
+  }
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  min-block-size: 0;
+}
+
+.handle {
+  flex: none;
+  inline-size: 32px;
+  block-size: 4px;
+  margin: var(--space-sm) auto var(--space-xxs);
+  border-radius: 2px;
+  background: var(--color-border-strong);
+}
+
+.header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-lg);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.header h2 {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.close {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: var(--space-xxs) 0 calc(var(--space-sm) + env(safe-area-inset-bottom));
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-block-size: 56px;
+  padding-inline: var(--space-lg);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+
+.option + .option {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.option:hover {
+  background: var(--color-surface-subtle);
+}
+
+.option[aria-selected='true'] {
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.option:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+/* Compact dropdown (birth star): a small list under the field, about five rows, scrolling inside itself. */
+.dropdown {
+  position: relative;
+}
+
+.dropdownList {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(100% + var(--space-xxs));
+  z-index: 25;
+  max-block-size: calc(5 * 44px + 2 * var(--space-xxs));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: var(--space-xxs) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  box-shadow:
+    var(--shadow-low),
+    0 8px 24px rgb(0 0 0 / 0.12);
+  list-style: none;
+}
+
+.dropdownOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  min-block-size: 44px;
+  padding-inline: var(--space-md);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.dropdownOption:hover {
+  background: var(--color-surface-subtle);
+}
+
+.dropdownOption[aria-selected='true'] {
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dropdownOption:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}

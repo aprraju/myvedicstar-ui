@@ -59,7 +59,7 @@ export const defaultApiEndpoints = {
   savedLocations: '/settings/locations',
   savedLocation: '/settings/locations/{locationId}',
   /** Contact Us form submission (POST). */
-  contactSubmit: '/contact',
+  contactSubmit: '/email/send',
 } as const;
 
 export type ApiEndpointName = keyof typeof defaultApiEndpoints;

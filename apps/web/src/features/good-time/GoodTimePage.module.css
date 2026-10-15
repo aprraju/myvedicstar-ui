@@ -394,44 +394,6 @@
   background: var(--color-surface-subtle);
 }
 
-.timeline {
-  display: flex;
-  overflow: hidden;
-  block-size: 0.875rem;
-  border-radius: 999px;
-  background: var(--color-surface-subtle);
-}
-
-.timelineSegment {
-  block-size: 100%;
-  background: var(--tone);
-  opacity: 0.55;
-}
-
-.timelineSegment[data-good] {
-  opacity: 1;
-}
-
-.timelineList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xxs) var(--space-md);
-  padding: 0;
-  list-style: none;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-}
-
-.timelineList li {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xxs);
-}
-
-.timelineList li svg {
-  color: var(--tone);
-}
-
 .state {
   display: grid;
   gap: var(--space-sm);
@@ -472,4 +434,19 @@
   background: var(--color-surface);
   color: var(--color-text-primary);
   font: inherit;
+}
+
+/* The Panchang page's day banner at the top of the page (wide windows only render this page). Nothing overlaps it
+   here, so all corners are rounded and the bottom padding is the same as the top. */
+.pageBanner > div {
+  padding-block-end: 5.25rem;
+  border-radius: var(--radius-md);
+}
+
+/* "What are you planning?" overlaps the bottom of the banner, like the Panchang page's cards. */
+.onBanner {
+  position: relative;
+  z-index: 1;
+  margin-block-start: calc(-1 * (var(--space-lg) + 4.25rem));
+  margin-inline: var(--space-md);
 }

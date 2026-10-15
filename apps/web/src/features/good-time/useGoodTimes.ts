@@ -4,13 +4,27 @@ import {
   type PanchangParams,
   queryKeys,
 } from '@myvedicstar/api-client';
-import { monthRange, panchangLocationParams, type YearMonth } from '@myvedicstar/domain-models';
-import { scopedKey, useGoodTime, useLocalDate, useRefreshAtWindowEnd } from '@myvedicstar/query-cache';
-import { useQuery } from '@tanstack/react-query';
+import type { LocalDate } from '@myvedicstar/date-time';
+import {
+  buildDayDashboardForDay,
+  monthRange,
+  panchangLocationParams,
+  type YearMonth,
+  yearMonthOf,
+} from '@myvedicstar/domain-models';
+import {
+  panchangMonthOptions,
+  scopedKey,
+  useGoodTime,
+  useLocalDate,
+  useRefreshAtWindowEnd,
+} from '@myvedicstar/query-cache';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 import { useAuth } from '../../shared/auth';
 import { useDebouncedValue } from '../../shared/hooks/useDebouncedValue';
+import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { useLocationState } from '../location';
@@ -174,7 +188,13 @@ export function useGoodTimeMonth(
 
 /** The next best Good Times for an activity (`/muhurta/good-times/best`): one per day, best first. */
 export function useBestGoodTimes(
-  selection: { activity: string; otherText?: string | undefined; nakshatra?: string | undefined } | null,
+  selection: {
+    activity: string;
+    otherText?: string | undefined;
+    nakshatra?: string | undefined;
+    /** Days searched from today (the backend's default, 30, when omitted). */
+    days?: number | undefined;
+  } | null,
 ) {
   const { api, config } = useServices();
   const { user, isAuthenticated, loading } = useAuth();
@@ -189,6 +209,7 @@ export function useBestGoodTimes(
       nakshatra: selection.nakshatra,
       otherText: selection.otherText,
       count: BEST_COUNT,
+      days: selection.days,
     };
   }, [base, selection]);
 
@@ -206,13 +227,17 @@ export function useBestGoodTimes(
   return query;
 }
 
-/** How many options the "Next best times" tile shows. */
+/** How many options the "Next best days" tile shows. */
 export const BEST_COUNT = 3;
 
-/** Date-based best windows are returned authoritatively by day-summaries; /best searches only from today. */
+/**
+ * Date-based best windows are returned authoritatively by day-summaries; /best searches only from today. `days` is the
+ * searched range (30 when omitted; the phone layout offers 60 and 90).
+ */
 export function useBestGoodTimeWindows(
   selection: {
     date: string;
+    days?: number | undefined;
     activity: string;
     otherText?: string | undefined;
     nakshatra?: string | undefined;
@@ -227,6 +252,7 @@ export function useBestGoodTimeWindows(
       base && selection && isComplete(selection.activity, selection.otherText)
         ? {
             start: selection.date,
+            days: selection.days ?? 30,
             params: {
               ...base,
               activity: selection.activity,
@@ -240,14 +266,14 @@ export function useBestGoodTimeWindows(
   const query = useQuery({
     queryKey: scopedKey(
       request
-        ? queryKeys.muhurta.daySummaries(request.start, 30, request.params)
+        ? queryKeys.muhurta.daySummaries(request.start, request.days, request.params)
         : ['muhurta', 'date-best', 'idle'],
       user?.id ?? null,
       config.cache,
     ),
     queryFn: ({ signal }) => {
-      const { start, params } = request as NonNullable<typeof request>;
-      return api.muhurta.daySummaries(start, 30, params, { signal });
+      const { start, days, params } = request as NonNullable<typeof request>;
+      return api.muhurta.daySummaries(start, days, params, { signal });
     },
     enabled:
       request !== null &&
@@ -256,4 +282,39 @@ export function useBestGoodTimeWindows(
       JSON.stringify(selection) === JSON.stringify(settled),
   });
   return { query, start: request?.start };
+}
+
+/**
+ * One day's Panchang view model (timeline, auspicious times, times to avoid, rating factors) for "Day at a glance".
+ * Reads the same month query as the Panchang calendar (`GET /panchang/month/{year}/{month}`), so the two pages share
+ * one cache entry; nothing is requested until `enabled`.
+ */
+export function useDayPanchang(date: LocalDate | undefined, enabled: boolean) {
+  const { api, config } = useServices();
+  const { user, isAuthenticated, loading } = useAuth();
+  const client = useQueryClient();
+  const base = useBaseParams();
+  const now = useNow();
+  const { year, month } = yearMonthOf(date ?? '1970-01-01');
+  const query = useQuery(
+    panchangMonthOptions(
+      {
+        api,
+        params: base,
+        userId: user?.id ?? null,
+        enabled: enabled && date !== undefined && isAuthenticated && !loading,
+        settings: config.cache,
+      },
+      client,
+      year,
+      month,
+    ),
+  );
+  const day = query.data?.days.find((item) => item.date === date);
+  const timeZone = base?.location.timeZone;
+  const dashboard = useMemo(
+    () => (day && timeZone ? buildDayDashboardForDay(day, timeZone, now) : undefined),
+    [day, timeZone, now],
+  );
+  return { query, dashboard, glossary: query.data?.glossary };
 }

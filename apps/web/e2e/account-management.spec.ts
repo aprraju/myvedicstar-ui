@@ -68,8 +68,20 @@ test('profile fields load, save without a page reload, and meet accessibility re
   await page.getByLabel('Street Address 2', { exact: true }).fill('Apartment 2');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect(page.getByText('Your profile has been saved.')).toBeVisible();
-  await page.getByRole('button', { name: 'Open account menu' }).click();
-  await expect(page.getByRole('banner').getByText('Raju,Bhupathi', { exact: true })).toBeVisible();
+  // Wide windows: the header's account menu. Phones: the header's account button opens the "Your Account" sheet.
+  const phone = page.viewportSize()!.width < 1024;
+  if (phone) {
+    await page.getByRole('banner').getByRole('button', { name: 'Your account' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Your Account' });
+    await expect(sheet).toContainText('Raju,Bhupathi');
+    await expect(sheet.getByRole('link', { name: /^Profile/ })).toHaveAttribute('href', '/profile');
+    await expect(sheet.getByRole('link', { name: /^Settings/ })).toHaveAttribute('href', '/settings');
+    await expect(sheet.getByRole('button', { name: 'Log out' })).toBeVisible();
+  } else {
+    const menu = page.getByRole('banner');
+    await menu.getByRole('button', { name: 'Open account menu' }).click();
+    await expect(menu.getByText('Raju,Bhupathi', { exact: true })).toBeVisible();
+  }
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
     .analyze();

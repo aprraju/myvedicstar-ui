@@ -73,7 +73,7 @@ function DesktopDashboard() {
             <PeriodList
               id="auspicious"
               tone="favorable"
-              title={t('dashboard.auspiciousTitle')}
+              title={t('dashboard.auspiciousTitle', { day: format.day(dashboard.summary.date) })}
               subtitle={t('dashboard.auspiciousSubtitle')}
               items={dashboard.auspicious}
               glossary={glossary}
@@ -101,14 +101,18 @@ function DesktopDashboard() {
             <PeriodList
               id="avoid"
               tone="caution"
-              title={t('dashboard.avoidTitle')}
+              title={t('dashboard.avoidTitle', { day: format.day(dashboard.summary.date) })}
               subtitle={t('dashboard.avoidSubtitle')}
               items={dashboard.avoid}
               glossary={glossary}
               timeZone={location.timeZone}
               date={dashboard.summary.date}
             />
-            <RatingFactors ratingName={dashboard.ratingName} factors={dashboard.factors} />
+            <RatingFactors
+              ratingName={dashboard.ratingName}
+              factors={dashboard.factors}
+              date={dashboard.summary.date}
+            />
           </div>
         </>
       )}

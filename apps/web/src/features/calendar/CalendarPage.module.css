@@ -514,3 +514,16 @@
     font-size: 0.625rem;
   }
 }
+
+/* The month card embedded in another page's card (Find a Good Time on phones): no second border or shadow, and the
+   compact month title the Panchang calendar uses on phones. */
+.embeddedCard {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.embeddedTitle {
+  font-size: var(--font-size-lg);
+}

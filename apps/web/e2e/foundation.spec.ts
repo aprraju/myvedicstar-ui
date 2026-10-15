@@ -74,15 +74,78 @@ test.describe('responsive layout', () => {
     });
   }
 
-  test('header collapses navigation into a menu on compact windows', async ({ page }) => {
+  test('phones, signed out: the home header and menu on every public page, no app navigation', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 800 });
+    for (const path of ['/about', '/privacy', '/terms', '/help']) {
+      await page.goto(path);
+      const banner = page.getByRole('banner');
+      await expect(banner.getByRole('link', { name: 'About' })).toBeHidden();
+      await expect(banner.getByRole('button', { name: 'Open menu' })).toBeHidden();
+      await expect(banner.getByRole('button', { name: 'Login' })).toBeVisible();
+      await expect(banner.getByRole('button', { name: 'Register' })).toHaveCount(0);
+      // The app's sections need sign-in, so signed-out visitors get a bottom bar of features that sign in first.
+      await expect(page.getByRole('navigation', { name: 'Today navigation' })).toHaveCount(0);
+      // The home page's menu, fixed at the bottom: features (sign in first) and Privacy · Terms · Help · Contact.
+      const bar = page.getByRole('list', { name: 'What you can do' });
+      await expect(bar.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      for (const name of ['Daily Panchang', 'Good Times', 'Festivals']) {
+        await expect(bar.getByRole('button', { name })).toBeVisible();
+      }
+      const links = page.getByRole('navigation', { name: 'Policies and help' });
+      const barBox = (await links.boundingBox())!;
+      expect(barBox.y + barBox.height).toBeGreaterThan(800 - 60); // at the bottom of the screen
+      await expect(links.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
+      await expect(links.getByRole('link', { name: 'Terms' })).toHaveAttribute('href', '/terms');
+      await expect(links.getByRole('link', { name: 'Help' })).toHaveAttribute('href', '/help');
+      await expect(links.getByRole('link', { name: 'Contact' })).toHaveAttribute(
+        'href',
+        'mailto:contact@myvedicstar.com',
+      );
+    }
+  });
+
+  test('phones: the signed-out home follows the mockup and signs in from the header or the page', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/');
     const banner = page.getByRole('banner');
-    await expect(banner.getByRole('link', { name: 'About' })).toBeHidden();
-    await banner.getByRole('button', { name: 'Open menu' }).click();
-    await expect(banner.getByRole('link', { name: 'About' })).toBeVisible();
     await expect(banner.getByRole('button', { name: 'Login' })).toBeVisible();
-    await expect(banner.getByRole('button', { name: 'Register' })).toHaveCount(0);
+    // The home page carries its own menu (once — no fixed bar) and no site footer.
+    await expect(page.getByRole('list', { name: 'What you can do' })).toHaveCount(1);
+    await expect(page.getByRole('contentinfo')).toBeHidden();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Find Auspicious Moments for a Happier Life' }),
+    ).toBeVisible();
+    await expect(page.getByText('Free to get started')).toBeVisible();
+    const features = page.getByRole('list', { name: 'What you can do' });
+    for (const name of ['Daily Panchang', 'Good Times', 'Festivals']) {
+      await expect(features.getByRole('button', { name })).toBeVisible();
+    }
+    await expect(page.getByRole('link', { name: 'Contact' })).toHaveAttribute(
+      'href',
+      'mailto:contact@myvedicstar.com',
+    );
+    // The brand stays centred on the screen.
+    const name = (await banner.getByText('My Vedic Star').boundingBox())!;
+    expect(Math.abs(name.x + name.width / 2 - 195)).toBeLessThan(4);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    // Tall phones: the menu sits at the bottom of the screen (no empty band).
+    const links = (await page.getByRole('navigation', { name: 'Policies and help' }).boundingBox())!;
+    expect(844 - (links.y + links.height)).toBeLessThan(40);
+    // A feature signs in like Login / Sign Up, then opens its page.
+    await features.getByRole('button', { name: 'Good Times' }).click();
+    await expect(page).toHaveURL(/\/good-time$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Find a Good Time' })).toHaveCount(1);
+  });
+
+  test('phones: Login / Sign Up on the home page signs in to the dashboard', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Login / Sign Up' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
   });
 
   test('guest header shows navigation and sign-in on wide windows', async ({ page }) => {

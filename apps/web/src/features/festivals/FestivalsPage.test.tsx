@@ -45,13 +45,23 @@ describe('Festivals', () => {
     expect(ekadashi).toHaveTextContent('In 5 days');
     expect(ekadashi).toHaveTextContent('Observance');
     expect(ekadashi).toHaveTextContent('observed with fasting in honor of Lord Vishnu');
-    expect(ekadashi).toHaveTextContent(/Observed at Sunrise: Oct 6, 07:27\sAM/);
-    expect(ekadashi).toHaveTextContent(/Tithi: Oct 5, 03:37\sPM – Oct 6, 02:04\sPM/);
+    // The engine's timing, by its own names, behind View details.
+    // Wide windows show the details expanded by default; they can still be collapsed.
+    expect(within(ekadashi).getByText('Observed at Sunrise')).toBeVisible();
+    expect(within(ekadashi).getByRole('button', { name: 'Hide details' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(ekadashi).toHaveTextContent(/Observed at Sunrise\s*Oct 6, 07:27\sAM/);
+    expect(ekadashi).toHaveTextContent(/Tithi transition\s*Tithi: Oct 5, 03:37\sPM – Oct 6, 02:04\sPM/);
 
     const pradosham = card(/^Pradosham$/);
-    expect(pradosham).toHaveTextContent(/Observed at Pradosha: Oct 7, 07:08\sPM – Oct 7, 09:36\sPM/);
+    expect(pradosham).toHaveTextContent(/Observed at Pradosha\s*Oct 7, 07:08\sPM – Oct 7, 09:36\sPM/);
 
     expect(card(/^Sankranti$/)).toHaveTextContent(/Sankranti: Oct 17, /);
+
+    await userEvent.click(within(ekadashi).getByRole('button', { name: 'Hide details' }));
+    expect(within(ekadashi).getByText('Observed at Sunrise')).not.toBeVisible();
   });
 
   it('filters festivals / observances and changes the range (kept in the URL)', async () => {

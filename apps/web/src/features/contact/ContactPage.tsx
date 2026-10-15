@@ -18,37 +18,67 @@ import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import styles from './ContactPage.module.css';
 
-type ContactFormInput = { name: string; email: string; reason: ContactReason | ''; message: string };
+type ContactFormInput = {
+  name: string;
+  email: string;
+  reason: ContactReason | '';
+  message: string;
+  subject: string;
+  phoneNumber: string;
+};
+
+/** The footer's Beta Feedback / Report an Issue / Contact buttons open this page with the matching reason. */
+const FORM_TITLES = {
+  feedback: { title: 'contact.forms.feedback.title', intro: 'contact.forms.feedback.intro' },
+  technical: { title: 'contact.forms.issue.title', intro: 'contact.forms.issue.intro' },
+} as const;
 
 /**
  * Contact Us: a small form (name, email, reason, message) instead of publishing an email address. Signed-in users get
- * their name and email prefilled from their profile; `?reason=technical` (Report an Issue) preselects the reason.
- * Submits to `POST /contact`; on success the form is replaced by a confirmation.
+ * their name and email prefilled from their profile; `?reason=` preselects the reason (`feedback` for Beta Feedback,
+ * `technical` for Report an Issue), and those two get their own title. Submits to `POST /email/send`; on success the
+ * form is replaced by a confirmation. A different `?reason=` starts a fresh form.
  */
 export function ContactPage() {
+  const [searchParams] = useSearchParams();
+  return <ContactForm key={searchParams.get('reason') ?? ''} />;
+}
+
+function ContactForm() {
   const { t, tDynamic } = useTranslation();
   const { api } = useServices();
   const { user } = useAuth();
   const { userInfo } = useUserInfo();
   const [searchParams] = useSearchParams();
-  const ids = { name: useId(), email: useId(), reason: useId(), message: useId() };
+  const ids = {
+    name: useId(),
+    email: useId(),
+    reason: useId(),
+    message: useId(),
+    subject: useId(),
+    phoneNumber: useId(),
+  };
   const confirmationRef = useRef<HTMLHeadingElement>(null);
 
   const requested = searchParams.get('reason');
+  const heading = requested === 'feedback' || requested === 'technical' ? FORM_TITLES[requested] : undefined;
   const form = useForm<ContactFormInput, unknown, ContactForm>({
     // The form holds '' until a reason is chosen; the schema rejects it on submit ("Choose a reason").
     resolver: zodResolver(contactFormSchema) as unknown as Resolver<ContactFormInput, unknown, ContactForm>,
     defaultValues: {
       name: '',
       email: '',
+      subject: '',
+      phoneNumber: '',
       reason: contactReasons.find((reason) => reason === requested) ?? '',
       message: '',
     },
   });
 
-  // Prefill from the signed-in user's profile, without overwriting anything already typed.
+  // Prefill from the signed-in user's profile (userinfo), falling back to the sign-in token's name and email, without
+  // overwriting anything already typed. Applies to Contact Us, Report an Issue and Beta Feedback alike.
   const profileName = displayNameOf(userInfo, user?.displayName);
-  const profileEmail = userInfo?.email ?? undefined;
+  const profileEmail = userInfo?.email?.trim() || user?.email?.trim() || undefined;
   useEffect(() => {
     if (profileName && !form.getValues('name')) form.setValue('name', profileName);
     if (profileEmail && !form.getValues('email')) form.setValue('email', profileEmail);
@@ -103,14 +133,16 @@ export function ContactPage() {
   const email = field('email');
   const reason = field('reason');
   const message = field('message');
+  const subject = field('subject');
+  const phoneNumber = field('phoneNumber');
 
   return (
     <section className={styles.page} aria-labelledby="contact-title">
       <div className={styles.card}>
         <h1 id="contact-title" className={styles.title}>
-          {t('pages.contact.title')}
+          {t(heading?.title ?? 'pages.contact.title')}
         </h1>
-        <p className={styles.intro}>{t('contact.intro')}</p>
+        <p className={styles.intro}>{t(heading?.intro ?? 'contact.intro')}</p>
 
         {submit.isError && (
           <div className={styles.error}>
@@ -124,7 +156,9 @@ export function ContactPage() {
         <form
           className={styles.form}
           noValidate
-          onSubmit={form.handleSubmit((values) => submit.mutate(values))}
+          onSubmit={form.handleSubmit((values) => {
+            if (!submit.isPending) submit.mutate(values);
+          })}
         >
           <div className={styles.field}>
             <label htmlFor={name.id} className={styles.label}>
@@ -172,6 +206,27 @@ export function ContactPage() {
           </div>
 
           <div className={styles.field}>
+            <label htmlFor={phoneNumber.id} className={styles.label}>
+              {t('contact.phoneNumber')}
+            </label>
+            <input
+              id={phoneNumber.id}
+              className={styles.input}
+              type="tel"
+              autoComplete="tel"
+              maxLength={40}
+              aria-invalid={phoneNumber['aria-invalid']}
+              aria-describedby={phoneNumber['aria-describedby']}
+              {...form.register('phoneNumber')}
+            />
+            {phoneNumber.error && (
+              <p id={`${phoneNumber.id}-error`} className={styles.fieldError}>
+                {phoneNumber.error}
+              </p>
+            )}
+          </div>
+
+          <div className={styles.field}>
             <label htmlFor={reason.id} className={styles.label}>
               {t('contact.reason')}
             </label>
@@ -197,6 +252,24 @@ export function ContactPage() {
           </div>
 
           <div className={styles.field}>
+            <label htmlFor={subject.id} className={styles.label}>
+              {t('contact.subject')}
+            </label>
+            <input
+              id={subject.id}
+              className={styles.input}
+              maxLength={200}
+              aria-invalid={subject['aria-invalid']}
+              aria-describedby={subject['aria-describedby']}
+              {...form.register('subject')}
+            />
+            {subject.error && (
+              <p id={`${subject.id}-error`} className={styles.fieldError}>
+                {subject.error}
+              </p>
+            )}
+          </div>
+          <div className={styles.field}>
             <label htmlFor={message.id} className={styles.label}>
               {t('contact.message')}
             </label>
@@ -219,7 +292,7 @@ export function ContactPage() {
             )}
           </div>
 
-          <Button type="submit" loading={submit.isPending}>
+          <Button type="submit" loading={submit.isPending} disabled={submit.isPending}>
             {t('contact.submit')}
           </Button>
         </form>

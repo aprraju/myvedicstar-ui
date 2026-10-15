@@ -40,3 +40,14 @@
     max-inline-size: 840px;
   }
 }
+
+/* Phones, signed out: room for the taller menu bar; on the home page the menu and footer are part of the page. */
+@media (max-width: 1023px) {
+  .guest > footer {
+    padding-block-end: calc(9.5rem + env(safe-area-inset-bottom));
+  }
+  .guestHome .mobileNavigation,
+  .guestHome > footer {
+    display: none;
+  }
+}

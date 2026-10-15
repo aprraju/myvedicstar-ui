@@ -3,6 +3,7 @@ import { Outlet, ScrollRestoration, useLocation } from 'react-router';
 
 import { MAIN_CONTENT_ID, RouteAnnouncer, SkipLink } from '../../shared/accessibility/RouteAnnouncer';
 import { useRouteHandle } from '../../shared/accessibility/usePageTitle';
+import { useAuth } from '../../shared/auth';
 import { OfflineBanner } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
@@ -15,6 +16,10 @@ import styles from './SiteLayout.module.css';
 export function SiteLayout() {
   const { pathname } = useLocation();
   const today = pathname === '/dashboard' || pathname === '/today';
+  const { isAuthenticated } = useAuth();
+  // Phones, signed-out home: its menu and footer are on the page (other public pages keep the bottom bar).
+  const guestHome = pathname === '/' && !isAuthenticated;
+  const guest = !isAuthenticated;
   const { t } = useTranslation();
   const { analytics } = useServices();
   const { title, screen } = useRouteHandle();
@@ -45,7 +50,7 @@ export function SiteLayout() {
   return (
     <div
       ref={shellRef}
-      className={`${styles.shell} ${styles.mobileShell} ${today ? styles.mobileTodayShell : ''}`}
+      className={`${styles.shell} ${styles.mobileShell} ${today ? styles.mobileTodayShell : ''} ${guest ? styles.guest : ''} ${guestHome ? styles.guestHome : ''}`}
     >
       <SkipLink />
       <SiteHeader todayMobile />

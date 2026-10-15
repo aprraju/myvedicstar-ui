@@ -1,0 +1,742 @@
+/* Find a Good Time on phones (< 1024px): search screen, then results. Status colors come from the global
+   [data-status-tone] map (--tone, --tone-surface). Used only by the mobile layout; the desktop page is unchanged. */
+.page {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.head h1 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+}
+
+.head p {
+  margin: var(--space-xxs) 0 0;
+  color: var(--color-text-secondary);
+}
+
+.card {
+  display: grid;
+  gap: var(--space-sm);
+  min-inline-size: 0;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg, 1rem);
+  background: var(--color-surface-elevated);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.cardHead h2,
+.glanceHeading {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.muted {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular, 400);
+}
+
+.strong {
+  margin: 0;
+  font-weight: var(--font-weight-bold);
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.hint[hidden] {
+  display: none;
+}
+
+/* Activities: four compact cards per row (three on the narrowest phones). Labels use a fluid size so the longest
+   names (e.g. Housewarming) stay inside their card on one line; they wrap between words, never mid-word. */
+.activities > [role='radiogroup'] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.activities button {
+  min-block-size: 5.25rem;
+  padding: var(--space-xs) 2px;
+}
+
+.activities button > span:nth-child(2) {
+  max-inline-size: 100%;
+  font-size: clamp(0.625rem, 2.85vw, 0.75rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: manual;
+}
+
+.activities button > span:first-child {
+  inline-size: 2rem;
+  block-size: 2rem;
+  background: transparent;
+}
+
+@media (max-width: 22rem) {
+  .activities > [role='radiogroup'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .activities button > span:nth-child(2) {
+    font-size: 0.75rem;
+  }
+}
+
+.other {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.other label {
+  font-weight: var(--font-weight-bold);
+}
+
+.other input {
+  min-block-size: 48px;
+  min-inline-size: 0;
+  padding-inline: var(--space-md);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.birthStar {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.birthStarLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: var(--font-weight-bold);
+}
+
+.iconButton {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  margin: calc(-1 * var(--space-xs));
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.iconButton:focus-visible,
+.why:focus-visible,
+.bestOption:focus-visible,
+.glanceToggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Choose a date: the Panchang calendar's phone day navigation (round ‹ ›, serif date, full-width Panchang button). */
+.cardTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dayPicker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-xs);
+  text-align: center;
+}
+
+.dayPicker p {
+  margin: 0;
+}
+
+.dayPicker > button {
+  inline-size: 44px;
+  block-size: 44px;
+  min-block-size: 44px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-lg);
+}
+
+.dayPickerDate {
+  font-family: var(--font-serif);
+  font-size: clamp(var(--font-size-sm), 4.2vw, var(--font-size-md));
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+}
+
+.dayPickerHint {
+  margin-block-start: var(--space-xxs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.panchangButton {
+  justify-content: center;
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: var(--space-xxs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+}
+
+.panchangButton svg {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+.find {
+  justify-content: center;
+  inline-size: 100%;
+  min-block-size: 52px;
+  border-radius: 999px;
+}
+
+/* Results */
+.back {
+  justify-self: start;
+}
+
+.results {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+/* Row 1: activity | birth star, one line each. Row 2: date range (dates, then the day count in small type) and Edit. */
+.summary {
+  position: relative;
+}
+
+.edit {
+  position: absolute;
+  inset-block-end: var(--space-md);
+  inset-inline-end: var(--space-md);
+}
+
+.summaryList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.summaryList > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--space-xs);
+  align-items: center;
+}
+
+.summaryList svg {
+  grid-row: span 2;
+  color: var(--color-primary);
+}
+
+.summaryList dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.summaryList dd {
+  min-inline-size: 0;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.oneLine {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summaryRange {
+  grid-column: 1 / -1;
+  /* Room for Edit beside the range. */
+  padding-inline-end: 6.5rem;
+}
+
+.summaryRange svg {
+  align-self: start;
+}
+
+.fit {
+  position: relative;
+}
+
+.measure {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.rangeDays {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+}
+
+.dayStatus {
+  display: grid;
+  gap: var(--space-xxs);
+  padding: var(--space-md);
+  border: 1px solid var(--tone);
+  border-radius: var(--radius-lg, 1rem);
+  background: var(--tone-surface);
+}
+
+.dayStatus h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dayStatus h2 svg {
+  color: var(--tone);
+}
+
+.dayStatus p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.notice {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.best {
+  border-color: var(--tone);
+}
+
+.best .cardHead {
+  flex-wrap: nowrap;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge {
+  flex: none;
+  padding: var(--space-xxs) var(--space-sm);
+  border-radius: 999px;
+  background: var(--tone-surface);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bestTime {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.bestMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.bestMeta svg {
+  color: var(--tone);
+}
+
+/* Not recommended: rows like the recommended times list, each opening to the backend's reasons. */
+.notList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.notList > li + li {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.notList .whyBody {
+  padding: 0 var(--space-xxs) var(--space-sm);
+}
+
+.notRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 0 var(--space-xxs);
+  border: 0;
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.notRow:hover {
+  background: var(--color-surface-subtle);
+}
+
+.notRow:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.notRow > svg {
+  color: var(--color-text-secondary);
+}
+
+.notRow[aria-expanded='true'] > svg {
+  transform: rotate(180deg);
+}
+
+/* The day's other recommended times, under the featured one. */
+.others {
+  display: grid;
+  gap: var(--space-xxs);
+  padding-block-start: var(--space-xs);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.othersTitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.others ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.others button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 0 var(--space-xxs);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.others li + li button {
+  border-block-start: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.others button:hover {
+  background: var(--color-surface-subtle);
+}
+
+/* The time shown above (the day's best by default, or the one tapped): the same green as a highly favorable day. */
+.others button[aria-current='true'] {
+  border-radius: var(--radius-sm);
+  background: var(--color-favorable-strong-surface);
+}
+
+.others li:has(button[aria-current='true']) + li button {
+  border-block-start-color: transparent;
+}
+
+.others button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.others button > svg {
+  color: var(--color-text-secondary);
+}
+
+.othersTime {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.why,
+.glanceToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-align: start;
+  cursor: pointer;
+}
+
+.why[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.whyBody {
+  display: grid;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+}
+
+.whyBody[hidden],
+.glanceBody[hidden] {
+  display: none;
+}
+
+.whyBody p {
+  margin: 0;
+}
+
+.whyBody .reasons + .strong {
+  margin-block-start: var(--space-xs);
+}
+
+.reasons {
+  display: grid;
+  gap: var(--space-xxs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reasons [data-kind='conflict'],
+.reasons [data-kind='negative'] {
+  color: var(--color-text-secondary);
+}
+
+.empty {
+  display: flex;
+  gap: var(--space-xs);
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.bestList {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bestList > li + li {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.bestOption {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  inline-size: 100%;
+  padding: var(--space-sm) var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+/* The time shown above: the same green as a highly favorable day, plus a filled rank (not color alone). */
+.bestOption[aria-current='true'] {
+  background: var(--color-favorable-strong-surface);
+}
+
+.bestOption[aria-current='true'] .rank {
+  background: var(--tone);
+  color: var(--color-on-primary);
+}
+
+.bestOption > svg {
+  color: var(--color-text-secondary);
+}
+
+.rank {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  border-radius: 50%;
+  background: var(--tone-surface);
+  color: var(--tone);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bestOptionBody {
+  display: grid;
+  gap: 0.125rem;
+  font-size: var(--font-size-sm);
+}
+
+.bestOptionBody > .strong {
+  font-weight: var(--font-weight-medium);
+}
+
+.bestOptionTime {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.toneText {
+  color: var(--tone);
+  font-size: var(--font-size-xs);
+}
+
+.viewAll {
+  justify-content: center;
+  inline-size: 100%;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+}
+
+.glanceToggle {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+}
+
+.glanceBar {
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+  block-size: 0.875rem;
+  border-radius: 999px;
+}
+
+.glanceBar > span {
+  block-size: 100%;
+  background: var(--tone);
+  opacity: 0.55;
+}
+
+.glanceBar > span[data-good] {
+  opacity: 1;
+}
+
+.glanceBody {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+/* Wide windows: the dashboard card look ("Why {day} is …", "Times to avoid on {day}") for the best and the
+   not-recommended times. */
+.panelCard {
+  display: grid;
+  min-inline-size: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
+  box-shadow: var(--shadow-low);
+}
+
+.panelHead {
+  --head-tone: var(--color-info);
+  --head-surface: var(--color-info-surface);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  border-block-end: 1px solid var(--color-border);
+  border-start-start-radius: var(--radius-md);
+  border-start-end-radius: var(--radius-md);
+  background: linear-gradient(
+    90deg,
+    var(--head-surface),
+    color-mix(in srgb, var(--head-surface) 40%, var(--color-surface))
+  );
+}
+
+.panelHead[data-tone='caution'] {
+  --head-tone: var(--color-caution);
+  --head-surface: var(--color-caution-surface);
+}
+
+.panelIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--head-tone) 14%, var(--color-surface));
+  color: var(--head-tone);
+}
+
+.panelTitle {
+  margin: 0;
+  color: var(--head-tone);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.panelSubtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.panelBody {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+}

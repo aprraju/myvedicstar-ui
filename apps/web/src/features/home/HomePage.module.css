@@ -421,3 +421,91 @@
     font-size: var(--font-size-xl);
   }
 }
+
+/* Phones (< 1024px): the home mockup — hero image, heading, intro, Login / Sign Up, features, short footer. */
+.mobileHome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  /* Fill the visible screen below the fixed header, so tall phones have no empty band at the bottom. */
+  min-block-size: calc(100dvh - var(--today-header-height, 7rem) - var(--space-md));
+  padding-block: var(--space-md) var(--space-lg);
+  text-align: center;
+}
+
+.mobileHome > * {
+  flex: none;
+}
+
+/* The hero takes the extra height on tall phones (never smaller than 16:9, never taller than half the screen). */
+.mobileHero {
+  flex: 1 0 auto;
+  inline-size: 100%;
+  min-block-size: min(calc((100vw - 2 * var(--gutter, 1rem)) * 9 / 16), 45dvh);
+  max-block-size: 50dvh;
+  border-radius: var(--radius-lg);
+  background: #0f2237 url('../../assets/images/home.jpg') center / cover no-repeat;
+  box-shadow: var(--shadow-low);
+}
+
+.mobileTitle {
+  margin: 0;
+  font-size: clamp(1.5rem, 6.5vw, 2rem);
+  line-height: 1.2;
+}
+
+.mobileBody {
+  max-inline-size: 30rem;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+}
+
+.mobileCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  min-block-size: 52px;
+  padding-inline: var(--space-lg);
+  border: 0;
+  border-radius: 999px;
+  /* The theme's primary action (same bronze gradient as the app's primary buttons). */
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 80%, black),
+    color-mix(in srgb, var(--color-primary) 94%, white)
+  );
+  box-shadow: var(--shadow-low);
+  color: var(--color-on-primary);
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.mobileCta:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.mobileFree {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: calc(-1 * var(--space-xs)) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.mobileFree svg {
+  color: var(--color-favorable);
+}
+
+/* The features and links sit at the bottom of the screen. */
+.mobileMenu {
+  inline-size: 100%;
+  margin-block-start: auto;
+}

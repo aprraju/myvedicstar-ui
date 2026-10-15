@@ -1,0 +1,70 @@
+/* Signed-out menu on phones: features row, then policy / help / contact links (home mockup). */
+.menu {
+  display: grid;
+  gap: var(--space-md);
+  inline-size: 100%;
+  text-align: center;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin: 0;
+  padding: var(--space-md) 0 0;
+  border-block-start: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.feature {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  inline-size: 100%;
+  padding: var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.feature svg {
+  color: var(--color-primary);
+}
+
+/* Home, when it is the current page. */
+.feature[aria-current='page'] {
+  color: var(--color-primary);
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs) var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.links a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.feature:focus-visible,
+.links a:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}

@@ -29,8 +29,8 @@ describe('Dashboard (authenticated Today)', () => {
     await atInstant('2026-09-29T18:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
-    await screen.findByRole('region', { name: "Today's Panchang" });
-    const panchang = region("Today's Panchang");
+    await screen.findByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
+    const panchang = region(/^\w+ \d{1,2} Panchang$/);
     expect(panchang).toHaveTextContent(/Tithi\s*Krishna Chaturthi\s*until 04:25\sAM/);
     expect(panchang).toHaveTextContent('then Krishna Panchami');
     expect(panchang).toHaveTextContent('Bharani');
@@ -48,7 +48,7 @@ describe('Dashboard (authenticated Today)', () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
-    const auspicious = await screen.findByRole('region', { name: 'Auspicious times' });
+    const auspicious = await screen.findByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ });
     expect(auspicious).toHaveTextContent('Amrita Kalam');
     expect(auspicious).toHaveTextContent(/04:36\sPM – 06:06\sPM/);
     // Amrit Kalam overlaps Rahu Kalam (4:19–05:49 PM): a resolved conflict — the overlap is explained inside the entry
@@ -56,7 +56,7 @@ describe('Dashboard (authenticated Today)', () => {
     expect(auspicious).toHaveTextContent(/Overlaps with Rahu Kalam: 04:36\sPM – 05:49\sPM/);
     expect(auspicious).not.toHaveTextContent('Auspicious period for positive activities');
 
-    const avoid = region('Times to avoid');
+    const avoid = region(/^Times to avoid on \w+ \d{1,2}$/);
     const items = within(avoid).getAllByRole('listitem');
     expect(items.map((item) => item.textContent)).toEqual([
       expect.stringContaining('Varjyam'),
@@ -75,7 +75,7 @@ describe('Dashboard (authenticated Today)', () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
-    const why = await screen.findByRole('region', { name: 'Why today is Mixed' });
+    const why = await screen.findByRole('region', { name: /^Why \w+ \d{1,2} is Mixed$/ });
     expect(why).toHaveTextContent('Tithi: Krishna Chaturthi');
     expect(why).toHaveTextContent('Yoga: Harshana');
     expect(why).toHaveTextContent('Favorable');
@@ -86,7 +86,7 @@ describe('Dashboard (authenticated Today)', () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
-    const timeline = await screen.findByRole('region', { name: "Today's timeline" });
+    const timeline = await screen.findByRole('region', { name: /^\w+ \d{1,2} timeline$/ });
     expect(timeline).toHaveTextContent('Sunrise');
     expect(timeline).toHaveTextContent('Next sunrise');
   });
@@ -94,7 +94,7 @@ describe('Dashboard (authenticated Today)', () => {
   it('asks for a location when none is selected', async () => {
     renderRoute('/dashboard', { auth: signedIn() });
     expect(await screen.findByText('Choose a location to see today’s Panchang')).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: "Today's Panchang" })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /^\w+ \d{1,2} Panchang$/ })).not.toBeInTheDocument();
   });
 
   it('shows a friendly error with retry when the Panchang cannot be loaded', async () => {
@@ -102,14 +102,14 @@ describe('Dashboard (authenticated Today)', () => {
     storeSelectedLocation();
     renderRoute('/dashboard', { auth: signedIn() });
     expect(await screen.findByRole('button', { name: 'Try again' })).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: "Today's Panchang" })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /^\w+ \d{1,2} Panchang$/ })).not.toBeInTheDocument();
   });
 
   it('has no accessibility violations', async () => {
     await atInstant('2026-09-29T10:00:00-05:00');
     storeSelectedLocation();
     const { container } = renderRoute('/dashboard', { auth: signedIn() });
-    await screen.findByRole('region', { name: 'Times to avoid' });
+    await screen.findByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ });
     expect(await axeViolations(container)).toEqual([]);
   });
 });

@@ -1,8 +1,9 @@
 import type { MessageKey } from '@myvedicstar/localization';
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { useAuth, useStartSignIn } from '../../shared/auth';
+import { GuestMenu } from '../../shared/components/GuestMenu';
 import { Icon, type IconName } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { routes } from '../../shared/routing/paths';
@@ -28,6 +29,14 @@ const FEATURES: { id: string; icon: IconName; accent: 'orange' | 'teal' | 'pink'
 
 const BENEFITS = ['registration', 'locations', 'personalized', 'reminders', 'devices'] as const;
 
+/** Phones and small tablets get the mockup layout (same breakpoint as the mobile header). */
+const MOBILE_MAX_WIDTH = 1024;
+
+function subscribeWidth(listener: () => void) {
+  window.addEventListener('resize', listener);
+  return () => window.removeEventListener('resize', listener);
+}
+
 /**
  * Public home: intentionally simple — a hero and a short explanation
  * of what the app offers. The full dashboard stays behind sign-in.
@@ -38,8 +47,14 @@ export function HomePage() {
   const { enabled, isAuthenticated } = useAuth();
   const { start, pending } = useStartSignIn();
   useScrollToHash();
+  const mobile = useSyncExternalStore(
+    subscribeWidth,
+    () => window.innerWidth < MOBILE_MAX_WIDTH,
+    () => false,
+  );
 
   if (isAuthenticated) return <Navigate to={routes.dashboard} replace />;
+  if (mobile) return <MobileHome />;
 
   return (
     <div className={styles.page}>
@@ -97,6 +112,46 @@ export function HomePage() {
           </section>
         )}
       </section>
+    </div>
+  );
+}
+
+/**
+ * Phones: hero image, heading, one-line intro, Login / Sign Up, the three features and a short footer — as in the
+ * home mockup. Colors stay the app's own.
+ */
+function MobileHome() {
+  const { t } = useTranslation();
+  const { enabled } = useAuth();
+  const { start, pending } = useStartSignIn();
+  return (
+    <div className={styles.mobileHome}>
+      <div className={styles.mobileHero} aria-hidden="true" />
+      <h1 id="home-title" className={styles.mobileTitle}>
+        {t('home.heroTitle')}
+      </h1>
+      <p className={styles.mobileBody}>{t('home.mobile.body')}</p>
+      {enabled && (
+        <>
+          <button
+            type="button"
+            className={styles.mobileCta}
+            aria-busy={pending === 'login' || undefined}
+            onClick={() => void start('login')}
+          >
+            <Icon name="login" size={20} />
+            {t('home.mobile.cta')}
+            <Icon name="arrowRight" size={20} />
+          </button>
+          <p className={styles.mobileFree}>
+            <Icon name="shieldCheck" size={18} />
+            {t('home.mobile.free')}
+          </p>
+        </>
+      )}
+      <div className={styles.mobileMenu}>
+        <GuestMenu />
+      </div>
     </div>
   );
 }

@@ -32,7 +32,7 @@ describe('Find a Good Time', () => {
     await screen.findByText(NO_GOOD_TIME);
     expect(goodTimeRequests().every((url) => !url.searchParams.has('nakshatra'))).toBe(true);
     await user.selectOptions(selector, 'Ashwini');
-    for (const endpoint of ['good-times', 'good-times/explanation', 'good-times/best']) {
+    for (const endpoint of ['good-times', 'good-times/explanation', 'day-summaries']) {
       await waitFor(() =>
         expect(
           apiRequests.some(
@@ -96,7 +96,7 @@ describe('Find a Good Time', () => {
     storeSelectedLocation();
     renderRoute('/good-time', { auth: signedIn() });
     expect(await screen.findByText(NO_GOOD_TIME)).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: /Recommended time/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^best recommended time/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Try another date' })).toBeInTheDocument();
   });
 
@@ -104,24 +104,24 @@ describe('Find a Good Time', () => {
     await atInstant('2026-10-02T10:00:00-05:00');
     storeSelectedLocation();
     renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
-    const section = await screen.findByRole('region', { name: 'Recommended time' });
-    const [best] = within(section)
-      .getAllByRole('listitem')
-      .filter((item) => item.parentElement?.tagName === 'OL');
+    // The same card as on phones: the best time, its status, and the backend's reasons behind "Why".
+    const best = await screen.findByRole('region', { name: 'Best recommended times' });
     expect(best).toHaveTextContent(/08:53\sAM – 10:22\sAM/);
-    expect(best).toHaveTextContent('Highly Favorable for Business');
-    expect(best).toHaveTextContent('Best');
-    expect(best).toHaveTextContent('Why this time?');
+    expect(best).toHaveTextContent('Highly Favorable');
+    expect(best).toHaveAttribute('data-status-tone', 'highly-favorable');
+    const why = within(best).getByRole('button', { name: 'Why is this time recommended?' });
+    expect(within(best).getByText('Highly Favorable for Business')).not.toBeVisible();
+    await userEvent.click(why);
+    expect(within(best).getByText('Highly Favorable for Business')).toBeVisible();
     expect(best).toHaveTextContent('✓ Favorable Nakshatra');
     expect(best).toHaveTextContent('✓ No Rahu Kalam conflict');
-    expect(best).toHaveAttribute('data-status-tone', 'highly-favorable');
     expect(radio('Business')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('explains favorable periods that are not recommended because of a conflict', async () => {
     storeSelectedLocation();
     renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
-    const section = await screen.findByRole('region', { name: 'Not recommended' });
+    const section = await screen.findByRole('region', { name: 'Not recommended times' });
     const amrit = within(section)
       .getAllByRole('listitem')
       .find((item) => item.textContent?.includes('2:58'))!;
@@ -134,8 +134,14 @@ describe('Find a Good Time', () => {
   it('shows Mixed and Caution overlaps, the in-brief explanation and the disclaimer', async () => {
     storeSelectedLocation();
     renderRoute('/good-time?date=2026-10-20', { auth: signedIn() });
-    expect(await screen.findByRole('region', { name: 'Recommended times' })).toBeInTheDocument();
-    const notRecommended = screen.getByRole('region', { name: 'Not recommended' });
+    // Several recommended times: all listed in the card, the best one highlighted.
+    const best = await screen.findByRole('region', { name: 'Best recommended times' });
+    expect(best).toHaveTextContent('Recommended times');
+    const current = within(best)
+      .getAllByRole('button')
+      .filter((button) => button.getAttribute('aria-current') === 'true');
+    expect(current).toHaveLength(1);
+    const notRecommended = screen.getByRole('region', { name: 'Not recommended times' });
     const tones = within(notRecommended)
       .getAllByRole('listitem')
       .map((item) => item.getAttribute('data-status-tone'))
@@ -160,7 +166,7 @@ describe('Find a Good Time', () => {
   it('supports the keyboard: arrows move and select, and rapid changes send one request', async () => {
     storeSelectedLocation();
     renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
-    await screen.findByRole('region', { name: 'Recommended time' });
+    await screen.findByRole('region', { name: 'Best recommended times' });
     const before = goodTimeRequests().length;
 
     radio('Business').focus();
@@ -213,7 +219,7 @@ describe('Find a Good Time', () => {
     expect(
       await screen.findByText(fixtures.muhurta.goodTimes.hyderabadExcluded.noGoodTimeMessage!),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: /Recommended time/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /^best recommended time/i })).not.toBeInTheDocument();
   });
 
   it('marks partial activities as guidance only', async () => {
@@ -233,48 +239,57 @@ describe('Find a Good Time', () => {
     expect(await screen.findByText(/Guidance only/)).toBeInTheDocument();
   });
 
-  describe('Next best times', () => {
-    const tile = () => screen.getByRole('complementary', { name: 'Next best times' });
+  describe('Next best days', () => {
+    const tile = () => screen.getByRole('complementary', { name: 'Next best days' });
 
-    it("lists the backend's best options in its order, and opens a day from one", async () => {
+    it('lists the best day of each day in the searched range, best first, and opens a day from one', async () => {
       storeSelectedLocation();
       const { router } = renderRoute('/good-time?activity=business', { auth: signedIn() });
 
       await waitFor(() => expect(within(tile()).getAllByRole('listitem').length).toBeGreaterThan(0));
-      const options = within(tile())
-        .getAllByRole('listitem')
-        .filter((item) => item.parentElement?.tagName === 'OL');
-      expect(options).toHaveLength(3);
-      expect(options[0]).toHaveTextContent(/October 2/);
-      expect(options[0]).toHaveTextContent(/02:30\sPM – 04:17\sPM/);
-      expect(options[0]).toHaveTextContent('Highly Favorable');
-      expect(options[0]).toHaveAttribute('data-status-tone', 'highly-favorable');
-      expect(options[1]).toHaveTextContent(/October 4/);
-      expect(options[2]).toHaveTextContent(/October 12/);
-      const best = apiRequests.find((url) => url.pathname.endsWith('/muhurta/good-times/best'))!;
-      expect(best.searchParams.get('activity')).toBe('business');
-      expect(best.searchParams.get('count')).toBe('3');
+      // The range starts on the chosen date (today) and covers 30 days by default.
+      const request = apiRequests.find((url) => url.pathname.endsWith('/muhurta/day-summaries'))!;
+      expect(request.searchParams.get('start')).toBe('2026-09-29');
+      expect(request.searchParams.get('days')).toBe('30');
+      expect(request.searchParams.get('activity')).toBe('business');
+      const options = () =>
+        within(tile())
+          .getAllByRole('listitem')
+          .filter((item) => item.parentElement?.tagName === 'OL');
+      expect(options()).toHaveLength(3);
+      // Highly Favorable days first.
+      expect(options()[0]).toHaveAttribute('data-status-tone', 'highly-favorable');
+      expect(options()[0]).toHaveTextContent('Highly Favorable');
 
-      await userEvent.click(within(tile()).getByRole('button', { name: /View .*October 4/ }));
-      await waitFor(() => expect(router.state.location.search).toContain('date=2026-10-04'));
-      await waitFor(() =>
-        expect(goodTimeRequests().some((url) => url.searchParams.get('date') === '2026-10-04')).toBe(true),
-      );
+      // View all lists every day in the range with a Good Time.
+      await userEvent.click(within(tile()).getByRole('button', { name: /^View all recommended times/ }));
+      expect(options().length).toBeGreaterThan(3);
+      await userEvent.click(within(tile()).getByRole('button', { name: 'Show fewer' }));
+      expect(options()).toHaveLength(3);
+
+      // Opening the first option shows that day (highlighted); the range keeps its start.
+      const first = options()[0]!;
+      await userEvent.click(within(first).getByRole('button', { name: /^View / }));
+      await waitFor(() => expect(router.state.location.search).toContain('from=2026-09-29'));
+      await waitFor(() => expect(options()[0]).toHaveAttribute('aria-current', 'date'));
     });
 
-    it("shows the backend's message when no Good Time qualifies, and promotes nothing", async () => {
+    it('says so when no day in the range has a Good Time, and promotes nothing', async () => {
       server.use(
-        scenarios.json('/muhurta/good-times/best', {
-          ...fixtures.muhurta.best.austinBusiness,
-          options: [],
-          noGoodTimeMessage: 'No Good Time was found for this activity in the next 30 days.',
+        scenarios.json('/muhurta/day-summaries', {
+          ...fixtures.muhurta.daySummariesBusiness,
+          days: fixtures.muhurta.daySummariesBusiness.days.map((day) => ({
+            ...day,
+            goodTimeCount: 0,
+            bestGoodTime: null,
+          })),
         }),
       );
       storeSelectedLocation();
       renderRoute('/good-time?activity=wedding', { auth: signedIn() });
       expect(
-        await within(await screen.findByRole('complementary', { name: 'Next best times' })).findByText(
-          'No Good Time was found for this activity in the next 30 days.',
+        await within(await screen.findByRole('complementary', { name: 'Next best days' })).findByText(
+          'No good time was found in the next 30 days.',
         ),
       ).toBeInTheDocument();
       expect(within(tile()).queryByRole('button', { name: /View/ })).not.toBeInTheDocument();
@@ -296,10 +311,15 @@ describe('Find a Good Time', () => {
         '/good-time?activity=business&view=month&month=2026-10&date=2026-10-31',
         { auth: signedIn() },
       );
-      await screen.findByRole('region', { name: 'Recommended time' });
-      expect(screen.getByRole('region', { name: 'Not recommended' })).toBeInTheDocument();
+      await screen.findByRole('region', { name: 'Best recommended times' });
+      expect(screen.getByRole('region', { name: 'Not recommended times' })).toBeInTheDocument();
       await screen.findByRole('region', { name: 'In brief' });
-      expect(screen.getByRole('region', { name: 'The day at a glance' })).toBeInTheDocument();
+      // The evaluated day's Panchang cards (as on the Panchang calendar) instead of a status bar. They follow the
+      // evaluation's date, which the mock fixes at October 1.
+      expect(await screen.findByRole('region', { name: 'October 1 Panchang' })).toBeInTheDocument();
+      expect(screen.getByRole('region', { name: 'Times to avoid on October 1' })).toBeInTheDocument();
+      expect(screen.getByRole('region', { name: /^Why October 1 is / })).toBeInTheDocument();
+      expect(screen.queryByRole('region', { name: 'The day at a glance' })).not.toBeInTheDocument();
       expect(
         within(screen.getByRole('group', { name: 'Date' })).getByText('Saturday, October 31'),
       ).toBeInTheDocument();
@@ -400,7 +420,7 @@ describe('Find a Good Time', () => {
       await atInstant('2026-10-11T12:00:00-05:00');
       storeSelectedLocation();
       const { router } = renderRoute('/good-time?activity=business&date=2026-10-01', { auth: signedIn() });
-      await screen.findByRole('region', { name: 'Recommended time' });
+      await screen.findByRole('region', { name: 'Best recommended times' });
 
       await userEvent.click(screen.getByRole('radio', { name: 'Month' }));
       expect(await screen.findByRole('heading', { name: 'October 2026' })).toBeInTheDocument();

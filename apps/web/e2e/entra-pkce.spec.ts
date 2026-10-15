@@ -228,9 +228,11 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     const entra = await simulateEntra(page, baseURL!, { accessTokenLifetime: 30 });
     await withSavedLocation(page);
     const authorization: string[] = [];
+    // Every application API call (Find a Good Time's month data can serve Home's Panchang from the cache, so Home
+    // need not request /panchang/today again).
     page.on('request', (request) => {
-      if (request.url().includes('/panchang/today'))
-        authorization.push(request.headers()['authorization'] ?? '');
+      if (request.url().includes('/api/v1/') && request.headers()['authorization'])
+        authorization.push(request.headers()['authorization']!);
     });
 
     await page.goto('/good-time'); // protected: straight to Entra, back to /good-time
@@ -240,7 +242,11 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(entra.authorize[0]!.get('code_challenge_method')).toBe('S256');
 
     await page.getByRole('banner').getByRole('link', { name: 'Home', exact: true }).click(); // in-app: memory kept
-    await expect(page.getByRole('region', { name: "Today's summary" }).getByText('Mixed', { exact: true })).toBeVisible();
+    // The day's rating can come from the month the previous page loaded (shared cache; the synthetic test month
+    // rates days differently from the single-day fixture), so check the day itself rather than its rating.
+    await expect(
+      page.getByRole('region', { name: "Today's summary" }).getByText('Tuesday, September 29'),
+    ).toBeVisible();
 
     const refresh = entra.token.find((body) => body.get('grant_type') === 'refresh_token');
     expect(refresh?.get('refresh_token')).toBe('refresh-1');

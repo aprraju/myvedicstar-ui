@@ -1,6 +1,6 @@
 import { addDays, type LocalDate } from '@myvedicstar/date-time';
 import { buildBestGoodTimes, toneForStatus } from '@myvedicstar/domain-models';
-import { useId, useMemo } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { Button } from '../../shared/components/Button';
 import { Icon } from '../../shared/components/Icon';
@@ -16,7 +16,7 @@ import { BEST_COUNT, useBestGoodTimes, useBestGoodTimeWindows } from './useGoodT
 const REASONS_SHOWN = 2;
 
 /**
- * "Next best times": the backend's best upcoming Good Times for the selected activity, one per day, best first
+ * "Next best days": the backend's best upcoming Good Times for the selected activity, one per day, best first
  * (`/muhurta/good-times/best`). Only Good Times are listed; when none qualifies, the backend's message is shown.
  */
 export function BestGoodTimes({
@@ -25,21 +25,33 @@ export function BestGoodTimes({
   otherText,
   nakshatra,
   onSelectDay,
+  days = 30,
+  onDaysChange,
+  selectedDate,
 }: Readonly<{
   activity: string;
+  /** First day of the searched range (today when omitted). Choosing a day here never moves it. */
   date?: LocalDate | undefined;
   otherText: string | undefined;
   nakshatra?: string | undefined;
   onSelectDay: (date: LocalDate) => void;
+  /** Days searched: 30, 60 or 90. */
+  days?: number;
+  onDaysChange?: (days: number) => void;
+  /** The day shown on the page; its option is highlighted. */
+  selectedDate?: LocalDate | undefined;
 }>) {
   const { t } = useTranslation();
   const now = useNow();
   const format = useFormatters();
   const titleId = useId();
+  const [showAll, setShowAll] = useState(false);
   const awaitingDescription = activity === 'other' && !otherText?.trim();
-  const standard = useBestGoodTimes(awaitingDescription || date ? null : { activity, otherText, nakshatra });
+  const standard = useBestGoodTimes(
+    awaitingDescription || date ? null : { activity, otherText, nakshatra, days },
+  );
   const selected = useBestGoodTimeWindows(
-    !awaitingDescription && date ? { date, activity, otherText, nakshatra } : null,
+    !awaitingDescription && date ? { date, days, activity, otherText, nakshatra } : null,
   );
   const query = date ? selected.query : standard;
   const response = date ? (selected.start === date ? selected.query.data : undefined) : standard.data;
@@ -49,7 +61,12 @@ export function BestGoodTimes({
     return (selected.query.data?.days ?? [])
       .flatMap((day) => {
         const segment = day.bestGoodTime;
-        return day.date >= date && day.date <= addDays(date, 29) && day.goodTimeCount > 0 && segment
+        // Every day in the searched range with a Good Time that has not ended yet.
+        return day.date >= date &&
+          day.date <= addDays(date, days - 1) &&
+          day.goodTimeCount > 0 &&
+          segment &&
+          Date.parse(segment.end) > now
           ? [{ date: day.date, segment }]
           : [];
       })
@@ -58,7 +75,6 @@ export function BestGoodTimes({
           Number(b.segment.status.status === 'HighlyFavorable') -
             Number(a.segment.status.status === 'HighlyFavorable') || a.date.localeCompare(b.date),
       )
-      .slice(0, BEST_COUNT)
       .map((day, index) => ({
         rank: index + 1,
         date: day.date,
@@ -66,7 +82,7 @@ export function BestGoodTimes({
         tone: toneForStatus(day.segment.status.status),
         supports: [],
       }));
-  }, [date, now, standard.data, selected.query.data, selected.start]);
+  }, [date, days, now, standard.data, selected.query.data, selected.start]);
 
   let body;
   if (awaitingDescription) {
@@ -91,7 +107,8 @@ export function BestGoodTimes({
     body = (
       <p className={styles.empty} role="status">
         <Icon name="info" size={18} />
-        {('noGoodTimeMessage' in response && response.noGoodTimeMessage) || t('goodTime.noGoodTime')}
+        {('noGoodTimeMessage' in response && response.noGoodTimeMessage) ||
+          t('goodTime.mobile.noBest', { count: days })}
       </p>
     );
   } else {
@@ -106,7 +123,7 @@ export function BestGoodTimes({
             ),
             through: format.date(
               date
-                ? addDays(date, 29)
+                ? addDays(date, days - 1)
                 : 'searchedThrough' in response
                   ? response.searchedThrough
                   : response.localToday,
@@ -114,11 +131,12 @@ export function BestGoodTimes({
           })}
         </p>
         <ol className={styles.list}>
-          {items.map((item) => (
+          {(showAll ? items : items.slice(0, BEST_COUNT)).map((item) => (
             <li
               key={`${item.date}-${item.segment.start}`}
               className={styles.option}
               data-status-tone={item.tone}
+              aria-current={item.date === selectedDate ? 'date' : undefined}
             >
               <span className={styles.rank} aria-label={t('goodTime.bestRank', { rank: item.rank })}>
                 {item.rank}
@@ -152,6 +170,11 @@ export function BestGoodTimes({
             </li>
           ))}
         </ol>
+        {items.length > BEST_COUNT && (
+          <Button variant="secondary" aria-expanded={showAll} onClick={() => setShowAll(!showAll)}>
+            {showAll ? t('goodTime.mobile.showFewer') : `${t('goodTime.mobile.viewAll')} (${items.length})`}
+          </Button>
+        )}
         {standard.isFetching && standard.isPlaceholderData && !date && (
           <p className={styles.hint}>{t('goodTime.updating')}</p>
         )}
@@ -161,10 +184,26 @@ export function BestGoodTimes({
 
   return (
     <aside className={styles.tile} aria-labelledby={titleId}>
-      <h2 id={titleId} className={styles.title}>
-        <Icon name="sparkle" size={20} />
-        {t('goodTime.bestTitle')}
-      </h2>
+      <div className={styles.head}>
+        <h2 id={titleId} className={styles.title}>
+          <Icon name="sparkle" size={20} />
+          {t('goodTime.bestTitle')}
+        </h2>
+        {onDaysChange && (
+          <select
+            className={styles.range}
+            aria-label={t('goodTime.mobile.range')}
+            value={days}
+            onChange={(event) => onDaysChange(Number(event.target.value))}
+          >
+            {[30, 60, 90].map((option) => (
+              <option key={option} value={option}>
+                {t('goodTime.mobile.nextBestRange', { count: option })}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
       <div aria-live="polite">{body}</div>
     </aside>
   );

@@ -1,19 +1,31 @@
 import type { Festival } from '@myvedicstar/contracts';
-import { useMemo } from 'react';
+import { buildDaySummary } from '@myvedicstar/domain-models';
+import { useMemo, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { Button } from '../../shared/components/Button';
 import { Icon } from '../../shared/components/Icon';
 import { EmptyState, ErrorState, Skeleton } from '../../shared/components/states';
+import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
-import { useFormatters } from '../../shared/i18n/useFormatters';
+import { DayBanner } from '../dashboard/DayBanner';
 import { useLocationState } from '../location';
+import { usePanchangToday } from '../today/usePanchangToday';
 import styles from './FestivalsPage.module.css';
+import { FestivalEventCard, MobileFestivals } from './MobileFestivals';
 import { useUpcomingFestivals } from './useUpcomingFestivals';
 
 const RANGES = [30, 60, 90] as const;
 const FILTERS = ['all', 'festival', 'observance'] as const;
 type Filter = (typeof FILTERS)[number];
+
+/** Phones and small tablets get the mobile layout (same breakpoint as the mobile header and navigation). */
+const MOBILE_MAX_WIDTH = 1024;
+
+function subscribeWidth(listener: () => void) {
+  window.addEventListener('resize', listener);
+  return () => window.removeEventListener('resize', listener);
+}
 
 /**
  * Upcoming festivals and observances for the selected location and tradition, grouped by month. Each entry shows its
@@ -28,11 +40,17 @@ export function FestivalsPage() {
   const show: Filter = FILTERS.find((filter) => filter === searchParams.get('show')) ?? 'all';
   const { query } = useUpcomingFestivals(days);
 
+  const mobile = useSyncExternalStore(
+    subscribeWidth,
+    () => window.innerWidth < MOBILE_MAX_WIDTH,
+    () => false,
+  );
   const update = (next: { days?: number; show?: Filter }) => {
     const params = new URLSearchParams(searchParams);
     if (next.days !== undefined) params.set('days', String(next.days));
     if (next.show !== undefined) params.set('show', next.show);
-    setSearchParams(params, { replace: true });
+    // Phones keep their scroll position when the filter or range changes.
+    setSearchParams(params, { replace: true, preventScrollReset: mobile });
   };
 
   const festivals = useMemo(
@@ -41,8 +59,61 @@ export function FestivalsPage() {
   );
   const months = useMemo(() => groupByMonth(festivals, locale), [festivals, locale]);
 
+  // Wide windows: the Panchang page's day banner for today (imported by file, not through the dashboard / today
+  // indexes, which import this feature).
+  const { query: todayQuery } = usePanchangToday();
+  const now = useNow();
+  const todaySummary = useMemo(
+    () => (todayQuery.data ? buildDaySummary(todayQuery.data, now) : undefined),
+    [todayQuery.data, now],
+  );
+
+  if (mobile && location) {
+    return (
+      <MobileFestivals
+        locationLabel={location.label}
+        traditionName={query.data?.tradition.name}
+        timeZone={location.timeZone}
+        filters={FILTERS}
+        show={show}
+        onShow={(filter) => update({ show: filter })}
+        ranges={RANGES}
+        days={days}
+        onDays={(next) => update({ days: next })}
+        festivals={query.data ? festivals : undefined}
+        months={months}
+        state={
+          query.isPending ? (
+            <div className={styles.list} role="status" aria-live="polite">
+              <span className="visually-hidden">{t('states.loading')}</span>
+              {Array.from({ length: 4 }, (_, i) => (
+                <Skeleton key={i} height="7rem" />
+              ))}
+            </div>
+          ) : query.isError ? (
+            <div className={styles.state}>
+              <p className={styles.stateTitle}>{t('festivals.errorTitle')}</p>
+              <ErrorState
+                error={query.error}
+                onRetry={() => void query.refetch()}
+                retrying={query.isFetching}
+              />
+            </div>
+          ) : festivals.length === 0 ? (
+            <EmptyState title={t('festivals.none')} />
+          ) : undefined
+        }
+      />
+    );
+  }
+
   return (
     <section className={styles.page} aria-labelledby="festivals-title">
+      {!mobile && todaySummary && location && (
+        <div className={styles.pageBanner}>
+          <DayBanner summary={todaySummary} location={location} />
+        </div>
+      )}
       <header className={styles.head}>
         <h1 id="festivals-title" className={styles.title}>
           {t('festivals.title')}
@@ -117,12 +188,14 @@ export function FestivalsPage() {
               <h2 id={`month-${key}`} className={styles.monthTitle}>
                 {title}
               </h2>
-              <ul className={styles.list}>
+              {/* The same event cards as on phones, three per row on wide windows, then two, then one. */}
+              <ul className={styles.eventGrid}>
                 {items.map((festival) => (
-                  <FestivalCard
+                  <FestivalEventCard
                     key={`${festival.key}-${festival.date}`}
                     festival={festival}
                     timeZone={location.timeZone}
+                    defaultOpen
                   />
                 ))}
               </ul>
@@ -131,66 +204,6 @@ export function FestivalsPage() {
         </>
       )}
     </section>
-  );
-}
-
-function FestivalCard({ festival, timeZone }: Readonly<{ festival: Festival; timeZone: string }>) {
-  const { t } = useTranslation();
-  const format = useFormatters();
-  const { timing } = festival;
-  const when =
-    festival.daysFromToday === 0
-      ? t('festivals.today')
-      : festival.daysFromToday === 1
-        ? t('festivals.tomorrow')
-        : t('festivals.inDays', { count: festival.daysFromToday });
-  // Days offset from the anchor day (Holi, Bhogi, Kanuma) have no observance window of their own.
-  const observance =
-    timing.observanceStart === null || timing.observanceEnd === null
-      ? undefined
-      : timing.observanceStart === timing.observanceEnd
-        ? format.dateTime(timing.observanceStart, timeZone)
-        : `${format.dateTime(timing.observanceStart, timeZone)} – ${format.dateTime(timing.observanceEnd, timeZone)}`;
-  const basis =
-    timing.start === timing.end
-      ? t('festivals.sankranti', { time: format.dateTime(timing.start, timeZone) })
-      : t('festivals.basisWindow', {
-          basis: timing.basis,
-          start: format.dateTime(timing.start, timeZone),
-          end: format.dateTime(timing.end, timeZone),
-        });
-
-  return (
-    <li className={styles.card} data-category={festival.category}>
-      <span className={styles.icon} aria-hidden="true">
-        {festival.icon ?? '•'}
-      </span>
-      <div className={styles.body}>
-        <div className={styles.cardHead}>
-          <h3 className={styles.name}>{festival.name}</h3>
-          <span className={styles.badge} data-category={festival.category}>
-            {festival.categoryName}
-          </span>
-        </div>
-        <p className={styles.date}>
-          {format.date(festival.date)}
-          <span className={styles.when} data-soon={festival.daysFromToday <= 1 || undefined}>
-            {when}
-          </span>
-        </p>
-        {festival.description && <p className={styles.description}>{festival.description}</p>}
-        {observance && (
-          <p className={styles.timing}>
-            <Icon name="clock" size={14} />
-            {t('festivals.observedAt', { moment: timing.observanceTimeName, time: observance })}
-          </p>
-        )}
-        <p className={styles.timing}>
-          <Icon name="moon" size={14} />
-          {basis}
-        </p>
-      </div>
-    </li>
   );
 }
 

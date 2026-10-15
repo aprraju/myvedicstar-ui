@@ -8,6 +8,7 @@ import { useAuth, useStartSignIn } from '../../shared/auth';
 import { Icon, type IconName } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { routes } from '../../shared/routing/paths';
+import { MobileAccountMenu } from './MobileAccountMenu';
 import { ProfileMenu } from './ProfileMenu';
 import styles from './SiteHeader.module.css';
 
@@ -27,7 +28,7 @@ const APP_NAV: { to: string; icon: IconName; label: MessageKey; highlight: boole
 const NO_TRADITION_PATHS = new Set<string>([routes.home, routes.authCallback]);
 
 /**
- * Public header: brand · Home, Features, About, Help · location · tradition · Login · swastika mark.
+ * Public header: brand · Home, Features, About, Help · location · tradition · Login (account menu when signed in).
  * The tradition selector is left out on the home and sign-in pages, which share one header.
  * Layout adapts to the window: one row on wide screens, two rows plus a menu on compact ones (see CSS).
  */
@@ -57,7 +58,11 @@ export function SiteHeader({ todayMobile = false }: { todayMobile?: boolean }) {
     `${styles.navLink}${isActive ? ` ${styles.active}` : ''}`;
 
   return (
-    <header className={`${styles.header} ${todayMobile ? styles.todayMobile : ''}`}>
+    <header
+      className={`${styles.header} ${todayMobile ? styles.todayMobile : ''}`}
+      // Phones, signed out (home, Privacy, Terms, Help…): Om · centred name · Login, as in the home mockup.
+      data-guest={showSignIn || undefined}
+    >
       <div className={styles.inner}>
         <Link to={routes.home} className={styles.brand}>
           <span className={styles.brandMark} aria-hidden="true">
@@ -151,9 +156,7 @@ export function SiteHeader({ todayMobile = false }: { todayMobile?: boolean }) {
               </>
             )
           )}
-          <span className={styles.swastika} aria-hidden="true">
-            卐
-          </span>
+          {isAuthenticated && <MobileAccountMenu className={styles.mobileAccount ?? ''} />}
           <button
             type="button"
             className={styles.menuButton}

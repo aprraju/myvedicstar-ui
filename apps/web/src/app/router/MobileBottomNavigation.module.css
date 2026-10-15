@@ -4,7 +4,9 @@
   inset-block-end: 0;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  /* Equal columns for however many items there are (four signed in, three signed out). */
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
   max-inline-size: 840px;
   margin-inline: auto;
   padding: var(--space-xs) max(var(--space-xxs), env(safe-area-inset-right))
@@ -29,4 +31,26 @@
 .active {
   color: var(--color-favorable);
   font-weight: var(--font-weight-semibold);
+}
+
+/* Signed out: the home page's menu in a fixed bar (same colors: brand icons, bold labels, muted links). */
+.guestBar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 20;
+  max-inline-size: 840px;
+  margin-inline: auto;
+  padding: 0 max(var(--space-md), env(safe-area-inset-right)) env(safe-area-inset-bottom)
+    max(var(--space-md), env(safe-area-inset-left));
+  background: var(--color-surface);
+  box-shadow: 0 -2px 12px rgb(0 0 0 / 0.06);
+}
+
+.guestBar > div {
+  gap: 0;
+}
+
+.guestBar ul {
+  padding-block-start: var(--space-xs);
 }

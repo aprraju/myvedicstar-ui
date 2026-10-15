@@ -100,18 +100,22 @@ describe('Calendar', () => {
       .map((element) => element.closest('[data-status-tone]'))
       .find(Boolean);
     expect(status).toHaveAttribute('data-status-tone', 'caution');
-    const panchang = screen.getByRole('region', { name: 'Panchang' });
+    const panchang = screen.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
     expect(panchang).toHaveTextContent('Purnima');
     expect(panchang).toHaveTextContent('Monday');
-    expect(screen.getByRole('region', { name: 'Auspicious times' })).toHaveTextContent('Amrita Kalam');
-    expect(screen.getByRole('region', { name: 'Times to avoid' })).toHaveTextContent('Rahu Kalam');
+    expect(screen.getByRole('region', { name: /^Auspicious times on \w+ \d{1,2}$/ })).toHaveTextContent(
+      'Amrita Kalam',
+    );
+    expect(screen.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).toHaveTextContent(
+      'Rahu Kalam',
+    );
     // The selected day's timeline sits under the calendar, without a "Now" marker for another date.
-    const timeline = screen.getByRole('region', { name: 'Timeline for Monday, October 5' });
+    const timeline = screen.getByRole('region', { name: 'October 5 timeline' });
     expect(timeline).toHaveTextContent(/Sunrise\s*07:23\sAM/);
     expect(within(timeline).queryByText('Now')).not.toBeInTheDocument();
     // Another date: no Now / Over badges.
     expect(
-      within(screen.getByRole('region', { name: 'Times to avoid' })).queryByText('Over'),
+      within(screen.getByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ })).queryByText('Over'),
     ).not.toBeInTheDocument();
   });
 
@@ -174,7 +178,7 @@ describe('Calendar', () => {
     await atInstant('2026-10-15T12:00:00-05:00');
     storeSelectedLocation();
     const { container } = renderRoute('/calendar?month=2026-10', { auth: signedIn() });
-    await screen.findByRole('region', { name: 'Times to avoid' });
+    await screen.findByRole('region', { name: /^Times to avoid on \w+ \d{1,2}$/ });
     expect(await axeViolations(container)).toEqual([]);
   });
 });

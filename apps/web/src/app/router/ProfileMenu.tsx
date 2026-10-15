@@ -12,11 +12,10 @@ import styles from './ProfileMenu.module.css';
  * `userinfo`), Settings and Log out. A disclosure (button + panel), not an ARIA menu: Tab moves through the options;
  * Escape, an outside click or choosing an option closes it and returns focus to the button.
  */
-export function ProfileMenu({ placement = 'header' }: { placement?: 'header' | 'bottom-navigation' }) {
-  const bottomNavigation = placement === 'bottom-navigation';
+export function ProfileMenu() {
   const { t } = useTranslation();
-  const { user, signOut } = useAuth();
-  const { userInfo } = useUserInfo();
+  const { signOut } = useAuth();
+  const { name, email } = useAccountIdentity();
   const [open, setOpen] = useState(false);
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -40,29 +39,18 @@ export function ProfileMenu({ placement = 'header' }: { placement?: 'header' | '
     };
   }, [open]);
 
-  const candidate = displayNameOf(userInfo, userInfo ? undefined : user?.displayName);
-  const email = userInfo?.email?.trim() || user?.email?.trim() || undefined;
-  const name =
-    candidate &&
-    !['unknown', t('profile.unknownName').toLowerCase(), email?.toLowerCase()].includes(
-      candidate.toLowerCase(),
-    )
-      ? candidate
-      : undefined;
-
   return (
-    <div ref={rootRef} className={`${styles.root} ${bottomNavigation ? styles.bottomNavigation : ''}`}>
+    <div ref={rootRef} className={styles.root}>
       <button
         ref={buttonRef}
         type="button"
         className={styles.trigger}
-        aria-label={t(bottomNavigation ? 'nav.profile' : 'profile.open')}
+        aria-label={t('profile.open')}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen(!open)}
       >
         <Icon name="user" size={22} />
-        {bottomNavigation && <span>{t('nav.profile')}</span>}
       </button>
       <div id={panelId} className={styles.panel} hidden={!open}>
         <div className={styles.identity}>
@@ -100,4 +88,24 @@ export function ProfileMenu({ placement = 'header' }: { placement?: 'header' | '
       </div>
     </div>
   );
+}
+
+/**
+ * The signed-in user's name and email for account menus: from `userinfo`, falling back to the sign-in token. A
+ * placeholder name ("Unknown", "Your account" or the email itself) is left out.
+ */
+export function useAccountIdentity() {
+  const { t } = useTranslation();
+  const { user } = useAuth();
+  const { userInfo } = useUserInfo();
+  const candidate = displayNameOf(userInfo, userInfo ? undefined : user?.displayName);
+  const email = userInfo?.email?.trim() || user?.email?.trim() || undefined;
+  const name =
+    candidate &&
+    !['unknown', t('profile.unknownName').toLowerCase(), email?.toLowerCase()].includes(
+      candidate.toLowerCase(),
+    )
+      ? candidate
+      : undefined;
+  return { name, email };
 }

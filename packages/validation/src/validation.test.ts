@@ -114,6 +114,8 @@ describe('contactFormSchema', () => {
     name: ' Asha ',
     email: 'asha@example.com',
     reason: 'technical',
+    subject: 'Calendar question',
+    phoneNumber: '',
     message: 'The calendar looks wrong.',
   };
 

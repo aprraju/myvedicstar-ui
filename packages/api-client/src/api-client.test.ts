@@ -171,7 +171,7 @@ describe('createApiClient', () => {
     expect(signedOut).not.toHaveBeenCalled();
   });
 
-  it('never sends any application request without a token', async () => {
+  it('never sends protected application requests without a token', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.panchang.austinTelugu));
     const { client } = setup(fetchImpl, { getAccessToken: async () => null });
     const params = { location: { place: 'Austin, TX' } };
@@ -202,13 +202,6 @@ describe('createApiClient', () => {
       () => client.muhurta.daySummaries('2026-10-11', 3, params),
       () => client.muhurta.bestGoodTimes(params),
       () => client.auth.userInfo(),
-      () =>
-        client.contact.submit({
-          name: 'Asha',
-          email: 'asha@example.com',
-          reason: 'other',
-          message: 'Please contact me.',
-        }),
     ];
     for (const call of calls) await expect(call()).rejects.toMatchObject({ kind: 'authentication' });
     expect(fetchImpl).not.toHaveBeenCalled();
@@ -366,6 +359,20 @@ describe('createApiClient', () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
+  it('sends anonymous contact submissions without an Authorization header', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
+    const { client } = setup(fetchImpl, { getAccessToken: async () => null });
+    await client.contact.submit({
+      name: 'Visitor',
+      email: 'visitor@example.com',
+      reason: 'general',
+      subject: 'Question',
+      message: 'Please contact me.',
+    });
+    expect(fetchImpl).toHaveBeenCalledOnce();
+    expect(fetchImpl.mock.calls[0]![1]?.headers).not.toHaveProperty('Authorization');
+  });
+
   it('submits the Contact Us form as JSON and accepts an empty 202', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 202 }));
     const { client } = setup(fetchImpl);
@@ -377,9 +384,16 @@ describe('createApiClient', () => {
     };
     await expect(client.contact.submit(body)).resolves.toBeUndefined();
     const [url, init] = fetchImpl.mock.calls[0]!;
-    expect(new URL(String(url)).pathname).toBe('/api/v1/contact');
+    expect(new URL(String(url)).pathname).toBe('/api/v1/email/send');
     expect(init?.method).toBe('POST');
-    expect(JSON.parse(String(init?.body))).toEqual(body);
+    expect(JSON.parse(String(init?.body))).toEqual({
+      email: body.email,
+      reason: body.reason,
+      phoneNumber: null,
+      subject: body.reason,
+      message: body.message,
+      type: 'ReportIssue',
+    });
   });
 
   it('normalizes validation Problem Details without exposing server text in the message', async () => {

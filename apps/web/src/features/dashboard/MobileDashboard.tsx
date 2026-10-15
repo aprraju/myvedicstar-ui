@@ -53,7 +53,7 @@ export function MobileDashboard() {
               <div className={styles.expandedTimeline}>
                 <PeriodList
                   id="timeline-auspicious"
-                  title={t('dashboard.auspiciousTitle')}
+                  title={t('dashboard.auspiciousTitle', { day: format.day(dashboard.summary.date) })}
                   subtitle={t('dashboard.timelineCompactSubtitle')}
                   tone="favorable"
                   items={dashboard.auspicious}
@@ -63,7 +63,7 @@ export function MobileDashboard() {
                 />
                 <PeriodList
                   id="timeline-avoid"
-                  title={t('dashboard.avoidTitle')}
+                  title={t('dashboard.avoidTitle', { day: format.day(dashboard.summary.date) })}
                   subtitle={t('dashboard.timelineCompactSubtitle')}
                   tone="caution"
                   items={dashboard.avoid}
@@ -76,7 +76,7 @@ export function MobileDashboard() {
             <PeriodList
               id="auspicious"
               tone="favorable"
-              title={t('dashboard.auspiciousTitle')}
+              title={t('dashboard.auspiciousTitle', { day: format.day(dashboard.summary.date) })}
               subtitle={t('dashboard.auspiciousSubtitle')}
               items={dashboard.auspicious}
               glossary={glossary}
@@ -144,12 +144,15 @@ export function MobileDayDetails({
   timeZone: string;
 }) {
   const { t } = useTranslation();
+  const format = useFormatters();
   const [fullPanchang, setFullPanchang] = useState(false);
   return (
     <>
       <section className={styles.panel} aria-labelledby="mobile-panchang-title">
         <div className={styles.panelHead}>
-          <h2 id="mobile-panchang-title">{t('dashboard.panchangTitle')}</h2>
+          <h2 id="mobile-panchang-title">
+            {t('dashboard.panchangTitle', { day: format.day(dashboard.summary.date) })}
+          </h2>
           <button type="button" aria-expanded={fullPanchang} onClick={() => setFullPanchang(!fullPanchang)}>
             {t(fullPanchang ? 'dashboard.showLess' : 'dashboard.seeAll')} <span aria-hidden="true">›</span>
           </button>
@@ -162,12 +165,13 @@ export function MobileDayDetails({
       </section>
       <details className={styles.disclosure}>
         <summary>
-          {t('dashboard.avoidTitle')} <Icon name="chevronDown" size={18} />
+          {t('dashboard.avoidTitle', { day: format.day(dashboard.summary.date) })}{' '}
+          <Icon name="chevronDown" size={18} />
         </summary>
         <PeriodList
           id="avoid"
           tone="caution"
-          title={t('dashboard.avoidTitle')}
+          title={t('dashboard.avoidTitle', { day: format.day(dashboard.summary.date) })}
           subtitle={t('dashboard.avoidSubtitle')}
           items={dashboard.avoid}
           glossary={glossary}
@@ -177,10 +181,17 @@ export function MobileDayDetails({
       </details>
       <details className={styles.disclosure}>
         <summary>
-          {t('dashboard.factorsTitle', { rating: dashboard.ratingName })}
+          {t('dashboard.factorsTitle', {
+            day: format.day(dashboard.summary.date),
+            rating: dashboard.ratingName,
+          })}
           <Icon name="chevronDown" size={18} />
         </summary>
-        <RatingFactors ratingName={dashboard.ratingName} factors={dashboard.factors} />
+        <RatingFactors
+          ratingName={dashboard.ratingName}
+          factors={dashboard.factors}
+          date={dashboard.summary.date}
+        />
       </details>
     </>
   );

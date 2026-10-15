@@ -24,7 +24,7 @@ const protectedPage = (load: () => Promise<ComponentType>) => async () => {
 
 /**
  * Route table. Each page is a lazily loaded chunk, so the first load only downloads the shell and the current page.
- * Public: home, about, help, auth callback. Everything else requires sign-in. There are no login/register pages:
+ * Public: home, about, help, contact, auth callback. Everything else requires sign-in. There are no login/register pages:
  * sign-in and sign-up happen on the identity provider's hosted pages.
  */
 export const appRoutes: RouteObject[] = [
@@ -77,7 +77,7 @@ export const appRoutes: RouteObject[] = [
       {
         path: routes.contact,
         handle: handle('Contact', 'pages.contact.title'),
-        lazy: protectedPage(async () => (await import('../../features/contact')).ContactPage),
+        lazy: async () => ({ Component: (await import('../../features/contact')).ContactPage }),
       },
       {
         path: routes.help,

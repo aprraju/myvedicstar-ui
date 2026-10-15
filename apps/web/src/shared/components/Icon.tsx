@@ -52,6 +52,12 @@ const paths = {
   ],
   logout: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9',
   chevronDown: 'm6 9 6 6 6-6',
+  chevronRight: 'm9 6 6 6-6 6',
+  arrowRight: 'M5 12h14M13 6l6 6-6 6',
+  login: 'M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3',
+  shieldCheck: ['M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6l-7-3Z', 'm9 12 2 2 4-4'],
+  mail: ['M3 6h18v12H3z', 'm3 7 9 6 9-6'],
+  edit: 'M4 20h4L19 9l-4-4L4 16v4Zm9-13 4 4',
   trash: 'M4 7h16M10 11v6m4-6v6M6 7l1 13h10l1-13M9 7V4h6v3',
 } as const satisfies Record<string, string | readonly string[]>;
 

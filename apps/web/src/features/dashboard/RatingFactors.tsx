@@ -1,8 +1,10 @@
 import type { GuidanceFactor } from '@myvedicstar/contracts';
+import type { LocalDate } from '@myvedicstar/date-time';
 import { dashboardFactorReason, toneForRating } from '@myvedicstar/domain-models';
 
 import { Icon } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { useFormatters } from '../../shared/i18n/useFormatters';
 import styles from './DashboardPage.module.css';
 
 const ICON_BY_TONE = {
@@ -13,12 +15,14 @@ const ICON_BY_TONE = {
   avoid: 'alert',
 } as const;
 
-/** "Why today is …": the backend's rating of each Panchanga limb and its reason (text and icon, never color alone). */
+/** "Why {day} is …": the backend's rating of each Panchanga limb and its reason (text and icon, never color alone). */
 export function RatingFactors({
   ratingName,
   factors,
-}: Readonly<{ ratingName: string; factors: readonly GuidanceFactor[] }>) {
+  date,
+}: Readonly<{ ratingName: string; factors: readonly GuidanceFactor[]; date: LocalDate }>) {
   const { t } = useTranslation();
+  const format = useFormatters();
   return (
     <section className={styles.panel} aria-labelledby="factors-title">
       <div className={styles.sectionTitle} data-tone="info">
@@ -27,7 +31,7 @@ export function RatingFactors({
         </span>
         <div>
           <h2 id="factors-title" className={styles.sectionHeading}>
-            {t('dashboard.factorsTitle', { rating: ratingName })}
+            {t('dashboard.factorsTitle', { day: format.day(date), rating: ratingName })}
           </h2>
           <p className={styles.sectionSubtitle}>{t('dashboard.factorsSubtitle')}</p>
         </div>

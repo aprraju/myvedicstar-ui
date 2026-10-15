@@ -16,6 +16,11 @@ export function useFormatters() {
       range: (start: string, end: string, timeZone: string, referenceDate: LocalDate) =>
         formatRangeForDay(start, end, { timeZone, locale }, referenceDate, t('summary.nextDay')),
       date: (date: LocalDate) => formatLocalDate(date, locale),
+      /** `October 14` — the day in card headings ("Times to avoid on October 14"). */
+      day: (date: LocalDate) =>
+        new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric', timeZone: 'UTC' }).format(
+          Date.parse(`${date}T00:00:00Z`),
+        ),
       /** `Oct 5, 3:37 PM` in the given zone — for windows that can span days (festival Tithi, observance). */
       dateTime: (instant: string, timeZone: string) =>
         new Intl.DateTimeFormat(locale, {

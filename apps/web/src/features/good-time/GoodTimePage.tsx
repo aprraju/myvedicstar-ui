@@ -3,11 +3,10 @@ import { addDays, type LocalDate, todayIn } from '@myvedicstar/date-time';
 import {
   buildGoodTimeView,
   defaultActivityKey,
-  type ExplainedSegment,
   formatYearMonth,
   yearMonthOf,
 } from '@myvedicstar/domain-models';
-import { type FormEvent, useId, useMemo, useState } from 'react';
+import { type FormEvent, useId, useMemo, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'react-router';
 
 import { Button } from '../../shared/components/Button';
@@ -16,6 +15,7 @@ import { EmptyState, ErrorState, Skeleton } from '../../shared/components/states
 import { useNow } from '../../shared/hooks/useNow';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useFormatters } from '../../shared/i18n/useFormatters';
+import { DayBanner, PanchangPanel, PeriodList, RatingFactors } from '../dashboard';
 import { useLocationState } from '../location';
 import { ActivityCards } from './ActivityCards';
 import { STATUS_ICON } from './activityIcons';
@@ -23,6 +23,16 @@ import { BestGoodTimes } from './BestGoodTimes';
 import { GoodTimeMonth } from './GoodTimeMonth';
 import styles from './GoodTimePage.module.css';
 import {
+  BestRecommended,
+  type GoodTimeUpdate,
+  MobileGoodTimeResults,
+  MobileGoodTimeSearch,
+  NotRecommendedCard,
+  RANGE_OPTIONS,
+  type RangeDays,
+} from './MobileGoodTime';
+import {
+  useDayPanchang,
   useGoodTimeExplanation,
   useGoodTimes,
   useMuhurtaActivities,
@@ -34,6 +44,14 @@ const OTHER_MAX_LENGTH = 80;
 
 type PlanningView = 'day' | 'month';
 
+/** Phones and small tablets get the two-step mobile flow (same breakpoint as the mobile header and navigation). */
+const MOBILE_MAX_WIDTH = 1024;
+
+function subscribeWidth(listener: () => void) {
+  window.addEventListener('resize', listener);
+  return () => window.removeEventListener('resize', listener);
+}
+
 /**
  * Find a Good Time. The user picks an activity (and a date); the backend rules engine evaluates the day and is the only
  * source of statuses, Good Times, reasons and conflicts. This page never decides or promotes a time itself: it shows
@@ -43,6 +61,9 @@ type PlanningView = 'day' | 'month';
  * Selection lives in the URL (`?activity=&date=&text=&view=month&month=`), so links can preset an activity; General
  * is the default. The day view evaluates one date; the month view shows each day's status for the activity. The "Next
  * best times" tile lists the backend's best upcoming Good Times for the activity in both views.
+ *
+ * Below 1024px the same selection drives a two-step flow (MobileGoodTime.tsx): a search screen, then results
+ * (`?step=results&from=&range=&at=`). Those parameters are ignored on wider windows.
  */
 export function GoodTimePage() {
   const { t } = useTranslation();
@@ -89,31 +110,87 @@ export function GoodTimePage() {
     matchesSelection && query.isSuccess && !query.isPlaceholderData,
   );
 
-  const update = (next: Record<string, string | undefined>) => {
+  const mobile = useSyncExternalStore(
+    subscribeWidth,
+    () => window.innerWidth < MOBILE_MAX_WIDTH,
+    () => false,
+  );
+  const update: GoodTimeUpdate = (next, options) => {
     const updated = new URLSearchParams(searchParams);
     for (const [key, value] of Object.entries(next)) {
       if (value === undefined || value === '') updated.delete(key);
       else updated.set(key, value);
     }
-    setSearchParams(updated, { replace: true });
+    // Phones: changing a selection in place (date, view, activity, star, range) keeps the scroll position.
+    setSearchParams(updated, options?.push ? {} : { replace: true, preventScrollReset: mobile });
   };
 
-  const shownMonth = shownDate ? yearMonthOf(shownDate) : undefined;
+  const requestedRange = Number(searchParams.get('range'));
+  const days: RangeDays = RANGE_OPTIONS.find((option) => option === requestedRange) ?? RANGE_OPTIONS[0];
+  const requestedFrom = searchParams.get('from') ?? '';
+  /** First day of "Next best days": the date the user chose (Day / Month / Today); choosing a best day keeps it. */
+  const rangeStart = /^\d{4}-\d{2}-\d{2}$/.test(requestedFrom) ? requestedFrom : shownDate;
+  // The date controls (Day / Month, ‹ date ›, the month grid) keep showing the user's own choice; a day picked from
+  // "Next best days" changes only the results.
+  const shownMonth = rangeStart ? yearMonthOf(rangeStart) : undefined;
 
-  /** Selects a date without changing the user's Day/Month choice. */
+  /** Selects a date without changing the user's Day/Month choice; it also becomes the start of "Next best days". */
   const selectDay = (day: LocalDate) =>
     update({
       date: day === today ? undefined : day,
+      from: undefined,
       ...(view === 'month' ? { month: formatYearMonth(yearMonthOf(day)) } : {}),
     });
 
+  // Wide windows: the Panchang page's day banner for the day shown (same month query as the Panchang cards below).
+  const bannerDay = useDayPanchang(shownDate, !mobile && location !== null);
+
+  if (mobile && location && shownDate) {
+    const selection = { activity, otherText, nakshatra };
+    if (searchParams.get('step') === 'results') {
+      return (
+        <MobileGoodTimeResults
+          activityList={activityList}
+          selection={selection}
+          from={rangeStart ?? shownDate}
+          days={days}
+          today={today}
+          at={searchParams.get('at') ?? undefined}
+          response={response}
+          pending={query.isPending && params !== null}
+          error={query.isError ? query.error : undefined}
+          onRetry={() => void query.refetch()}
+          retrying={query.isFetching}
+          explanation={explanation.data}
+          update={update}
+        />
+      );
+    }
+    return (
+      <MobileGoodTimeSearch
+        activities={activities}
+        activityList={activityList}
+        selection={selection}
+        stars={stars}
+        view={view}
+        date={shownDate}
+        today={today}
+        update={update}
+      />
+    );
+  }
+
   return (
     <section className={styles.page} aria-labelledby="good-time-title">
-      <header className={styles.head}>
-        <h1 id="good-time-title" className={styles.title}>
-          {t('goodTime.title')}
-        </h1>
-      </header>
+      {bannerDay.dashboard && location && (
+        <div className={styles.pageBanner}>
+          <DayBanner summary={bannerDay.dashboard.summary} location={location} />
+        </div>
+      )}
+      {/* The page name is for screen readers; the planner sits on the banner, as on the Panchang page. */}
+      <h1 id="good-time-title" className="visually-hidden">
+        {t('goodTime.title')}
+      </h1>
 
       {!location ? (
         <EmptyState
@@ -128,7 +205,7 @@ export function GoodTimePage() {
         />
       ) : (
         <>
-          <div className={styles.planner}>
+          <div className={`${styles.planner} ${bannerDay.dashboard ? styles.onBanner : ''}`}>
             <h2 id={questionId} className={styles.question}>
               {t('goodTime.question')}
             </h2>
@@ -207,7 +284,7 @@ export function GoodTimePage() {
                 }
               />
 
-              {shownDate && <DatePicker date={shownDate} today={today} onChange={selectDay} />}
+              {rangeStart && <DatePicker date={rangeStart} today={today} onChange={selectDay} />}
             </div>
           </div>
 
@@ -218,7 +295,7 @@ export function GoodTimePage() {
                   yearMonth={shownMonth}
                   thisMonth={today ? yearMonthOf(today) : undefined}
                   onMonthChange={(next) => selectDay(`${formatYearMonth(next)}-01`)}
-                  selectedDate={shownDate}
+                  selectedDate={rangeStart}
                   activity={activity}
                   otherText={otherText}
                   nakshatra={nakshatra}
@@ -239,11 +316,21 @@ export function GoodTimePage() {
               />
             </div>
             <BestGoodTimes
-              date={shownDate !== today ? shownDate : undefined}
+              // Always the searched range from the chosen start (today by default), so 30 / 60 / 90 changes the list.
+              date={rangeStart}
               activity={activity}
               otherText={otherText}
               nakshatra={nakshatra}
-              onSelectDay={selectDay}
+              days={days}
+              onDaysChange={(next) => update({ range: next === RANGE_OPTIONS[0] ? undefined : String(next) })}
+              selectedDate={shownDate}
+              // A best day becomes the shown day; the range keeps its start.
+              onSelectDay={(day) =>
+                update({
+                  date: day === today ? undefined : day,
+                  from: rangeStart,
+                })
+              }
             />
           </div>
         </>
@@ -375,6 +462,7 @@ function Results({
   onNextDate: (() => void) | undefined;
 }>) {
   const { t } = useTranslation();
+  const format = useFormatters();
   const now = useNow();
   const view = useMemo(() => (response ? buildGoodTimeView(response, now) : undefined), [response, now]);
 
@@ -405,7 +493,8 @@ function Results({
         <div className={styles.summaryRow}>
           <span className={styles.dayStatus} data-status-tone={view.dayTone}>
             <Icon name={STATUS_ICON[view.dayTone]} size={18} />
-            {t('goodTime.dayStatus')}: <strong>{response.dayStatus.name}</strong>
+            {t('goodTime.dayStatus', { day: format.day(response.date) })}:{' '}
+            <strong>{response.dayStatus.name}</strong>
           </span>
           <span className={styles.activityTag}>
             {response.activity.name}
@@ -423,6 +512,16 @@ function Results({
           </p>
         ))}
 
+        {(showAllCards || explanation) && (
+          <section aria-labelledby="in-brief-title" className={styles.brief}>
+            <h2 id="in-brief-title" className={styles.sectionTitle}>
+              {t('goodTime.inBrief')}
+            </h2>
+            <p>{explanation?.summary ?? t('goodTime.briefUnavailable')}</p>
+            {explanation?.source === 'ai' && <p className={styles.hint}>{t('goodTime.writtenWithAi')}</p>}
+          </section>
+        )}
+
         {showAllCards && view.goodTimes.length === 0 && (
           <section aria-labelledby="recommended-title" className={styles.section}>
             <h2 id="recommended-title" className={styles.sectionTitle}>
@@ -431,30 +530,12 @@ function Results({
           </section>
         )}
         {view.goodTimes.length > 0 ? (
-          <section aria-labelledby="recommended-title" className={styles.section}>
-            <h2 id="recommended-title" className={styles.sectionTitle}>
-              {t('goodTime.recommended', { count: view.goodTimes.length })}
-            </h2>
-            <ol className={styles.list}>
-              {view.goodTimes.map((item) => (
-                <SegmentCard
-                  key={item.segment.id}
-                  item={item}
-                  timeZone={tz}
-                  date={response.date}
-                  badge={
-                    item.segment.id === view.now?.segment.id
-                      ? t('goodTime.goodTimeNow')
-                      : item.segment.id === view.next?.segment.id
-                        ? t('goodTime.nextGoodTime')
-                        : item.segment.id === response.goodTimes[0]
-                          ? t('goodTime.best')
-                          : undefined
-                  }
-                />
-              ))}
-            </ol>
-          </section>
+          // The same card as on phones: the best time (or the one chosen), the day's times, and why.
+          <DesktopBestRecommended
+            key={`${response.date}-${response.activity.key}`}
+            response={response}
+            view={view}
+          />
         ) : (
           <div className={styles.noGoodTime} data-status-tone={view.dayTone} role="status">
             <Icon name="info" size={22} />
@@ -470,32 +551,11 @@ function Results({
         )}
 
         {(showAllCards || view.notRecommended.length > 0) && (
-          <section aria-labelledby="not-recommended-title" className={styles.section}>
-            <h2 id="not-recommended-title" className={styles.sectionTitle}>
-              {t('goodTime.whyNot')}
-            </h2>
-            <p className={styles.hint}>
-              {t(view.notRecommended.length > 0 ? 'goodTime.whyNotBody' : 'goodTime.noNotRecommended')}
-            </p>
-            <ul className={styles.list}>
-              {view.notRecommended.map((item) => (
-                <SegmentCard key={item.segment.id} item={item} timeZone={tz} date={response.date} />
-              ))}
-            </ul>
-          </section>
+          // The same card style as the best recommended time.
+          <NotRecommendedCard items={view.notRecommended} date={response.date} timeZone={tz} />
         )}
 
-        {(showAllCards || explanation) && (
-          <section aria-labelledby="in-brief-title" className={styles.brief}>
-            <h2 id="in-brief-title" className={styles.sectionTitle}>
-              {t('goodTime.inBrief')}
-            </h2>
-            <p>{explanation?.summary ?? t('goodTime.briefUnavailable')}</p>
-            {explanation?.source === 'ai' && <p className={styles.hint}>{t('goodTime.writtenWithAi')}</p>}
-          </section>
-        )}
-
-        <Timeline segments={view.segments} timeZone={tz} date={response.date} />
+        <DayPanchangCards date={response.date} timeZone={tz} />
 
         <p className={styles.disclaimer}>{response.disclaimer}</p>
       </div>
@@ -509,96 +569,72 @@ function Results({
   );
 }
 
-/** A segment with its status (icon + text) and the backend's reasons: ✓ supportive, ⚠ conflicts and cautions. */
-function SegmentCard({
-  item,
-  timeZone,
-  date,
-  badge,
-}: Readonly<{ item: ExplainedSegment; timeZone: string; date: string; badge?: string | undefined }>) {
+/** The phone layout's best-recommended card on wide windows; choosing one of the day's times features it (not in the URL). */
+function DesktopBestRecommended({
+  response,
+  view,
+}: Readonly<{ response: GoodTimesResponse; view: ReturnType<typeof buildGoodTimeView> }>) {
   const { t } = useTranslation();
-  const format = useFormatters();
-  const { segment } = item;
+  const [chosen, setChosen] = useState<string | undefined>(undefined);
+  const featured =
+    view.goodTimes.find((item) => item.segment.start === chosen) ??
+    view.goodTimes.find((item) => item.segment.id === response.goodTimes[0]) ??
+    view.goodTimes[0];
   return (
-    <li className={styles.segment} data-status-tone={item.tone}>
-      <div className={styles.segmentHead}>
-        <p className={styles.segmentTime}>{format.range(segment.start, segment.end, timeZone, date)}</p>
-        {badge && <span className={styles.badge}>{badge}</span>}
-      </div>
-      <p className={styles.segmentStatus}>
-        <Icon name={STATUS_ICON[item.tone]} size={18} />
-        {segment.headline}
-      </p>
-      <p className={styles.why}>{segment.isGoodTime ? t('goodTime.why') : segment.status.name}</p>
-      <ul className={styles.reasons}>
-        {item.supports.map((reason) => (
-          <li key={`${reason.code}-${reason.subject ?? ''}`} data-kind="positive">
-            <span aria-hidden="true">✓</span> {reason.label}
-          </li>
-        ))}
-        {item.clearOf.map((reason) => (
-          <li key={reason.code} data-kind="positive">
-            <span aria-hidden="true">✓</span> {reason.label}
-          </li>
-        ))}
-        {item.conflicts.map((conflict) => (
-          <li key={`${conflict.code}-${conflict.start}`} data-kind="conflict">
-            <span aria-hidden="true">⚠</span> {conflict.label}:{' '}
-            {format.range(conflict.start, conflict.end, timeZone, date)}
-          </li>
-        ))}
-        {item.cautions.map((reason) => (
-          <li key={`${reason.code}-${reason.subject ?? ''}`} data-kind="negative">
-            <span aria-hidden="true">⚠</span> {reason.label}
-          </li>
-        ))}
-      </ul>
-    </li>
+    <BestRecommended
+      featured={featured}
+      times={view.goodTimes}
+      onSelectTime={setChosen}
+      chosen={chosen !== undefined && featured?.segment.start === chosen}
+      response={response}
+      badge={
+        featured?.segment.id === view.now?.segment.id
+          ? t('goodTime.goodTimeNow')
+          : featured?.segment.id === view.next?.segment.id
+            ? t('goodTime.nextGoodTime')
+            : undefined
+      }
+      noGoodTime={view.noGoodTime?.message || t('goodTime.noGoodTime')}
+      // "In brief" has its own section on wide windows.
+      explanation={undefined}
+      panel
+    />
   );
 }
 
-/** The whole evaluated window as a bar: each segment colored by its backend status, with a text list for everyone. */
-function Timeline({
-  segments,
-  timeZone,
-  date,
-}: Readonly<{ segments: readonly ExplainedSegment[]; timeZone: string; date: string }>) {
+/**
+ * The selected day's Panchang, times to avoid and why it is rated as it is — the same cards as the Panchang calendar,
+ * from the same month query (shared cache).
+ */
+function DayPanchangCards({ date, timeZone }: Readonly<{ date: LocalDate; timeZone: string }>) {
   const { t } = useTranslation();
   const format = useFormatters();
-  const first = segments[0];
-  const last = segments.at(-1);
-  if (!first || !last) return null;
-  const start = Date.parse(first.segment.start);
-  const span = Date.parse(last.segment.end) - start;
-  return (
-    <section aria-labelledby="timeline-title" className={styles.section}>
-      <h2 id="timeline-title" className={styles.sectionTitle}>
-        {t('goodTime.timeline')}
-      </h2>
-      <div className={styles.timeline} aria-hidden="true">
-        {segments.map((item) => (
-          <span
-            key={item.segment.id}
-            className={styles.timelineSegment}
-            data-status-tone={item.tone}
-            data-good={item.segment.isGoodTime || undefined}
-            style={{
-              inlineSize: `${((Date.parse(item.segment.end) - Date.parse(item.segment.start)) / span) * 100}%`,
-            }}
-          />
-        ))}
+  const day = useDayPanchang(date, true);
+  if (day.query.isError) return null; // optional context; the evaluation above stands on its own
+  if (!day.dashboard) {
+    return (
+      <div role="status" className={styles.results}>
+        <span className="visually-hidden">{t('states.loading')}</span>
+        <Skeleton height="10rem" />
       </div>
-      <ol className={styles.timelineList}>
-        {segments.map((item) => (
-          <li key={item.segment.id} data-status-tone={item.tone}>
-            <Icon name={STATUS_ICON[item.tone]} size={14} />
-            {t('goodTime.timelineLabel', {
-              time: format.range(item.segment.start, item.segment.end, timeZone, date),
-              status: item.segment.status.name,
-            })}
-          </li>
-        ))}
-      </ol>
-    </section>
+    );
+  }
+  return (
+    <>
+      {day.glossary !== undefined && (
+        <PanchangPanel dashboard={day.dashboard} glossary={day.glossary} timeZone={timeZone} />
+      )}
+      <PeriodList
+        id="good-time-avoid"
+        tone="caution"
+        title={t('dashboard.avoidTitle', { day: format.day(date) })}
+        subtitle={t('dashboard.avoidSubtitle')}
+        items={day.dashboard.avoid}
+        glossary={day.glossary}
+        timeZone={timeZone}
+        date={date}
+      />
+      <RatingFactors ratingName={day.dashboard.ratingName} factors={day.dashboard.factors} date={date} />
+    </>
   );
 }

@@ -22,6 +22,13 @@ export default function MoreScreen() {
   return (
     <Screen>
       <AppText variant="title">{t('nav.more')}</AppText>
+      <Button label="Contact Us" variant="secondary" onPress={() => router.push('/contact')} />
+      <Button label="Feedback" variant="secondary" onPress={() => router.push('/contact?reason=feedback')} />
+      <Button
+        label="Report an Issue"
+        variant="secondary"
+        onPress={() => router.push('/contact?reason=technical')}
+      />
       {isAuthenticated ? (
         <>
           {userInfo?.name && <AppText variant="heading">{userInfo.name}</AppText>}

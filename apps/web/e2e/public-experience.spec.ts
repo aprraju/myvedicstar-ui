@@ -34,6 +34,8 @@ test.describe('public home', () => {
 
   test('change tradition → Panchang requested for the new tradition', async ({ page, apiRequests }) => {
     // The tradition selector is not shown on the home page; choose it elsewhere, then return home.
+    // Uses the wide-window header links (phones have no Help link in the header).
+    await page.setViewportSize({ width: 1280, height: 800 });
     await withSavedLocation(page);
     await page.goto('/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
@@ -62,12 +64,11 @@ test.describe('public home', () => {
 
 test.describe('sign-in journeys (mock identity provider)', () => {
   test('Home → Login → Dashboard', async ({ page }) => {
+    // Header Login is a wide-window control; phones sign in through the bottom navigation's Profile.
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     const banner = page.getByRole('banner');
-    // On phones Login lives in the menu.
-    const menu = banner.getByRole('button', { name: 'Open menu' });
-    if (await menu.isVisible()) await menu.click();
     // Login goes straight to the identity provider (mock: signs in instantly), then to the dashboard.
     await banner.getByRole('button', { name: 'Login' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
@@ -117,6 +118,8 @@ test.describe('calendar (signed in)', () => {
   test('month view: observances, selecting a day, moving months — with the access token', async ({
     page,
   }) => {
+    // Wide-window month view (phones open on the day view; see mobile-dashboard.spec.ts).
+    await page.setViewportSize({ width: 1280, height: 900 });
     await withSavedLocation(page);
     const monthCalls: (string | undefined)[] = [];
     page.on('request', (request) => {
@@ -127,7 +130,8 @@ test.describe('calendar (signed in)', () => {
     const grid = page.getByRole('group', { name: 'Days of October 2026' });
     await expect(grid.getByRole('button', { name: /^Tuesday, October 20,.*Vijayadashami/ })).toBeVisible();
     const festivalDay = grid.getByRole('button', { name: /^Tuesday, October 20,.*Vijayadashami/ });
-    await expect(festivalDay.getByText('Amavasya', { exact: true })).toBeVisible();
+    // Each day carries a full (desktop) and a short (mobile) tithi label; CSS shows one.
+    await expect(festivalDay.getByText('Amavasya', { exact: true }).filter({ visible: true })).toBeVisible();
     await expect(festivalDay.getByText(/Vijayadashami \(Dasara\)/)).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await grid.screenshot({ path: test.info().outputPath('calendar-month.png') });
@@ -148,13 +152,15 @@ test.describe('calendar (signed in)', () => {
 
 test.describe('find a good time (signed in)', () => {
   test('month view stays selected and precedes other cards on mobile', async ({ page }) => {
+    // The desktop page below 64rem (tablet widths); phones use the two-step flow (mobile-good-time.spec.ts).
+    await page.setViewportSize({ width: 1024, height: 900 });
     await withSavedLocation(page);
     await page.goto('/good-time?activity=business&view=month&month=2026-10&date=2026-10-01');
     await expect(page.getByRole('heading', { level: 2, name: 'October 2026' })).toBeVisible();
     const grid = page.getByRole('group', { name: 'Days of October 2026' });
     await expect(grid.getByRole('button', { name: /^Thursday, October 1,.*Highly Favorable/ })).toBeVisible();
 
-    const tile = page.getByRole('complementary', { name: 'Next best times' });
+    const tile = page.getByRole('complementary', { name: 'Next best days' });
     await expect(tile.getByRole('listitem').first()).toContainText('Highly Favorable');
 
     const results = await new AxeBuilder({ page })
@@ -170,10 +176,12 @@ test.describe('find a good time (signed in)', () => {
       'aria-pressed',
       'true',
     );
-    await expect(page.getByRole('region', { name: 'Recommended time', exact: true })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Not recommended', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Best recommended times', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Not recommended times', exact: true })).toBeVisible();
     await expect(page.getByRole('region', { name: 'In brief', exact: true })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'The day at a glance', exact: true })).toBeVisible();
+    await expect(page.getByRole('region', { name: /^\w+ \d{1,2} Panchang$/ })).toBeVisible();
+    await expect(page.getByRole('region', { name: /^Times to avoid on / })).toBeVisible();
+    await expect(page.getByRole('region', { name: /^Why \w+ \d{1,2} is / })).toBeVisible();
     if (page.viewportSize()!.width < 1024) {
       const calendarBounds = await page
         .getByRole('heading', { level: 2, name: 'October 2026' })

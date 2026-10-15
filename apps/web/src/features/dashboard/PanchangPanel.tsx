@@ -25,11 +25,12 @@ export function PanchangPanel({
   title,
 }: Readonly<{ dashboard: DayDashboard; glossary: Glossary; timeZone: string; title?: string }>) {
   const { t } = useTranslation();
+  const format = useFormatters();
   return (
     <section className={styles.panel} aria-labelledby="panchang-title">
       <div className={styles.panelHead}>
         <h2 id="panchang-title" className={styles.panelTitle}>
-          {title ?? t('dashboard.panchangTitle')}
+          {title ?? t('dashboard.panchangTitle', { day: format.day(dashboard.summary.date) })}
         </h2>
       </div>
       <PanchangDetails dashboard={dashboard} glossary={glossary} timeZone={timeZone} />

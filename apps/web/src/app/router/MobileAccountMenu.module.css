@@ -1,0 +1,192 @@
+/* Phones: "Your Account" bottom sheet (Material 3 bottom sheet / iOS sheet: 28px top corners, 32×4 handle, scrim). */
+.trigger {
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
+  border-radius: 50%;
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.trigger:focus-visible,
+.close:focus-visible,
+.option:focus-visible,
+.logout:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.sheet {
+  position: fixed;
+  inset: auto 0 0;
+  inline-size: 100%;
+  max-inline-size: 40rem;
+  max-block-size: 85dvh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  box-shadow: 0 -4px 24px rgb(0 0 0 / 0.18);
+}
+
+.sheet[open] {
+  display: flex;
+  animation: sheet-up 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.sheet::backdrop {
+  background: rgb(0 0 0 / 0.4);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet[open] {
+    animation: none;
+  }
+}
+
+.panel {
+  display: grid;
+  inline-size: 100%;
+  overflow-y: auto;
+  padding: 0 var(--space-md) calc(var(--space-md) + env(safe-area-inset-bottom));
+}
+
+.handle {
+  justify-self: center;
+  inline-size: 32px;
+  block-size: 4px;
+  margin-block: var(--space-sm) var(--space-xs);
+  border-radius: 2px;
+  background: var(--color-border-strong);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: var(--space-sm) var(--space-md);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  inline-size: 3.5rem;
+  block-size: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+}
+
+.heading {
+  display: grid;
+  gap: 0.125rem;
+  min-inline-size: 0;
+}
+
+.heading h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.heading .identity {
+  overflow: hidden;
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.close {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.options {
+  display: grid;
+  margin: 0;
+  padding: var(--space-xs) 0;
+  border-block-end: 1px solid var(--color-border);
+  list-style: none;
+}
+
+.option {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  min-block-size: 64px;
+  padding: var(--space-xs) var(--space-xs);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.option:hover {
+  background: var(--color-surface-subtle);
+}
+
+.option > svg {
+  color: var(--color-text-secondary);
+}
+
+.optionText {
+  display: grid;
+  gap: 0.125rem;
+}
+
+.optionLabel {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.optionHint {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-block-size: 56px;
+  margin-block-start: var(--space-xs);
+  padding: var(--space-xs);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-caution);
+  font: inherit;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.logout:hover {
+  background: var(--color-caution-surface);
+}

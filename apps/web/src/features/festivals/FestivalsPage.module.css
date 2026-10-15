@@ -2,7 +2,9 @@
 .page {
   display: grid;
   gap: var(--space-lg);
-  max-inline-size: 56rem;
+  /* Same width as Find a Good Time, so the three-column event grid has room. */
+  max-inline-size: 80rem;
+  min-inline-size: 0;
 }
 
 .head {
@@ -217,4 +219,28 @@
   .controls {
     align-items: stretch;
   }
+}
+
+/* Event cards: at most three per row, then two, then one as the content narrows (each card at least 18rem). */
+.eventGrid {
+  --event-gap: var(--space-md);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(18rem, (100% - 2 * var(--event-gap)) / 3), 1fr));
+  gap: var(--event-gap);
+  align-items: start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Alternate tiles get a light background so neighbouring cards are easy to tell apart. */
+.eventGrid > li:nth-child(even) {
+  background: var(--color-surface-subtle);
+}
+
+/* The Panchang page's day banner at the top of the page (wide windows only render this page). Nothing overlaps it
+   here, so all corners are rounded and the bottom padding is the same as the top. */
+.pageBanner > div {
+  padding-block-end: var(--space-xl);
+  border-radius: var(--radius-md);
 }

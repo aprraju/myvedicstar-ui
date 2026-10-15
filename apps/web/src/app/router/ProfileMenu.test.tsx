@@ -11,6 +11,8 @@ import { renderRoute } from '../../test/render';
 
 const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Token Name' } });
 
+// The header and the mobile bottom navigation each render a ProfileMenu (CSS shows one per window size; jsdom has no
+// CSS), so lookups that expect exactly one match are scoped to the header (banner).
 describe('Profile menu', () => {
   it('uses the minimal userinfo response for two profile lines and the dashboard greeting', async () => {
     server.use(
@@ -49,7 +51,7 @@ describe('Profile menu', () => {
     const auth = createInMemoryAuthClient({ user: { id: 'u1', email: 'asha.rao@example.com' } });
     renderRoute('/about', { auth });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
-    expect(await screen.findByText('asha.rao@example.com')).toBeInTheDocument();
+    expect(await within(screen.getByRole('banner')).findByText('asha.rao@example.com')).toBeInTheDocument();
     expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
   });
 
@@ -67,7 +69,7 @@ describe('Profile menu', () => {
     );
     renderRoute('/about', { auth: signedIn() });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
-    await screen.findByText('asha.rao@example.com');
+    await within(screen.getByRole('banner')).findByText('asha.rao@example.com');
     expect(screen.queryByText('Unknown')).not.toBeInTheDocument();
     expect(screen.queryByText('Token Name')).not.toBeInTheDocument();
   });
@@ -92,7 +94,7 @@ describe('Profile menu', () => {
   it('completes sign-in with a single POST /auth/userinfo carrying the access token', async () => {
     renderRoute('/about', { auth: signedIn() });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
-    await screen.findByText('Asha Rao');
+    await within(screen.getByRole('banner')).findByText('Asha Rao');
     await userEvent.click(screen.getByRole('button', { name: 'Open account menu' }));
     await userEvent.click(screen.getByRole('button', { name: 'Open account menu' }));
     expect(apiRequests.filter((u) => u.pathname.endsWith('/auth/userinfo'))).toHaveLength(1);
@@ -101,7 +103,7 @@ describe('Profile menu', () => {
   it('reuses userinfo across page navigation', async () => {
     const { router } = renderRoute('/about', { auth: signedIn() });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
-    await screen.findByText('Asha Rao');
+    await within(screen.getByRole('banner')).findByText('Asha Rao');
     await act(() => router.navigate('/contact'));
     await screen.findByRole('heading', { level: 1, name: 'Contact Us' });
     await act(() => router.navigate('/dashboard'));
@@ -173,7 +175,9 @@ describe('Profile menu', () => {
     server.use(scenarios.serverError('/auth/userinfo', 'post'));
     renderRoute('/about', { auth: signedIn() });
     await userEvent.click(await screen.findByRole('button', { name: 'Open account menu' }));
-    await waitFor(() => expect(screen.getByText('Token Name')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(within(screen.getByRole('banner')).getByText('Token Name')).toBeInTheDocument(),
+    );
   });
 
   it('is not shown to signed-out visitors', async () => {

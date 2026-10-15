@@ -28,11 +28,12 @@ import {
   PeriodList,
   RatingFactors,
 } from '../dashboard';
-import { FestivalChips, type FestivalsByDate, useFestivalsByDate } from '../festivals';
+import { FestivalChips, useFestivalsByDate } from '../festivals';
 import { useGoodTimes } from '../good-time';
 import { useLocationState } from '../location';
 import { SelectedDaySummaryCard } from '../today';
 import styles from './CalendarPage.module.css';
+import { Legend, MonthGrid } from './MonthCalendar';
 import { useCalendarMonth } from './useCalendarMonth';
 
 function subscribeWidth(listener: () => void) {
@@ -224,157 +225,12 @@ export function CalendarPage() {
             timeZone={location.timeZone}
             date={selected.date}
             locationLabel={location.label}
-            title={t('calendar.timelineTitle', { date: format.date(selected.date) })}
           />
         )}
       </div>
       {selectedDashboard && location && !query.isError && (
         <SelectedDayDetails dashboard={selectedDashboard} glossary={glossary} timeZone={location.timeZone} />
       )}
-    </div>
-  );
-}
-
-function MonthGrid({
-  weeks,
-  monthTitle,
-  selected,
-  loading,
-  festivals,
-  onSelect,
-}: Readonly<{
-  weeks: (CalendarDay | null)[][];
-  monthTitle: string;
-  selected: LocalDate | undefined;
-  loading: boolean;
-  festivals: FestivalsByDate;
-  onSelect: (date: LocalDate) => void;
-}>) {
-  const { t, locale } = useTranslation();
-  const format = useFormatters();
-  // 4 January 2026 is a Sunday: localized short weekday names, Sunday first.
-  const weekdays = useMemo(
-    () =>
-      Array.from({ length: 7 }, (_, i) =>
-        new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' }).format(
-          Date.UTC(2026, 0, 4 + i),
-        ),
-      ),
-    [locale],
-  );
-
-  return (
-    <div
-      className={styles.grid}
-      role="group"
-      aria-label={t('calendar.monthGrid', { month: monthTitle })}
-      aria-busy={loading || undefined}
-    >
-      {weekdays.map((name) => (
-        <div key={name} className={styles.weekday} aria-hidden="true">
-          {name}
-        </div>
-      ))}
-      {weeks.flat().map((day, index) => {
-        if (!day) return <div key={`pad-${index}`} className={styles.pad} aria-hidden="true" />;
-        // Within the festival data window the backend's festivals are authoritative; outside it (past months, more
-        // than 90 days ahead) the Tithi-based observance is shown instead.
-        const known = festivals.covers(day.date);
-        const dayFestivals = known ? festivals.festivalsOn(day.date) : [];
-        const observance = known ? undefined : day.observance;
-        const first = dayFestivals[0];
-        const firstObservance =
-          first?.category === 'observance' &&
-          ['ekadashi', 'purnima', 'amavasya'].includes(first.key.toLowerCase())
-            ? first.key.toLowerCase()
-            : undefined;
-        return (
-          <button
-            key={day.date}
-            type="button"
-            className={styles.day}
-            data-tone={day.tone}
-            aria-pressed={day.date === selected}
-            aria-current={day.isToday ? 'date' : undefined}
-            aria-label={[
-              format.date(day.date),
-              day.tithi?.name,
-              day.ratingName,
-              ...dayFestivals.map((festival) => festival.name),
-              observance ? t(`calendar.observances.${observance}`) : undefined,
-              day.isToday ? t('calendar.todayMarker') : undefined,
-            ]
-              .filter(Boolean)
-              .join(', ')}
-            onClick={() => onSelect(day.date)}
-          >
-            <span className={styles.dayTop}>
-              <span className={styles.dayNumber}>{day.dayOfMonth}</span>
-              {day.tone && (
-                <span className={styles.toneDot} data-tone={day.tone} data-status-tone={day.tone} />
-              )}
-            </span>
-            {loading ? (
-              <span className={styles.dayLoading} />
-            ) : (
-              <>
-                {day.tithi && (
-                  <>
-                    <span className={`${styles.tithi} ${styles.desktopTithi}`}>{day.tithi.name}</span>
-                    <span className={`${styles.tithi} ${styles.mobileTithi}`}>
-                      {day.tithi.shortName || day.tithi.name.replace(/^(?:Krishna|Shukla)\s+/i, '')}
-                    </span>
-                  </>
-                )}
-                {first && (
-                  <span
-                    className={styles.tag}
-                    data-category={first.category}
-                    data-observance={firstObservance}
-                  >
-                    {first.icon && <span aria-hidden="true">{first.icon} </span>}
-                    {first.name}
-                  </span>
-                )}
-                {dayFestivals.length > 1 && (
-                  <span className={styles.more}>
-                    {t('festivals.more', { count: dayFestivals.length - 1 })}
-                  </span>
-                )}
-                {observance && (
-                  <span className={styles.tag} data-observance={observance}>
-                    {t(`calendar.observances.${observance}`)}
-                  </span>
-                )}
-              </>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function Legend() {
-  const { t } = useTranslation();
-  return (
-    <div className={styles.legend}>
-      <ul aria-label={t('calendar.legendRating')}>
-        {(['highly-favorable', 'favorable', 'mixed', 'caution', 'avoid'] as const).map((tone) => (
-          <li key={tone} data-tone={tone} data-status-tone={tone}>
-            {t(`summary.tone.${tone}`)}
-          </li>
-        ))}
-      </ul>
-      <ul aria-label={t('calendar.legendObservances')}>
-        {(['ekadashi', 'purnima', 'amavasya'] as const).map((observance) => (
-          <li key={observance}>
-            <span className={styles.tag} data-observance={observance}>
-              {t(`calendar.observances.${observance}`)}
-            </span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -438,7 +294,7 @@ function SelectedDay({
           <PeriodList
             id="calendar-auspicious"
             tone="favorable"
-            title={t('dashboard.auspiciousTitle')}
+            title={t('dashboard.auspiciousTitle', { day: format.day(day.date) })}
             subtitle={t('dashboard.auspiciousSubtitle')}
             items={dashboard.auspicious}
             glossary={glossary}
@@ -463,6 +319,7 @@ function SelectedDayDetails({
   timeZone: string;
 }) {
   const { t } = useTranslation();
+  const format = useFormatters();
   const day = { date: dashboard.summary.date };
   const mobile = useSyncExternalStore(
     subscribeWidth,
@@ -476,24 +333,19 @@ function SelectedDayDetails({
       ) : (
         <>
           {glossary !== undefined && (
-            <PanchangPanel
-              dashboard={dashboard}
-              glossary={glossary}
-              timeZone={timeZone}
-              title={t('calendar.panchangTitle')}
-            />
+            <PanchangPanel dashboard={dashboard} glossary={glossary} timeZone={timeZone} />
           )}
           <PeriodList
             id="calendar-avoid"
             tone="caution"
-            title={t('dashboard.avoidTitle')}
+            title={t('dashboard.avoidTitle', { day: format.day(day.date) })}
             subtitle={t('dashboard.avoidSubtitle')}
             items={dashboard.avoid}
             glossary={glossary}
             timeZone={timeZone}
             date={day.date}
           />
-          <RatingFactors ratingName={dashboard.ratingName} factors={dashboard.factors} />
+          <RatingFactors ratingName={dashboard.ratingName} factors={dashboard.factors} date={day.date} />
         </>
       )}
     </div>

@@ -26,7 +26,7 @@ describe('Today cache integration', () => {
     const { router } = renderRoute('/dashboard', {
       auth: createInMemoryAuthClient({ user: { id: 'cache-user' } }),
     });
-    await screen.findByRole('region', { name: "Today's Panchang" });
+    await screen.findByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
     expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1);
     await act(async () => {
       await router.navigate('/calendar');
@@ -35,7 +35,7 @@ describe('Today cache integration', () => {
     await act(async () => {
       await router.navigate('/dashboard');
     });
-    await screen.findByRole('region', { name: "Today's Panchang" });
+    await screen.findByRole('region', { name: /^\w+ \d{1,2} Panchang$/ });
     expect(apiRequests.filter((url) => url.pathname.endsWith('/panchang/today'))).toHaveLength(1);
   });
 

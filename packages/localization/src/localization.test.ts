@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createTranslator, negotiateLanguage, type PartialMessages } from './index';
+import { createTranslator, en, negotiateLanguage, type PartialMessages } from './index';
 
 describe('createTranslator', () => {
   const t = createTranslator('en');
@@ -22,7 +22,7 @@ describe('createTranslator', () => {
     const partial: PartialMessages = { nav: { today: 'ఈ రోజు' } };
     const te = createTranslator('te', partial);
     expect(te.t('nav.today')).toBe('ఈ రోజు');
-    expect(te.t('nav.calendar')).toBe('Calendar');
+    expect(te.t('nav.calendar')).toBe(en.nav.calendar);
   });
 
   it('selects plural forms with Intl.PluralRules', () => {

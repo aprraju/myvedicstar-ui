@@ -1,0 +1,261 @@
+/* Upcoming festivals and observances on phones (< 1024px). The desktop page keeps FestivalsPage.module.css. */
+.page {
+  display: grid;
+  gap: var(--space-md);
+  min-inline-size: 0;
+}
+
+.head h1 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  line-height: 1.2;
+}
+
+.where {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  margin: var(--space-xxs) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.muted {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* All | Festivals | Observances */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.segmented button {
+  min-block-size: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-primary);
+}
+
+.segmented button:focus-visible,
+.toggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* Coming up next */
+.next {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-auspicious-surface);
+}
+
+.next h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.next h2 svg {
+  color: var(--color-primary);
+}
+
+.nextBody,
+.cardMain {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-sm);
+  align-items: start;
+}
+
+.nextText,
+.cardText {
+  display: grid;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+}
+
+.nextText p,
+.cardText p {
+  margin: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.oneLine {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dateBlock {
+  display: grid;
+  justify-items: center;
+  min-inline-size: 3.25rem;
+  padding: var(--space-xs) var(--space-xxs);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+  line-height: 1.2;
+}
+
+.dateMonth,
+.dateWeekday {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.dateMonth {
+  text-transform: uppercase;
+}
+
+.dateDay {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Months and cards */
+.month {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.monthHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.monthHead h2 {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-elevated);
+}
+
+.cardHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xxs) var(--space-xs);
+}
+
+.badge {
+  padding: 0.125rem var(--space-xs);
+  border-radius: 999px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.badge[data-category='observance'] {
+  background: var(--color-info-surface);
+  color: var(--color-info);
+}
+
+.badge[data-category='festival'] {
+  background: var(--color-auspicious-surface);
+  color: var(--color-primary);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-block-size: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.details {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding-block-start: var(--space-sm);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.details[hidden] {
+  display: none;
+}
+
+.details > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--space-xs);
+}
+
+.details svg {
+  grid-row: span 2;
+  color: var(--color-text-secondary);
+}
+
+.details dt {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.details dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}

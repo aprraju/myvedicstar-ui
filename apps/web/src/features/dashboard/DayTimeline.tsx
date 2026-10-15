@@ -112,7 +112,7 @@ export function DayTimeline({
       aria-labelledby="timeline-title"
     >
       <h2 id="timeline-title" className={styles.panelTitle}>
-        {title ?? t('dashboard.timelineTitle')}
+        {title ?? t('dashboard.timelineTitle', { day: format.day(date) })}
       </h2>
 
       {onExpand ? (

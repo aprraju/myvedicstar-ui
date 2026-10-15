@@ -444,10 +444,23 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'contact.submit',
           method: 'POST',
           path: path('contactSubmit'),
-          body: request,
+          body: {
+            email: request.email,
+            reason: request.reason,
+            phoneNumber: request.phoneNumber || null,
+            subject: request.subject?.trim() || request.reason,
+            message: request.message,
+            type:
+              request.reason === 'feedback'
+                ? 'Feedback'
+                : request.reason === 'technical'
+                  ? 'ReportIssue'
+                  : 'ContactUs',
+          },
           schema: contactResponseSchema,
           signal: call?.signal,
-          auth: 'required',
+          timeoutMs: 45000,
+          auth: 'optional',
         }),
     },
     traditions: {
