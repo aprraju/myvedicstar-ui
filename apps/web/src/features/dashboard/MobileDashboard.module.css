@@ -17,7 +17,7 @@
 .dayDate {
   margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(var(--font-size-lg), 5.5vw, var(--font-size-xl));
+  font-size: var(--mobile-title-size, 1.25rem);
   font-weight: var(--font-weight-semibold);
   line-height: 1.3;
 }
@@ -147,4 +147,23 @@
 .disclosure [data-state='past'],
 .expandedTimeline [data-state='past'] {
   opacity: 1;
+}
+/* Cards alternate two light tints. Today: timeline A, auspicious B, Panchang A, avoid B, why A (the calendar's selected
+   day sets its own first two in CalendarPage.module.css). */
+.body [aria-labelledby='timeline-title'],
+[aria-labelledby='mobile-panchang-title'],
+.disclosure:last-of-type {
+  background: var(--color-card-a, var(--color-surface));
+}
+.body [aria-labelledby='auspicious-title'],
+.panel + .disclosure {
+  background: var(--color-card-b, var(--color-surface));
+}
+/* Its title strip takes the card's tint. */
+.body [aria-labelledby='auspicious-title'] > :first-child {
+  background: transparent;
+}
+/* "See all" stays on one line; the title wraps instead. */
+.body [aria-labelledby='auspicious-title'] button {
+  white-space: nowrap;
 }

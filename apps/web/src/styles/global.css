@@ -166,3 +166,22 @@ h1 {
   --tone: var(--color-caution);
   --tone-surface: var(--color-caution-surface);
 }
+
+/*
+ * Phones and small tablets (< 1024px, the mobile layout): one page-title size like native apps (iOS and Material title
+ * styles are about 20-22pt), and cards in two alternating light tints (warm from the primary color, teal from the
+ * secondary) so neighbouring cards are easy to tell apart. Both follow the theme, so dark mode gets dark tints.
+ */
+@media (max-width: 1023px) {
+  :root {
+    --mobile-title-size: 1.25rem;
+    --color-card-a: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface-elevated));
+    --color-card-b: color-mix(in srgb, var(--color-secondary) 6%, var(--color-surface-elevated));
+  }
+
+  .page-title {
+    margin-block-end: var(--space-md);
+    font-size: var(--mobile-title-size);
+    line-height: 1.25;
+  }
+}

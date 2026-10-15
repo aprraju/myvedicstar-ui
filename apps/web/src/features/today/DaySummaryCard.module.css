@@ -296,6 +296,18 @@
   overflow-wrap: anywhere;
   font-size: var(--font-size-md);
 }
+.mobile .fact:nth-child(odd) {
+  background: var(--color-card-a, var(--color-surface-elevated));
+}
+.mobile .fact:nth-child(even) {
+  background: var(--color-card-b, var(--color-surface-elevated));
+}
+/* A message (no time or period name inside): body text, not a bold value. */
+.mobile .factValue:not(.factTime):not(:has(*)) {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
 .mobile .factTime {
   display: block;
   font-size: clamp(var(--font-size-xs), 3.4vw, var(--font-size-sm));

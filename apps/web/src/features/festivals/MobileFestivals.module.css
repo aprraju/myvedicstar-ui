@@ -7,8 +7,8 @@
 
 .head h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
-  line-height: 1.2;
+  font-size: var(--mobile-title-size, 1.25rem);
+  line-height: 1.25;
 }
 
 .where {
@@ -258,4 +258,17 @@
 .details dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
+}
+
+/* Cards alternate two light tints, so neighbouring cards are easy to tell apart; the date stays on white. */
+.list > .card:nth-child(odd) {
+  background: var(--color-card-a, var(--color-surface-elevated));
+}
+
+.list > .card:nth-child(even) {
+  background: var(--color-card-b, var(--color-surface-elevated));
+}
+
+.list > .card .dateBlock {
+  background: var(--color-surface-elevated);
 }

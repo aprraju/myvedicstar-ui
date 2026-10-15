@@ -527,3 +527,14 @@
 .embeddedTitle {
   font-size: var(--font-size-lg);
 }
+
+/* Phones, the selected day: auspicious A, timeline B, then Panchang A, avoid B, why A (MobileDashboard.module.css). */
+@media (max-width: 1023px) {
+  .layout [aria-labelledby='calendar-auspicious-title'] {
+    background: var(--color-card-a);
+  }
+
+  .layout [aria-labelledby='timeline-title'] {
+    background: var(--color-card-b);
+  }
+}

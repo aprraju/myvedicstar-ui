@@ -8,8 +8,8 @@
 
 .head h1 {
   margin: 0;
-  font-size: var(--font-size-xl);
-  line-height: 1.2;
+  font-size: var(--mobile-title-size, 1.25rem);
+  line-height: 1.25;
 }
 
 .head p {
@@ -570,6 +570,20 @@
   color: var(--color-text-secondary);
 }
 
+/* Phones (the desktop page reuses these cards): body-size text, the icon keeps its size level with the first line. */
+@media (max-width: 1023px) {
+  .empty {
+    align-items: flex-start;
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+  }
+
+  .empty svg {
+    flex: none;
+    margin-block-start: 0.1em;
+  }
+}
+
 .bestList {
   display: grid;
   margin: 0;
@@ -742,4 +756,16 @@
   display: grid;
   gap: var(--space-sm);
   padding: var(--space-md) var(--space-lg);
+}
+
+/* Phones: cards alternate two light tints ("What are you planning?" warm, "Choose a date" teal, …); the status-colored
+   best card keeps its own look. The desktop page reuses some of these cards, so this stays inside the phone query. */
+@media (max-width: 1023px) {
+  .page :is(.card, .panelCard):nth-child(odd of .card:not(.best), .panelCard) {
+    background: var(--color-card-a);
+  }
+
+  .page :is(.card, .panelCard):nth-child(even of .card:not(.best), .panelCard) {
+    background: var(--color-card-b);
+  }
 }

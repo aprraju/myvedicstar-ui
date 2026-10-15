@@ -39,3 +39,11 @@
   gap: var(--space-xxs);
   padding-inline-start: var(--space-xl);
 }
+
+/* Phones: section headings a step below the page title. */
+@media (max-width: 1023px) {
+  .h2 {
+    margin-block-start: var(--space-md);
+    font-size: var(--font-size-lg);
+  }
+}

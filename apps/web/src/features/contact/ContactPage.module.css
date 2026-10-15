@@ -100,6 +100,13 @@
   }
 
   .title {
-    font-size: var(--font-size-xl);
+    font-size: var(--mobile-title-size, 1.25rem);
+  }
+}
+
+/* Phones: the form card in the warm card tint; fields stay white. */
+@media (max-width: 1023px) {
+  .card {
+    background: var(--color-card-a);
   }
 }

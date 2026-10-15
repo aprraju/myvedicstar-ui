@@ -88,3 +88,15 @@
     white-space: normal;
   }
 }
+
+/* Phones: the form card in the warm card tint; fields stay white. */
+@media (max-width: 1023px) {
+  .card {
+    background: var(--color-card-a);
+  }
+
+  /* Section headings (Settings → Saved Locations) a step below the page title. */
+  .card h2 {
+    font-size: var(--font-size-lg);
+  }
+}
