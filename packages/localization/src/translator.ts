@@ -27,8 +27,16 @@ export interface Translator {
  * Creates a translator for a locale. Missing entries fall back to English, so partially translated catalogs are safe.
  */
 export function createTranslator(locale: string, catalog?: PartialMessages): Translator {
-  const plural = new Intl.PluralRules(locale);
-  const number = new Intl.NumberFormat(locale);
+  // Hermes on Android (React Native) has no Intl.PluralRules, and may lack Intl.NumberFormat: fall back to the English
+  // rule (1 → "one", else "other") and plain numbers there. Browsers and Node have both.
+  const plural =
+    typeof Intl.PluralRules === 'function'
+      ? new Intl.PluralRules(locale)
+      : { select: (count: number) => (count === 1 ? 'one' : 'other') };
+  const number =
+    typeof Intl.NumberFormat === 'function'
+      ? new Intl.NumberFormat(locale)
+      : { format: (value: number) => String(value) };
 
   const lookup = (key: string): string | undefined => {
     return resolve(catalog, key) ?? resolve(en, key);
