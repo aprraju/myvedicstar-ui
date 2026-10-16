@@ -96,11 +96,19 @@ function otherTextKey(activity: string | undefined, otherText: string | undefine
   return activity === 'other' ? (otherText?.trim().toLowerCase() ?? null) : null;
 }
 
+/** Decimal places kept for coordinates in keys and requests (~11 m), so GPS jitter reuses cached results. */
+export const KEY_COORDINATE_DECIMALS = 4;
+
+const roundKeyCoordinate = (value: number | undefined) =>
+  value === undefined
+    ? null
+    : Math.round(value * 10 ** KEY_COORDINATE_DECIMALS) / 10 ** KEY_COORDINATE_DECIMALS;
+
 function normalizeLocation(location: LocationParams) {
   return {
     place: location.place?.trim().toLowerCase() ?? null,
-    latitude: location.latitude ?? null,
-    longitude: location.longitude ?? null,
+    latitude: roundKeyCoordinate(location.latitude),
+    longitude: roundKeyCoordinate(location.longitude),
     timeZone: location.timeZone?.trim() ?? null,
   };
 }

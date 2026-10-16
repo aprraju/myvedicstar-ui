@@ -5,7 +5,12 @@ import {
   type TelemetryClient,
   type TelemetrySink,
 } from '@myvedicstar/analytics';
-import { type ApiClient, createApiClient, createSessionAudit } from '@myvedicstar/api-client';
+import {
+  type ApiClient,
+  createApiClient,
+  createSessionAudit,
+  KEY_COORDINATE_DECIMALS,
+} from '@myvedicstar/api-client';
 import type { AppConfig } from '@myvedicstar/config';
 import {
   type CacheReporter,
@@ -54,7 +59,8 @@ export function createMobileServices(
     baseUrl: config.apiBaseUrl,
     endpoints: config.endpoints,
     timeoutMs: config.apiTimeoutMs,
-    ...(config.locationSearch.enabled ? { coordinateDecimals: false as const } : {}),
+    // Location search keeps ~11 m precision (stable URLs and cache keys); the backend rounds further for calculations.
+    ...(config.locationSearch.enabled ? { coordinateDecimals: KEY_COORDINATE_DECIMALS } : {}),
     getAccessToken: () => auth.getAccessToken(),
     onUnauthorized: () => auth.handleUnauthorized(),
     ...(overrides.fetchImpl ? { fetchImpl: overrides.fetchImpl } : {}),

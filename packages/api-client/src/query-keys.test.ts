@@ -70,4 +70,18 @@ describe('queryKeys', () => {
     expect(queryKeys.festivals.upcoming(austin, 90)).not.toEqual(queryKeys.festivals.upcoming(austin, 30));
     expect(queryKeys.auth.userInfo('u1')).not.toEqual(queryKeys.auth.userInfo('u2'));
   });
+
+  it('rounds coordinates to 4 decimals so tiny GPS differences share one cache entry', () => {
+    const at = (latitude: number, longitude: number) => ({
+      location: { latitude, longitude, timeZone: 'America/Chicago' },
+      tradition: 'all',
+      language: 'en',
+    });
+    expect(queryKeys.panchang.month(2026, 10, at(30.627480707106724, -97.76246120407086))).toEqual(
+      queryKeys.panchang.month(2026, 10, at(30.62749, -97.76247)),
+    );
+    expect(queryKeys.panchang.month(2026, 10, at(30.6275, -97.7625))).not.toEqual(
+      queryKeys.panchang.month(2026, 10, at(30.6276, -97.7625)),
+    );
+  });
 });

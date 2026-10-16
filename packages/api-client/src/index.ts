@@ -21,7 +21,7 @@ export {
   validateEndpointTemplate,
 } from './endpoints';
 export { ApiError, type ApiErrorKind, isApiError } from './errors';
-export { queryKeys } from './query-keys';
+export { KEY_COORDINATE_DECIMALS, queryKeys } from './query-keys';
 export { isIdempotent, isRetryableError, MAX_RETRIES, retryDelayMs, shouldRetryQuery } from './retry';
 export { createSessionAudit } from './session-audit';
 export {
