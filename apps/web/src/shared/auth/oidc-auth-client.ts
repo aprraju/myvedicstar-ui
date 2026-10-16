@@ -77,9 +77,10 @@ export function createOidcAuthClient(config: OidcConfig, origin: string): AuthCl
 
 /**
  * Microsoft Entra External ID (`auth.mode = "entra-external-id"`): full-page redirect to the Entra-hosted sign-in,
- * sign-up (`prompt=create`: email verification, password, attributes) and password-reset pages. Tokens are held in
- * memory only. (MSAL cannot combine a redirect flow with a memory-only cache, so the standards-based client is used;
- * Entra External ID is a compliant OpenID Connect provider — see docs/security/authentication.md.)
+ * sign-up (`prompt=create`: email verification, password, attributes) and password-reset pages. Tokens are kept in
+ * tab-scoped sessionStorage, so a page refresh keeps the user signed in until they log out (never localStorage; closing
+ * the tab ends the session). Entra External ID is a compliant OpenID Connect provider — see
+ * docs/security/authentication.md.
  */
 export function createEntraAuthClient(config: EntraConfig): AuthClient {
   return createClient({
@@ -88,7 +89,7 @@ export function createEntraAuthClient(config: EntraConfig): AuthClient {
     scopes: config.apiScopes,
     redirectUri: config.redirectUri,
     postLogoutRedirectUri: config.postLogoutRedirectUri,
-    tokenStorage: 'memory',
+    tokenStorage: 'session',
     providers: config.providers,
     providerParams: {},
     registerParams: { prompt: 'create' },
@@ -159,7 +160,27 @@ function createClient(settings: OidcClientSettings): AuthClient {
   manager.events.addUserLoaded((user) => publish(user));
   manager.events.addUserUnloaded(() => publish(null));
   manager.events.addSilentRenewError(() => void endSession(true));
-  void manager.getUser().then(publish, () => publish(null));
+  // A session restored after a page refresh may hold an expired access token: renew it with the refresh token before
+  // publishing it. If the refresh token has expired too, the stored session is dropped quietly (signed out, no error),
+  // so protected pages simply sign in again; offline, it is kept and requests fail normally.
+  const restore = async (user: User | null) => {
+    if (!user?.expired || !user.refresh_token) return user;
+    try {
+      return await manager.signinSilent();
+    } catch (error) {
+      if (error instanceof TypeError) return user;
+      await manager.removeUser();
+      return null;
+    }
+  };
+  // Sign-in, logout or a renewal may settle the state first; a late restore must not overwrite it.
+  const publishRestored = (user: User | null) => {
+    if (state.status === 'loading') publish(user);
+  };
+  void manager
+    .getUser()
+    .then(restore)
+    .then(publishRestored, () => publishRestored(null));
 
   return {
     enabled: true,

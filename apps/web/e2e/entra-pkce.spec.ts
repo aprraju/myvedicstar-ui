@@ -138,13 +138,14 @@ async function simulateEntra(
   return record;
 }
 
-/** Text of every value in local/session storage, to prove tokens never reach browser storage. */
-const browserStorage = (page: Page) =>
-  page.evaluate(() =>
-    [window.localStorage, window.sessionStorage]
-      .flatMap((store) => Object.keys(store).map((key) => store.getItem(key) ?? ''))
-      .join('\n'),
-  );
+/** Text of every value in local or session storage. */
+const browserStorage = (page: Page, kind: 'local' | 'session') =>
+  page.evaluate((which) => {
+    const store = which === 'local' ? window.localStorage : window.sessionStorage;
+    return Object.keys(store)
+      .map((key) => store.getItem(key) ?? '')
+      .join('\n');
+  }, kind);
 
 test.describe('Entra External ID: authorization code + PKCE', () => {
   test.beforeEach(({ page }, testInfo) => {
@@ -153,7 +154,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     void page;
   });
 
-  test('Login: PKCE S256 authorize request, verified code exchange, Home, tokens in memory only', async ({
+  test('Login: PKCE S256 authorize request, verified code exchange, Home, session kept on refresh', async ({
     page,
     baseURL,
   }) => {
@@ -183,10 +184,18 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     expect(exchange.get('code_verifier')).toMatch(/^[A-Za-z0-9._~-]{43,128}$/);
     expect(exchange.has('client_secret')).toBe(false); // public client
 
-    const storage = await browserStorage(page);
-    expect(storage).not.toContain('access-1');
-    expect(storage).not.toContain('refresh-1');
-    expect(storage).not.toContain(exchange.get('code_verifier')!); // the one-redirect PKCE record is cleaned up
+    // Tokens are tab-scoped (sessionStorage), never in localStorage; the one-redirect PKCE record is cleaned up.
+    const local = await browserStorage(page, 'local');
+    expect(local).not.toContain('access-1');
+    expect(local).not.toContain('refresh-1');
+    expect(await browserStorage(page, 'session')).not.toContain(exchange.get('code_verifier')!);
+
+    // A page refresh keeps the user signed in without another trip to Entra.
+    await page.reload();
+    await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Open account menu' })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Login' })).toHaveCount(0);
+    expect(entra.authorize).toHaveLength(1);
   });
 
   test('does not offer Register on public pages or an authentication callback error', async ({
@@ -248,7 +257,7 @@ test.describe('Entra External ID: authorization code + PKCE', () => {
     });
     expect(entra.authorize[0]!.get('code_challenge_method')).toBe('S256');
 
-    await page.getByRole('banner').getByRole('link', { name: 'Home', exact: true }).click(); // in-app: memory kept
+    await page.getByRole('banner').getByRole('link', { name: 'Home', exact: true }).click(); // in-app: session kept
     await expect(page).toHaveURL(/\/calendar$/);
     await expect(page.getByRole('heading', { level: 1, name: 'September 2026' })).toBeVisible();
 

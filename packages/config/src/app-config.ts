@@ -77,7 +77,8 @@ const authSchema = z.discriminatedUnion('mode', [
   z.object({
     /**
      * Microsoft Entra External ID as an OpenID Connect provider (web: oidc-client-ts; mobile: expo-auth-session).
-     * Authorization code + PKCE, public client, full-page redirect; tokens in memory; refresh tokens renew silently.
+     * Authorization code + PKCE, public client, full-page redirect; tokens in sessionStorage; refresh tokens renew
+     * silently.
      * Values come from the Entra admin center — see docs/security/entra-setup.md.
      */
     mode: z.literal('entra-external-id'),
@@ -100,7 +101,7 @@ const authSchema = z.discriminatedUnion('mode', [
     redirectUri: filled(z.string()).pipe(z.url()),
     postLogoutRedirectUri: filled(z.string()).pipe(z.url()),
     providers: z.array(z.enum(identityProviders)).min(1).default(['email']),
-    // Tokens are always held in memory only (no sessionStorage, localStorage or cookies) — not configurable.
+    // Tokens are kept in tab-scoped sessionStorage so a refresh keeps the session (never localStorage or cookies).
   }),
   z.object({
     /** OpenID Connect authorization code flow with PKCE (e.g. Microsoft Entra External ID). Public client only. */

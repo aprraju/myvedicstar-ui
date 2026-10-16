@@ -281,7 +281,7 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
     mocks.manager.getUser.mockResolvedValue(null);
   });
 
-  it('uses the tenant issuer, exact redirect URIs, the API scope and memory-only tokens', () => {
+  it('uses the tenant issuer, exact redirect URIs, the API scope and tab-scoped token storage', () => {
     createEntraAuthClient(entra);
     const settings = mocks.manager.settings as Record<string, unknown> & {
       userStore: { options: { store: { kind?: string } } };
@@ -296,9 +296,38 @@ describe('createEntraAuthClient (Microsoft Entra External ID)', () => {
       scope: 'openid profile email offline_access api://api-client-id/access_as_user',
       automaticSilentRenew: true,
     });
-    // Tokens in memory; only the one-redirect PKCE/state record uses sessionStorage.
-    expect(settings.userStore.options.store.kind).toBe('memory');
+    // Tokens in sessionStorage so a page refresh keeps the session; never localStorage.
+    expect(settings.userStore.options.store).toBe(window.sessionStorage);
     expect(settings.stateStore.options.store).toBe(window.sessionStorage);
+  });
+
+  it('stays signed in after a page refresh', async () => {
+    mocks.manager.getUser.mockResolvedValue(user());
+    const client = createEntraAuthClient(entra);
+    await vi.waitFor(() =>
+      expect(client.getState()).toMatchObject({ status: 'ready', user: { id: 'user-1' } }),
+    );
+    expect(mocks.manager.signinSilent).not.toHaveBeenCalled();
+  });
+
+  it('renews an expired access token restored after a refresh instead of signing out', async () => {
+    mocks.manager.getUser.mockResolvedValue(user({ expired: true, refresh_token: 'refresh-1' }));
+    mocks.manager.signinSilent.mockResolvedValue(user({ access_token: 'access-2' }));
+    const client = createEntraAuthClient(entra);
+    await vi.waitFor(() =>
+      expect(client.getState()).toMatchObject({ status: 'ready', user: { id: 'user-1' } }),
+    );
+    expect(mocks.manager.signinSilent).toHaveBeenCalledOnce();
+    expect(client.getState().signInError).toBeUndefined();
+  });
+
+  it('drops a restored session quietly when its refresh token has expired', async () => {
+    mocks.manager.getUser.mockResolvedValue(user({ expired: true, refresh_token: 'refresh-1' }));
+    mocks.manager.signinSilent.mockRejectedValue(new Error('invalid_grant'));
+    const client = createEntraAuthClient(entra);
+    await vi.waitFor(() => expect(client.getState().status).toBe('ready'));
+    expect(client.getState()).toEqual({ status: 'ready', user: null });
+    expect(mocks.manager.removeUser).toHaveBeenCalled();
   });
 
   it('opens the Entra sign-up page for Register', async () => {

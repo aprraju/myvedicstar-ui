@@ -22,15 +22,15 @@ Mobile  ── OIDC authorization code + PKCE (system browser)  ─────�
 
 The primary configuration. Setup and the Entra → config field mapping: [entra-setup.md](entra-setup.md).
 
-| Platform      | Library                                                                                                         | Notes                                                                                                                                                  |
-| ------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Web           | **`oidc-client-ts`** (`createEntraAuthClient` in `apps/web/src/shared/auth/oidc-auth-client.ts`, loaded lazily) | Full-page redirect, authorization code + PKCE, public client, tokens in memory. Issuer: `entraIssuer()` → `https://<sub>.ciamlogin.com/<tenant>/v2.0`. |
-| Android / iOS | `expo-auth-session` + `expo-secure-store`                                                                       | System browser, PKCE, same issuer; tokens in Keychain / Keystore.                                                                                      |
+| Platform      | Library                                                                                                         | Notes                                                                                                                                                          |
+| ------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web           | **`oidc-client-ts`** (`createEntraAuthClient` in `apps/web/src/shared/auth/oidc-auth-client.ts`, loaded lazily) | Full-page redirect, authorization code + PKCE, public client, tokens in sessionStorage. Issuer: `entraIssuer()` → `https://<sub>.ciamlogin.com/<tenant>/v2.0`. |
+| Android / iOS | `expo-auth-session` + `expo-secure-store`                                                                       | System browser, PKCE, same issuer; tokens in Keychain / Keystore.                                                                                              |
 
-**Why not MSAL (`@azure/msal-browser`)?** Tokens must be held in memory only. MSAL refuses a redirect sign-in with a
-memory cache (`in_mem_redirect_unavailable`) because it persists its token cache across the redirect; its only
-memory-compatible option is a popup window. `oidc-client-ts` keeps tokens in memory and only the one-redirect PKCE
-record in sessionStorage, so it supports the required full-page redirect. Entra External ID is a standard OpenID
+**Why not MSAL (`@azure/msal-browser`)?** It was ruled out when tokens had to be held in memory only: MSAL refuses a
+redirect sign-in with a memory cache (`in_mem_redirect_unavailable`), and its only memory-compatible option is a popup
+window. Tokens now live in sessionStorage (see below) and `oidc-client-ts` remains the client, keeping the provider
+configurable and the bundle small. Entra External ID is a standard OpenID
 Connect provider and works with it unchanged. Microsoft also ships no MSAL for React Native/Expo.
 
 ### Flows
@@ -45,7 +45,7 @@ Logout  ──►  local session cleared (silent: no Entra page)  ──►  pos
 Next Login after Logout  ──►  Entra with prompt=login (credentials asked again)
 ```
 
-- Logout is local and silent: tokens (memory only) are dropped and the post-logout page replaces the current one. The
+- Logout is local and silent: tokens are removed from sessionStorage and the post-logout page replaces the current one. The
   app does not visit Entra's end-session endpoint, which always shows a page of its own ("Pick an account" without a
   `logout_hint`, "Hang on a moment while we sign you out" with one).
 - The Entra browser session therefore remains, so Logout sets a flag (`mvs.auth.reauthenticate` in localStorage — no
@@ -57,23 +57,25 @@ Next Login after Logout  ──►  Entra with prompt=login (credentials asked a
   `/auth/callback`) show a friendly message with "Try again" and "Home", so a failure never loops.
 - No email or password field is shown in Entra mode; passwords are only ever typed on Entra's pages.
 
-### Tokens: memory only, refresh tokens for renewal
+### Tokens: tab-scoped sessionStorage, refresh tokens for renewal
 
-- Access, ID and refresh tokens are held **in memory only** (`InMemoryWebStorage`) — never sessionStorage,
-  localStorage or cookies. Not configurable in Entra mode.
+- Access, ID and refresh tokens are kept in **sessionStorage** — never localStorage or cookies. Not configurable in
+  Entra mode. A page refresh keeps the user signed in until they press Log out; closing the tab ends the session.
+  (They were memory-only until 2026-10-16, which signed users out on every refresh.)
 - Only the transient redirect record (PKCE verifier, `state` with the `returnTo` path, nonce) sits in sessionStorage
-  between leaving for Entra and returning to `/auth/callback`; it is removed when the callback completes and never
-  contains a token.
-- **Refresh tokens:** `offline_access` is always requested. `getAccessToken()` returns the in-memory access token
+  between leaving for Entra and returning to `/auth/callback`; it is removed when the callback completes.
+- **Refresh tokens:** `offline_access` is always requested. `getAccessToken()` returns the stored access token
   while it has more than 60 seconds left; otherwise it redeems the refresh token at the token endpoint
   (`refresh_token` grant) and uses the new pair. Concurrent API calls share one refresh, and a timer also renews
   shortly before expiry. No hidden iframe is used, so CSP keeps `frame-src 'none'`. (Entra issues SPA refresh tokens
   valid for 24 hours.)
 - Refresh token rejected (expired or revoked): the session ends and the next protected page sends the user to Entra.
   Offline: the session is kept and the request fails normally.
-- A reload or new tab starts with no tokens (memory only). Protected routes then redirect to Entra, whose own session
-  cookie usually signs the user straight back in without a prompt.
-- A 401 from the API clears the in-memory session (`handleUnauthorized`).
+- A reload restores the stored session. If its access token has expired it is renewed with the refresh token first;
+  if the refresh token has expired too, the stored session is dropped quietly and protected pages sign in again.
+- A new tab has its own (empty) sessionStorage. Protected routes then redirect to Entra, whose own session cookie
+  usually signs the user straight back in without a prompt.
+- A 401 from the API clears the stored session (`handleUnauthorized`).
 
 ## Libraries (Phase 2 decision; `auth.mode = "oidc"`)
 
