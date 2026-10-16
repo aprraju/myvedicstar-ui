@@ -157,7 +157,19 @@ describe('location sheet (mobile)', () => {
         url.pathname.endsWith('/settings/locations')
           ? {
               status: 200,
+              // No default location: the first saved location (Austin) is shown after login.
               body: [
+                {
+                  locationId: 'f85dddfa-2fb8-48c1-a3bf-36310c47f609',
+                  city: 'Austin',
+                  state: 'Texas',
+                  country: null,
+                  countryCode: 'US',
+                  postalCode: null,
+                  latitude: 30.27,
+                  longitude: -97.74,
+                  timeZone: 'America/Chicago',
+                },
                 {
                   locationId: 'e96544af-55b1-458b-92e0-33044c47ad28',
                   city: 'Hyderabad',

@@ -359,6 +359,22 @@ describe('createApiClient', () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
+  it('attaches the signed-in user’s access token to contact submissions', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
+    const { client } = setup(fetchImpl, { getAccessToken: async () => 'token-1' });
+    await client.contact.submit({
+      name: 'Asha',
+      email: 'asha@example.com',
+      reason: 'technical',
+      subject: 'Broken page',
+      message: 'The calendar does not load.',
+    });
+    const [url, init] = fetchImpl.mock.calls[0]!;
+    expect(new URL(String(url)).pathname).toBe('/api/v1/email/send');
+    expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer token-1');
+    expect(new Headers(init?.headers).get('X-Correlation-ID')).toBeTruthy();
+  });
+
   it('sends anonymous contact submissions without an Authorization header', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 200 }));
     const { client } = setup(fetchImpl, { getAccessToken: async () => null });

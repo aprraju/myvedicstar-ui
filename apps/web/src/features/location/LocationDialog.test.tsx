@@ -209,3 +209,115 @@ describe('location selection', () => {
     ).toBeInTheDocument();
   });
 });
+
+describe('signed-in saved locations', () => {
+  const saved = (
+    id: string,
+    place: typeof austin,
+    coordinates?: { latitude: number; longitude: number },
+  ) => ({
+    locationId: id,
+    city: place.city ?? null,
+    state: place.region ?? null,
+    country: place.country ?? null,
+    countryCode: place.countryCode ?? null,
+    postalCode: null,
+    latitude: coordinates?.latitude ?? place.latitude,
+    longitude: coordinates?.longitude ?? place.longitude,
+    timeZone: place.timeZone,
+  });
+  const HYDERABAD_ID = 'e96544af-55b1-458b-92e0-33044c47ad28';
+  const AUSTIN_ID = 'f85dddfa-2fb8-48c1-a3bf-36310c47f609';
+  function accountBackend(initial: ReturnType<typeof saved>[], defaultLocationId: string | null = null) {
+    let locations = [...initial];
+    const added: unknown[] = [];
+    server.use(
+      http.get(`${TEST_API_BASE_URL}/api/v1/settings`, () =>
+        HttpResponse.json({
+          defaultTradition: null,
+          defaultLocationId,
+          defaultLocation: locations.find((item) => item.locationId === defaultLocationId) ?? null,
+          revision: 1,
+        }),
+      ),
+      http.get(`${TEST_API_BASE_URL}/api/v1/settings/locations`, () => HttpResponse.json(locations)),
+      http.post(`${TEST_API_BASE_URL}/api/v1/settings/locations`, async ({ request }) => {
+        const body = (await request.json()) as Omit<ReturnType<typeof saved>, 'locationId'>;
+        added.push(body);
+        const created = { ...body, locationId: `00000000-0000-4000-8000-00000000000${added.length}` };
+        locations = [...locations, created];
+        return HttpResponse.json(created);
+      }),
+    );
+    return { added, locations: () => locations };
+  }
+
+  it('shows the default location in the header after login', async () => {
+    accountBackend([saved(HYDERABAD_ID, hyderabad), saved(AUSTIN_ID, austin)], AUSTIN_ID);
+    renderRoute('/');
+    expect(
+      await screen.findByRole('button', { name: /^Change location: Austin, Texas/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('shows the first saved location when no default is set, and lists saved locations in the picker', async () => {
+    const backend = accountBackend([saved(HYDERABAD_ID, hyderabad), saved(AUSTIN_ID, austin)]);
+    storeSelectedLocation(austin);
+    renderRoute('/');
+    expect(
+      await screen.findByRole('button', { name: /^Change location: Hyderabad, Telangana/ }),
+    ).toBeInTheDocument();
+    const dialog = await openDialog();
+    const recent = within(await within(dialog).findByRole('region', { name: 'Recent locations' }));
+    expect(recent.getByRole('button', { name: /^Hyderabad, Telangana/ })).toBeInTheDocument();
+    expect(recent.getByRole('button', { name: /^Austin, Texas/ })).toBeInTheDocument();
+    expect(backend.added).toHaveLength(0);
+  });
+
+  it('keeps the existing location when the account has no saved locations', async () => {
+    accountBackend([]);
+    storeSelectedLocation(hyderabad);
+    renderRoute('/');
+    expect(
+      await screen.findByRole('button', { name: 'Change location: Hyderabad, Telangana' }),
+    ).toBeInTheDocument();
+  });
+
+  it('saves a location picked in the header once, and shows it in Settings without a refresh', async () => {
+    const backend = accountBackend([]);
+    const { router } = renderRoute('/');
+    const dialog = await openDialog();
+    await searchFor(dialog, 'Austin, TX');
+    await userEvent.click(await within(dialog).findByRole('button', { name: 'Use this location' }));
+    await waitFor(() => expect(backend.added).toHaveLength(1));
+    expect(backend.added[0]).toMatchObject({ city: 'Austin', state: 'Texas', countryCode: 'US' });
+
+    // Picking the same place again (here from the saved list) never adds it twice.
+    const reopened = await openDialog();
+    const recent = await within(reopened).findByRole('region', { name: 'Recent locations' });
+    await userEvent.click(within(recent).getByRole('button', { name: /^Austin, Texas/ }));
+
+    await router.navigate('/settings');
+    expect(await screen.findByRole('button', { name: /^Delete Austin, Texas/ })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Delete / })).toHaveLength(1);
+    expect(backend.added).toHaveLength(1);
+  });
+
+  it('does not save the same place twice when it is found with slightly different coordinates', async () => {
+    const backend = accountBackend([
+      saved(AUSTIN_ID, austin, { latitude: 30.2672, longitude: -97.7431 }),
+      saved(HYDERABAD_ID, hyderabad),
+    ]);
+    renderRoute('/');
+    await screen.findByRole('button', { name: /^Change location: Austin, Texas/ });
+    const dialog = await openDialog();
+    await searchFor(dialog, 'Austin, TX');
+    await userEvent.click(await within(dialog).findByRole('button', { name: 'Use this location' }));
+    expect(await screen.findByText('All times shown in local time — Austin, Texas')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(apiRequests.some((u) => u.searchParams.get('place') === 'Austin, TX')).toBe(true),
+    );
+    expect(backend.added).toHaveLength(0);
+    expect(backend.locations()).toHaveLength(2);
+  });
+});

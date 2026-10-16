@@ -9,7 +9,12 @@ import {
   parseStoredRecentLocations,
   type SelectedLocation,
 } from '@myvedicstar/domain-models';
-import { toAccountLocation, useAccountSettings, useSavedLocations } from '@myvedicstar/query-cache';
+import {
+  accountStartLocation,
+  toAccountLocation,
+  useAccountSettings,
+  useSavedLocations,
+} from '@myvedicstar/query-cache';
 import {
   createContext,
   type ReactNode,
@@ -56,8 +61,10 @@ interface LocationContextValue {
 const LocationContext = createContext<LocationContextValue | null>(null);
 
 /**
- * Selected location for the app (mobile). Same behaviour as web: a saved location wins; otherwise the current
- * position is requested once if the OS allows asking; a denial is remembered; manual search always works.
+ * Selected location for the app (mobile). Same behaviour as web: after login, the account's default location, else its
+ * first saved location; locations picked while signed in are saved to the account (never twice). Otherwise a stored
+ * location wins, or the current position is requested once if the OS allows asking; a denial is remembered; manual
+ * search always works.
  */
 export function LocationProvider({
   children,
@@ -174,6 +181,8 @@ export function LocationProvider({
         !userId ||
         accountSettings.isPending ||
         accountSettings.data?.defaultLocation ||
+        saved.query.isPending ||
+        saved.query.data?.length ||
         stored ||
         config.locationSearch.enabled
       )
@@ -186,7 +195,7 @@ export function LocationProvider({
     };
     // Detect only after account registration and settings have settled.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, accountSettings.isPending]);
+  }, [userId, accountSettings.isPending, saved.query.isPending]);
 
   useEffect(() => {
     if (!userId) {
@@ -194,11 +203,12 @@ export function LocationProvider({
       defaultsApplied.current = undefined;
       return;
     }
-    if (defaultsApplied.current === userId || !accountSettings.isSuccess) return;
+    if (defaultsApplied.current === userId) return;
+    const start = accountStartLocation(accountSettings, saved.query);
+    if (start === undefined) return;
     defaultsApplied.current = userId;
-    if (accountSettings.data.defaultLocation)
-      setLocation(toAccountLocation(accountSettings.data.defaultLocation));
-  }, [userId, accountSettings.isSuccess, accountSettings.data]);
+    if (start) setLocation(start);
+  }, [userId, accountSettings, saved.query]);
 
   const accountRecent = userId ? (saved.query.data ?? []).map(toAccountLocation) : recent;
   const applyDefault = useCallback(
