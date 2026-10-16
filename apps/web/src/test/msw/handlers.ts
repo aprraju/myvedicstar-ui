@@ -122,7 +122,13 @@ export const handlers = [
     apiRequests.push(new URL(request.url));
     return HttpResponse.json(fixtures.festivals);
   }),
-  http.post(api('/auth/login'), () => new HttpResponse(null, { status: 204 })),
+  http.post(api('/auth/login'), ({ request }) => {
+    apiRequests.push(new URL(request.url));
+    if (!request.headers.get('Authorization')?.startsWith('Bearer ')) {
+      return HttpResponse.json({ status: 401, title: 'Unauthorized' }, { status: 401 });
+    }
+    return HttpResponse.json(fixtures.userInfo);
+  }),
   http.post(api('/auth/logout'), () => new HttpResponse(null, { status: 204 })),
   http.get(api('/settings'), () =>
     HttpResponse.json({
@@ -133,13 +139,6 @@ export const handlers = [
     }),
   ),
   http.get(api('/settings/locations'), () => HttpResponse.json([])),
-  http.post(api('/auth/userinfo'), ({ request }) => {
-    apiRequests.push(new URL(request.url));
-    if (!request.headers.get('Authorization')?.startsWith('Bearer ')) {
-      return HttpResponse.json({ status: 401, title: 'Unauthorized' }, { status: 401 });
-    }
-    return HttpResponse.json(fixtures.userInfo);
-  }),
   http.post(api('/email/send'), ({ request }) => {
     apiRequests.push(new URL(request.url));
     return new HttpResponse(null, { status: 202 });

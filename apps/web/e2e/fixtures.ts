@@ -104,7 +104,7 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
           return route.fulfill({ status: 401, json: { title: 'Unauthorized' } });
         if (url.pathname.endsWith('/traditions')) return route.fulfill({ json: fixtures.traditions });
         if (url.pathname.endsWith('/festivals/upcoming')) return route.fulfill({ json: fixtures.festivals });
-        if (url.pathname.endsWith('/auth/userinfo')) return route.fulfill({ json: fixtures.userInfo });
+        if (url.pathname.endsWith('/auth/login')) return route.fulfill({ json: fixtures.userInfo });
         if (url.pathname.endsWith('/settings'))
           return route.fulfill({
             json: { defaultTradition: null, defaultLocationId: null, defaultLocation: null, revision: 0 },

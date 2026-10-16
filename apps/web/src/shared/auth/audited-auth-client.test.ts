@@ -9,7 +9,9 @@ function setup() {
   const requests: { path: string; token: string | null }[] = [];
   const fetchImpl = vi.fn<typeof fetch>(async (input, init) => {
     requests.push({ path: String(input), token: new Headers(init?.headers).get('Authorization') });
-    return new Response(null, { status: 204 });
+    return String(input).endsWith('/auth/login')
+      ? Response.json(userInfo)
+      : new Response(null, { status: 204 });
   });
   const api = createApiClient({
     baseUrl: 'https://api.example/api/v1',
@@ -17,8 +19,24 @@ function setup() {
     fetchImpl,
   });
   const failure = vi.fn();
-  return { client, auth: withAuthAudit(client, api, failure), requests, fetchImpl, failure };
+  const onLogin = vi.fn();
+  return {
+    client,
+    auth: withAuthAudit(client, api, failure, onLogin),
+    requests,
+    fetchImpl,
+    failure,
+    onLogin,
+  };
 }
+
+const userInfo = {
+  id: 'mock-user',
+  name: 'Asha',
+  email: 'asha@example.com',
+  firstName: 'Asha',
+  lastName: 'Rao',
+};
 
 describe('authentication audits', () => {
   it('keeps account consumers loading until backend registration completes', async () => {
@@ -33,9 +51,18 @@ describe('authentication audits', () => {
     const signingIn = auth.signIn({ intent: 'login', returnTo: '/settings' });
     await vi.waitFor(() => expect(fetchImpl).toHaveBeenCalledTimes(1));
     expect(auth.getState()).toEqual({ status: 'loading', user: null });
-    finish(new Response(null, { status: 204 }));
+    finish(Response.json(userInfo));
     await signingIn;
     expect(auth.getState()).toMatchObject({ status: 'ready', user: { id: 'mock-user' } });
+  });
+  it('hands the login response to onLogin before publishing the account (no separate userinfo request)', async () => {
+    const { auth, onLogin, failure, requests } = setup();
+    onLogin.mockImplementation(() => expect(auth.getState().user).toBeNull());
+    await auth.signIn({ intent: 'login', returnTo: '/' });
+    expect(onLogin).toHaveBeenCalledExactlyOnceWith('mock-user', userInfo);
+    expect(failure).not.toHaveBeenCalled();
+    expect(auth.getState().user).toMatchObject({ id: 'mock-user' });
+    expect(requests.map((request) => request.path)).toEqual(['https://api.example/api/v1/auth/login']);
   });
   it('fails the callback when the login API rejects the token instead of restarting sign-in', async () => {
     const client = createInMemoryAuthClient();

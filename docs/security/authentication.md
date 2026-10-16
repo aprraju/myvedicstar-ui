@@ -137,7 +137,9 @@ The web app attempts `POST /api/v1/auth/login` once when an account session star
 `POST /api/v1/auth/logout` before clearing the session and redirecting to the provider. Both requests
 use the active account's bearer token and an empty JSON body. Failed audit requests are reported as
 `auth.auditFailed` metrics without blocking sign-out; they are not retried automatically.
-The profile request remains separate (`POST /api/v1/auth/userinfo`).
+The login response carries the user's ID, display name, email and names; it is seeded into the query cache before
+the account is published, so there is no separate user-info request (`/auth/userinfo` duplicates `/auth/login` on the
+backend, including its database write, and is not called).
 
 The app holds one active account and ignores additional sign-in requests while signed in. Entra
 logout sends the ID token and the token's optional `login_hint` claim as `logout_hint`. Configure

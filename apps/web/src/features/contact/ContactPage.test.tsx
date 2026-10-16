@@ -25,7 +25,7 @@ const fill = async (fields: { name?: string; email?: string; reason?: string; me
 };
 
 describe('Contact Us', () => {
-  beforeEach(() => server.use(scenarios.serverError('/auth/userinfo', 'post')));
+  beforeEach(() => server.use(scenarios.serverError('/auth/login', 'post')));
   it('offers name, email, reason (with the seven reasons) and message', async () => {
     const { container } = renderRoute('/contact', { auth: createInMemoryAuthClient({ user: { id: 'u1' } }) });
     expect(await screen.findByRole('heading', { level: 1, name: 'Contact Us' })).toBeInTheDocument();
@@ -108,8 +108,8 @@ describe('Contact Us', () => {
 
   it('falls back to the sign-in name and email when the profile has none', async () => {
     server.use(
-      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
-        HttpResponse.json({ id: 'u1', name: null, givenName: null, surname: null, email: null }),
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/login`, () =>
+        HttpResponse.json({ id: 'u1', name: null, email: null }),
       ),
     );
     renderRoute('/contact?reason=feedback', {
@@ -123,12 +123,12 @@ describe('Contact Us', () => {
 
   it('prefills the signed-in user’s name and email from their profile', async () => {
     server.use(
-      http.post(`${TEST_API_BASE_URL}/api/v1/auth/userinfo`, () =>
+      http.post(`${TEST_API_BASE_URL}/api/v1/auth/login`, () =>
         HttpResponse.json({
           id: 'u1',
           name: 'Asha Rao',
-          givenName: 'Asha',
-          surname: 'Rao',
+          firstName: 'Asha',
+          lastName: 'Rao',
           email: 'asha.rao@example.com',
         }),
       ),

@@ -4,6 +4,8 @@ import { validateProfile } from '@myvedicstar/validation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 
+import { seedUserInfo } from './user-info';
+
 export function useProfileEditor(api: ApiClient, userId: string | undefined) {
   const cache = useQueryClient();
   const alive = useRef(true);
@@ -26,14 +28,16 @@ export function useProfileEditor(api: ApiClient, userId: string | undefined) {
   const values = { ...profileValues(query.data), ...edits };
   const accept = async (profile: UserProfile) => {
     if (!alive.current) return;
-    await cache.cancelQueries({ queryKey: ['auth', 'userinfo', userId] });
-    if (!alive.current) return;
     cache.setQueryData(key, profile);
-    cache.setQueryData(['auth', 'userinfo', userId], {
-      id: userId,
-      name: [profile.firstName, profile.lastName].filter(Boolean).join(',') || null,
-      email: profile.email,
-    });
+    // Keep the header and greeting in step with the saved names (the login response is not requested again).
+    if (userId)
+      seedUserInfo(cache, userId, {
+        id: userId,
+        name: profile.displayName,
+        email: profile.email,
+        firstName: profile.firstName,
+        lastName: profile.lastName,
+      });
     setEdits({});
   };
   const save = useMutation({

@@ -13,6 +13,7 @@ import {
   createCachingClient,
   createLocationSearchService,
   type LocationSearchService,
+  seedUserInfo,
 } from '@myvedicstar/query-cache';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { QueryClient } from '@tanstack/react-query';
@@ -78,8 +79,11 @@ export function createMobileServices(
       : undefined;
 
   const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
-  const audit = createSessionAudit(auth, api, (operation) =>
-    telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+  const audit = createSessionAudit(
+    auth,
+    api,
+    (operation) => telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+    (userId, userInfo) => seedUserInfo(queryClient, userId, userInfo),
   );
   let signingOut: Promise<void> | null = null;
   const auditedAuth: AuthClient = {

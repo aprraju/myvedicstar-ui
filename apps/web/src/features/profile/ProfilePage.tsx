@@ -118,6 +118,7 @@ function ProfileForm({ userId }: { userId: string | undefined }) {
 const autoComplete: Record<ProfileField, string> = {
   firstName: 'given-name',
   lastName: 'family-name',
+  displayName: 'nickname',
   streetAddress: 'address-line1',
   streetAddress2: 'address-line2',
   country: 'country',

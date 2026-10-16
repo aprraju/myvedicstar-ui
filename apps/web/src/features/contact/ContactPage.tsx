@@ -75,7 +75,7 @@ function ContactForm() {
     },
   });
 
-  // Prefill from the signed-in user's profile (userinfo), falling back to the sign-in token's name and email, without
+  // Prefill from the signed-in user's profile (login response), falling back to the sign-in token's name and email, without
   // overwriting anything already typed. Applies to Contact Us, Report an Issue and Beta Feedback alike.
   const profileName = displayNameOf(userInfo, user?.displayName);
   const profileEmail = userInfo?.email?.trim() || user?.email?.trim() || undefined;

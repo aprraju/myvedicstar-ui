@@ -8,7 +8,7 @@ Governing standards: `../myvedicstar/.github/copilot-instructions.md`, especiall
 
 Add Profile above Settings and Log out in the signed-in web account menu. Provide the same profile functionality on React Native Android/iOS. Display ten editable fields in the requested order, load the existing account, update only changed fields, and preserve authentication, account status, issuer, and audit history.
 
-Use the existing PostgreSQL `myvedicstar.User` table and existing GeoNames provider. Keep `POST /api/v1/auth/userinfo` and its Id/Name/Email response unchanged. Opening Profile must never register an account or append a login audit event.
+Use the existing PostgreSQL `myvedicstar.User` table and existing GeoNames provider. The UI reads Id/Name/Email from the `POST /api/v1/auth/login` response (`/auth/userinfo` is the same backend action and is not called). The profile includes `displayName` after first and last name; the API rejects clearing it. Opening Profile must never register an account or append a login audit event.
 
 ## Projects, dependencies, and responsibilities
 

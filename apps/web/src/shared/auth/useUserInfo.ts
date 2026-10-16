@@ -1,35 +1,21 @@
-import { queryKeys } from '@myvedicstar/api-client';
 import type { UserInfo } from '@myvedicstar/contracts';
-import { useQuery } from '@tanstack/react-query';
+import { useLoginUserInfo } from '@myvedicstar/query-cache';
 
-import { useServices } from '../services/ServicesContext';
 import { useAuth } from './useAuth';
 
 /**
- * The signed-in user's profile from the Authorize API (`POST /auth/userinfo`), fetched once per signed-in user and
- * session: cached indefinitely, never retried automatically. Login/logout audits are handled by the auth client.
- * Undefined while signed out, loading, or if the service is unavailable.
+ * The signed-in user's info from this session's `POST /auth/login` response (seeded into the query cache by the auth
+ * audit before the account is published, and refreshed when the profile is saved). Never requested separately.
+ * Undefined while signed out or if the login request failed.
  */
-export function useUserInfo(): { userInfo: UserInfo | undefined; loading: boolean } {
-  const { api } = useServices();
-  const { user, loading } = useAuth();
-  const query = useQuery({
-    queryKey: queryKeys.auth.userInfo(user?.id ?? 'signed-out'),
-    queryFn: ({ signal }) => api.auth.userInfo({ signal }),
-    enabled: user !== null && !loading,
-    staleTime: Infinity,
-    gcTime: Infinity,
-    retry: false,
-    retryOnMount: false,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    refetchOnReconnect: false,
-  });
-  return { userInfo: user ? query.data : undefined, loading: user !== null && query.isPending };
+export function useUserInfo(): { userInfo: UserInfo | undefined } {
+  const { user } = useAuth();
+  const userInfo = useLoginUserInfo(user?.id);
+  return { userInfo: user ? userInfo : undefined };
 }
 
-/** Display name: the profile's full name, else given name, else the identity token's name. */
+/** Display name: the profile's display name, else first name, else the identity token's name. */
 export function displayNameOf(userInfo: UserInfo | undefined, fallback?: string): string | undefined {
-  const name = userInfo?.name?.trim() || userInfo?.givenName?.trim() || fallback?.trim();
+  const name = userInfo?.name?.trim() || userInfo?.firstName?.trim() || fallback?.trim();
   return name || undefined;
 }

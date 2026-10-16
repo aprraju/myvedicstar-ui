@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const profileFields = {
   firstName: 'First Name',
   lastName: 'Last Name',
+  displayName: 'Display Name',
   streetAddress: 'Street Address',
   streetAddress2: 'Street Address 2',
   country: 'Country',
@@ -18,6 +19,8 @@ export const userProfileSchema = z.object({
   id: z.string(),
   firstName: text,
   lastName: text,
+  // Older API versions omit the display name; treat it as unset rather than failing the whole profile.
+  displayName: text.default(null),
   streetAddress: text,
   streetAddress2: text,
   country: text,

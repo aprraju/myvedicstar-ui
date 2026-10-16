@@ -1,5 +1,6 @@
+import { useLoginUserInfo } from '@myvedicstar/query-cache';
 import { contactFormSchema, type ContactReason } from '@myvedicstar/validation';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
@@ -25,17 +26,11 @@ export function ContactScreen() {
         : 'general') as ContactReason,
   });
   const [error, setError] = useState('');
-  const profile = useQuery({
-    queryKey: ['auth', 'userinfo', user?.id],
-    queryFn: ({ signal }) => api.auth.userInfo({ signal }),
-    enabled: isAuthenticated,
-    staleTime: 60000,
-    retry: false,
-  });
+  const userInfo = useLoginUserInfo(isAuthenticated ? user?.id : undefined);
   const values = {
     ...typed,
-    name: typed.name ?? profile.data?.name ?? '',
-    email: typed.email ?? profile.data?.email ?? '',
+    name: typed.name ?? userInfo?.name ?? '',
+    email: typed.email ?? userInfo?.email ?? '',
   };
   const submit = useMutation({ mutationFn: () => api.contact.submit(values) });
   const change = (key: keyof typeof typed, value: string) => setValues((old) => ({ ...old, [key]: value }));

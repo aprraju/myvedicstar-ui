@@ -1,3 +1,5 @@
+import type { UserInfo } from '@myvedicstar/contracts';
+
 import type { ApiClient } from './client';
 
 interface SessionClient {
@@ -5,11 +7,15 @@ interface SessionClient {
   subscribe(listener: () => void): () => void;
 }
 
-/** Register/audit the account before publishing it to consumers that read account-owned data. */
+/**
+ * Register/audit the account before publishing it to consumers that read account-owned data. The login response is the
+ * user's info for the session: `onLogin` receives it before the account is published (e.g. to seed the query cache).
+ */
 export function createSessionAudit<T extends SessionClient>(
   client: T,
   api: ApiClient,
   reportFailure: (operation: 'login' | 'logout') => void,
+  onLogin?: (userId: string, userInfo: UserInfo) => void,
 ) {
   type State = ReturnType<T['getState']>;
   let state = client.getState() as State;
@@ -36,6 +42,9 @@ export function createSessionAudit<T extends SessionClient>(
       if (id)
         login = api.auth
           .login()
+          .then((userInfo) => {
+            if (generation === currentGeneration) onLogin?.(id, userInfo);
+          })
           .catch(() => reportFailure('login'))
           .finally(() => {
             if (generation === currentGeneration) {

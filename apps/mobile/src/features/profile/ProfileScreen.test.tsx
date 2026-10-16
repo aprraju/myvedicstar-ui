@@ -8,6 +8,7 @@ const profile = {
   id: 'u1',
   firstName: 'Raju',
   lastName: 'Bhupathi',
+  displayName: 'Raju B',
   streetAddress: '1 Main Street',
   streetAddress2: null,
   country: 'US',
@@ -32,6 +33,7 @@ describe('Profile on mobile', () => {
       },
     );
     await waitFor(() => expect(screen.getByLabelText('First Name')).toHaveProp('value', 'Raju'));
+    expect(screen.getByLabelText('Display Name')).toHaveProp('value', 'Raju B');
     expect(screen.getByLabelText('Email')).toHaveProp('value', 'aprraju@gmail.com');
     await fireEvent.changeText(screen.getByLabelText('Street Address 2'), 'Apartment 2');
     await fireEvent.press(screen.getByRole('button', { name: 'Save' }));

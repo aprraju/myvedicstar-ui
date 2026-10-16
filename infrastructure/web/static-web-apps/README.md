@@ -45,7 +45,7 @@ A non-empty GitHub variable with the same name overrides the file without a comm
 | `MVS_ENVIRONMENT`, `MVS_SITE_URL`                      | `production`; the public origin (HTTPS)                                      |
 | `MVS_API_BASE_URL`                                     | APIM gateway origin                                                          |
 | `MVS_API_ENDPOINT_PREFIX`                              | Route prefixed to every endpoint (APIM `/<api path>/v1` + backend `/api/v1`) |
-| `MVS_API_ENDPOINTS`                                    | JSON overrides for endpoints served by another API (e.g. `authUserInfo`)     |
+| `MVS_API_ENDPOINTS`                                    | JSON overrides for endpoints served by another API (e.g. `authLogin`)        |
 | `MVS_AUTH_*`                                           | Entra External ID authority, tenant, SPA client ID, API client ID            |
 | `MVS_FEATURE_FLAGS`                                    | Comma separated flags to enable                                              |
 | `MVS_TELEMETRY_*`, `MVS_APPINSIGHTS_CONNECTION_STRING` | Browser telemetry; the ingestion origin is added to the CSP automatically    |

@@ -1,24 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
+import { useLoginUserInfo } from '@myvedicstar/query-cache';
 import { useRouter } from 'expo-router';
 
 import { useAuth } from '../../src/shared/auth';
 import { AppText, Button, Screen } from '../../src/shared/components';
 import { useTranslation } from '../../src/shared/i18n';
-import { useServices } from '../../src/shared/services';
 
 /** More: Full Panchang, Locations, Tradition, Notifications, Profile, Settings, Help (Phases 4–5). */
 export default function MoreScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { isAuthenticated, user, signOut } = useAuth();
-  const { api } = useServices();
-  const { data: userInfo } = useQuery({
-    queryKey: ['auth', 'userinfo', user?.id],
-    queryFn: ({ signal }) => api.auth.userInfo({ signal }),
-    enabled: isAuthenticated,
-    staleTime: 60_000,
-    retry: false,
-  });
+  const userInfo = useLoginUserInfo(user?.id);
   return (
     <Screen>
       <AppText variant="title">{t('nav.more')}</AppText>

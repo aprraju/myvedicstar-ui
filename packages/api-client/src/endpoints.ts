@@ -47,10 +47,9 @@ export const defaultApiEndpoints = {
   /** GetBestGoodTimes */
   muhurtaBestGoodTimes: '/muhurta/good-times/best',
   /**
-   * MyVedicStar.Authorize.Api — POST, completes sign-in and returns the user's profile. Same base URL: API Management
-   * routes it (development: the Vite dev server proxies `/api/v1/auth` to the Authorize API).
+   * MyVedicStar.Authorize.Api — POST, completes sign-in and returns the user's ID, display name, email and names. Same
+   * base URL: API Management routes it (development: the Vite dev server proxies `/api/v1/auth` to the Authorize API).
    */
-  authUserInfo: '/auth/userinfo',
   authLogin: '/auth/login',
   authLogout: '/auth/logout',
   authProfile: '/auth/profile',
@@ -92,7 +91,6 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   muhurtaExplanation: [],
   muhurtaDaySummaries: [],
   muhurtaBestGoodTimes: [],
-  authUserInfo: [],
   authLogin: [],
   authLogout: [],
   authProfile: [],

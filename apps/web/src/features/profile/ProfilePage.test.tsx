@@ -12,6 +12,7 @@ const profile = {
   id: 'u1',
   firstName: 'Raju',
   lastName: 'Bhupathi',
+  displayName: 'Raju B',
   streetAddress: '1 Main Street',
   streetAddress2: null,
   country: 'US',
@@ -83,7 +84,7 @@ describe('Profile', () => {
     expect(screen.getByLabelText('ZIP / Postal Code')).toHaveValue('78642');
     expect(screen.getByLabelText('Street Address')).toHaveValue('1 Main Street');
   });
-  it('loads all ten fields in order and sends only edited fields', async () => {
+  it('loads all eleven fields in order and sends only edited fields', async () => {
     const requests = backend();
     renderRoute('/profile', { auth: auth() });
     await waitFor(() => expect(screen.getByLabelText('First Name')).toHaveValue('Raju'));
@@ -94,6 +95,7 @@ describe('Profile', () => {
     ).toEqual([
       'given-name',
       'family-name',
+      'nickname',
       'address-line1',
       'address-line2',
       'country',
@@ -108,6 +110,31 @@ describe('Profile', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('Your profile has been saved.')).toBeInTheDocument();
     expect(requests).toEqual([{ revision: 3, changes: { streetAddress2: 'Apartment 2' } }]);
+  });
+  it('shows the display name after the last name and saves a changed display name', async () => {
+    const requests = backend();
+    renderRoute('/profile', { auth: auth() });
+    const displayName = await screen.findByLabelText('Display Name');
+    await waitFor(() => expect(displayName).toHaveValue('Raju B'));
+    const labels = Array.from(document.querySelectorAll('form label')).map((label) => label.textContent);
+    expect(labels.slice(0, 3)).toEqual(['First Name', 'Last Name', 'Display Name']);
+    await userEvent.clear(displayName);
+    await userEvent.type(displayName, '  Raju  ');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Your profile has been saved.')).toBeInTheDocument();
+    expect(requests).toEqual([{ revision: 3, changes: { displayName: 'Raju' } }]);
+    expect(displayName).toHaveValue('Raju');
+  });
+  it('requires a display name, which the API cannot clear', async () => {
+    const requests = backend();
+    renderRoute('/profile', { auth: auth() });
+    const displayName = await screen.findByLabelText('Display Name');
+    await waitFor(() => expect(displayName).toHaveValue('Raju B'));
+    await userEvent.clear(displayName);
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Enter a display name.')).toBeInTheDocument();
+    expect(displayName).toHaveAttribute('aria-invalid', 'true');
+    expect(requests).toEqual([]);
   });
   it('clears dependent geography when country changes and preserves street fields', async () => {
     backend();

@@ -14,6 +14,7 @@ import {
   createCachePersister,
   createLocationSearchService,
   type LocationSearchService,
+  seedUserInfo,
 } from '@myvedicstar/query-cache';
 import type { QueryClient } from '@tanstack/react-query';
 import type { Persister } from '@tanstack/react-query-persist-client';
@@ -110,8 +111,11 @@ export function createServices(config: AppConfig, overrides: ServiceOverrides = 
       ? createCachePersister(createIndexedDbCacheStorage(), config.cache, report)
       : undefined;
   const locationSearch = createLocationSearchService(api, queryClient, config.locationSearch);
-  const auditedAuth = withAuthAudit(auth, api, (operation) =>
-    telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+  const auditedAuth = withAuthAudit(
+    auth,
+    api,
+    (operation) => telemetry.trackMetric('auth.auditFailed', 1, { operation }),
+    (userId, userInfo) => seedUserInfo(queryClient, userId, userInfo),
   );
   return {
     config,

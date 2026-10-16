@@ -30,3 +30,4 @@ export { cachePolicies, defaultCacheSettings } from './policies';
 export { useProfileEditor, useProfileGeography } from './profile';
 export { CacheProvider, useCacheOnline } from './provider';
 export { toAccountLocation, useAccountSettings, useSavedLocations } from './settings';
+export { seedUserInfo, useLoginUserInfo } from './user-info';

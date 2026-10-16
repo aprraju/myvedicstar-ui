@@ -1,4 +1,5 @@
 import { type ApiClient, createSessionAudit } from '@myvedicstar/api-client';
+import type { UserInfo } from '@myvedicstar/contracts';
 
 import type { AuthClient } from './auth-client';
 
@@ -7,8 +8,9 @@ export function withAuthAudit(
   client: AuthClient,
   api: ApiClient,
   reportFailure: (operation: 'login' | 'logout') => void,
+  onLogin?: (userId: string, userInfo: UserInfo) => void,
 ): AuthClient {
-  const audit = createSessionAudit(client, api, reportFailure);
+  const audit = createSessionAudit(client, api, reportFailure, onLogin);
   let signingOut: Promise<void> | null = null;
 
   return {

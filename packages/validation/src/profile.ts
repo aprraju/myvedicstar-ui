@@ -8,6 +8,8 @@ export function validateProfile(values: ProfileValues): Partial<Record<ProfileFi
     const max = key === 'email' ? 320 : key === 'postalCode' ? 20 : key === 'phoneNumber' ? 40 : 256;
     if (value.trim().length > max) errors[key as ProfileField] = `Use at most ${max} characters.`;
   }
+  // The API rejects clearing the display name (it is the name shown across the app and on the sign-in account).
+  if (!values.displayName.trim()) errors.displayName = 'Enter a display name.';
   if (values.email.trim() && !z.email().safeParse(values.email.trim()).success)
     errors.email = 'Enter a valid email address.';
   const phone = values.phoneNumber.trim();

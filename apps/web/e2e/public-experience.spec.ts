@@ -199,7 +199,7 @@ test.describe('find a good time (signed in)', () => {
 });
 
 test.describe('festivals and account (signed in)', () => {
-  test('upcoming festivals load with the access token; the profile menu shows the user from userinfo', async ({
+  test('upcoming festivals load with the access token; the profile menu shows the user from the login response', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -207,7 +207,7 @@ test.describe('festivals and account (signed in)', () => {
     const calls: { path: string; method: string; authorization: string | undefined }[] = [];
     page.on('request', (request) => {
       const url = new URL(request.url());
-      if (/\/(festivals\/upcoming|auth\/userinfo)$/.test(url.pathname)) {
+      if (/\/(festivals\/upcoming|auth\/(login|userinfo))$/.test(url.pathname)) {
         calls.push({
           path: url.pathname,
           method: request.method(),
@@ -226,9 +226,10 @@ test.describe('festivals and account (signed in)', () => {
     await expect(banner.getByRole('link', { name: 'Settings' })).toBeVisible();
 
     const festivals = calls.find((c) => c.path.endsWith('/festivals/upcoming'));
-    const userinfo = calls.filter((c) => c.path.endsWith('/auth/userinfo'));
+    const login = calls.filter((c) => c.path.endsWith('/auth/login'));
     expect(festivals?.authorization).toBe('Bearer mock-access-token');
-    expect(userinfo).toHaveLength(1);
-    expect(userinfo[0]).toMatchObject({ method: 'POST', authorization: 'Bearer mock-access-token' });
+    expect(login).toHaveLength(1);
+    expect(login[0]).toMatchObject({ method: 'POST', authorization: 'Bearer mock-access-token' });
+    expect(calls.some((c) => c.path.endsWith('/auth/userinfo'))).toBe(false);
   });
 });

@@ -399,14 +399,19 @@ export function createApiClient(options: ApiClientOptions) {
           signal: call?.signal,
           auth: 'required',
         }),
-      /** Records a login audit event using the current account's access token. */
+      /**
+       * Completes sign-in: registers the account if necessary, records the session's login once and returns the user's
+       * ID, display name, email and names. Call it once per session (the session audit does); there is no separate
+       * user-info request.
+       */
       login: (call?: CallOptions) =>
         transport.request({
           operation: 'auth.login',
           method: 'POST',
           path: path('authLogin'),
+          // The backend reads no body, but the API gateway rejects a POST without a Content-Type (415), so send `{}`.
           body: {},
-          schema: z.unknown(),
+          schema: userInfoSchema,
           signal: call?.signal,
           auth: 'required',
         }),
@@ -418,20 +423,6 @@ export function createApiClient(options: ApiClientOptions) {
           path: path('authLogout'),
           body: {},
           schema: z.unknown(),
-          signal: call?.signal,
-          auth: 'required',
-        }),
-      /**
-       * Refreshes and returns the signed-in user's profile; call it once per session. Requires the access token.
-       */
-      userInfo: (call?: CallOptions) =>
-        transport.request({
-          operation: 'auth.userInfo',
-          method: 'POST',
-          path: path('authUserInfo'),
-          // The backend reads no body, but the API gateway rejects a POST without a Content-Type (415), so send `{}`.
-          body: {},
-          schema: userInfoSchema,
           signal: call?.signal,
           auth: 'required',
         }),

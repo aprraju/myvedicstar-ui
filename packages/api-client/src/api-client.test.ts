@@ -201,7 +201,7 @@ describe('createApiClient', () => {
       () => client.muhurta.explanation(params),
       () => client.muhurta.daySummaries('2026-10-11', 3, params),
       () => client.muhurta.bestGoodTimes(params),
-      () => client.auth.userInfo(),
+      () => client.auth.login(),
     ];
     for (const call of calls) await expect(call()).rejects.toMatchObject({ kind: 'authentication' });
     expect(fetchImpl).not.toHaveBeenCalled();
@@ -339,12 +339,12 @@ describe('createApiClient', () => {
     );
   });
 
-  it('completes sign-in with POST /auth/userinfo and the access token', async () => {
+  it('completes sign-in with POST /auth/login, which returns the user info', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(fixtures.userInfo));
     const { client } = setup(fetchImpl, { getAccessToken: async () => 'token-1' });
-    expect(await client.auth.userInfo()).toEqual(fixtures.userInfo);
+    expect(await client.auth.login()).toEqual(fixtures.userInfo);
     const [url, init] = fetchImpl.mock.calls[0]!;
-    expect(new URL(String(url)).pathname).toBe('/api/v1/auth/userinfo');
+    expect(new URL(String(url)).pathname).toBe('/api/v1/auth/login');
     expect(init?.method).toBe('POST');
     expect(new Headers(init?.headers).get('Authorization')).toBe('Bearer token-1');
     // The API gateway answers 415 to a POST without a Content-Type.
@@ -352,10 +352,10 @@ describe('createApiClient', () => {
     expect(init?.body).toBe('{}');
   });
 
-  it('never calls /auth/userinfo without a token', async () => {
+  it('never calls /auth/login without a token', async () => {
     const fetchImpl = vi.fn<typeof fetch>();
     const { client } = setup(fetchImpl, { getAccessToken: async () => null });
-    await expect(client.auth.userInfo()).rejects.toMatchObject({ kind: 'authentication' });
+    await expect(client.auth.login()).rejects.toMatchObject({ kind: 'authentication' });
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 

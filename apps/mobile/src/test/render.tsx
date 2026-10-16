@@ -58,7 +58,7 @@ export function fakeFetch(override?: Responder): typeof fetch {
           }
         : url.pathname.endsWith('/settings/locations')
           ? { status: 200, body: [] }
-          : url.pathname.endsWith('/auth/userinfo')
+          : url.pathname.endsWith('/auth/login')
             ? { status: 200, body: fixtures.userInfo }
             : url.pathname.endsWith('/muhurta/activities')
               ? { status: 200, body: fixtures.muhurta.activities }

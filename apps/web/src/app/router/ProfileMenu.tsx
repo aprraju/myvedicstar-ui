@@ -9,7 +9,7 @@ import styles from './ProfileMenu.module.css';
 
 /**
  * Account menu for signed-in users: a profile icon that opens the user's name and email (from the Authorize API's
- * `userinfo`), Settings and Log out. A disclosure (button + panel), not an ARIA menu: Tab moves through the options;
+ * login response), Settings and Log out. A disclosure (button + panel), not an ARIA menu: Tab moves through the options;
  * Escape, an outside click or choosing an option closes it and returns focus to the button.
  */
 export function ProfileMenu() {
@@ -91,7 +91,7 @@ export function ProfileMenu() {
 }
 
 /**
- * The signed-in user's name and email for account menus: from `userinfo`, falling back to the sign-in token. A
+ * The signed-in user's name and email for account menus: from the login response, falling back to the sign-in token. A
  * placeholder name ("Unknown", "Your account" or the email itself) is left out.
  */
 export function useAccountIdentity() {

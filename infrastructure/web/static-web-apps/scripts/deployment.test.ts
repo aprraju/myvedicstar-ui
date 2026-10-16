@@ -74,11 +74,11 @@ describe('runtime config from environment variables', () => {
       ...production,
       MVS_API_BASE_URL: 'https://apim.example.azure-api.net',
       MVS_API_ENDPOINT_PREFIX: '/myvedicday/api/v1/',
-      MVS_API_ENDPOINTS: '{"authUserInfo":"/api/v1/auth/userinfo"}',
+      MVS_API_ENDPOINTS: '{"authLogin":"/api/v1/auth/login"}',
     });
     expect(config.endpoints.panchangToday).toBe('/myvedicday/api/v1/panchang/today');
     expect(config.endpoints.panchangMonth).toBe('/myvedicday/api/v1/panchang/month/{year}/{month}');
-    expect(config.endpoints.authUserInfo).toBe('/api/v1/auth/userinfo');
+    expect(config.endpoints.authLogin).toBe('/api/v1/auth/login');
   });
 
   it('treats blank variables (unset GitHub variables) as unset', () => {

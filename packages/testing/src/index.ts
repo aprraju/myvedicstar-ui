@@ -113,7 +113,7 @@ export const fixtures = {
       austinOther: muhurtaBestAustinOther as BestGoodTimesResponse,
     },
   },
-  /** Sample `POST /auth/userinfo` profile (synthetic person). */
+  /** Sample `POST /auth/login` user info (synthetic person). */
   userInfo: userInfo as UserInfo,
   glossary: glossary as GlossaryResponse,
   problem: {

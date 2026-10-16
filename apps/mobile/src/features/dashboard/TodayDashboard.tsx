@@ -1,5 +1,4 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { queryKeys } from '@myvedicstar/api-client';
 import { formatDayMonth, formatLocalDate } from '@myvedicstar/date-time';
 import {
   buildDayDashboard,
@@ -7,7 +6,7 @@ import {
   dashboardFirstName,
   toneForRating,
 } from '@myvedicstar/domain-models';
-import { useQuery } from '@tanstack/react-query';
+import { useLoginUserInfo } from '@myvedicstar/query-cache';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
@@ -18,7 +17,6 @@ import dashboardImage from '../../../assets/images/dashboard.jpg';
 import { useAuth } from '../../shared/auth';
 import { AppText, Button, Screen } from '../../shared/components';
 import { useTranslation } from '../../shared/i18n';
-import { useServices } from '../../shared/services';
 import { statusToneColors } from '../../shared/statusTone';
 import { useTheme } from '../../shared/theme';
 import { useLocationState } from '../location/LocationProvider';
@@ -42,7 +40,6 @@ export function TodayDashboard() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { user, loading } = useAuth();
-  const { api } = useServices();
   const { query, location } = usePanchangToday();
   const { openSheet } = useLocationState();
   const now = useNow();
@@ -50,14 +47,8 @@ export function TodayDashboard() {
     () => (query.data ? buildDayDashboard(query.data, now) : undefined),
     [query.data, now],
   );
-  const { data: userInfo } = useQuery({
-    queryKey: queryKeys.auth.userInfo(user?.id ?? 'signed-out'),
-    queryFn: ({ signal }) => api.auth.userInfo({ signal }),
-    enabled: !!user && !loading,
-    staleTime: Infinity,
-    retry: false,
-  });
-  const name = dashboardFirstName(userInfo?.name?.trim() || userInfo?.givenName?.trim() || user?.displayName);
+  const userInfo = useLoginUserInfo(user && !loading ? user.id : undefined);
+  const name = dashboardFirstName(userInfo?.name?.trim() || userInfo?.firstName?.trim() || user?.displayName);
   const summary = dashboard?.summary;
   const glossary = query.data?.glossary;
   return (

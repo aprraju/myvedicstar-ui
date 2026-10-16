@@ -57,7 +57,7 @@ describe('contract schemas accept responses captured from the real API', () => {
   it('user info (nullable names and email)', () => {
     expect(userInfoSchema.safeParse(fixtures.userInfo).success).toBe(true);
     expect(
-      userInfoSchema.safeParse({ id: 'x', givenName: null, surname: null, name: null, email: null }).success,
+      userInfoSchema.safeParse({ id: 'x', name: null, email: null, firstName: null, lastName: null }).success,
     ).toBe(true);
   });
 

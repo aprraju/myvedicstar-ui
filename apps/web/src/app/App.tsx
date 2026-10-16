@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router';
 
 import { type GeolocationProvider, LocationDialog, LocationStateProvider } from '../features/location';
 import { TraditionStateProvider } from '../features/tradition';
-import { useRefetchOnUserChange, useUserInfo } from '../shared/auth';
+import { useRefetchOnUserChange } from '../shared/auth';
 import { AppErrorBoundary } from '../shared/errors/AppErrorBoundary';
 import { I18nProvider } from '../shared/i18n/I18nProvider';
 import type { AppServices } from '../shared/services/services';
@@ -65,7 +65,5 @@ export function AppProviders({
 /** Re-requests API data with the access token whenever the signed-in user changes. */
 function RefetchOnUserChange() {
   useRefetchOnUserChange();
-  // Keep the login POST subscribed for the lifetime of the app, including route transitions.
-  useUserInfo();
   return null;
 }
