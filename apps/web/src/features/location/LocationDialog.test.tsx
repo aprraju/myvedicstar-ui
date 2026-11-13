@@ -170,6 +170,8 @@ describe('location selection', () => {
           defaultLocationId: null,
           defaultLocation: null,
           revision: 1,
+          chartStyle: 'south-indian',
+          ayanamsa: 'lahiri',
         });
       }),
     );
@@ -238,6 +240,8 @@ describe('signed-in saved locations', () => {
           defaultLocationId,
           defaultLocation: locations.find((item) => item.locationId === defaultLocationId) ?? null,
           revision: 1,
+          chartStyle: 'south-indian',
+          ayanamsa: 'lahiri',
         }),
       ),
       http.get(`${TEST_API_BASE_URL}/api/v1/settings/locations`, () => HttpResponse.json(locations)),

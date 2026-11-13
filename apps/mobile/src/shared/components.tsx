@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { type ComponentProps, type ReactNode, useId } from 'react';
 import {
+  type AccessibilityState,
   ActivityIndicator,
   Modal,
   Pressable,
@@ -93,6 +94,7 @@ export function Button({
   disabled = false,
   accessibilityLabel,
   expanded,
+  accessibilityState,
 }: {
   label: string;
   onPress: () => void;
@@ -102,6 +104,7 @@ export function Button({
   disabled?: boolean;
   accessibilityLabel?: string;
   expanded?: boolean;
+  accessibilityState?: AccessibilityState;
 }) {
   const theme = useTheme();
   const colors = {
@@ -118,6 +121,7 @@ export function Button({
         disabled: inactive,
         busy: loading,
         ...(expanded === undefined ? {} : { expanded }),
+        ...accessibilityState,
       }}
       disabled={inactive}
       onPress={onPress}

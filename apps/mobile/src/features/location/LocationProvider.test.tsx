@@ -45,6 +45,8 @@ async function render(locations: (typeof austin)[], defaultLocation: typeof aust
                 defaultLocationId: defaultLocation?.locationId ?? null,
                 defaultLocation,
                 revision: 1,
+                chartStyle: 'south-indian',
+                ayanamsa: 'lahiri',
               },
             }
           : url.pathname.endsWith('/settings/locations')

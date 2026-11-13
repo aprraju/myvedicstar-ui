@@ -239,6 +239,26 @@ export const en = {
     hint: 'Changes which timings and names are shown. It doesn’t depend on where you are.',
     loadFailed: 'Traditions are unavailable right now.',
   },
+  /** Account Settings preference fields (codes are the API wire values; labels are display only). */
+  settingsPreferences: {
+    chartStyle: {
+      label: 'Chart Style',
+      options: {
+        'north-indian': 'North Indian',
+        'south-indian': 'South Indian',
+        'east-indian': 'East Indian',
+      },
+    },
+    ayanamsa: {
+      label: 'Ayanamsa',
+      options: {
+        lahiri: 'N.C. Lahiri',
+        raman: 'Raman',
+        krishnamurti: 'Krishnamurti (KP)',
+        'true-chitra': 'True Chitra',
+      },
+    },
+  },
   profile: {
     menu: 'Account',
     open: 'Open account menu',

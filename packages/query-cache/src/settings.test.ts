@@ -46,6 +46,8 @@ const settings = (defaultLocation: SavedLocation | null): UserSettings => ({
   defaultLocationId: defaultLocation?.locationId ?? null,
   defaultLocation,
   revision: 1,
+  chartStyle: 'south-indian',
+  ayanamsa: 'lahiri',
 });
 
 describe('findSavedLocation', () => {

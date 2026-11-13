@@ -101,11 +101,15 @@ test('settings prefill, explicit save, and default deletion work under productio
     defaultLocationId: string | null;
     defaultLocation: typeof location | null;
     revision: number;
+    chartStyle: string;
+    ayanamsa: string;
   } = {
     defaultTradition: 'telugu',
     defaultLocationId: location.locationId,
     defaultLocation: location,
     revision: 1,
+    chartStyle: 'south-indian',
+    ayanamsa: 'lahiri',
   };
   await page.route('**/api/v1/settings', async (route) => {
     if (route.request().method() === 'PUT') {
@@ -128,6 +132,8 @@ test('settings prefill, explicit save, and default deletion work under productio
   await page.goto('/settings');
   await expect(page.getByLabel('Default Tradition')).toHaveValue('telugu');
   await expect(page.getByLabel('Default Location')).toHaveValue(location.locationId);
+  await expect(page.getByLabel('Chart Style')).toHaveValue('south-indian');
+  await expect(page.getByLabel('Ayanamsa')).toHaveValue('lahiri');
   for (const width of [320, 375, 640]) {
     await page.setViewportSize({ width, height: 812 });
     await expect
