@@ -16,6 +16,6 @@
   },
   "dependencies": {
     "@myvedicstar/api-client": "0.1.0",
-    "zod": "4.6.5"
+    "zod": "4.6.6"
   }
 }
