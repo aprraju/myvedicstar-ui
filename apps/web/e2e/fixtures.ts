@@ -107,7 +107,14 @@ export const test = base.extend<{ violations: string[]; apiRequests: URL[] }>({
         if (url.pathname.endsWith('/auth/login')) return route.fulfill({ json: fixtures.userInfo });
         if (url.pathname.endsWith('/settings'))
           return route.fulfill({
-            json: { defaultTradition: null, defaultLocationId: null, defaultLocation: null, revision: 0 },
+            json: {
+              defaultTradition: null,
+              defaultLocationId: null,
+              defaultLocation: null,
+              revision: 0,
+              chartStyle: 'south-indian',
+              ayanamsa: 'lahiri',
+            },
           });
         if (url.pathname.endsWith('/settings/locations')) return route.fulfill({ json: [] });
         if (url.pathname.endsWith('/muhurta/nakshatras'))

@@ -1,9 +1,11 @@
+import { ayanamsaSchema, ayanamsaValues, chartStyleSchema, chartStyleValues } from '@myvedicstar/contracts';
 import { toAccountLocation, useAccountSettings, useSavedLocations } from '@myvedicstar/query-cache';
 import { useState } from 'react';
 import { View } from 'react-native';
 
 import { useAuth } from '../../shared/auth';
 import { AppText, Button, Notice, Screen } from '../../shared/components';
+import { useTranslation } from '../../shared/i18n';
 import { useServices } from '../../shared/services';
 import { useLocationState } from '../location/LocationProvider';
 import { useTradition, useTraditions } from '../tradition/TraditionProvider';
@@ -20,12 +22,18 @@ export function SettingsScreen() {
 }
 function SettingsForm({ userId }: { userId: string }) {
   const { api, config } = useServices();
+  const { t } = useTranslation();
   const { query, save } = useAccountSettings(api, userId);
   const locations = useSavedLocations(api, userId);
   const traditions = useTraditions();
   const { applyDefault: applyLocation, openSheet } = useLocationState();
   const { applyDefault: applyTradition } = useTradition();
-  const [edits, setEdits] = useState<{ tradition?: string; location?: string }>({});
+  const [edits, setEdits] = useState<{
+    tradition?: string;
+    location?: string;
+    chartStyle?: string;
+    ayanamsa?: string;
+  }>({});
   const data = query.data;
   const selectedLocation = edits.location ?? data?.defaultLocationId ?? '';
   const busy = save.isPending || locations.remove.isPending;
@@ -41,22 +49,24 @@ function SettingsForm({ userId }: { userId: string }) {
         </>
       )}
       <AppText variant="heading">Default Tradition</AppText>
-      <View accessibilityRole="radiogroup">
+      <View accessibilityRole="radiogroup" accessibilityLabel="Default Tradition">
         {[{ key: '', name: 'Use application default' }, ...(traditions.data?.traditions ?? [])].map(
-          (item) => (
-            <Button
-              key={item.key}
-              variant={
-                (edits.tradition ?? data?.defaultTradition ?? '') === item.key ? 'primary' : 'secondary'
-              }
-              disabled={busy || !data}
-              label={item.name}
-              onPress={() => {
-                save.reset();
-                setEdits((current) => ({ ...current, tradition: item.key }));
-              }}
-            />
-          ),
+          (item) => {
+            const checked = (edits.tradition ?? data?.defaultTradition ?? '') === item.key;
+            return (
+              <Button
+                key={item.key}
+                variant={checked ? 'primary' : 'secondary'}
+                disabled={busy || !data}
+                label={item.name}
+                accessibilityState={{ checked, disabled: busy || !data }}
+                onPress={() => {
+                  save.reset();
+                  setEdits((current) => ({ ...current, tradition: item.key }));
+                }}
+              />
+            );
+          },
         )}
       </View>
       <AppText variant="heading">Default Location</AppText>
@@ -78,6 +88,48 @@ function SettingsForm({ userId }: { userId: string }) {
           }}
         />
       ))}
+      {data && (
+        <>
+          <AppText variant="heading">{t('settingsPreferences.chartStyle.label')}</AppText>
+          <View accessibilityRole="radiogroup" accessibilityLabel={t('settingsPreferences.chartStyle.label')}>
+            {chartStyleValues.map((value) => {
+              const checked = (edits.chartStyle ?? data.chartStyle) === value;
+              return (
+                <Button
+                  key={value}
+                  label={t(`settingsPreferences.chartStyle.options.${value}`)}
+                  variant={checked ? 'primary' : 'secondary'}
+                  disabled={busy}
+                  accessibilityState={{ checked, disabled: busy }}
+                  onPress={() => {
+                    save.reset();
+                    setEdits((current) => ({ ...current, chartStyle: value }));
+                  }}
+                />
+              );
+            })}
+          </View>
+          <AppText variant="heading">{t('settingsPreferences.ayanamsa.label')}</AppText>
+          <View accessibilityRole="radiogroup" accessibilityLabel={t('settingsPreferences.ayanamsa.label')}>
+            {ayanamsaValues.map((value) => {
+              const checked = (edits.ayanamsa ?? data.ayanamsa) === value;
+              return (
+                <Button
+                  key={value}
+                  label={t(`settingsPreferences.ayanamsa.options.${value}`)}
+                  variant={checked ? 'primary' : 'secondary'}
+                  disabled={busy}
+                  accessibilityState={{ checked, disabled: busy }}
+                  onPress={() => {
+                    save.reset();
+                    setEdits((current) => ({ ...current, ayanamsa: value }));
+                  }}
+                />
+              );
+            })}
+          </View>
+        </>
+      )}
       {save.isError && (
         <Notice tone="error">Settings could not be saved. Reload if another session changed them.</Notice>
       )}
@@ -93,6 +145,8 @@ function SettingsForm({ userId }: { userId: string }) {
               defaultTradition: (edits.tradition ?? data.defaultTradition) || null,
               defaultLocationId: selectedLocation || null,
               revision: data.revision,
+              chartStyle: chartStyleSchema.parse(edits.chartStyle ?? data.chartStyle),
+              ayanamsa: ayanamsaSchema.parse(edits.ayanamsa ?? data.ayanamsa),
             },
             {
               onSuccess: (result) => {

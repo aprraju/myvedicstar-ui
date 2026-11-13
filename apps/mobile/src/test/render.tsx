@@ -54,7 +54,14 @@ export function fakeFetch(override?: Responder): typeof fetch {
       (url.pathname.endsWith('/settings')
         ? {
             status: 200,
-            body: { defaultTradition: null, defaultLocationId: null, defaultLocation: null, revision: 0 },
+            body: {
+              defaultTradition: null,
+              defaultLocationId: null,
+              defaultLocation: null,
+              revision: 0,
+              chartStyle: 'south-indian',
+              ayanamsa: 'lahiri',
+            },
           }
         : url.pathname.endsWith('/settings/locations')
           ? { status: 200, body: [] }

@@ -1,8 +1,10 @@
+import { ayanamsaSchema, ayanamsaValues, chartStyleSchema, chartStyleValues } from '@myvedicstar/contracts';
 import { toAccountLocation, useAccountSettings, useSavedLocations } from '@myvedicstar/query-cache';
 import { useState } from 'react';
 
 import { useAuth } from '../../shared/auth';
 import { Button } from '../../shared/components/Button';
+import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { useServices } from '../../shared/services/ServicesContext';
 import { useLocationState } from '../location';
 import styles from '../profile/ProfilePage.module.css';
@@ -16,12 +18,18 @@ export function SettingsPage() {
 }
 function SettingsForm({ userId }: { userId: string | undefined }) {
   const { api, config } = useServices();
+  const { t } = useTranslation();
   const { query, save } = useAccountSettings(api, userId);
   const locations = useSavedLocations(api, userId);
   const traditions = useTraditions();
   const { applyDefault: applyLocation, openDialog } = useLocationState();
   const { applyDefault: applyTradition } = useTradition();
-  const [edits, setEdits] = useState<{ tradition?: string; location?: string }>({});
+  const [edits, setEdits] = useState<{
+    tradition?: string;
+    location?: string;
+    chartStyle?: string;
+    ayanamsa?: string;
+  }>({});
   const data = query.data;
   const busy = save.isPending || locations.remove.isPending;
   const defaultLocation = data?.defaultLocationId ?? '';
@@ -50,6 +58,8 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
                 defaultTradition: (edits.tradition ?? data.defaultTradition) || null,
                 defaultLocationId: locationId || null,
                 revision: data.revision,
+                chartStyle: chartStyleSchema.parse(edits.chartStyle ?? data.chartStyle),
+                ayanamsa: ayanamsaSchema.parse(edits.ayanamsa ?? data.ayanamsa),
               },
               {
                 onSuccess: (result) => {
@@ -61,7 +71,7 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
             );
           }}
         >
-          <fieldset className={styles.fields} disabled={!data || busy}>
+          <fieldset className={styles.fields} aria-label="Settings defaults" disabled={!data || busy}>
             <div className={styles.field}>
               <label htmlFor="default-tradition">Default Tradition</label>
               <select
@@ -98,6 +108,44 @@ function SettingsForm({ userId }: { userId: string | undefined }) {
                 ))}
               </select>
             </div>
+            {data && (
+              <>
+                <div className={styles.field}>
+                  <label htmlFor="chart-style">{t('settingsPreferences.chartStyle.label')}</label>
+                  <select
+                    id="chart-style"
+                    value={edits.chartStyle ?? data.chartStyle}
+                    onChange={(event) => {
+                      save.reset();
+                      setEdits((current) => ({ ...current, chartStyle: event.target.value }));
+                    }}
+                  >
+                    {chartStyleValues.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`settingsPreferences.chartStyle.options.${value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="ayanamsa">{t('settingsPreferences.ayanamsa.label')}</label>
+                  <select
+                    id="ayanamsa"
+                    value={edits.ayanamsa ?? data.ayanamsa}
+                    onChange={(event) => {
+                      save.reset();
+                      setEdits((current) => ({ ...current, ayanamsa: event.target.value }));
+                    }}
+                  >
+                    {ayanamsaValues.map((value) => (
+                      <option key={value} value={value}>
+                        {t(`settingsPreferences.ayanamsa.options.${value}`)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
           </fieldset>
           {!validLocation && (
             <p role="alert">The chosen location was removed. Choose another default location.</p>

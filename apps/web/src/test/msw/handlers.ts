@@ -136,6 +136,8 @@ export const handlers = [
       defaultLocationId: null,
       defaultLocation: null,
       revision: 0,
+      chartStyle: 'south-indian',
+      ayanamsa: 'lahiri',
     }),
   ),
   http.get(api('/settings/locations'), () => HttpResponse.json([])),
