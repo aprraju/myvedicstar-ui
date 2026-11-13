@@ -24,6 +24,8 @@ const initial = {
   defaultLocationId: location.locationId,
   defaultLocation: location,
   revision: 2,
+  chartStyle: 'south-indian',
+  ayanamsa: 'lahiri',
 };
 const secondLocation = {
   ...location,
@@ -99,7 +101,13 @@ describe('Settings', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(await screen.findByText('Your settings have been saved.')).toBeInTheDocument();
     expect(saves).toEqual([
-      { defaultTradition: 'tamil', defaultLocationId: location.locationId, revision: 2 },
+      {
+        defaultTradition: 'tamil',
+        defaultLocationId: location.locationId,
+        revision: 2,
+        chartStyle: 'south-indian',
+        ayanamsa: 'lahiri',
+      },
     ]);
   });
   it('deletes a default location and immediately clears the default and list', async () => {
@@ -140,6 +148,130 @@ describe('Settings', () => {
     expect(
       await screen.findByText(/Austin, Texas, United States/, { selector: 'button span' }),
     ).toBeInTheDocument();
+  });
+  it('shows the persisted Chart Style and Ayanamsa after Default Location and before Save', async () => {
+    backend();
+    renderRoute('/settings', { auth: auth() });
+    const chartStyle = await screen.findByRole('combobox', { name: 'Chart Style' });
+    const ayanamsa = screen.getByRole('combobox', { name: 'Ayanamsa' });
+    expect(chartStyle).toHaveValue('south-indian');
+    expect(ayanamsa).toHaveValue('lahiri');
+    expect(
+      within(chartStyle)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['North Indian', 'South Indian', 'East Indian']);
+    expect(
+      within(ayanamsa)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['N.C. Lahiri', 'Raman', 'Krishnamurti (KP)', 'True Chitra']);
+    const fields = screen.getByRole('group', { name: 'Settings defaults' });
+    const order = within(fields)
+      .getAllByRole('combobox')
+      .map((select) => select.id);
+    expect(order).toEqual(['default-tradition', 'default-location', 'chart-style', 'ayanamsa']);
+    const save = screen.getByRole('button', { name: 'Save' });
+    expect(fields.compareDocumentPosition(save) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+  it.each([
+    ['north-indian', 'lahiri'],
+    ['north-indian', 'raman'],
+    ['north-indian', 'krishnamurti'],
+    ['north-indian', 'true-chitra'],
+    ['south-indian', 'lahiri'],
+    ['south-indian', 'raman'],
+    ['south-indian', 'krishnamurti'],
+    ['south-indian', 'true-chitra'],
+    ['east-indian', 'lahiri'],
+    ['east-indian', 'raman'],
+    ['east-indian', 'krishnamurti'],
+    ['east-indian', 'true-chitra'],
+  ])('loads, edits and saves chart style %s with ayanamsa %s', async (chartStyle, ayanamsa) => {
+    const { saves } = backend();
+    renderRoute('/settings', { auth: auth() });
+    const chartSelect = await screen.findByRole('combobox', { name: 'Chart Style' });
+    const ayanamsaSelect = screen.getByRole('combobox', { name: 'Ayanamsa' });
+    await waitFor(() => expect(chartSelect).toHaveValue('south-indian'));
+    await userEvent.selectOptions(chartSelect, chartStyle);
+    await userEvent.selectOptions(ayanamsaSelect, ayanamsa);
+    expect(saves).toHaveLength(0);
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Your settings have been saved.')).toBeInTheDocument();
+    expect(saves).toEqual([
+      {
+        defaultTradition: 'telugu',
+        defaultLocationId: location.locationId,
+        revision: 2,
+        chartStyle,
+        ayanamsa,
+      },
+    ]);
+    expect(chartSelect).toHaveValue(chartStyle);
+    expect(ayanamsaSelect).toHaveValue(ayanamsa);
+  });
+  it('saves unchanged values and preserves tradition and location selections', async () => {
+    const { saves } = backend();
+    renderRoute('/settings', { auth: auth() });
+    const tradition = await screen.findByRole('combobox', { name: 'Default Tradition' });
+    await waitFor(() => expect(tradition).toHaveValue('telugu'));
+    await userEvent.selectOptions(tradition, 'tamil');
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Default Location' }),
+      secondLocation.locationId,
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await screen.findByText('Your settings have been saved.');
+    expect(saves).toEqual([
+      {
+        defaultTradition: 'tamil',
+        defaultLocationId: secondLocation.locationId,
+        revision: 2,
+        chartStyle: 'south-indian',
+        ayanamsa: 'lahiri',
+      },
+    ]);
+    expect(screen.getByRole('combobox', { name: 'Chart Style' })).toHaveValue('south-indian');
+  });
+  it('surfaces an error and shows no success when the API rejects the save', async () => {
+    backend();
+    let attempts = 0;
+    server.use(
+      http.put(`${TEST_API_BASE_URL}/api/v1/settings`, () => {
+        attempts += 1;
+        return HttpResponse.json(
+          {
+            title: 'Validation failed',
+            status: 400,
+            errors: { ayanamsa: ['Choose a supported ayanamsa.'] },
+          },
+          { status: 400, headers: { 'Content-Type': 'application/problem+json' } },
+        );
+      }),
+    );
+    renderRoute('/settings', { auth: auth() });
+    const ayanamsa = await screen.findByRole('combobox', { name: 'Ayanamsa' });
+    await waitFor(() => expect(ayanamsa).toHaveValue('lahiri'));
+    await userEvent.selectOptions(ayanamsa, 'raman');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(
+      await screen.findByText(
+        'Settings could not be saved. Reload settings if another session changed them.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Your settings have been saved.')).not.toBeInTheDocument();
+    expect(attempts).toBe(1);
+  });
+  it('rejects an unsupported server value instead of silently showing a default', async () => {
+    backend();
+    server.use(
+      http.get(`${TEST_API_BASE_URL}/api/v1/settings`, () =>
+        HttpResponse.json({ ...initial, chartStyle: 'west-indian' }),
+      ),
+    );
+    renderRoute('/settings', { auth: auth() });
+    expect(await screen.findByText('Settings could not be loaded.')).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Chart Style' })).not.toBeInTheDocument();
   });
   it('allows a temporary tradition choice without modifying saved defaults', async () => {
     const { saves } = backend();
