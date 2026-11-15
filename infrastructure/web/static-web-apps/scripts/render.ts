@@ -3,6 +3,8 @@
  *   config.json               runtime configuration (validated)
  *   staticwebapp.config.json  Azure Static Web Apps routing, caching and security headers
  *   404.html                  pre-rendered not-found document served with HTTP 404 for unknown paths
+ *   sitemap.xml               the ten public pages
+ *   robots.txt                the same policy, pointing at this deployment's sitemap
  *
  *   tsx render.ts --out <staged-dist-dir> [--expect-environment production]
  *
@@ -15,6 +17,7 @@ import { parseArgs } from 'node:util';
 
 import { NOT_FOUND_FILE, renderNotFoundPage } from './not-found-page.ts';
 import { renderRuntimeConfig } from './runtime-config.ts';
+import { renderRobots, renderSitemap } from './sitemap.ts';
 import { buildStaticWebAppConfig } from './static-web-app-config.ts';
 
 const { values } = parseArgs({
@@ -47,6 +50,8 @@ function findNotFoundStylesheet(out: string): string {
 }
 
 writeFileSync(join(values.out, 'config.json'), `${JSON.stringify(result.raw, null, 2)}\n`);
+writeFileSync(join(values.out, 'sitemap.xml'), renderSitemap(result.siteUrl));
+writeFileSync(join(values.out, 'robots.txt'), renderRobots(result.siteUrl));
 writeFileSync(
   join(values.out, NOT_FOUND_FILE),
   renderNotFoundPage({ stylesheetHref: findNotFoundStylesheet(values.out) }),
