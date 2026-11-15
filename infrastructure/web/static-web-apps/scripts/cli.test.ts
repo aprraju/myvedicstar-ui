@@ -13,12 +13,16 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
+
 const SCRIPTS = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(SCRIPTS, '../../../..');
 const TIMEOUT = 60_000;
 
+// Mirrors a real Vite build: the entry stylesheet is linked and the module script carries crossorigin.
 const INDEX_HTML =
-  '<!doctype html><html><head><script type="module" src="/assets/index-abc123.js"></script></head>' +
+  '<!doctype html><html><head><link rel="stylesheet" crossorigin href="/assets/index-def456.css">' +
+  '<script type="module" crossorigin src="/assets/index-abc123.js"></script></head>' +
   '<body><div id="root"></div></body></html>';
 
 function runScript(script: string, args: string[], env: Record<string, string> = {}) {
@@ -51,12 +55,41 @@ afterEach(() => {
   for (const server of servers.splice(0)) server.close();
 });
 
+/** One pre-rendered public page, shaped like prerender.ts output: head contract + body inside #root. */
+const prerenderedPage = (path: string, title: string, description: string) => {
+  const canonical = `https://www.myvedicstar.com${path === '/' ? '/' : path}`;
+  return (
+    `<!doctype html><html><head><title>${title} · My Vedic Star</title>` +
+    `<meta name="description" content="${description}" />` +
+    `<link rel="canonical" href="${canonical}" />` +
+    `</head><body><div id="root"><main id="main-content"><h1>${title}</h1><p>Body text.</p></main></div>` +
+    `<script type="module" src="/assets/index-abc123.js"></script></body></html>`
+  );
+};
+
+/**
+ * Every public page the build gate requires, keyed by output path — except `/`, which is written by render.ts itself
+ * (it replaces the shell's body). Pre-writing it here would clobber the fixture's index.html, the source of the
+ * script/stylesheet tags.
+ */
+const prerenderedPages = () =>
+  Object.fromEntries(
+    publicPageMetadata
+      .filter((meta) => meta.path !== '/')
+      .map((meta) => [
+        `${meta.path.replace(/^\//, '')}/index.html`,
+        prerenderedPage(meta.path, meta.title, meta.description),
+      ]),
+  );
+
 const goodBuild = () =>
   buildDir({
     'index.html': INDEX_HTML,
     'assets/index-abc123.js': 'export const app = () => 1;\n',
-    // The not-found stylesheet the deployment links from 404.html.
+    // The entry stylesheet index.html links, and the not-found stylesheet 404.html links.
+    'assets/index-def456.css': '.app{display:grid}\n',
     'assets/not-found-def456.css': '.not-found-main{display:grid}\n',
+    ...prerenderedPages(),
   });
 
 describe('validate-build.ts', () => {
@@ -64,7 +97,8 @@ describe('validate-build.ts', () => {
     'passes a clean production build and reports its size',
     async () => {
       const { code, output } = await runScript('validate-build.ts', [goodBuild()]);
-      expect(output).toMatch(/Build validation passed: 3 files/);
+      // index.html + entry script + entry stylesheet + not-found stylesheet + the ten pre-rendered pages.
+      expect(output).toMatch(/Build validation passed: 13 files/);
       expect(code).toBe(0);
     },
     TIMEOUT,

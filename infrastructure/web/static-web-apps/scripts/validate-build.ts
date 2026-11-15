@@ -17,6 +17,8 @@ import { join, relative } from 'node:path';
 import { parseArgs } from 'node:util';
 import { gzipSync } from 'node:zlib';
 
+import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
+
 const { values, positionals } = parseArgs({
   allowPositionals: true,
   options: { staged: { type: 'boolean', default: false } },
@@ -81,12 +83,42 @@ try {
   fail('index.html is missing');
 }
 for (const match of indexHtml.matchAll(/<script\b([^>]*)>/gi)) {
-  if (!/\bsrc=/.test(match[1] ?? '')) fail('index.html contains an inline <script> (blocked by the CSP)');
+  const attrs = match[1] ?? '';
+  // A typed JSON-LD block is data, not executable script: CSP allows it and the head contract needs it.
+  if (!/\bsrc=/.test(attrs) && !/type="application\/ld\+json"/i.test(attrs))
+    fail('index.html contains an inline <script> (blocked by the CSP)');
 }
 for (const match of indexHtml.matchAll(/(?:src|href)="\/(assets\/[^"]+)"/g)) {
   if (!files.some((file) => rel(file) === match[1])) fail(`index.html references missing ${match[1]}`);
 }
 if (/\son[a-z]+=/i.test(indexHtml)) fail('index.html contains an inline event handler (blocked by the CSP)');
+
+/**
+ * Pre-rendered public pages (SEO-3A): each must exist, carry the head contract, and contain real body text — that is the
+ * whole point, so a missing or hollow page fails the build rather than shipping silently.
+ */
+for (const meta of publicPageMetadata) {
+  const name = meta.path === '/' ? 'index.html' : `${meta.path.replace(/^\//, '')}/index.html`;
+  let html: string;
+  try {
+    html = readFileSync(join(dist, name), 'utf8');
+  } catch {
+    fail(`pre-rendered page ${name} is missing`);
+    continue;
+  }
+  if (!/<h1[^>]*>\s*\S/i.test(html)) fail(`${name}: no non-empty <h1>`);
+  if (!/<link[^>]+rel="canonical"[^>]+href="https:\/\/[^"]+"/i.test(html))
+    fail(`${name}: no absolute canonical link`);
+  if (!/<meta[^>]+name="description"[^>]+content="[^"]{20,}"/i.test(html))
+    fail(`${name}: no page description`);
+  if (!/<div id="root">[\s\S]*<main[\s\S]*<p>/i.test(html)) fail(`${name}: #root has no page body text`);
+  // Only a typed JSON-LD block may be inline; the CSP has no 'unsafe-inline' for script.
+  for (const match of html.matchAll(/<script\b([^>]*)>/gi)) {
+    const attrs = match[1] ?? '';
+    if (!/type="application\/ld\+json"/i.test(attrs) && !/\bsrc=/.test(attrs))
+      fail(`${name}: inline <script> (blocked by the CSP)`);
+  }
+}
 
 // 404.html: a real document with no script (served for unknown paths), and its stylesheet must exist.
 try {
