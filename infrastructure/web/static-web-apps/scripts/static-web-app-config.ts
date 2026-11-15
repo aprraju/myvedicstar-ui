@@ -83,6 +83,8 @@ export function buildStaticWebAppConfig(config: AppConfig): Record<string, unkno
     ],
     globalHeaders: headers,
     mimeTypes: {
+      // Served because it is a real file (rendered per deployment), and crawlers expect application/xml.
+      '.xml': 'application/xml',
       '.json': 'application/json',
       '.webmanifest': 'application/manifest+json',
     },
