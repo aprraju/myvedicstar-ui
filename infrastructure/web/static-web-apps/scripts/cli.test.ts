@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
 
 const SCRIPTS = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(SCRIPTS, '../../../..');
@@ -54,41 +53,6 @@ afterEach(() => {
   for (const dir of temporary.splice(0)) rmSync(dir, { recursive: true, force: true });
   for (const server of servers.splice(0)) server.close();
 });
-
-/** One pre-rendered public page, shaped like prerender.ts output: head contract + body inside #root. */
-const prerenderedPage = (path: string, title: string, description: string) => {
-  const canonical = `https://www.myvedicstar.com${path === '/' ? '/' : path}`;
-  return (
-    `<!doctype html><html><head><title>${title} · My Vedic Star</title>` +
-    `<meta name="description" content="${description}" />` +
-    `<link rel="canonical" href="${canonical}" />` +
-    // The entry stylesheet: render.ts reads it from the document it pre-renders, as it does in a real build.
-    `<link rel="stylesheet" crossorigin href="/assets/index-def456.css">` +
-    `</head><body><div id="root"><main id="main-content"><h1>${title}</h1><p>Body text.</p></main></div>` +
-    `<script type="module" src="/assets/index-abc123.js"></script></body></html>`
-  );
-};
-
-/**
- * The home page, which render.ts writes over `index.html`. The fixture therefore models the POST-render tree: this
- * document is both the pre-rendered `/` page and the source of the script/stylesheet tags the other pages reuse.
- */
-const prerenderedHome = () => {
-  const home = publicPageMetadata.find((meta) => meta.path === '/');
-  if (!home) throw new Error('No metadata for the home page');
-  return prerenderedPage(home.path, home.title, home.description);
-};
-
-/** Every other public page the build gate requires, keyed by output path. */
-const prerenderedPages = () =>
-  Object.fromEntries(
-    publicPageMetadata
-      .filter((meta) => meta.path !== '/')
-      .map((meta) => [
-        `${meta.path.replace(/^\//, '')}/index.html`,
-        prerenderedPage(meta.path, meta.title, meta.description),
-      ]),
-  );
 
 const goodBuild = () =>
   buildDir({
