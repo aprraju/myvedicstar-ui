@@ -103,6 +103,24 @@ describe('runtime config from environment variables', () => {
     });
   });
 
+  // Regression guard for the class of bug that broke a production deploy: a CI/deploy-time toggle must never leak
+  // into the rendered runtime config. The skip flag must therefore be able to run with the config rendering clean, and
+  // any toggle that sneaks into the MVS_* namespace must still fail loudly.
+  it('leaves CI toggles out of the rendered runtime config while the render succeeds', () => {
+    const withSkip = renderRuntimeConfig({ ...production, SMOKE_SKIP_CORS_401: 'true' });
+    expect(withSkip.ok).toBe(true);
+    const rendered = JSON.stringify(withSkip.ok ? withSkip.raw : {});
+    expect(rendered).not.toContain('SMOKE_SKIP_CORS_401');
+    expect(rendered).not.toContain('smokeSkipCors401');
+  });
+
+  it('fails loudly when a CI toggle is placed in the MVS_* runtime namespace', () => {
+    // The exact mistake that shipped once: putting the toggle under MVS_ publishes it (or breaks the deploy).
+    const result = renderRuntimeConfig({ ...production, MVS_SMOKE_SKIP_CORS_401: 'true' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.issues.join('\n')).toMatch(/MVS_SMOKE_SKIP_CORS_401: unknown variable/);
+  });
+
   it.each([
     [{ MVS_AUTH_CLIENT_SECRET: 'abc123' }, /MVS_AUTH_CLIENT_SECRET: unknown variable/],
     [{ MVS_API_BASE_URL: 'http://api.myvedicstar.example/api/v1' }, /apiBaseUrl must use HTTPS/],
