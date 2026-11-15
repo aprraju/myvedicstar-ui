@@ -1,11 +1,11 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
 import { GATED_PATHS, PUBLIC_PAGE_PATHS } from '../../../../apps/web/src/shared/routing/served-routes.ts';
+import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
 import { prerenderPublicPages, renderPage } from './prerender.ts';
 
 const site = 'https://www.myvedicstar.com';

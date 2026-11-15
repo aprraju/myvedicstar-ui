@@ -17,8 +17,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { parseMarkdown } from '../../../../apps/web/src/features/content/markdown-parser.ts';
-import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
 import { PUBLIC_PAGE_PATHS } from '../../../../apps/web/src/shared/routing/served-routes.ts';
+import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-metadata.ts';
 
 const SITE_NAME = 'My Vedic Star';
 const CONTENT_DIR = 'apps/web/src/content/pages';
