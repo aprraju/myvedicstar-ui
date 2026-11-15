@@ -48,7 +48,7 @@ export const publicPageMetadata: readonly PageMetadata[] = [
   },
   {
     path: '/terms',
-    title: 'Terms of Use',
+    title: 'Terms of Use — Your Agreement with Us',
     description:
       'The terms that apply when you use My Vedic Star, including acceptable use, accounts, the nature of Panchang guidance, and limitations of liability.',
   },
@@ -60,13 +60,13 @@ export const publicPageMetadata: readonly PageMetadata[] = [
   },
   {
     path: '/cookies',
-    title: 'Cookie Policy',
+    title: 'Cookie Policy — Cookies and Local Storage',
     description:
       'Which cookies and local storage My Vedic Star uses for sign-in, saved locations and settings, and how to control them in your browser.',
   },
   {
     path: '/accessibility',
-    title: 'Accessibility',
+    title: 'Accessibility — How We Meet WCAG',
     description:
       'How My Vedic Star is built to be keyboard accessible, screen-reader friendly and readable on phones, tablets and desktop, and how to report a barrier.',
   },

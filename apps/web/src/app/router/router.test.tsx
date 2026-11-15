@@ -27,7 +27,9 @@ describe('routing', () => {
       'href',
       '#main-content',
     );
-    await waitFor(() => expect(document.title).toBe('Home · My Vedic Star'));
+    await waitFor(() =>
+      expect(document.title).toBe('Hindu Panchang for Your Location — Daily Timings · My Vedic Star'),
+    );
     expect(await axeViolations(container)).toEqual([]);
   });
 

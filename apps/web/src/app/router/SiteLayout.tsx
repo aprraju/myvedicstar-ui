@@ -6,6 +6,7 @@ import { useRouteHandle } from '../../shared/accessibility/usePageTitle';
 import { useAuth } from '../../shared/auth';
 import { OfflineBanner } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { pageMetadataFor } from '../../shared/seo/page-metadata';
 import { PageMetadata } from '../../shared/seo/PageMetadata';
 import { StructuredDataScript } from '../../shared/seo/StructuredData';
 import { useServices } from '../../shared/services/ServicesContext';
@@ -44,9 +45,15 @@ export function SiteLayout() {
   }, []);
 
   useEffect(() => {
-    document.title = title === t('app.name') ? title : `${title} · ${t('app.name')}`;
+    // Public pages carry their own search title; everything else keeps the route title plus the site name.
+    const page = pageMetadataFor(pathname);
+    document.title = page
+      ? `${page.title} · ${t('app.name')}`
+      : title === t('app.name')
+        ? title
+        : `${title} · ${t('app.name')}`;
     analytics.trackScreen(screen);
-  }, [title, screen, t, analytics]);
+  }, [title, screen, t, analytics, pathname]);
 
   return (
     <div
