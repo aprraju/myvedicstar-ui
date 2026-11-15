@@ -148,7 +148,9 @@ describe('staticwebapp.config.json', () => {
     expect(swa.globalHeaders['X-Robots-Tag']).toBeUndefined();
 
     expect(swa.navigationFallback.rewrite).toBe('/index.html');
-    expect(swa.navigationFallback.exclude).toContain('/assets/*');
+    // Nothing may fall back to the shell: the public pages are real files, so a catch-all rewrite would answer an
+    // unknown URL with the home page at HTTP 200 (the soft 404 SEO-2 removed). Gated routes have explicit rewrites.
+    expect(swa.navigationFallback.exclude).toEqual(['/*']);
     const routes = swa.routes.map((route) => route.route);
     expect(routes.indexOf('/assets/*')).toBeLessThan(routes.indexOf('/*'));
     expect(routes.indexOf('/config.json')).toBeLessThan(routes.indexOf('/*'));
