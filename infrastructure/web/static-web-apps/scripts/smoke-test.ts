@@ -3,6 +3,9 @@
  *
  *   tsx smoke-test.ts --site-url https://www.example.com --staged <staged-dir> [--skip-cors] [--timeout-s 300]
  *
+ * Env: MVS_SMOKE_SKIP_CORS_401=true temporarily skips ONLY the CORS-on-401 assertion (myvedicstar-infra#7) and prints a
+ * loud SKIPPED warning. Default is unset, so the check runs.
+ *
  * Waits until the edge serves matching index.html/config.json and the entry script with immutable caching, then checks:
  * - HTTPS: HTTP redirects to HTTPS and HSTS is sent;
  * - security headers: the CSP and other headers equal staticwebapp.config.json's globalHeaders;
@@ -204,10 +207,27 @@ async function runChecks(siteUrl: string): Promise<void> {
         headers: { Origin: site.origin },
       });
       const allowed = response.headers.get('access-control-allow-origin');
-      check(
-        allowed === site.origin || allowed === '*',
-        `API GET CORS allows ${site.origin} (status ${response.status}, got ${allowed ?? 'none'})`,
-      );
+      // TEMPORARILY SKIPPED — re-enable once myvedicstar-infra#7 lands.
+      //
+      // APIM answers an unauthenticated GET with 401 that omits Access-Control-Allow-Origin, so this assertion fails
+      // every production deploy even though the site is healthy. The APIM policy fix is tracked as
+      // https://github.com/aprraju/myvedicstar-infra/issues/7 (UI reminder: myvedicstar-ui re-enable issue).
+      //
+      // Default OFF = the check RUNS. Setting MVS_SMOKE_SKIP_CORS_401=true skips ONLY this assertion, and prints a
+      // loud SKIPPED warning so a skipped check can never be mistaken for a passing one. Delete this flag when
+      // infra#7 is fixed; nothing else changes.
+      if (process.env.MVS_SMOKE_SKIP_CORS_401 === 'true') {
+        console.warn(
+          `\n  !! SKIPPED: the CORS-on-401 check for ${site.origin} was NOT RUN and NOT VERIFIED.\n` +
+            '  !! Reason: APIM returns 401 without Access-Control-Allow-Origin. Tracked as myvedicstar-infra#7.\n' +
+            '  !! Remove MVS_SMOKE_SKIP_CORS_401 once infra#7 is fixed; this message will not appear again.\n',
+        );
+      } else {
+        check(
+          allowed === site.origin || allowed === '*',
+          `API GET CORS allows ${site.origin} (status ${response.status}, got ${allowed ?? 'none'})`,
+        );
+      }
       check(response.status === 401, `application API rejects requests without a token (${response.status})`);
       await response.body?.cancel();
     } catch (error) {

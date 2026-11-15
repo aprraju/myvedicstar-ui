@@ -62,16 +62,24 @@ const prerenderedPage = (path: string, title: string, description: string) => {
     `<!doctype html><html><head><title>${title} · My Vedic Star</title>` +
     `<meta name="description" content="${description}" />` +
     `<link rel="canonical" href="${canonical}" />` +
+    // The entry stylesheet: render.ts reads it from the document it pre-renders, as it does in a real build.
+    `<link rel="stylesheet" crossorigin href="/assets/index-def456.css">` +
     `</head><body><div id="root"><main id="main-content"><h1>${title}</h1><p>Body text.</p></main></div>` +
     `<script type="module" src="/assets/index-abc123.js"></script></body></html>`
   );
 };
 
 /**
- * Every public page the build gate requires, keyed by output path — except `/`, which is written by render.ts itself
- * (it replaces the shell's body). Pre-writing it here would clobber the fixture's index.html, the source of the
- * script/stylesheet tags.
+ * The home page, which render.ts writes over `index.html`. The fixture therefore models the POST-render tree: this
+ * document is both the pre-rendered `/` page and the source of the script/stylesheet tags the other pages reuse.
  */
+const prerenderedHome = () => {
+  const home = publicPageMetadata.find((meta) => meta.path === '/');
+  if (!home) throw new Error('No metadata for the home page');
+  return prerenderedPage(home.path, home.title, home.description);
+};
+
+/** Every other public page the build gate requires, keyed by output path. */
 const prerenderedPages = () =>
   Object.fromEntries(
     publicPageMetadata
@@ -84,7 +92,7 @@ const prerenderedPages = () =>
 
 const goodBuild = () =>
   buildDir({
-    'index.html': INDEX_HTML,
+    'index.html': prerenderedHome(),
     'assets/index-abc123.js': 'export const app = () => 1;\n',
     // The entry stylesheet index.html links, and the not-found stylesheet 404.html links.
     'assets/index-def456.css': '.app{display:grid}\n',
@@ -373,7 +381,10 @@ describe('smoke-test.ts', () => {
       const config = JSON.parse(readFileSync(configPath, 'utf8'));
       config.apiBaseUrl = `http://127.0.0.1:${(api.address() as AddressInfo).port}`;
       writeFileSync(configPath, JSON.stringify(config));
-      const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage]);
+      const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
+        // The CORS-on-401 assertion is temporarily skippable (myvedicstar-infra#7); these cases assert it still RUNS.
+        MVS_SMOKE_SKIP_CORS_401: '',
+      });
       expect(output).toContain('API GET CORS allows');
       expect(output).toContain(`application API rejects requests without a token (${status})`);
       expect(code).toBe(expectedCode);
@@ -389,6 +400,74 @@ describe('smoke-test.ts', () => {
         });
         expect(request.origin).toBe(siteUrl);
       }
+    },
+    TIMEOUT,
+  );
+
+  it(
+    'skips ONLY the CORS-on-401 assertion when asked, and says so loudly',
+    async () => {
+      const { stage, siteUrl } = await stagedSite();
+      // APIM answers 401 without Access-Control-Allow-Origin (myvedicstar-infra#7): the assertion fails, but the
+      // authentication check right after it must still run and pass.
+      const api = createServer((request, response) => {
+        if (request.method === 'OPTIONS') {
+          response.setHeader('Access-Control-Allow-Origin', siteUrl);
+          return response.writeHead(200).end();
+        }
+        return response.writeHead(401).end('{}');
+      });
+      servers.push(api);
+      await new Promise<void>((ready) => api.listen(0, '127.0.0.1', ready));
+      const configPath = join(stage, 'config.json');
+      const config = JSON.parse(readFileSync(configPath, 'utf8'));
+      config.apiBaseUrl = `http://127.0.0.1:${(api.address() as AddressInfo).port}`;
+      writeFileSync(configPath, JSON.stringify(config));
+
+      const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
+        MVS_SMOKE_SKIP_CORS_401: 'true',
+      });
+
+      // The skip must be visibly a skip, never a silent pass.
+      expect(output).toContain('!! SKIPPED:');
+      expect(output).toContain('myvedicstar-infra#7');
+      // The assertion's own PASS line must not appear: the only mention of its name is the SKIPPED warning, so a
+      // skipped check can never be read as green.
+      expect(output).not.toContain('PASS: API GET CORS allows');
+      expect(output).not.toContain(`API GET CORS allows ${siteUrl} (status`);
+
+      // Everything else still runs: the 401 auth check passes, and the release verifies.
+      expect(output).toContain('application API rejects requests without a token (401)');
+      expect(code).toBe(0);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    'runs the CORS-on-401 assertion by default',
+    async () => {
+      const { stage, siteUrl } = await stagedSite();
+      const api = createServer((request, response) => {
+        if (request.method === 'OPTIONS') {
+          response.setHeader('Access-Control-Allow-Origin', siteUrl);
+          return response.writeHead(200).end();
+        }
+        return response.writeHead(401).end('{}'); // no CORS header, as APIM does today
+      });
+      servers.push(api);
+      await new Promise<void>((ready) => api.listen(0, '127.0.0.1', ready));
+      const configPath = join(stage, 'config.json');
+      const config = JSON.parse(readFileSync(configPath, 'utf8'));
+      config.apiBaseUrl = `http://127.0.0.1:${(api.address() as AddressInfo).port}`;
+      writeFileSync(configPath, JSON.stringify(config));
+
+      // No env flag: the default must be to RUN the check, so fixing infra#7 restores it with no code change.
+      const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
+        MVS_SMOKE_SKIP_CORS_401: '',
+      });
+      expect(output).toContain('API GET CORS allows');
+      expect(output).not.toContain('!! SKIPPED:');
+      expect(code).toBe(1);
     },
     TIMEOUT,
   );
