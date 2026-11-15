@@ -82,7 +82,11 @@ jobs:
         run: npm run web:build
         env:
           BUILD_ID: ${{ github.sha }}
-      # CSP compatibility (no inline scripts or eval), no secrets or environment-specific values, size budgets.
+      # The ten public pages become real static HTML in the artifact itself, so what is validated is what ships.
+      - name: Pre-render public pages
+        run: npm run web:prerender
+      # CSP compatibility (no inline scripts or eval), no secrets or environment-specific values, size budgets, and the
+      # pre-rendered pages each carrying their head contract and body text.
       - name: Validate production build
         run: npm run web:validate-build
       - name: Install Playwright browser

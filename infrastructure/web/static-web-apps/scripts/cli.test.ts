@@ -87,7 +87,8 @@ describe('validate-build.ts', () => {
         join(build, '404.html'),
         '<html><head><meta name="robots" content="noindex"></head></html>',
       );
-      const { code, output } = await runScript('validate-build.ts', [build, '--staged']);
+      // --expect-prerendered is the bare-build mode: pages required, staging config not.
+      const { code, output } = await runScript('validate-build.ts', [build, '--expect-prerendered']);
       expect(code).toBe(1);
       expect(output).toContain('pre-rendered page about/index.html is missing');
       expect(output).toContain('index.html: no absolute canonical link');
