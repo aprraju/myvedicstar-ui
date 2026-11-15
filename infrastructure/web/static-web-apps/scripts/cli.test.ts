@@ -366,7 +366,7 @@ describe('smoke-test.ts', () => {
       writeFileSync(configPath, JSON.stringify(config));
       const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
         // The CORS-on-401 assertion is temporarily skippable (myvedicstar-infra#7); these cases assert it still RUNS.
-        MVS_SMOKE_SKIP_CORS_401: '',
+        SMOKE_SKIP_CORS_401: '',
       });
       expect(output).toContain('API GET CORS allows');
       expect(output).toContain(`application API rejects requests without a token (${status})`);
@@ -408,7 +408,7 @@ describe('smoke-test.ts', () => {
       writeFileSync(configPath, JSON.stringify(config));
 
       const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
-        MVS_SMOKE_SKIP_CORS_401: 'true',
+        SMOKE_SKIP_CORS_401: 'true',
       });
 
       // The skip must be visibly a skip, never a silent pass.
@@ -446,7 +446,7 @@ describe('smoke-test.ts', () => {
 
       // No env flag: the default must be to RUN the check, so fixing infra#7 restores it with no code change.
       const { code, output } = await runScript('smoke-test.ts', ['--site-url', siteUrl, '--staged', stage], {
-        MVS_SMOKE_SKIP_CORS_401: '',
+        SMOKE_SKIP_CORS_401: '',
       });
       expect(output).toContain('API GET CORS allows');
       expect(output).not.toContain('!! SKIPPED:');
