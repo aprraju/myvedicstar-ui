@@ -82,7 +82,11 @@ jobs:
         run: npm run web:build
         env:
           BUILD_ID: ${{ github.sha }}
-      # CSP compatibility (no inline scripts or eval), no secrets or environment-specific values, size budgets.
+      # The ten public pages become real static HTML in the artifact itself, so what is validated is what ships.
+      - name: Pre-render public pages
+        run: npm run web:prerender
+      # CSP compatibility (no inline scripts or eval), no secrets or environment-specific values, size budgets, and the
+      # pre-rendered pages each carrying their head contract and body text.
       - name: Validate production build
         run: npm run web:validate-build
       - name: Install Playwright browser
@@ -216,7 +220,7 @@ jobs:
           WEB_SMOKE_LOG_PATH: web-smoke.log
           # TEMPORARY — remove when myvedicstar-infra#7 (APIM CORS on 401) is fixed. Skips ONLY the CORS-on-401
           # assertion and prints a loud SKIPPED warning; the default (unset) runs the check.
-          MVS_SMOKE_SKIP_CORS_401: 'true'
+          SMOKE_SKIP_CORS_401: 'true'
         run: >-
           bash infrastructure/web/static-web-apps/scripts/deploy.sh --environment "$TARGET_ENVIRONMENT"
           --dist apps/web/dist --env-file "$SETTINGS_FILE"

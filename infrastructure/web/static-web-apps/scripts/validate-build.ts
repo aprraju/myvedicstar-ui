@@ -21,7 +21,13 @@ import { publicPageMetadata } from '../../../../apps/web/src/shared/seo/page-met
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { staged: { type: 'boolean', default: false } },
+  options: {
+    // Content must carry the rendered environment files (deployment staging).
+    staged: { type: 'boolean', default: false },
+    // Content must carry the pre-rendered public pages. Implied by --staged; also used on the bare build right after
+    // prerender runs, before staging.
+    'expect-prerendered': { type: 'boolean', default: false },
+  },
 });
 const dist = positionals[0] ?? 'apps/web/dist';
 
@@ -100,10 +106,11 @@ if (/\son[a-z]+=/i.test(indexHtml)) fail('index.html contains an inline event ha
  * Pre-rendered public pages (SEO-3A): each must exist, carry the head contract, and contain real body text — that is the
  * whole point, so a missing or hollow page fails the build rather than shipping silently.
  *
- * Staged content only. The raw Vite build (`apps/web/dist`) holds just the shell; render.ts creates these files during
- * the deployment staging step, so requiring them of the un-staged build would reject a perfectly good artifact.
+ * Only when the content is expected to be pre-rendered: right after `web:prerender` writes the pages into the build,
+ * or in staged deployment content. The bare post-Vite build legitimately holds just the shell.
  */
-for (const meta of values.staged ? publicPageMetadata : []) {
+const expectPrerendered = values.staged || values['expect-prerendered'];
+for (const meta of expectPrerendered ? publicPageMetadata : []) {
   const name = meta.path === '/' ? 'index.html' : `${meta.path.replace(/^\//, '')}/index.html`;
   let html: string;
   try {
@@ -178,6 +185,9 @@ if (kib(entryGzip) > ENTRY_BUDGET_KIB)
   fail(`entry script is ${kib(entryGzip)} KiB gzip (budget ${ENTRY_BUDGET_KIB})`);
 if (kib(totalGzip) > TOTAL_BUDGET_KIB)
   fail(`JavaScript totals ${kib(totalGzip)} KiB gzip (budget ${TOTAL_BUDGET_KIB})`);
+
+if (expectPrerendered && !files.some((file) => rel(file) === '404.html'))
+  fail('404.html is missing from the pre-rendered content');
 
 if (values.staged) {
   for (const required of ['config.json', 'staticwebapp.config.json', '404.html']) {

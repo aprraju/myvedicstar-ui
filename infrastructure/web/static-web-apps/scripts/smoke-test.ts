@@ -3,7 +3,7 @@
  *
  *   tsx smoke-test.ts --site-url https://www.example.com --staged <staged-dir> [--skip-cors] [--timeout-s 300]
  *
- * Env: MVS_SMOKE_SKIP_CORS_401=true temporarily skips ONLY the CORS-on-401 assertion (myvedicstar-infra#7) and prints a
+ * Env: SMOKE_SKIP_CORS_401=true temporarily skips ONLY the CORS-on-401 assertion (myvedicstar-infra#7) and prints a
  * loud SKIPPED warning. Default is unset, so the check runs.
  *
  * Waits until the edge serves matching index.html/config.json and the entry script with immutable caching, then checks:
@@ -213,14 +213,14 @@ async function runChecks(siteUrl: string): Promise<void> {
       // every production deploy even though the site is healthy. The APIM policy fix is tracked as
       // https://github.com/aprraju/myvedicstar-infra/issues/7 (UI reminder: myvedicstar-ui re-enable issue).
       //
-      // Default OFF = the check RUNS. Setting MVS_SMOKE_SKIP_CORS_401=true skips ONLY this assertion, and prints a
+      // Default OFF = the check RUNS. Setting SMOKE_SKIP_CORS_401=true skips ONLY this assertion, and prints a
       // loud SKIPPED warning so a skipped check can never be mistaken for a passing one. Delete this flag when
       // infra#7 is fixed; nothing else changes.
-      if (process.env.MVS_SMOKE_SKIP_CORS_401 === 'true') {
+      if (process.env.SMOKE_SKIP_CORS_401 === 'true') {
         console.warn(
           `\n  !! SKIPPED: the CORS-on-401 check for ${site.origin} was NOT RUN and NOT VERIFIED.\n` +
             '  !! Reason: APIM returns 401 without Access-Control-Allow-Origin. Tracked as myvedicstar-infra#7.\n' +
-            '  !! Remove MVS_SMOKE_SKIP_CORS_401 once infra#7 is fixed; this message will not appear again.\n',
+            '  !! Remove SMOKE_SKIP_CORS_401 once infra#7 is fixed; this message will not appear again.\n',
         );
       } else {
         check(
