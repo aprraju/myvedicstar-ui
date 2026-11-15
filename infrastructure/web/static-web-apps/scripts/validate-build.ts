@@ -88,6 +88,20 @@ for (const match of indexHtml.matchAll(/(?:src|href)="\/(assets\/[^"]+)"/g)) {
 }
 if (/\son[a-z]+=/i.test(indexHtml)) fail('index.html contains an inline event handler (blocked by the CSP)');
 
+// 404.html: a real document with no script (served for unknown paths), and its stylesheet must exist.
+try {
+  const notFoundHtml = readFileSync(join(dist, '404.html'), 'utf8');
+  if (/<script\b/i.test(notFoundHtml))
+    fail('404.html contains a <script> (it must render without JavaScript)');
+  if (!/<meta\s+name="robots"\s+content="noindex"/i.test(notFoundHtml))
+    fail('404.html must declare <meta name="robots" content="noindex">');
+  for (const match of notFoundHtml.matchAll(/href="\/(assets\/[^"]+\.css)"/g)) {
+    if (!files.some((file) => rel(file) === match[1])) fail(`404.html references missing ${match[1]}`);
+  }
+} catch {
+  if (values.staged) fail('404.html is missing from the staged content');
+}
+
 const deployingSourceMaps = files.filter((file) => file.endsWith('.map'));
 if (values.staged && deployingSourceMaps.length)
   fail(`source maps would be published: ${deployingSourceMaps.map(rel).join(', ')}`);
@@ -128,7 +142,7 @@ if (kib(totalGzip) > TOTAL_BUDGET_KIB)
   fail(`JavaScript totals ${kib(totalGzip)} KiB gzip (budget ${TOTAL_BUDGET_KIB})`);
 
 if (values.staged) {
-  for (const required of ['config.json', 'staticwebapp.config.json']) {
+  for (const required of ['config.json', 'staticwebapp.config.json', '404.html']) {
     if (!files.some((file) => rel(file) === required)) fail(`${required} is missing from the staged content`);
   }
 }

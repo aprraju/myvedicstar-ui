@@ -12,6 +12,12 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
   version: string;
 };
 
+/**
+ * Extra stylesheet entry, built to its own hashed file under /assets/ so the deployment can link it from the
+ * pre-rendered 404.html, which loads no JavaScript and therefore cannot rely on a chunk's stylesheet.
+ */
+const NOT_FOUND_STYLESHEET_ENTRY = 'not-found.css';
+
 /** Local API origin used by preview/E2E. Must match public/config.json; E2E fixtures answer it, nothing real runs. */
 const LOCAL_API_ORIGIN = 'http://localhost:5275';
 /**
@@ -122,7 +128,18 @@ export default defineConfig(({ mode, command, isPreview }) => ({
     assetsInlineLimit: 0,
     modulePreload: { polyfill: false },
     rolldownOptions: {
+      input: {
+        // The SPA document (Vite's default single entry) plus the 404 stylesheet, which is hashed to
+        // /assets/not-found-<hash>.css so 404.html can link it without loading any JavaScript.
+        index: 'index.html',
+        'not-found': 'src/styles/not-found.css',
+      },
       output: {
+        // The 404 document links this file directly; keep a readable prefix so the deploy script can find it.
+        assetFileNames: (asset) =>
+          asset.names?.some((name) => name.endsWith(NOT_FOUND_STYLESHEET_ENTRY))
+            ? 'assets/not-found-[hash][extname]'
+            : 'assets/[name]-[hash][extname]',
         codeSplitting: {
           groups: [
             // Zod and src/zod-config.ts share one chunk so jitless mode is on before any chunk can create a schema;

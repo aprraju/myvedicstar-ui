@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
+import {
+  GATED_PATH_PREFIXES,
+  PUBLIC_PAGE_PATHS,
+} from '../../../../apps/web/src/shared/routing/served-routes.ts';
 import { renderRuntimeConfig } from './runtime-config.ts';
 import { buildStaticWebAppConfig } from './static-web-app-config.ts';
 
@@ -149,6 +153,26 @@ describe('staticwebapp.config.json', () => {
     expect(routes.indexOf('/assets/*')).toBeLessThan(routes.indexOf('/*'));
     expect(routes.indexOf('/config.json')).toBeLessThan(routes.indexOf('/*'));
     expect(swa.routes.find((route) => route.route === '/.auth/login/github')?.statusCode).toBe(404);
+  });
+
+  it('answers unknown paths with HTTP 404 from 404.html instead of the SPA shell', () => {
+    const swa = buildStaticWebAppConfig(render(production).config) as {
+      responseOverrides: Record<string, { rewrite?: string; statusCode?: number }>;
+      routes: { route: string; rewrite?: string; statusCode?: number }[];
+    };
+
+    expect(swa.responseOverrides['404']).toEqual({ rewrite: '/404.html', statusCode: 404 });
+
+    // Every path the SPA owns is rewritten to the shell, and the not-found document never is.
+    for (const path of PUBLIC_PAGE_PATHS) {
+      expect(swa.routes.find((route) => route.route === path)?.rewrite, path).toBe('/index.html');
+    }
+    for (const prefix of GATED_PATH_PREFIXES) {
+      expect(swa.routes.find((route) => route.route === `${prefix}*`)?.rewrite, prefix).toBe('/index.html');
+    }
+    expect(swa.routes.some((route) => route.rewrite === '/404.html')).toBe(false);
+    // The catch-all must not rewrite to the shell: anything unlisted falls through to the 404 override.
+    expect(swa.routes.find((route) => route.route === '/*')?.rewrite).toBeUndefined();
   });
 
   it('keeps non-production environments out of search engines', () => {

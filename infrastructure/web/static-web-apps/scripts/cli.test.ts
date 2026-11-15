@@ -52,14 +52,19 @@ afterEach(() => {
 });
 
 const goodBuild = () =>
-  buildDir({ 'index.html': INDEX_HTML, 'assets/index-abc123.js': 'export const app = () => 1;\n' });
+  buildDir({
+    'index.html': INDEX_HTML,
+    'assets/index-abc123.js': 'export const app = () => 1;\n',
+    // The not-found stylesheet the deployment links from 404.html.
+    'assets/not-found-def456.css': '.not-found-main{display:grid}\n',
+  });
 
 describe('validate-build.ts', () => {
   it(
     'passes a clean production build and reports its size',
     async () => {
       const { code, output } = await runScript('validate-build.ts', [goodBuild()]);
-      expect(output).toMatch(/Build validation passed: 2 files/);
+      expect(output).toMatch(/Build validation passed: 3 files/);
       expect(code).toBe(0);
     },
     TIMEOUT,
