@@ -13,7 +13,6 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-
 const SCRIPTS = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(SCRIPTS, '../../../..');
 const TIMEOUT = 60_000;
