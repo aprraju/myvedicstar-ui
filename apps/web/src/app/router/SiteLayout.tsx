@@ -7,7 +7,6 @@ import { useAuth } from '../../shared/auth';
 import { OfflineBanner } from '../../shared/components/states';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { pageMetadataFor } from '../../shared/seo/page-metadata';
-import { PageMetadata } from '../../shared/seo/PageMetadata';
 import { StructuredDataScript } from '../../shared/seo/StructuredData';
 import { useServices } from '../../shared/services/ServicesContext';
 import { MobileBottomNavigation } from './MobileBottomNavigation';
@@ -71,11 +70,7 @@ export function SiteLayout() {
         <MobileBottomNavigation />
       </div>
       <RouteAnnouncer title={title} />
-<<<<<<< HEAD
-=======
-      <PageMetadata />
       <StructuredDataScript />
->>>>>>> 4611845 (feat(seo): Organization and WebSite JSON-LD on the homepage (SEO-6))
       <ScrollRestoration />
     </div>
   );

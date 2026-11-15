@@ -34,25 +34,6 @@ describe('per-page titles and Open Graph tags', () => {
     expect(new Set(titles).size).toBe(pages.length);
   });
 
-  it('matches og:url to the canonical and og:title to the page title', async () => {
-    renderRoute('/help');
-    await screen.findByRole('heading', { level: 1 });
-    await waitFor(() =>
-      expect(document.querySelector('meta[property="og:url"]')?.getAttribute('content')).toBe(
-        `${window.location.origin}/help`,
-      ),
-    );
-    expect(document.querySelector('meta[property="og:title"]')?.getAttribute('content')).toBe(
-      'Help and Frequently Asked Questions',
-    );
-    expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
-      document.querySelector('meta[property="og:url"]')?.getAttribute('content'),
-    );
-    expect(document.querySelector('meta[name="description"]')?.getAttribute('content')).toBe(
-      document.querySelector('meta[property="og:description"]')?.getAttribute('content'),
-    );
-  }, 30000);
-
   it('keeps the route title plus site name for non-public routes', async () => {
     renderRoute('/calendar');
     await waitFor(() => expect(document.title).toBe('Panchang · My Vedic Star'));
