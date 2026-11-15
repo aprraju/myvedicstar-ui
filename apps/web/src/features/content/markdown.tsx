@@ -1,48 +1,14 @@
 import { Fragment, type ReactNode } from 'react';
 
+import { type MarkdownBlock, parseMarkdown } from './markdown-parser';
+
 /**
- * Minimal Markdown renderer for the site's content pages (`src/content/pages/*.md`). Supports what those documents use:
- * `#`–`###` headings, paragraphs, `-` bullet lists, `**bold**` and `*italic*`. Everything is rendered as React text
- * nodes — never as HTML — so it is safe and Content-Security-Policy friendly.
+ * Renders the site content pages' Markdown as React nodes. The block parser lives in `markdown-parser.ts` so the
+ * deployment's pre-renderer can use it too; that module is framework-free.
+ *
+ * Everything is rendered as React text nodes — never as HTML — so it is safe and Content-Security-Policy friendly.
  */
-type MarkdownBlock =
-  | { type: 'heading'; level: 1 | 2 | 3; text: string }
-  | { type: 'paragraph'; text: string }
-  | { type: 'list'; items: string[] };
-
-export function parseMarkdown(source: string): MarkdownBlock[] {
-  const blocks: MarkdownBlock[] = [];
-  let paragraph: string[] = [];
-  let list: string[] | null = null;
-
-  const flush = () => {
-    if (paragraph.length) blocks.push({ type: 'paragraph', text: paragraph.join(' ') });
-    if (list) blocks.push({ type: 'list', items: list });
-    paragraph = [];
-    list = null;
-  };
-
-  for (const raw of source.replace(/\r\n?/g, '\n').split('\n')) {
-    const line = raw.trim();
-    const heading = /^(#{1,3})\s+(.*)$/.exec(line);
-    const bullet = /^[-*]\s+(.*)$/.exec(line);
-    if (!line) {
-      flush();
-    } else if (heading) {
-      flush();
-      const [, hashes = '#', text = ''] = heading;
-      blocks.push({ type: 'heading', level: hashes.length as 1 | 2 | 3, text });
-    } else if (bullet) {
-      if (paragraph.length) flush();
-      (list ??= []).push(bullet[1] ?? '');
-    } else {
-      if (list) flush();
-      paragraph.push(line);
-    }
-  }
-  flush();
-  return blocks;
-}
+export { parseMarkdown };
 
 /** `**bold**` and `*italic*` → <strong>/<em>; everything else stays plain text. */
 function renderInline(text: string): ReactNode {

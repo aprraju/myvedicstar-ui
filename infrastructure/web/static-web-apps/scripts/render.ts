@@ -3,6 +3,7 @@
  *   config.json               runtime configuration (validated)
  *   staticwebapp.config.json  Azure Static Web Apps routing, caching and security headers
  *   404.html                  pre-rendered not-found document served with HTTP 404 for unknown paths
+ *   <route>/index.html        the ten public pages pre-rendered as real static HTML (SEO-3A)
  *   sitemap.xml               the ten public pages
  *   robots.txt                the same policy, pointing at this deployment's sitemap
  *   llms.txt                  plain-text summary for AI crawlers
@@ -17,12 +18,18 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { NOT_FOUND_FILE, renderNotFoundPage } from './not-found-page.ts';
+import { prerenderPublicPages } from './prerender.ts';
 import { renderRuntimeConfig } from './runtime-config.ts';
 import { renderLlmsTxt, renderRobots, renderSitemap } from './sitemap.ts';
 import { buildStaticWebAppConfig } from './static-web-app-config.ts';
 
 const { values } = parseArgs({
-  options: { out: { type: 'string' }, 'expect-environment': { type: 'string' } },
+  options: {
+    out: { type: 'string' },
+    'expect-environment': { type: 'string' },
+    // Local debugging only: skip the ten pre-rendered pages.
+    'skip-prerender': { type: 'boolean' },
+  },
 });
 if (!values.out) {
   console.error('Usage: render.ts --out <dir> [--expect-environment <name>]');
@@ -51,6 +58,11 @@ function findNotFoundStylesheet(out: string): string {
 }
 
 writeFileSync(join(values.out, 'config.json'), `${JSON.stringify(result.raw, null, 2)}\n`);
+// Public pages are pre-rendered here, in the same staging step as 404.html, so deploy.sh and CI need no new step.
+if (!values['skip-prerender']) {
+  const { files } = prerenderPublicPages(values.out, result.siteUrl);
+  console.log(`  Pre-rendered     ${files.length} public pages`);
+}
 writeFileSync(join(values.out, 'sitemap.xml'), renderSitemap(result.siteUrl));
 writeFileSync(join(values.out, 'robots.txt'), renderRobots(result.siteUrl));
 writeFileSync(join(values.out, 'llms.txt'), renderLlmsTxt(result.siteUrl));

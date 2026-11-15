@@ -27,15 +27,10 @@ const BUILT_IN_AUTH_ROUTES = [
 const IMMUTABLE = 'public, max-age=31536000, immutable';
 
 /**
- * Paths the SPA router owns. Everything else bypasses `navigationFallback`, so Azure Static Web Apps answers with the
- * pre-rendered `404.html` document and HTTP 404 instead of the app shell at 200.
+ * Gated routes are reachable but must never be indexed: they carry `X-Robots-Tag: noindex, nofollow` and no canonical,
+ * so they cannot compete with the ten public pages.
  */
-const SPA_ROUTES: string[] = [
-  ...PUBLIC_PAGE_PATHS,
-  ...GATED_PATHS,
-  ...GATED_PATH_PREFIXES.map((prefix) => `${prefix}*`),
-  ...APP_ONLY_PATHS,
-];
+const NOINDEX = 'noindex, nofollow';
 const REVALIDATE = 'no-cache';
 
 export function buildStaticWebAppConfig(config: AppConfig): Record<string, unknown> {
@@ -64,10 +59,29 @@ export function buildStaticWebAppConfig(config: AppConfig): Record<string, unkno
       },
     },
     routes: [
-      // Known SPA routes are rewritten to the shell; this comes first so no other rule can shadow it.
-      ...SPA_ROUTES.map((route) => ({
+      // Gated routes keep the SPA shell with HTTP 200 (they redirect unauthenticated users) but are explicitly
+      // unindexable. This comes first so no other rule can shadow it.
+      ...GATED_PATHS.map((route) => ({
         route,
         rewrite: '/index.html',
+        headers: { 'Cache-Control': REVALIDATE, 'X-Robots-Tag': NOINDEX },
+      })),
+      // `/calendar/*` covers the deeper deep links; the exact `/calendar` rule above already handles its own path.
+      ...GATED_PATH_PREFIXES.map((prefix) => ({
+        route: `${prefix}*`,
+        rewrite: '/index.html',
+        headers: { 'Cache-Control': REVALIDATE, 'X-Robots-Tag': NOINDEX },
+      })).filter((rule) => !(GATED_PATHS as readonly string[]).includes(rule.route.replace(/\*$/, ''))),
+      // Non-page SPA routes (sign-in callback, the signed-in Home alias): shell, not indexable.
+      ...APP_ONLY_PATHS.map((route) => ({
+        route,
+        rewrite: '/index.html',
+        headers: { 'Cache-Control': REVALIDATE },
+      })),
+      // The ten public pages are served from their pre-rendered files at the same path. Only revalidate them, never
+      // rewrite them to /index.html.
+      ...PUBLIC_PAGE_PATHS.map((route) => ({
+        route,
         headers: { 'Cache-Control': REVALIDATE },
       })),
       ...BUILT_IN_AUTH_ROUTES.map((route) => ({ route, statusCode: 404 })),

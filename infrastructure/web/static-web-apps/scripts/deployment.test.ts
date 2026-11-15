@@ -163,9 +163,10 @@ describe('staticwebapp.config.json', () => {
 
     expect(swa.responseOverrides['404']).toEqual({ rewrite: '/404.html', statusCode: 404 });
 
-    // Every path the SPA owns is rewritten to the shell, and the not-found document never is.
+    // Public pages are pre-rendered files: they must NOT be rewritten to the shell (that would shadow the real
+    // document and restore the soft 404). Gated routes keep the shell because the SPA gates them at runtime.
     for (const path of PUBLIC_PAGE_PATHS) {
-      expect(swa.routes.find((route) => route.route === path)?.rewrite, path).toBe('/index.html');
+      expect(swa.routes.find((route) => route.route === path)?.rewrite, path).toBeUndefined();
     }
     for (const prefix of GATED_PATH_PREFIXES) {
       expect(swa.routes.find((route) => route.route === `${prefix}*`)?.rewrite, prefix).toBe('/index.html');
