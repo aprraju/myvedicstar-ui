@@ -43,7 +43,7 @@ const CONTENT_SOURCES: Record<string, string> = {
  */
 const LEAD_ONLY_PATHS = new Set(['/', '/contact', '/help']);
 
-export class PrerenderError extends Error {}
+class PrerenderError extends Error {}
 
 const escapeHtml = (value: string): string =>
   value
@@ -72,7 +72,7 @@ interface PageBody {
 }
 
 /** Body markup for one route: the Markdown document when one exists, otherwise the registry description as a lead. */
-export function pageBody(path: string, description: string): PageBody {
+function pageBody(path: string, description: string): PageBody {
   const file = CONTENT_SOURCES[path];
   if (!file) {
     if (!LEAD_ONLY_PATHS.has(path)) throw new PrerenderError(`No body source for public page ${path}`);
@@ -105,7 +105,7 @@ export function pageBody(path: string, description: string): PageBody {
 }
 
 /** The build's own entry script and stylesheet, read from the emitted `index.html` — never hardcoded. */
-export function readBuildAssets(dist: string): { script: string; stylesheet: string | null } {
+function readBuildAssets(dist: string): { script: string; stylesheet: string | null } {
   const indexPath = join(dist, 'index.html');
   if (!existsSync(indexPath))
     throw new PrerenderError(`No build at ${indexPath} (run npm run web:build first)`);
@@ -132,7 +132,7 @@ export function readBuildAssets(dist: string): { script: string; stylesheet: str
  * JSON-LD for one page: Organization + WebSite on the homepage (the same entities the SPA writes there), and a WebPage
  * elsewhere describing the page itself. Serialised once as a plain `application/ld+json` block.
  */
-export function pageStructuredData(options: {
+function pageStructuredData(options: {
   path: string;
   title: string;
   description: string;
