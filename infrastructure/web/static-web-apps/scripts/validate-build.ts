@@ -93,11 +93,17 @@ for (const match of indexHtml.matchAll(/(?:src|href)="\/(assets\/[^"]+)"/g)) {
 }
 if (/\son[a-z]+=/i.test(indexHtml)) fail('index.html contains an inline event handler (blocked by the CSP)');
 
+// Un-staged build: the shell has no per-page head contract yet (render.ts writes it per page at deploy time). The
+// canonical/description checks below therefore belong to the staged gate only.
+
 /**
  * Pre-rendered public pages (SEO-3A): each must exist, carry the head contract, and contain real body text — that is the
  * whole point, so a missing or hollow page fails the build rather than shipping silently.
+ *
+ * Staged content only. The raw Vite build (`apps/web/dist`) holds just the shell; render.ts creates these files during
+ * the deployment staging step, so requiring them of the un-staged build would reject a perfectly good artifact.
  */
-for (const meta of publicPageMetadata) {
+for (const meta of values.staged ? publicPageMetadata : []) {
   const name = meta.path === '/' ? 'index.html' : `${meta.path.replace(/^\//, '')}/index.html`;
   let html: string;
   try {

@@ -92,12 +92,13 @@ const prerenderedPages = () =>
 
 const goodBuild = () =>
   buildDir({
-    'index.html': prerenderedHome(),
+    // The raw Vite build: the shell only. Pre-rendered pages appear at deploy staging, so the un-staged gate must not
+    // require them (validate-build asserts them only with --staged).
+    'index.html': INDEX_HTML,
     'assets/index-abc123.js': 'export const app = () => 1;\n',
     // The entry stylesheet index.html links, and the not-found stylesheet 404.html links.
     'assets/index-def456.css': '.app{display:grid}\n',
     'assets/not-found-def456.css': '.not-found-main{display:grid}\n',
-    ...prerenderedPages(),
   });
 
 describe('validate-build.ts', () => {
@@ -105,9 +106,28 @@ describe('validate-build.ts', () => {
     'passes a clean production build and reports its size',
     async () => {
       const { code, output } = await runScript('validate-build.ts', [goodBuild()]);
-      // index.html + entry script + entry stylesheet + not-found stylesheet + the ten pre-rendered pages.
-      expect(output).toMatch(/Build validation passed: 13 files/);
+      // index.html + entry script + entry stylesheet + not-found stylesheet.
+      expect(output).toMatch(/Build validation passed: 4 files/);
       expect(code).toBe(0);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    'requires the pre-rendered public pages in staged content',
+    async () => {
+      // A staged tree: the shell plus the generated files, but WITHOUT the pre-rendered pages.
+      const build = goodBuild();
+      writeFileSync(join(build, 'config.json'), '{}');
+      writeFileSync(join(build, 'staticwebapp.config.json'), '{}');
+      writeFileSync(
+        join(build, '404.html'),
+        '<html><head><meta name="robots" content="noindex"></head></html>',
+      );
+      const { code, output } = await runScript('validate-build.ts', [build, '--staged']);
+      expect(code).toBe(1);
+      expect(output).toContain('pre-rendered page about/index.html is missing');
+      expect(output).toContain('index.html: no absolute canonical link');
     },
     TIMEOUT,
   );
