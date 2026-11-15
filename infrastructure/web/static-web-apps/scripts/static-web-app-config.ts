@@ -43,12 +43,12 @@ export function buildStaticWebAppConfig(config: AppConfig): Record<string, unkno
     // Deep links on routes the SPA owns (/calendar/2026-09-29) load the SPA with HTTP 200. Only those routes are
     // rewritten: any other path is a real 404 served from 404.html (see responseOverrides below). Files with an
     // extension and hashed assets are excluded, so a missing chunk is a real 404 rather than HTML served as JavaScript.
+    // Only the SPA-owned routes fall back to the shell (they have explicit rewrite routes below). Everything else
+    // reaches the real file at its own path, or the 404 override: a catch-all rewrite serves the home page at HTTP 200
+    // for any unknown URL, which is the soft 404 SEO-2 removed.
     navigationFallback: {
       rewrite: '/index.html',
-      exclude: [
-        '/assets/*',
-        '/*.{js,mjs,css,json,map,svg,png,jpg,jpeg,gif,webp,ico,txt,xml,woff,woff2,webmanifest}',
-      ],
+      exclude: ['/*'],
     },
     responseOverrides: {
       // A request that fell through to 404.html was not rewritten by navigationFallback: it is an unknown path.
