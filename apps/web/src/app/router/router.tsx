@@ -111,6 +111,11 @@ export const appRoutes: RouteObject[] = [
         lazy: protectedPage(async () => (await import('../../features/profile/ProfilePage')).ProfilePage),
       },
       {
+        path: routes.vedicProfiles,
+        handle: handle('VedicProfiles', 'nav.vedicProfiles'),
+        lazy: protectedPage(async () => (await import('../../features/vedic-profiles')).VedicProfilesPage),
+      },
+      {
         path: routes.festivals,
         handle: handle('Festivals', 'nav.festivals'),
         lazy: protectedPage(async () => (await import('../../features/festivals')).FestivalsPage),

@@ -102,6 +102,16 @@ export function MobileAccountMenu({ className }: Readonly<{ className: string }>
                 </Link>
               </li>
               <li>
+                <Link to={routes.vedicProfiles} className={styles.option} onClick={close}>
+                  <Icon name="user" size={22} />
+                  <span className={styles.optionText}>
+                    <span className={styles.optionLabel}>{t('nav.vedicProfiles')}</span>
+                    <span className={styles.optionHint}>{t('profile.mobile.vedicProfilesHint')}</span>
+                  </span>
+                  <Icon name="chevronRight" size={20} />
+                </Link>
+              </li>
+              <li>
                 <Link to={routes.settings} className={styles.option} onClick={close}>
                   <Icon name="settings" size={22} />
                   <span className={styles.optionText}>

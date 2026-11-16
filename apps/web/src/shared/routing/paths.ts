@@ -25,6 +25,7 @@ export const routes = {
   locations: '/locations',
   settings: '/settings',
   profile: '/profile',
+  vedicProfiles: '/profiles',
 } as const;
 
 /** Signed-in Home: the Panchang page. Sign-in, the signed-in `/` and the old `/dashboard` all land here. */
