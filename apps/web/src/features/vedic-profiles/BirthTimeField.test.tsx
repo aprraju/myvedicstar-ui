@@ -5,10 +5,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { I18nProvider } from '../../shared/i18n/I18nProvider';
 import {
   BirthTimeField,
+  type BirthTimeValue,
   changeBirthTimeMode,
   EMPTY_BIRTH_TIME,
   isDraftSavable,
-  type BirthTimeValue,
 } from './BirthTimeField';
 
 const renderField = (value = EMPTY_BIRTH_TIME, onChange = vi.fn()) =>
