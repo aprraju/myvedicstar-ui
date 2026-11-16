@@ -34,7 +34,7 @@ export const GATED_PATHS = ['/calendar', '/festivals', '/good-time', '/settings'
 export const GATED_PATH_PREFIXES = ['/calendar/'] as const;
 
 /** Non-page routes the SPA owns: the identity callback and the signed-in alias for Home. */
-export const APP_ONLY_PATHS = ['/auth/callback', '/dashboard', '/today'] as const;
+export const APP_ONLY_PATHS = ['/auth/callback', '/dashboard', '/today', '/profiles'] as const;
 
 const withoutTrailingSlash = (path: string): string => (path.length > 1 ? path.replace(/\/+$/, '') : path);
 
