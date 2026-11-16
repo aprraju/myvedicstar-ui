@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { I18nProvider } from '../../shared/i18n/I18nProvider';
-import { BirthTimeField, changeBirthTimeMode, EMPTY_BIRTH_TIME, isDraftSavable } from './BirthTimeField';
+import {
+  BirthTimeField,
+  changeBirthTimeMode,
+  EMPTY_BIRTH_TIME,
+  isDraftSavable,
+  type BirthTimeValue,
+} from './BirthTimeField';
 
 const renderField = (value = EMPTY_BIRTH_TIME, onChange = vi.fn()) =>
   render(
@@ -95,5 +101,77 @@ describe('isDraftSavable', () => {
   it('requires the custom relationship when Other is selected', () => {
     expect(isDraftSavable({ ...base, relationship: 'other', customRelationship: '' })).toBe(false);
     expect(isDraftSavable({ ...base, relationship: 'other', customRelationship: 'Mentor' })).toBe(true);
+  });
+});
+
+describe('changeBirthTimeMode — exhaustive transition matrix', () => {
+  const modes = ['known', 'approximate', 'unknown'] as const;
+  const samples: Record<(typeof modes)[number], BirthTimeValue> = {
+    known: { mode: 'known', from: '06:30:00', to: '' },
+    approximate: { mode: 'approximate', from: '06:00:00', to: '08:00:00' },
+    unknown: { mode: 'unknown', from: '', to: '' },
+  };
+
+  // Covers all nine pairs, so a future edit to any branch of the function cannot quietly reintroduce a stale value.
+  for (const fromMode of modes) {
+    for (const toMode of modes) {
+      it(`${fromMode} -> ${toMode} never leaves a value the target mode cannot hold`, () => {
+        const next = changeBirthTimeMode(samples[fromMode], toMode);
+        expect(next.mode).toBe(toMode);
+
+        if (toMode === 'unknown') {
+          expect(next.from).toBe('');
+          expect(next.to).toBe('');
+        }
+        if (toMode === 'known') {
+          expect(next.to).toBe('');
+        }
+        if (toMode === 'approximate' && fromMode !== 'approximate') {
+          expect(next.to).toBe('');
+        }
+        // approximate -> approximate is a no-op and returns the same object, asserted separately below.
+      });
+    }
+  }
+
+  it('preserves the start time when widening to approximate, so the user does not retype it', () => {
+    const next = changeBirthTimeMode({ mode: 'known', from: '06:30:00', to: '' }, 'approximate');
+    expect(next.from).toBe('06:30:00');
+    expect(next.to).toBe('');
+  });
+
+  it('returns the same object when the mode is unchanged, so React can skip the update', () => {
+    for (const mode of modes) {
+      expect(changeBirthTimeMode(samples[mode], mode)).toBe(samples[mode]);
+    }
+  });
+});
+
+describe('BirthTimeField — editing inside a mode', () => {
+  it('updates the start time without disturbing the mode', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    renderField({ mode: 'approximate', from: '', to: '08:00:00' }, onChange);
+
+    const from = screen.getByLabelText('From');
+    await user.clear(from);
+    await user.type(from, '06:00:00');
+
+    expect(onChange).toHaveBeenCalled();
+    for (const call of onChange.mock.calls) {
+      expect(call[0].mode).toBe('approximate');
+      expect(call[0].to).toBe('08:00:00');
+    }
+  });
+
+  it('keeps the mode as unknown while no time input is rendered', () => {
+    renderField({ mode: 'unknown', from: '', to: '' });
+    expect(screen.getByRole('radio', { name: 'Unknown' })).toBeChecked();
+    expect(screen.queryAllByRole('textbox')).toHaveLength(0);
+  });
+
+  it('does not offer a To input for an exact time', () => {
+    renderField({ mode: 'known', from: '', to: '' });
+    expect(screen.queryByLabelText('To (optional)')).not.toBeInTheDocument();
   });
 });
