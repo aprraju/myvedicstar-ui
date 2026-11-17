@@ -281,6 +281,9 @@ export function VedicProfilesPage() {
                 value={draft.birthLocation}
                 onChange={(location) => update$('birthLocation', location)}
               />
+              {draft.birthLocation && (
+                <p className={styles.hint}>{draft.birthLocation.fullName ?? draft.birthLocation.label}</p>
+              )}
             </div>
 
             <label className={styles.field}>

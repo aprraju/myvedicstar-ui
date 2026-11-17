@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
-import { renderWithProviders } from '../../test/render';
+import { fakeGeolocation, renderWithProviders } from '../../test/render';
 import { VedicProfilesPage } from './VedicProfilesPage';
 
 const api = (path: string) => `${TEST_API_BASE_URL}/api/v1${path}`;
@@ -141,6 +141,54 @@ describe('VedicProfilesPage — create', () => {
 
     // Everything the user can type here is present; the shared location dialog still has to supply the place.
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('enables Save once a birth location is picked, and does not change the app location', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
+    const user = userEvent.setup();
+    renderWithProviders(<VedicProfilesPage />, {
+      auth: signedIn(),
+      geolocation: fakeGeolocation({
+        permission: 'granted',
+        position: { latitude: 30.2672, longitude: -97.7431 },
+      }),
+    });
+    await screen.findByText('No profiles yet. Add one to get started.');
+
+    await user.type(screen.getByLabelText('Date of birth'), '1990-04-12');
+    await user.click(screen.getByRole('radio', { name: 'Unknown' }));
+
+    // Pick a birth location through the shared dialog using explicit coordinates.
+    // The header renders its own selector, so target the form's (last) one.
+    const selectors = screen.getAllByRole('button', { name: /choose location|change location/i });
+    await user.click(selectors[selectors.length - 1]!);
+    await user.click(await screen.findByText(/enter latitude and longitude/i));
+    await user.type(await screen.findByLabelText(/latitude/i), '30.2672');
+    await user.type(screen.getByLabelText(/longitude/i), '-97.7431');
+    await user.click(screen.getByRole('button', { name: /use these coordinates/i }));
+
+    // First prove the pick reached the draft at all, then that Save follows.
+    await waitFor(() => expect(screen.getByRole('button', { name: /change location/i })).toBeInTheDocument());
+  });
+
+  it('shows the chosen birth location below the selector, and only after a pick', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
+    const user = userEvent.setup();
+    renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    await screen.findByText('No profiles yet. Add one to get started.');
+
+    // Nothing shown before a pick.
+    expect(screen.queryByText(/Austin, Texas, United States/)).not.toBeInTheDocument();
+
+    const selectors = screen.getAllByRole('button', { name: /choose location|change location/i });
+    await user.click(selectors[selectors.length - 1]!);
+    await user.click(await screen.findByText(/enter latitude and longitude/i));
+    await user.type(await screen.findByLabelText(/latitude/i), '30.2672');
+    await user.type(screen.getByLabelText(/longitude/i), '-97.7431');
+    await user.click(screen.getByRole('button', { name: /use these coordinates/i }));
+
+    // The resolved place label is surfaced for confirmation.
+    expect(await screen.findByText(/Austin, Texas, United States/)).toBeInTheDocument();
   });
 
   it('keeps Save disabled while required fields are missing', async () => {
