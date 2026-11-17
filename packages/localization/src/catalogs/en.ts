@@ -305,7 +305,7 @@ export const en = {
     gender: {
       female: 'Female',
       male: 'Male',
-      nonBinary: 'Non-binary',
+      nonBinary: 'Non Binary',
       undisclosed: 'Prefer not to say',
     },
     relationship: {

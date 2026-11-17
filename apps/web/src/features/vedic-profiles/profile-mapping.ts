@@ -9,6 +9,14 @@ export type GenderValue = (typeof GENDER_VALUES)[number];
 /** The DTO requires a gender string, so an unanswered field still sends a neutral value rather than ''. */
 export const DEFAULT_GENDER: GenderValue = 'Prefer not to say';
 
+/** Explicit catalog keys: lowercasing the wire value breaks Non-binary -> nonBinary. */
+export const GENDER_LABEL_KEYS = {
+  Female: 'vedicProfiles.gender.female',
+  Male: 'vedicProfiles.gender.male',
+  'Non-binary': 'vedicProfiles.gender.nonBinary',
+  'Prefer not to say': 'vedicProfiles.gender.undisclosed',
+} as const satisfies Record<GenderValue, string>;
+
 export const RELATIONSHIP_VALUES = [
   'Self',
   'Father',
@@ -33,6 +41,14 @@ export interface ProfileDraft {
   occupation: string;
   relationship: RelationshipValue;
   customRelationship: string;
+}
+
+/** "First Last" from the account profile, skipping empty parts so no stray spaces appear. */
+export function accountDisplayName(firstName?: string | null, lastName?: string | null): string {
+  return [firstName, lastName]
+    .map((part) => part?.trim() ?? '')
+    .filter((part) => part.length > 0)
+    .join(' ');
 }
 
 export const EMPTY_DRAFT: ProfileDraft = {

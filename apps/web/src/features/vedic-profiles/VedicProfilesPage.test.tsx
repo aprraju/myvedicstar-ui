@@ -1,5 +1,6 @@
 import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
-import { screen, waitFor } from '@testing-library/react';
+import { seedUserInfo } from '@myvedicstar/query-cache';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
@@ -147,6 +148,40 @@ describe('VedicProfilesPage — create', () => {
     renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
     await screen.findByText('No profiles yet. Add one to get started.');
     expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
+  });
+
+  it('pre-fills the first profile name from the signed-in account (First + Last)', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
+    const { services } = renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    seedUserInfo(services.queryClient, 'u1', {
+      id: 'u1',
+      name: null,
+      email: null,
+      firstName: 'Asha',
+      lastName: 'Rao',
+    });
+    await screen.findByText('No profiles yet. Add one to get started.');
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Asha Rao'));
+  });
+
+  it('leaves the name empty when the login profile has no name parts', async () => {
+    server.use(
+      http.get(api('/vedic-profiles'), () => HttpResponse.json([])),
+      http.post(api('/auth/login'), () => HttpResponse.json({ id: 'u1', name: null, email: null })),
+    );
+    renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    await screen.findByText('No profiles yet. Add one to get started.');
+    expect(screen.getByLabelText('Name')).toHaveValue('');
+  });
+
+  it('renders human labels for every Gender option, never a raw key (AC: Non Binary)', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
+    renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    await screen.findByText('No profiles yet. Add one to get started.');
+    const options = within(screen.getByLabelText('Gender')).getAllByRole('option');
+    const labels = options.map((option) => option.textContent);
+    expect(labels).toEqual(['Female', 'Male', 'Non Binary', 'Prefer not to say']);
+    expect(labels.some((label) => label?.includes('vedicProfiles'))).toBe(false);
   });
 
   it('requires the custom relationship when Other is chosen (AC6)', async () => {

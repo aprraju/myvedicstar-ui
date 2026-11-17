@@ -1,15 +1,17 @@
 import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 import type { MessageKey, MessageParams } from '@myvedicstar/localization';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useUserInfo } from '../../shared/auth';
 import { Button } from '../../shared/components/Button';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { LocationSelector } from '../location';
 import { BirthTimeField } from './BirthTimeField';
 import { toFriendlyKey } from './error-key';
 import {
-  DEFAULT_GENDER,
+  accountDisplayName,
   EMPTY_DRAFT,
+  GENDER_LABEL_KEYS,
   GENDER_VALUES,
   type GenderValue,
   type ProfileDraft,
@@ -58,10 +60,34 @@ export function VedicProfilesPage() {
     refreshAfterConflict,
   } = useVedicProfiles();
 
+  const { userInfo } = useUserInfo();
+  /** The first profile is the account owner, so its name defaults to the login profile. */
+  const newDraft = useCallback(
+    (): ProfileDraft => ({
+      ...EMPTY_DRAFT,
+      name: accountDisplayName(userInfo?.firstName, userInfo?.lastName),
+    }),
+    [userInfo?.firstName, userInfo?.lastName],
+  );
+
   const [draft, setDraft] = useState<ProfileDraft>(EMPTY_DRAFT);
   const [editing, setEditing] = useState<VedicProfile | null>(null);
   const [pendingDelete, setPendingDelete] = useState<VedicProfileSummary | null>(null);
   const [loaded, setLoaded] = useState<VedicProfile | null>(null);
+
+  /**
+   * The login profile arrives after the first render, so the name cannot be seeded in the initial state. A ref keeps
+   * this one-shot: a late userInfo fills a name the user has not typed, and never overwrites one they have.
+   */
+  const nameSeeded = useRef(false);
+  useEffect(() => {
+    if (nameSeeded.current || editing) return;
+    const name = accountDisplayName(userInfo?.firstName, userInfo?.lastName);
+    if (!name) return;
+    nameSeeded.current = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the name comes from an async cache, not a render derivation.
+    setDraft((current) => (current.name.trim() ? current : { ...current, name }));
+  }, [userInfo?.firstName, userInfo?.lastName, editing]);
 
   const savable = isDraftComplete(draft);
   const busy = mutation.status === 'saving';
@@ -81,9 +107,10 @@ export function VedicProfilesPage() {
 
   const startNew = useCallback(() => {
     setEditing(null);
-    setDraft(EMPTY_DRAFT);
+    setDraft(newDraft());
+    nameSeeded.current = false;
     clearMutation();
-  }, [clearMutation]);
+  }, [clearMutation, newDraft]);
 
   // Selecting a saved row loads its full record so edits carry the current revision.
   const selectSummary = useCallback(
@@ -265,9 +292,7 @@ export function VedicProfilesPage() {
               >
                 {GENDER_VALUES.map((value) => (
                   <option key={value} value={value}>
-                    {t(
-                      `vedicProfiles.gender.${value === DEFAULT_GENDER ? 'undisclosed' : value.toLowerCase()}` as MessageKey,
-                    )}
+                    {t(GENDER_LABEL_KEYS[value] as MessageKey)}
                   </option>
                 ))}
               </select>
