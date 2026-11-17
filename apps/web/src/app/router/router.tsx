@@ -101,7 +101,7 @@ export const appRoutes: RouteObject[] = [
       },
       {
         path: routes.kundali,
-        handle: handle('Kundali', 'nav.kundali'),
+        handle: handle('Kundali', 'pages.kundali.title'),
         lazy: protectedPage(async () => (await import('../../features/kundali')).KundaliPage),
       },
       {

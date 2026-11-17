@@ -364,7 +364,10 @@ export function VedicProfilesPage() {
               </Button>
               <Button
                 variant="secondary"
-                onClick={() => void navigate(DEFAULT_AUTHENTICATED_PATH)}
+                // KUN-02 AC1: Cancel returns the user to where they came from and creates nothing. A caller that
+                // sent us a return path (e.g. Kundali's first-profile prompt) gets it back; everyone else keeps the
+                // existing behaviour of going Home.
+                onClick={() => void navigate(returnTo ?? DEFAULT_AUTHENTICATED_PATH)}
                 disabled={busy}
               >
                 {t('vedicProfiles.cancel')}

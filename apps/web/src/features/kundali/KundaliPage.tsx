@@ -57,11 +57,11 @@ export function KundaliPage() {
         />
       )}
 
-      {status === 'loading' && (
-        <p className={styles.muted} role="status">
-          {t('kundali.loading')}
-        </p>
-      )}
+      {/* One polite live region for state changes. Errors and prompts are already headings in the DOM, so they are
+          announced when they appear; this carries the transient "loading" message without competing with them. */}
+      <div role="status" aria-live="polite" className={styles.liveRegion}>
+        {status === 'loading' ? t('kundali.loading') : ''}
+      </div>
 
       {status === 'error' && (
         <section className={styles.alert} aria-labelledby="kundali-error-title">

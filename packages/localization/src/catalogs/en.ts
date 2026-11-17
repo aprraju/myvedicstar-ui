@@ -325,6 +325,7 @@ export const en = {
     subtitle: 'Your birth chart, read from the profiles you have saved.',
     profileLabel: 'Astro Profile',
     profileSelectHint: 'Choose which profile this Kundali is for.',
+    profileSelectPlaceholder: 'Select an Astro Profile…',
     loading: 'Loading profiles…',
     loadFailedTitle: 'Profiles could not be loaded',
     loadFailedBody: 'Your saved Astro Profiles could not be loaded right now. Try again in a moment.',
@@ -641,6 +642,10 @@ export const en = {
   },
   pages: {
     home: { title: 'Home' },
+    kundali: {
+      title: 'Kundali',
+      notFound: 'Kundali is not available',
+    },
     about: {
       title: 'About Us',
       body1:

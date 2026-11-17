@@ -22,6 +22,14 @@ describe('ProfileSelector', () => {
     );
   });
 
+  it('uses placeholder text distinct from the hint, so the two are not announced twice', () => {
+    renderWithProviders(<ProfileSelector options={options} value={null} onChange={() => undefined} />);
+    const placeholder = screen.getByRole('option', { name: 'Select an Astro Profile…' });
+    expect(placeholder).toBeInTheDocument();
+    // The hint is separate copy; a shared string would make the control read the same label twice.
+    expect(placeholder.textContent).not.toBe('Choose which profile this Kundali is for.');
+  });
+
   it('shows a placeholder option only while nothing is selected', () => {
     const { unmount } = renderWithProviders(
       <ProfileSelector options={options} value={null} onChange={() => undefined} />,

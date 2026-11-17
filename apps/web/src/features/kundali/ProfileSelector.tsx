@@ -42,7 +42,8 @@ export function ProfileSelector({ options, value, onChange, disabled = false }: 
         aria-describedby={hintId}
         onChange={(event) => onChange(event.target.value)}
       >
-        {value === null && <option value="">{t('kundali.profileSelectHint')}</option>}
+        {/* Distinct from the hint above: the hint explains the control, this labels the empty choice. */}
+        {value === null && <option value="">{t('kundali.profileSelectPlaceholder')}</option>}
         {options.map((option) => (
           <option key={option.id} value={option.id}>
             {option.name}
