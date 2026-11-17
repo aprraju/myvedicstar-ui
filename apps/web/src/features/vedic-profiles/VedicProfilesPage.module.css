@@ -174,3 +174,10 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-elevated);
 }
+
+/* The chosen birth location, shown under the selector so the user can confirm the place. */
+.hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #5b6472);
+}

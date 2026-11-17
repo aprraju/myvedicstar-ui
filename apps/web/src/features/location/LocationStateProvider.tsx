@@ -103,7 +103,26 @@ export function LocationStateProvider({
   const [detecting, setDetecting] = useState(false);
   const [detectError, setDetectError] = useState<DetectError | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectOverride, setSelectOverride] = useState<((location: SelectedLocation) => void) | null>(null);
+  // Several selectors can be mounted at once (the header and a form). Each registration is pushed onto a stack:
+  // the most recent registrant owns the dialog, and unmounting it restores whoever registered before, instead of
+  // clearing the sink for everyone. Without this the header (rendered after the page) wins and a form never
+  // receives its own pick.
+  const [selectOverrides, setSelectOverrides] = useState<readonly ((location: SelectedLocation) => void)[]>(
+    [],
+  );
+  const selectOverride = selectOverrides[selectOverrides.length - 1] ?? null;
+  // Mirror it in a ref so async paths (position detection) read the current handler, not a stale closure.
+  const selectOverrideRef = useRef<((location: SelectedLocation) => void) | null>(null);
+  useEffect(() => {
+    selectOverrideRef.current = selectOverride;
+  }, [selectOverride]);
+
+  const registerOverride = useCallback((handler: ((location: SelectedLocation) => void) | null) => {
+    setSelectOverrides((current) => {
+      if (!handler) return current.slice(0, -1);
+      return current[current.length - 1] === handler ? current : [...current, handler];
+    });
+  }, []);
   // Incremented whenever the user picks a location, so a slower automatic detection never overrides their choice.
   const choice = useRef(0);
 
@@ -164,6 +183,13 @@ export function LocationStateProvider({
           : await locateAndResolve(geolocation, (params) => api.locations.resolve(params));
         if (choice.current !== startedAt) return false;
         preferenceStorage.remove(KEYS.denied);
+        // A form that owns the dialog (e.g. a profile birth location) gets the pick instead of the app.
+        // Global state, saved locations and persistence must not move for a value that belongs to that form.
+        const sink = selectOverrideRef.current;
+        if (sink) {
+          sink(located);
+          return true;
+        }
         select(located);
         return true;
       } catch (error) {
@@ -257,7 +283,7 @@ export function LocationStateProvider({
       dialogOpen,
       openDialog: () => setDialogOpen(true),
       closeDialog: () => setDialogOpen(false),
-      overrideSelect: setSelectOverride,
+      overrideSelect: registerOverride,
       selectOverride,
     }),
     [
@@ -273,6 +299,7 @@ export function LocationStateProvider({
       detect,
       dialogOpen,
       selectOverride,
+      registerOverride,
     ],
   );
 
