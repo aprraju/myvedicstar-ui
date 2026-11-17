@@ -26,6 +26,7 @@
     "web:e2e": "npm run e2e -w @myvedicstar/web",
     "web:prerender": "tsx infrastructure/web/static-web-apps/scripts/prerender-cli.ts apps/web/dist",
     "web:validate-build": "tsx infrastructure/web/static-web-apps/scripts/validate-build.ts apps/web/dist --expect-prerendered",
+    "web:audit": "node infrastructure/web/static-web-apps/scripts/audit-with-exceptions.mjs",
     "web:deploy": "bash infrastructure/web/static-web-apps/scripts/deploy.sh",
     "deploy:typecheck": "tsc -p infrastructure/web/static-web-apps/tsconfig.json",
     "deploy:test": "vitest run --root infrastructure/web/static-web-apps",
