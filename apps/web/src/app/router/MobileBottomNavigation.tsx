@@ -14,15 +14,14 @@ export function MobileBottomNavigation() {
   // Home is the Panchang page; only Panchang is highlighted there so two items are never active together.
   const items: {
     to: string;
-    label: 'nav.home' | 'nav.calendar' | 'nav.goodTime' | 'nav.kundali' | 'nav.upcomingEvents';
+    label: 'nav.home' | 'nav.calendar' | 'nav.goodTime' | 'nav.upcomingEvents';
     icon: IconName;
     highlight: boolean;
   }[] = [
     { to: DEFAULT_AUTHENTICATED_PATH, label: 'nav.home', icon: 'home', highlight: false },
     { to: routes.calendar, label: 'nav.calendar', icon: 'calendar', highlight: true },
     { to: routes.goodTime, label: 'nav.goodTime', icon: 'clock', highlight: true },
-    // KUN-01: the phone bar mirrors APP_NAV, so Kundali follows Find Good Time here too.
-    { to: routes.kundali, label: 'nav.kundali', icon: 'star', highlight: true },
+    // Kundali is NOT a bottom tab: owner decision on #79 is More-first, so the 5-slot bar stays as it was.
     { to: routes.festivals, label: 'nav.upcomingEvents', icon: 'flower', highlight: true },
   ];
   return (
