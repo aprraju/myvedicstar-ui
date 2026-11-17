@@ -59,6 +59,8 @@ export function KundaliPage() {
 
       {/* One polite live region for state changes. Errors and prompts are already headings in the DOM, so they are
           announced when they appear; this carries the transient "loading" message without competing with them. */}
+      {/* One polite live region for transient state changes, so a screen-reader user hears loading finish or a
+          cancellation without the page needing focus. The prompts themselves are headings in the DOM. */}
       <div role="status" aria-live="polite" className={styles.liveRegion}>
         {status === 'loading' ? t('kundali.loading') : ''}
       </div>

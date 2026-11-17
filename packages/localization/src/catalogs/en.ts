@@ -337,7 +337,8 @@ export const en = {
       title: 'Create your first Astro Profile',
       body: 'A Kundali is calculated from a birth date, birth time and birth place. Add an Astro Profile once and every chart uses it.',
       action: 'Create Astro Profile',
-      returning: 'Cancel returns to where you were and creates nothing.',
+      cancel: 'Cancel',
+      cancelled: 'Cancelled. Nothing was created.',
     },
     selected: {
       title: 'Kundali for {name}',

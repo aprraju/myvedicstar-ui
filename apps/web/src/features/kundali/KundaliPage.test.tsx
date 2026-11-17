@@ -128,7 +128,37 @@ describe('KundaliPage — zero profile guidance (KUN-02)', () => {
       'href',
       '/astro-profiles?from=%2Fkundali',
     );
-    expect(screen.getByText('Cancel returns to where you were and creates nothing.')).toBeInTheDocument();
+  });
+
+  it('leaves the page when Cancel is pressed, and creates nothing (KUN-02 AC1)', async () => {
+    let created = 0;
+    server.use(
+      http.get(api('/vedic-profiles'), () => HttpResponse.json([])),
+      http.post(api('/vedic-profiles'), () => {
+        created += 1;
+        return HttpResponse.json(null, { status: 201 });
+      }),
+    );
+    const user = userEvent.setup();
+    const { router } = renderKundali('/kundali');
+
+    await screen.findByRole('heading', { name: 'Create your first Astro Profile' });
+    // The control must be a real button. Prose describing a Cancel action is not evidence.
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
+    expect(created).toBe(0);
+  });
+
+  it('announces the loading state through a live region', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => new Promise(() => undefined)));
+    renderKundali();
+    // The router's lazy fallback is also a status region, so wait for the page's own live region text.
+    // getAllByRole joins all status texts, which is enough to prove ours is present and announced.
+    await waitFor(() => {
+      const statuses = screen.getAllByRole('status').map((node) => node.textContent ?? '');
+      expect(statuses.join(' ')).toContain('Loading profiles…');
+    });
   });
 
   it('shows an error with retry instead of the zero-profile prompt when the list request fails', async () => {

@@ -95,12 +95,6 @@
   font-size: var(--font-size-sm);
 }
 
-.emptyNote {
-  margin: var(--space-sm) 0 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-
 .button {
   display: inline-flex;
   align-items: center;
@@ -133,6 +127,14 @@
   .page {
     padding: var(--space-md) var(--space-sm) var(--space-lg);
   }
+}
+
+/* Empty-state actions sit side by side on wide screens and stack on narrow ones. */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
 }
 
 /* Announced by screen readers, not painted. Kept local so the feature owns its own utility. */
