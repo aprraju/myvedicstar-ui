@@ -111,7 +111,7 @@ export const appRoutes: RouteObject[] = [
         lazy: protectedPage(async () => (await import('../../features/profile/ProfilePage')).ProfilePage),
       },
       {
-        path: routes.vedicProfiles,
+        path: routes.astroProfiles,
         handle: handle('VedicProfiles', 'nav.vedicProfiles'),
         lazy: protectedPage(async () => (await import('../../features/vedic-profiles')).VedicProfilesPage),
       },

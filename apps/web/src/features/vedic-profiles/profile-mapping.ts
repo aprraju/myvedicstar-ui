@@ -7,7 +7,7 @@ import type { BirthTimeValue } from './BirthTimeField';
 export const GENDER_VALUES = ['Female', 'Male', 'Non-binary', 'Prefer not to say'] as const;
 export type GenderValue = (typeof GENDER_VALUES)[number];
 /** The DTO requires a gender string, so an unanswered field still sends a neutral value rather than ''. */
-export const DEFAULT_GENDER: GenderValue = 'Prefer not to say';
+export const DEFAULT_GENDER: GenderValue = 'Male';
 
 /** Explicit catalog keys: lowercasing the wire value breaks Non-binary -> nonBinary. */
 export const GENDER_LABEL_KEYS = {

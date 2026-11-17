@@ -102,7 +102,7 @@ export function MobileAccountMenu({ className }: Readonly<{ className: string }>
                 </Link>
               </li>
               <li>
-                <Link to={routes.vedicProfiles} className={styles.option} onClick={close}>
+                <Link to={routes.astroProfiles} className={styles.option} onClick={close}>
                   <Icon name="user" size={22} />
                   <span className={styles.optionText}>
                     <span className={styles.optionLabel}>{t('nav.vedicProfiles')}</span>
