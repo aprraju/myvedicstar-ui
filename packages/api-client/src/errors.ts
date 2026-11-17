@@ -9,6 +9,7 @@ export type ApiErrorKind =
   | 'authentication'
   | 'authorization'
   | 'notFound'
+  | 'conflict'
   | 'rateLimit'
   | 'network'
   | 'timeout'
@@ -61,6 +62,9 @@ function kindFromStatus(status: number): ApiErrorKind {
   if (status === 401) return 'authentication';
   if (status === 403) return 'authorization';
   if (status === 404) return 'notFound';
+  // 409 means a concurrent write won the race (e.g. a stale optimistic-concurrency revision); callers must
+  // re-read and retry rather than retry blindly, so it needs its own kind instead of collapsing into 'unknown'.
+  if (status === 409) return 'conflict';
   if (status === 408) return 'timeout';
   if (status === 429) return 'rateLimit';
   if (status >= 500) return 'server';

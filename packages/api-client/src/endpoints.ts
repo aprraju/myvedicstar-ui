@@ -59,6 +59,9 @@ export const defaultApiEndpoints = {
   savedLocation: '/settings/locations/{locationId}',
   /** Contact Us form submission (POST). */
   contactSubmit: '/email/send',
+  /** Vedic Profiles — owned CRUD (list/create, read/replace/delete by id). */
+  vedicProfiles: '/vedic-profiles',
+  vedicProfile: '/vedic-profiles/{id}',
 } as const;
 
 export type ApiEndpointName = keyof typeof defaultApiEndpoints;
@@ -99,6 +102,8 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   savedLocations: [],
   savedLocation: ['locationId'],
   contactSubmit: [],
+  vedicProfiles: [],
+  vedicProfile: ['id'],
 };
 
 const TEMPLATE_PATTERN = /^\/[A-Za-z0-9_\-./{}]*$/;
