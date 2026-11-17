@@ -1,10 +1,10 @@
+import type { SelectedLocation } from '@myvedicstar/domain-models';
 import { useEffect, useRef } from 'react';
 
 import { Icon } from '../../shared/components/Icon';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import styles from './LocationSelector.module.css';
 import { useLocationState } from './LocationStateProvider';
-import type { SelectedLocation } from '@myvedicstar/domain-models';
 
 interface LocationSelectorProps {
   /**
@@ -30,7 +30,10 @@ export function LocationSelector({ value, onChange, disabled = false }: Location
   // The identity of `onChange` must not be a dependency: callers pass an inline arrow, so a fresh function every render
   // would re-register state on the provider, re-render, and loop forever. A ref keeps the latest handler without that.
   const handlerRef = useRef(onChange);
-  handlerRef.current = onChange;
+  // Assigning during an effect (not render) keeps the latest handler without writing a ref while rendering.
+  useEffect(() => {
+    handlerRef.current = onChange;
+  }, [onChange]);
   useEffect(() => {
     if (!onChange) return;
     const registered: (location: SelectedLocation) => void = (picked) => handlerRef.current?.(picked);

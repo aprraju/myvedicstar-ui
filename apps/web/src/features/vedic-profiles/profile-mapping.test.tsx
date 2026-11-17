@@ -1,10 +1,9 @@
-import { HttpResponse, http } from 'msw';
+import type { VedicProfile } from '@myvedicstar/contracts';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import type { VedicProfile } from '@myvedicstar/contracts';
-
-import { server } from '../../test/msw/server';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';
+import { server } from '../../test/msw/server';
 import {
   birthTimeBody,
   birthTimeFromProfile,

@@ -18,17 +18,17 @@ import {
   panchangResponseSchema,
   panchangTraditionsResponseSchema,
   type ProfileUpdate,
+  type ReplaceVedicProfileRequest,
   savedLocationSchema,
   type SaveSettings,
   traditionsResponseSchema,
   userInfoSchema,
   userProfileSchema,
   userSettingsSchema,
-  type ReplaceVedicProfileRequest,
   type VedicProfile,
   type VedicProfileRequest,
-  type VedicProfileSummary,
   vedicProfileSchema,
+  type VedicProfileSummary,
   vedicProfileSummarySchema,
 } from '@myvedicstar/contracts';
 import { z } from 'zod';
@@ -560,12 +560,12 @@ export function createApiClient(options: ApiClientOptions) {
           signal: call?.signal,
           auth: 'required',
         }),
+      // 204 No Content: the transport yields undefined, so this resolves to undefined rather than a parsed body.
       remove: (id: string, call?: CallOptions) =>
-        transport.request<void>({
+        transport.request<undefined>({
           operation: 'vedicProfiles.remove',
           method: 'DELETE',
           path: path('vedicProfile', { id }),
-          // 204 No Content: the transport yields undefined, so the schema must accept it.
           schema: z.undefined(),
           signal: call?.signal,
           auth: 'required',

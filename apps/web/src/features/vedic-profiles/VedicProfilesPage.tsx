@@ -1,13 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
-
 import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 import type { MessageKey, MessageParams } from '@myvedicstar/localization';
+import { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '../../shared/components/Button';
-import { toFriendlyKey } from './error-key';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { LocationSelector } from '../location';
 import { BirthTimeField } from './BirthTimeField';
+import { toFriendlyKey } from './error-key';
 import {
   DEFAULT_GENDER,
   EMPTY_DRAFT,

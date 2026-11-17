@@ -1,9 +1,8 @@
+import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
-
-import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';

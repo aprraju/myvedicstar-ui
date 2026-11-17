@@ -85,7 +85,10 @@ export function useVedicProfiles(): VedicProfilesState {
    * duplicates requests and can wipe rows the user is looking at. `reloadRef` keeps the latest closure instead.
    */
   const reloadRef = useRef(reload);
-  reloadRef.current = reload;
+  // Keep the newest closure without writing a ref during render.
+  useEffect(() => {
+    reloadRef.current = reload;
+  }, [reload]);
   /**
    * Load once per signed-in account. `summaries` is NOT cleared up front: doing so races an in-flight first load and
    * can wipe rows that already arrived, which is why a list with data appeared blank. Status carries the loading
