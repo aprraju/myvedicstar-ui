@@ -133,7 +133,14 @@ test('signed-in Home is the Panchang page: no Today item, and the old Today addr
   await page.goto('/dashboard');
   await expect(page).toHaveURL(/\/calendar$/);
   const navigation = page.getByRole('navigation', { name: 'App navigation' });
-  await expect(navigation.getByRole('link')).toHaveText(['Home', 'Panchang', 'Good Time', 'Upcoming Events']);
+  // KUN-01: Kundali sits immediately after Good Time, mirroring the signed-in desktop nav.
+  await expect(navigation.getByRole('link')).toHaveText([
+    'Home',
+    'Panchang',
+    'Good Time',
+    'Kundali',
+    'Upcoming Events',
+  ]);
   await expect(navigation.getByRole('link', { name: 'Today' })).toHaveCount(0);
   await expect(navigation.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/calendar');
   await navigation.getByRole('link', { name: 'Good Time' }).click();
@@ -177,9 +184,10 @@ test('mobile Panchang card opens in full and folds; the account opens from the h
   await expect(panchang).not.toContainText('Karana');
   await panchang.getByRole('button', { name: 'See all' }).click();
   await expect(panchang).toContainText('Karana');
-  // Four app sections in the bottom bar; the account opens from the header's icon as a "Your Account" sheet.
+  // Five app sections in the bottom bar (KUN-01 added Kundali); the account opens from the header
+  // icon as a "Your Account" sheet, so it is never a bar item.
   const navigation = page.getByRole('navigation', { name: 'App navigation' });
-  await expect(navigation.getByRole('link')).toHaveCount(4);
+  await expect(navigation.getByRole('link')).toHaveCount(5);
   await expect(navigation.getByRole('button')).toHaveCount(0);
   await expect(page.getByRole('banner').getByRole('button', { name: 'Open account menu' })).toBeHidden();
   await expect(page.getByRole('banner').getByRole('button', { name: 'Open menu' })).toBeHidden();
