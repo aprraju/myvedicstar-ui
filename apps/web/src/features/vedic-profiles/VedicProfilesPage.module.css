@@ -142,3 +142,35 @@
     min-width: 0;
   }
 }
+
+/* Status text and the live region: presence-only containers so the layout never shifts on an empty state. */
+.muted {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.errorText {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-caution);
+  font-size: var(--font-size-sm);
+}
+
+.successText {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-favorable-strong);
+  font-size: var(--font-size-sm);
+}
+
+.liveRegion:empty {
+  display: none;
+}
+
+/* Delete confirmation sits inline in the form pane; it is an alertdialog, so it must be readable and in focus order. */
+.confirm {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border, var(--color-text-secondary));
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}

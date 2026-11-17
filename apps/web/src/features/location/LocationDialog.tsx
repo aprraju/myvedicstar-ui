@@ -44,9 +44,10 @@ export function LocationDialog() {
 function LocationDialogContent({ onDone }: { onDone: () => void }) {
   const { config } = useServices();
   const [hasSearch, setHasSearch] = useState(false);
-  const { select } = useLocationState();
+  const { select, selectOverride } = useLocationState();
   const choose = (location: SelectedLocation) => {
-    select(location);
+    // A caller-supplied sink (e.g. a form capturing its own birth location) wins; otherwise this stays app-global.
+    (selectOverride ?? select)(location);
     onDone();
   };
   return (

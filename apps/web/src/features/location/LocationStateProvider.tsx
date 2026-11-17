@@ -58,6 +58,13 @@ interface LocationContextValue {
   dialogOpen: boolean;
   openDialog(): void;
   closeDialog(): void;
+  /**
+   * Optional per-dialog override for `select`. The location dialog is shared (there is exactly one), so a caller that
+   * needs its own selection sink — e.g. a birth location that belongs to a form, not the app header — registers a
+   * handler and unregisters it on unmount. When nothing is registered the dialog keeps today's app-global behaviour.
+   */
+  overrideSelect(handler: ((location: SelectedLocation) => void) | null): void;
+  selectOverride: ((location: SelectedLocation) => void) | null;
 }
 
 const LocationContext = createContext<LocationContextValue | null>(null);
@@ -96,6 +103,7 @@ export function LocationStateProvider({
   const [detecting, setDetecting] = useState(false);
   const [detectError, setDetectError] = useState<DetectError | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectOverride, setSelectOverride] = useState<((location: SelectedLocation) => void) | null>(null);
   // Incremented whenever the user picks a location, so a slower automatic detection never overrides their choice.
   const choice = useRef(0);
 
@@ -249,6 +257,8 @@ export function LocationStateProvider({
       dialogOpen,
       openDialog: () => setDialogOpen(true),
       closeDialog: () => setDialogOpen(false),
+      overrideSelect: setSelectOverride,
+      selectOverride,
     }),
     [
       location,
@@ -262,6 +272,7 @@ export function LocationStateProvider({
       removeRecent,
       detect,
       dialogOpen,
+      selectOverride,
     ],
   );
 

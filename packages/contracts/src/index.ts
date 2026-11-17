@@ -9,3 +9,4 @@ export * from './problem-details';
 export * from './profile';
 export * from './settings';
 export * from './traditions';
+export * from './vedic-profiles';

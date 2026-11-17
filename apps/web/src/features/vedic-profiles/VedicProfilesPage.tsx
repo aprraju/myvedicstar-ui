@@ -1,53 +1,147 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+
+import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
+import type { MessageKey, MessageParams } from '@myvedicstar/localization';
 
 import { Button } from '../../shared/components/Button';
+import { toFriendlyKey } from './error-key';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { LocationSelector } from '../location';
-import { BirthTimeField, type BirthTimeValue, EMPTY_BIRTH_TIME, isDraftSavable } from './BirthTimeField';
+import { BirthTimeField } from './BirthTimeField';
+import {
+  DEFAULT_GENDER,
+  EMPTY_DRAFT,
+  GENDER_VALUES,
+  type GenderValue,
+  type ProfileDraft,
+  RELATIONSHIP_VALUES,
+  type RelationshipValue,
+  toDraft,
+  toReplaceRequest,
+  toRequest,
+} from './profile-mapping';
+import { useVedicProfiles } from './useVedicProfiles';
 import styles from './VedicProfilesPage.module.css';
 
-/**
- * Vedic Profiles — layout scaffolding only.
- *
- * Deliberately NOT wired to an API: the field names and endpoint shape are still being agreed with the backend
- * (apraju/myvedicstar#9, tracked here as #28). Everything below is presentation and local form state so the layout,
- * the three-state birth time control and the mandatory-field behaviour can be built and tested without guessing the
- * contract. When the contract lands, the save call replaces the `onSave` placeholder and nothing else moves.
- */
-export interface VedicProfileDraft {
-  name: string;
-  /** DD/MM/YYYY, as displayed. */
-  birthDate: string;
-  birthTime: BirthTimeValue;
-  birthLocationLabel: string;
-  gender: string;
-  occupation: string;
-  relationship: string;
-  customRelationship: string;
+/** Birth time is required to be a real value for the chart, so Save stays blocked until the draft is usable. */
+function isDraftComplete(draft: ProfileDraft): boolean {
+  if (!draft.name.trim() || !draft.birthDate || !draft.birthLocation) return false;
+  if (draft.birthTime.mode === 'known') return draft.birthTime.from.length > 0;
+  if (draft.birthTime.mode === 'approximate') {
+    return (
+      draft.birthTime.from.length > 0 &&
+      draft.birthTime.to.length > 0 &&
+      draft.birthTime.to >= draft.birthTime.from
+    );
+  }
+  return true;
 }
 
-const EMPTY_DRAFT: VedicProfileDraft = {
-  name: '',
-  birthDate: '',
-  birthTime: EMPTY_BIRTH_TIME,
-  birthLocationLabel: '',
-  gender: '',
-  occupation: '',
-  relationship: '',
-  customRelationship: '',
-};
+/** Display label for a saved profile: its name, with the relationship as the secondary line. */
+type Translate = (key: MessageKey, params?: MessageParams) => string;
 
-/** Placeholder list until persistence exists. Never presented as real data. */
-const SCAFFOLD_PROFILES = [{ id: 'self', name: 'Self', relationship: 'Self', isSelf: true }];
+function relationshipLabel(t: Translate, summary: VedicProfileSummary): string {
+  if (summary.relationship === 'Other' && summary.customRelationship) return summary.customRelationship;
+  return t(toFriendlyKey('vedicProfiles.relationship', summary.relationship));
+}
 
 export function VedicProfilesPage() {
   const { t } = useTranslation();
-  const [draft, setDraft] = useState<VedicProfileDraft>(EMPTY_DRAFT);
-  const [selectedId, setSelectedId] = useState('self');
-  const savable = isDraftSavable(draft);
+  const {
+    summaries,
+    listStatus,
+    listError,
+    mutation,
+    create,
+    update,
+    remove,
+    clearMutation,
+    refreshAfterConflict,
+  } = useVedicProfiles();
 
-  const update = <K extends keyof VedicProfileDraft>(key: K, value: VedicProfileDraft[K]) =>
-    setDraft((current) => ({ ...current, [key]: value }));
+  const [draft, setDraft] = useState<ProfileDraft>(EMPTY_DRAFT);
+  const [editing, setEditing] = useState<VedicProfile | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<VedicProfileSummary | null>(null);
+  const [loaded, setLoaded] = useState<VedicProfile | null>(null);
+
+  const savable = isDraftComplete(draft);
+  const busy = mutation.status === 'saving';
+
+  /**
+   * Editing after a conflict or an error means the user has decided what to do, so the stale prompt goes away.
+   * This runs in the event handler rather than an effect: clearing from an effect keyed on the mutation state would
+   * flip it back to idle on every render and re-trigger the effect, which is an infinite loop.
+   */
+  const update$ = useCallback(
+    <K extends keyof ProfileDraft>(key: K, value: ProfileDraft[K]) => {
+      setDraft((current) => ({ ...current, [key]: value }));
+      if (mutation.status === 'conflict' || mutation.status === 'error') clearMutation();
+    },
+    [mutation.status, clearMutation],
+  );
+
+  const startNew = useCallback(() => {
+    setEditing(null);
+    setDraft(EMPTY_DRAFT);
+    clearMutation();
+  }, [clearMutation]);
+
+  // Selecting a saved row loads its full record so edits carry the current revision.
+  const selectSummary = useCallback(
+    async (summary: VedicProfileSummary) => {
+      clearMutation();
+      const loadedProfile = await refreshAfterConflict(summary.id);
+      if (!loadedProfile) return;
+      setEditing(loadedProfile);
+      setDraft(toDraft(loadedProfile));
+    },
+    [clearMutation, refreshAfterConflict],
+  );
+
+  /**
+   * The revision baseline comes from the last profile the server confirmed, so a save or a conflict updates it
+   * without touching the user's draft. Derived during render from the mutation rather than synced in an effect:
+   * `mutation` is a fresh object on every state change, so an effect on it would set state and re-run forever.
+   */
+  const revisionBaseline =
+    mutation.status === 'saved' || mutation.status === 'conflict' ? mutation.profile : loaded;
+
+  const onSubmit = async () => {
+    if (!savable || busy) return;
+    const request = toRequest(draft);
+    const result = editing
+      ? await update(editing.id, toReplaceRequest(draft, revisionBaseline?.revision ?? editing.revision))
+      : await create(request);
+    if (result) {
+      setEditing(result);
+      setLoaded(result);
+      setDraft(toDraft(result));
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    const ok = await remove(pendingDelete.id);
+    if (ok) {
+      setPendingDelete(null);
+      if (editing?.id === pendingDelete.id) startNew();
+    }
+  };
+
+  const statusMessage = useMemo(() => {
+    switch (mutation.status) {
+      case 'saved':
+        return { tone: 'success' as const, text: t('vedicProfiles.status.saved') };
+      case 'deleted':
+        return { tone: 'success' as const, text: t('vedicProfiles.status.deleted') };
+      case 'conflict':
+        return { tone: 'error' as const, text: t('errors.conflict') };
+      case 'error':
+        return { tone: 'error' as const, text: t(toFriendlyKey('errors', mutation.kind)) };
+      default:
+        return null;
+    }
+  }, [mutation, t]);
 
   return (
     <section className={styles.page} aria-labelledby="vedic-profiles-title">
@@ -63,36 +157,72 @@ export function VedicProfilesPage() {
           <h2 id="vedic-profiles-list-title" className={styles.paneTitle}>
             {t('vedicProfiles.savedTitle')}
           </h2>
+
+          {listStatus === 'loading' && <p className={styles.muted}>{t('vedicProfiles.list.loading')}</p>}
+          {listStatus === 'error' && (
+            <p className={styles.errorText} role="alert">
+              {t(toFriendlyKey('errors', listError ?? 'unknown'))}
+            </p>
+          )}
+          {listStatus === 'ready' && summaries.length === 0 && (
+            <p className={styles.muted}>{t('vedicProfiles.list.empty')}</p>
+          )}
+
           <ul className={styles.cards}>
-            {SCAFFOLD_PROFILES.map((profile) => (
-              <li key={profile.id}>
+            {summaries.map((summary) => (
+              <li key={summary.id}>
                 <button
                   type="button"
                   className={styles.card}
-                  aria-current={selectedId === profile.id}
-                  onClick={() => setSelectedId(profile.id)}
+                  aria-current={editing?.id === summary.id}
+                  onClick={() => void selectSummary(summary)}
                 >
-                  <span className={styles.cardName}>{profile.name}</span>
-                  <span className={styles.cardRelationship}>{profile.relationship}</span>
+                  <span className={styles.cardName}>{summary.name}</span>
+                  <span className={styles.cardRelationship}>{relationshipLabel(t, summary)}</span>
                 </button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setPendingDelete(summary)}
+                  aria-label={t('vedicProfiles.deleteNamed', { name: summary.name })}
+                >
+                  {t('vedicProfiles.delete')}
+                </Button>
               </li>
             ))}
           </ul>
-          <Button variant="secondary" fullWidth onClick={() => setDraft(EMPTY_DRAFT)}>
+
+          <Button variant="secondary" fullWidth onClick={startNew}>
             {t('vedicProfiles.add')}
           </Button>
         </section>
 
         <section className={styles.formPane} aria-labelledby="vedic-profiles-form-title">
           <h2 id="vedic-profiles-form-title" className={styles.paneTitle}>
-            {t('vedicProfiles.formTitle')}
+            {editing ? t('vedicProfiles.editTitle') : t('vedicProfiles.formTitle')}
           </h2>
+
+          {/* Errors and confirmations are announced; nothing claims success before the server answered. */}
+          <div role="status" aria-live="polite" className={styles.liveRegion}>
+            {statusMessage && (
+              <p className={statusMessage.tone === 'error' ? styles.errorText : styles.successText}>
+                {statusMessage.text}
+                {mutation.status === 'conflict' && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => void selectSummary(editing ?? (mutation.profile as VedicProfileSummary))}
+                  >
+                    {t('vedicProfiles.conflictRefresh')}
+                  </Button>
+                )}
+              </p>
+            )}
+          </div>
 
           <form
             className={styles.form}
             onSubmit={(event) => {
-              // No mutation yet: the save contract is not defined (#28). This keeps the button honest.
               event.preventDefault();
+              void onSubmit();
             }}
           >
             <label className={styles.field}>
@@ -100,7 +230,7 @@ export function VedicProfilesPage() {
               <input
                 className={styles.input}
                 value={draft.name}
-                onChange={(event) => update('name', event.target.value)}
+                onChange={(event) => update$('name', event.target.value)}
                 autoComplete="name"
               />
             </label>
@@ -111,17 +241,20 @@ export function VedicProfilesPage() {
                 className={styles.input}
                 type="date"
                 value={draft.birthDate}
-                onChange={(event) => update('birthDate', event.target.value)}
+                onChange={(event) => update$('birthDate', event.target.value)}
                 max={new Date().toISOString().slice(0, 10)}
               />
             </label>
 
-            <BirthTimeField value={draft.birthTime} onChange={(next) => update('birthTime', next)} />
+            <BirthTimeField value={draft.birthTime} onChange={(next) => update$('birthTime', next)} />
 
             <div className={styles.field}>
               <span className={styles.label}>{t('vedicProfiles.form.birthLocation')}</span>
-              {/* Reuses the app's single location selector; a second one would be a duplicate implementation. */}
-              <LocationSelector />
+              {/* The one shared selector, in controlled mode: its pick becomes this profile's birth location. */}
+              <LocationSelector
+                value={draft.birthLocation}
+                onChange={(location) => update$('birthLocation', location)}
+              />
             </div>
 
             <label className={styles.field}>
@@ -129,30 +262,24 @@ export function VedicProfilesPage() {
               <select
                 className={styles.input}
                 value={draft.gender}
-                onChange={(event) => update('gender', event.target.value)}
+                onChange={(event) => update$('gender', event.target.value as GenderValue)}
               >
-                <option value="">{t('vedicProfiles.form.choose')}</option>
-                <option value="female">{t('vedicProfiles.gender.female')}</option>
-                <option value="male">{t('vedicProfiles.gender.male')}</option>
-                <option value="other">{t('vedicProfiles.gender.other')}</option>
-                <option value="undisclosed">{t('vedicProfiles.gender.undisclosed')}</option>
+                {GENDER_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(
+                      `vedicProfiles.gender.${value === DEFAULT_GENDER ? 'undisclosed' : value.toLowerCase()}` as MessageKey,
+                    )}
+                  </option>
+                ))}
               </select>
             </label>
 
             <label className={styles.field}>
-              <span className={styles.label}>
-                {t('vedicProfiles.form.occupation')}
-                <span className={styles.required} aria-hidden="true">
-                  {' '}
-                  *
-                </span>
-              </span>
+              <span className={styles.label}>{t('vedicProfiles.form.occupation')}</span>
               <input
                 className={styles.input}
                 value={draft.occupation}
-                onChange={(event) => update('occupation', event.target.value)}
-                required
-                aria-required="true"
+                onChange={(event) => update$('occupation', event.target.value)}
               />
             </label>
 
@@ -161,38 +288,53 @@ export function VedicProfilesPage() {
               <select
                 className={styles.input}
                 value={draft.relationship}
-                onChange={(event) => update('relationship', event.target.value)}
+                onChange={(event) => update$('relationship', event.target.value as RelationshipValue)}
               >
-                <option value="">{t('vedicProfiles.form.choose')}</option>
-                <option value="self">{t('vedicProfiles.relationship.self')}</option>
-                <option value="spouse">{t('vedicProfiles.relationship.spouse')}</option>
-                <option value="child">{t('vedicProfiles.relationship.child')}</option>
-                <option value="parent">{t('vedicProfiles.relationship.parent')}</option>
-                <option value="other">{t('vedicProfiles.relationship.other')}</option>
+                {RELATIONSHIP_VALUES.map((value) => (
+                  <option key={value} value={value}>
+                    {t(`vedicProfiles.relationship.${value}` as MessageKey)}
+                  </option>
+                ))}
               </select>
             </label>
 
-            {draft.relationship === 'other' && (
+            {draft.relationship === 'Other' && (
               <label className={styles.field}>
                 <span className={styles.label}>{t('vedicProfiles.form.customRelationship')}</span>
                 <input
                   className={styles.input}
                   value={draft.customRelationship}
-                  onChange={(event) => update('customRelationship', event.target.value)}
+                  onChange={(event) => update$('customRelationship', event.target.value)}
                   required
                 />
               </label>
             )}
 
             <div className={styles.actions}>
-              <Button type="submit" disabled={!savable}>
-                {t('vedicProfiles.save')}
+              <Button type="submit" disabled={!savable || busy}>
+                {busy ? t('vedicProfiles.saving') : t('vedicProfiles.save')}
               </Button>
-              <Button variant="secondary" onClick={() => setDraft(EMPTY_DRAFT)}>
+              <Button variant="secondary" onClick={startNew} disabled={busy}>
                 {t('vedicProfiles.cancel')}
               </Button>
             </div>
           </form>
+
+          {pendingDelete && (
+            <div role="alertdialog" aria-labelledby="vedic-profiles-delete-title" className={styles.confirm}>
+              <p id="vedic-profiles-delete-title">
+                {t('vedicProfiles.confirmDelete', { name: pendingDelete.name })}
+              </p>
+              <div className={styles.actions}>
+                <Button onClick={() => void confirmDelete()} disabled={busy}>
+                  {t('vedicProfiles.delete')}
+                </Button>
+                <Button variant="secondary" onClick={() => setPendingDelete(null)} disabled={busy}>
+                  {t('vedicProfiles.cancel')}
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </section>

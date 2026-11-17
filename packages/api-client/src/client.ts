@@ -24,6 +24,12 @@ import {
   userInfoSchema,
   userProfileSchema,
   userSettingsSchema,
+  type ReplaceVedicProfileRequest,
+  type VedicProfile,
+  type VedicProfileRequest,
+  type VedicProfileSummary,
+  vedicProfileSchema,
+  vedicProfileSummarySchema,
 } from '@myvedicstar/contracts';
 import { z } from 'zod';
 
@@ -508,6 +514,59 @@ export function createApiClient(options: ApiClientOptions) {
           method: 'DELETE',
           path: path('savedLocation', { locationId }),
           schema: userSettingsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+    },
+    /**
+     * Vedic Profiles: the caller's own profiles only. A foreign or missing id is a 404, deliberately indistinguishable
+     * from "not found". Replace requires the revision the client last saw; a stale one surfaces as ApiError kind
+     * 'conflict' (409) and must not be retried without re-reading.
+     */
+    vedicProfiles: {
+      list: (call?: CallOptions) =>
+        transport.request<VedicProfileSummary[]>({
+          operation: 'vedicProfiles.list',
+          path: path('vedicProfiles'),
+          schema: z.array(vedicProfileSummarySchema),
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      get: (id: string, call?: CallOptions) =>
+        transport.request<VedicProfile>({
+          operation: 'vedicProfiles.get',
+          path: path('vedicProfile', { id }),
+          schema: vedicProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      create: (request: VedicProfileRequest, call?: CallOptions) =>
+        transport.request<VedicProfile>({
+          operation: 'vedicProfiles.create',
+          method: 'POST',
+          path: path('vedicProfiles'),
+          body: request,
+          schema: vedicProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      replace: (id: string, request: ReplaceVedicProfileRequest, call?: CallOptions) =>
+        transport.request<VedicProfile>({
+          operation: 'vedicProfiles.replace',
+          method: 'PUT',
+          path: path('vedicProfile', { id }),
+          body: request,
+          schema: vedicProfileSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      remove: (id: string, call?: CallOptions) =>
+        transport.request<void>({
+          operation: 'vedicProfiles.remove',
+          method: 'DELETE',
+          path: path('vedicProfile', { id }),
+          // 204 No Content: the transport yields undefined, so the schema must accept it.
+          schema: z.undefined(),
           signal: call?.signal,
           auth: 'required',
         }),
