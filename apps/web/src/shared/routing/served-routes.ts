@@ -28,7 +28,7 @@ export const PUBLIC_PAGE_PATHS = [
 ] as const;
 
 /** Routes the SPA owns that are gated behind sign-in. They are known paths, never a 404. */
-export const GATED_PATHS = ['/calendar', '/festivals', '/good-time', '/settings', '/profile'] as const;
+export const GATED_PATHS = ['/calendar', '/festivals', '/good-time', '/settings', '/profile', '/kundali'] as const;
 
 /** Gated routes that also match a deeper path, e.g. `/calendar/2026-11-15`. */
 export const GATED_PATH_PREFIXES = ['/calendar/'] as const;
