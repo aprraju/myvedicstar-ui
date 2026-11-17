@@ -167,9 +167,7 @@ describe('VedicProfilesPage — create', () => {
   it('leaves the name empty when the login profile has no name parts', async () => {
     server.use(
       http.get(api('/vedic-profiles'), () => HttpResponse.json([])),
-      http.post(api('/auth/login'), () =>
-        HttpResponse.json({ id: 'u1', name: null, email: null }),
-      ),
+      http.post(api('/auth/login'), () => HttpResponse.json({ id: 'u1', name: null, email: null })),
     );
     renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
     await screen.findByText('No profiles yet. Add one to get started.');

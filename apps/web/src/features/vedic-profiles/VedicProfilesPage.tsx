@@ -89,7 +89,6 @@ export function VedicProfilesPage() {
     setDraft((current) => (current.name.trim() ? current : { ...current, name }));
   }, [userInfo?.firstName, userInfo?.lastName, editing]);
 
-
   const savable = isDraftComplete(draft);
   const busy = mutation.status === 'saving';
 

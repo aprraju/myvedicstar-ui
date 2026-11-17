@@ -44,10 +44,7 @@ export interface ProfileDraft {
 }
 
 /** "First Last" from the account profile, skipping empty parts so no stray spaces appear. */
-export function accountDisplayName(
-  firstName?: string | null,
-  lastName?: string | null,
-): string {
+export function accountDisplayName(firstName?: string | null, lastName?: string | null): string {
   return [firstName, lastName]
     .map((part) => part?.trim() ?? '')
     .filter((part) => part.length > 0)
