@@ -1,10 +1,12 @@
 import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 import type { MessageKey, MessageParams } from '@myvedicstar/localization';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 import { useUserInfo } from '../../shared/auth';
 import { Button } from '../../shared/components/Button';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { DEFAULT_AUTHENTICATED_PATH } from '../../shared/routing/paths';
 import { LocationSelector } from '../location';
 import { BirthTimeField } from './BirthTimeField';
 import { toFriendlyKey } from './error-key';
@@ -61,13 +63,18 @@ export function VedicProfilesPage() {
   } = useVedicProfiles();
 
   const { userInfo } = useUserInfo();
-  /** The first profile is the account owner, so its name defaults to the login profile. */
+  const navigate = useNavigate();
+  /**
+   * Only the very first profile (no profiles saved yet, added as Self) belongs to the account owner, so only that
+   * one may borrow the login name. Every later profile is someone else, so its name starts empty.
+   */
+  const isFirstSelfProfile = listStatus === 'ready' && summaries.length === 0;
   const newDraft = useCallback(
     (): ProfileDraft => ({
       ...EMPTY_DRAFT,
-      name: accountDisplayName(userInfo?.firstName, userInfo?.lastName),
+      name: isFirstSelfProfile ? accountDisplayName(userInfo?.firstName, userInfo?.lastName) : '',
     }),
-    [userInfo?.firstName, userInfo?.lastName],
+    [isFirstSelfProfile, userInfo?.firstName, userInfo?.lastName],
   );
 
   const [draft, setDraft] = useState<ProfileDraft>(EMPTY_DRAFT);
@@ -81,13 +88,13 @@ export function VedicProfilesPage() {
    */
   const nameSeeded = useRef(false);
   useEffect(() => {
-    if (nameSeeded.current || editing) return;
+    if (nameSeeded.current || editing || !isFirstSelfProfile) return;
     const name = accountDisplayName(userInfo?.firstName, userInfo?.lastName);
     if (!name) return;
     nameSeeded.current = true;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- the name comes from an async cache, not a render derivation.
     setDraft((current) => (current.name.trim() ? current : { ...current, name }));
-  }, [userInfo?.firstName, userInfo?.lastName, editing]);
+  }, [userInfo?.firstName, userInfo?.lastName, editing, isFirstSelfProfile]);
 
   const savable = isDraftComplete(draft);
   const busy = mutation.status === 'saving';
@@ -341,7 +348,11 @@ export function VedicProfilesPage() {
               <Button type="submit" disabled={!savable || busy}>
                 {busy ? t('vedicProfiles.saving') : t('vedicProfiles.save')}
               </Button>
-              <Button variant="secondary" onClick={startNew} disabled={busy}>
+              <Button
+                variant="secondary"
+                onClick={() => void navigate(DEFAULT_AUTHENTICATED_PATH)}
+                disabled={busy}
+              >
                 {t('vedicProfiles.cancel')}
               </Button>
             </div>

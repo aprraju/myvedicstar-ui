@@ -66,7 +66,7 @@ export function ProfileMenu() {
             </Link>
           </li>
           <li>
-            <Link to={routes.vedicProfiles} className={styles.option} onClick={() => setOpen(false)}>
+            <Link to={routes.astroProfiles} className={styles.option} onClick={() => setOpen(false)}>
               <Icon name="user" size={18} />
               {t('nav.vedicProfiles')}
             </Link>

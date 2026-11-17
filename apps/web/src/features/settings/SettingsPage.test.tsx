@@ -133,8 +133,8 @@ describe('Settings', () => {
       within(options as HTMLUListElement)
         .getAllByRole('listitem')
         .map((item) => item.textContent),
-      // AC1 (#28): Vedic Profiles sits between Profile and Settings, desktop and mobile.
-    ).toEqual(['Profile', 'Vedic Profiles', 'Settings', 'Log out']);
+      // AC1 (#28): Astro Profiles sits between Profile and Settings, desktop and mobile.
+    ).toEqual(['Profile', 'Astro Profiles', 'Settings', 'Log out']);
     await userEvent.click(screen.getByRole('link', { name: 'Settings' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/settings'));
     expect(await screen.findByRole('heading', { name: 'Settings', level: 1 })).toBeInTheDocument();

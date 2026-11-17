@@ -3,6 +3,7 @@ import { seedUserInfo } from '@myvedicstar/query-cache';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { useLocation } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
@@ -15,6 +16,12 @@ const api = (path: string) => `${TEST_API_BASE_URL}/api/v1${path}`;
 
 /** Every Vedic Profiles endpoint requires a bearer token, so these tests run signed in. */
 const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Asha' } });
+
+/** Reports the current router path so a navigation can be asserted. */
+function LocationProbe() {
+  const location = useLocation();
+  return <span data-testid="path">{location.pathname}</span>;
+}
 
 const summary = (overrides: Partial<VedicProfileSummary> = {}): VedicProfileSummary => ({
   id: '11111111-1111-4111-8111-111111111111',
@@ -191,6 +198,22 @@ describe('VedicProfilesPage — create', () => {
     expect(await screen.findByText(/Austin, Texas, United States/)).toBeInTheDocument();
   });
 
+  it('starts Gender at Male on a new profile', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
+    renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    await screen.findByText('No profiles yet. Add one to get started.');
+    expect(screen.getByLabelText('Gender')).toHaveValue('Male');
+  });
+
+  it('leaves Name empty when profiles already exist', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([summary()])));
+    const user = userEvent.setup();
+    renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
+    await screen.findByText('Asha');
+    await user.click(screen.getByRole('button', { name: /add astro profile/i }));
+    expect(screen.getByLabelText('Name')).toHaveValue('');
+  });
+
   it('keeps Save disabled while required fields are missing', async () => {
     server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
     renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
@@ -230,6 +253,22 @@ describe('VedicProfilesPage — create', () => {
     const labels = options.map((option) => option.textContent);
     expect(labels).toEqual(['Female', 'Male', 'Non Binary', 'Prefer not to say']);
     expect(labels.some((label) => label?.includes('vedicProfiles'))).toBe(false);
+  });
+
+  it('Cancel returns to the home page', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([summary()])));
+    const user = userEvent.setup();
+    renderWithProviders(
+      <>
+        <LocationProbe />
+        <VedicProfilesPage />
+      </>,
+      { auth: signedIn() },
+    );
+    await screen.findByText('Asha');
+    expect(screen.getByTestId('path')).toHaveTextContent('/');
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.getByTestId('path')).toHaveTextContent('/calendar'));
   });
 
   it('requires the custom relationship when Other is chosen (AC6)', async () => {
