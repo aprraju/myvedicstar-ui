@@ -96,8 +96,12 @@ jobs:
         run: npm run e2e -w @myvedicstar/web
       # The web app's own runtime dependency tree (including the shared packages it uses). The mobile app's Expo /
       # React Native toolchain is in the same lockfile but never ships in the web build; it is audited by its own pipeline.
+      # Same audit as `npm audit --omit=dev --audit-level=high --workspace=@myvedicstar/web`, but it tolerates
+      # exactly the GHSA ids listed in the script. Any other advisory, and any new one, still fails the job.
+      # The only accepted entry today is GHSA-fc5q-39xc-vjpf (picomatch), which has no fixed release upstream:
+      # see https://github.com/aprraju/myvedicstar-ui/issues/95
       - name: Dependency audit (web runtime dependencies)
-        run: npm audit --omit=dev --audit-level=high --workspace=@myvedicstar/web
+        run: npm run web:audit
       - uses: actions/upload-artifact@v5
         if: always()
         with:

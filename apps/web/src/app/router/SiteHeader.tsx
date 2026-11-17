@@ -21,6 +21,8 @@ const APP_NAV: { to: string; icon: IconName; label: MessageKey; highlight: boole
   { to: routes.calendar, icon: 'calendar', label: 'nav.calendar', highlight: true },
   { to: routes.festivals, icon: 'flower', label: 'nav.upcomingEvents', highlight: true },
   { to: routes.goodTime, icon: 'clock', label: 'nav.findGoodTime', highlight: true },
+  // KUN-01 (#11): Kundali sits immediately after Find Good Time in the signed-in menu.
+  { to: routes.kundali, icon: 'star', label: 'nav.kundali', highlight: true },
 ];
 
 /** Pages whose header omits the tradition selector. */

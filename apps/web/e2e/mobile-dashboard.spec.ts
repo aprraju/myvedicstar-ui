@@ -133,6 +133,7 @@ test('signed-in Home is the Panchang page: no Today item, and the old Today addr
   await page.goto('/dashboard');
   await expect(page).toHaveURL(/\/calendar$/);
   const navigation = page.getByRole('navigation', { name: 'App navigation' });
+  // Owner decision on #79 (More-first): Kundali is not a bottom tab, so the bar stays at these four.
   await expect(navigation.getByRole('link')).toHaveText(['Home', 'Panchang', 'Good Time', 'Upcoming Events']);
   await expect(navigation.getByRole('link', { name: 'Today' })).toHaveCount(0);
   await expect(navigation.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/calendar');
@@ -177,7 +178,8 @@ test('mobile Panchang card opens in full and folds; the account opens from the h
   await expect(panchang).not.toContainText('Karana');
   await panchang.getByRole('button', { name: 'See all' }).click();
   await expect(panchang).toContainText('Karana');
-  // Four app sections in the bottom bar; the account opens from the header's icon as a "Your Account" sheet.
+  // Four app sections in the bottom bar; the account opens from the header's icon as a "Your Account"
+  // sheet. Kundali lives under More, never in the bar (owner decision #79).
   const navigation = page.getByRole('navigation', { name: 'App navigation' });
   await expect(navigation.getByRole('link')).toHaveCount(4);
   await expect(navigation.getByRole('button')).toHaveCount(0);

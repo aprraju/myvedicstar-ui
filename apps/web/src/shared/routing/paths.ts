@@ -19,6 +19,7 @@ export const routes = {
   calendar: '/calendar',
   calendarDate: '/calendar/:date',
   goodTime: '/good-time',
+  kundali: '/kundali',
   festivals: '/festivals',
   festival: '/festivals/:id',
   panchangDate: '/panchang/:date',

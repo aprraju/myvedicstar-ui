@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
-import { fakeGeolocation, renderWithProviders } from '../../test/render';
+import { fakeGeolocation, renderRoute, renderWithProviders } from '../../test/render';
 import { VedicProfilesPage } from './VedicProfilesPage';
 
 const api = (path: string) => `${TEST_API_BASE_URL}/api/v1${path}`;
@@ -269,6 +269,39 @@ describe('VedicProfilesPage — create', () => {
     expect(screen.getByTestId('path')).toHaveTextContent('/');
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.getByTestId('path')).toHaveTextContent('/calendar'));
+  });
+
+  it('Cancel returns to the Kundali prompt when that is where the user came from (KUN-02 AC1)', async () => {
+    let created = 0;
+    server.use(
+      http.get(api('/vedic-profiles'), () => HttpResponse.json([])),
+      http.post(api('/vedic-profiles'), () => {
+        created += 1;
+        return HttpResponse.json(full(), { status: 201 });
+      }),
+    );
+    const user = userEvent.setup();
+    // renderRoute carries the real query string, which `from` needs.
+    const { router } = renderRoute('/astro-profiles?from=%2Fkundali', { auth: signedIn() });
+    await screen.findByText('No profiles yet. Add one to get started.');
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/kundali'));
+    // Nothing is created by cancelling — the AC's other half.
+    expect(created).toBe(0);
+  });
+
+  it('ignores an absolute return path so the parameter cannot become an open redirect', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([summary()])));
+    const user = userEvent.setup();
+    const { router } = renderRoute('/astro-profiles?from=https%3A%2F%2Fevil.example', { auth: signedIn() });
+    await screen.findByText('Asha');
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/calendar'));
+    expect(router.state.location.pathname).not.toContain('evil');
   });
 
   it('requires the custom relationship when Other is chosen (AC6)', async () => {

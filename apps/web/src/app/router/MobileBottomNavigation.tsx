@@ -21,6 +21,7 @@ export function MobileBottomNavigation() {
     { to: DEFAULT_AUTHENTICATED_PATH, label: 'nav.home', icon: 'home', highlight: false },
     { to: routes.calendar, label: 'nav.calendar', icon: 'calendar', highlight: true },
     { to: routes.goodTime, label: 'nav.goodTime', icon: 'clock', highlight: true },
+    // Kundali is NOT a bottom tab: owner decision on #79 is More-first, so the 5-slot bar stays as it was.
     { to: routes.festivals, label: 'nav.upcomingEvents', icon: 'flower', highlight: true },
   ];
   return (

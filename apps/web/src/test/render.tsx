@@ -62,6 +62,8 @@ interface RenderOptions {
   auth?: AuthClient;
   config?: AppConfig;
   geolocation?: GeolocationProvider;
+  /** Initial URL for the memory router, so a component that reads the query string can be exercised. */
+  route?: string;
 }
 
 /** Renders a single component with all app providers (inside a memory router, for links). */
@@ -70,7 +72,7 @@ export function renderWithProviders(ui: ReactElement, options: RenderOptions = {
   return {
     ...render(
       <AppProviders services={services} language="en" geolocation={options.geolocation ?? fakeGeolocation()}>
-        <MemoryRouter>{ui}</MemoryRouter>
+        <MemoryRouter initialEntries={[options.route ?? '/']}>{ui}</MemoryRouter>
       </AppProviders>,
     ),
     services,

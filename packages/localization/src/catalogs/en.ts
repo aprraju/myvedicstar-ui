@@ -52,6 +52,7 @@ export const en = {
     notifications: 'Notifications',
     profile: 'Profile',
     vedicProfiles: 'Astro Profiles',
+    kundali: 'Kundali',
     settings: 'Settings',
     dashboard: 'Dashboard',
   },
@@ -319,6 +320,33 @@ export const en = {
       Other: 'Other',
     },
   },
+  kundali: {
+    title: 'Kundali',
+    subtitle: 'Your birth chart, read from the profiles you have saved.',
+    profileLabel: 'Astro Profile',
+    profileSelectHint: 'Choose which profile this Kundali is for.',
+    profileSelectPlaceholder: 'Select an Astro Profile…',
+    loading: 'Loading profiles…',
+    loadFailedTitle: 'Profiles could not be loaded',
+    loadFailedBody: 'Your saved Astro Profiles could not be loaded right now. Try again in a moment.',
+    retry: 'Try again',
+    unavailableTitle: 'This profile is not available',
+    unavailableBody: 'The profile in this link is not one of yours, or it no longer exists.',
+    unavailableBack: 'Choose another profile',
+    empty: {
+      title: 'Create your first Astro Profile',
+      body: 'A Kundali is calculated from a birth date, birth time and birth place. Add an Astro Profile once and every chart uses it.',
+      action: 'Create Astro Profile',
+      cancel: 'Cancel',
+      cancelled: 'Cancelled. Nothing was created.',
+    },
+    selected: {
+      title: 'Kundali for {name}',
+      pendingBody:
+        'Chart sections are being delivered in a later release. Your profile is selected and ready.',
+      change: 'Change profile',
+    },
+  },
   profile: {
     menu: 'Account',
     open: 'Open account menu',
@@ -333,6 +361,7 @@ export const en = {
       subtitle: 'Manage your MyVedicStar account',
       profileHint: 'Personal and contact information',
       vedicProfilesHint: 'Birth details for family and friends',
+      kundaliHint: 'Charts from your saved profiles',
       settingsHint: 'Tradition and saved locations',
     },
   },
@@ -614,6 +643,10 @@ export const en = {
   },
   pages: {
     home: { title: 'Home' },
+    kundali: {
+      title: 'Kundali',
+      notFound: 'Kundali is not available',
+    },
     about: {
       title: 'About Us',
       body1:
