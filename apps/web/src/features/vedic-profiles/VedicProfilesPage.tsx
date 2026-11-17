@@ -1,7 +1,7 @@
 import type { VedicProfile, VedicProfileSummary } from '@myvedicstar/contracts';
 import type { MessageKey, MessageParams } from '@myvedicstar/localization';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 
 import { useUserInfo } from '../../shared/auth';
 import { Button } from '../../shared/components/Button';
@@ -64,6 +64,18 @@ export function VedicProfilesPage() {
 
   const { userInfo } = useUserInfo();
   const navigate = useNavigate();
+  /**
+   * Kundali's zero-profile prompt links here with \`from=<route>\` so a successful first save returns the user to where
+   * they started (KUN-02). Only same-origin in-app paths are honoured: an absolute URL or protocol-relative value is
+   * ignored, so the parameter cannot become an open redirect.
+   */
+  const [searchParams] = useSearchParams();
+  const returnTo = (() => {
+    const raw = searchParams.get('from');
+    if (!raw) return null;
+    if (!raw.startsWith('/') || raw.startsWith('//')) return null;
+    return raw;
+  })();
   /**
    * Only the very first profile (no profiles saved yet, added as Self) belongs to the account owner, so only that
    * one may borrow the login name. Every later profile is someone else, so its name starts empty.
@@ -149,6 +161,8 @@ export function VedicProfilesPage() {
       setEditing(result);
       setLoaded(result);
       setDraft(toDraft(result));
+      // Returning from the Kundali prompt: land on the profile that was just created, not on a list of one.
+      if (!editing && returnTo) void navigate(`${returnTo}?profile=${encodeURIComponent(result.id)}`);
     }
   };
 

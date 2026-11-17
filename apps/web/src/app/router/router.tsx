@@ -100,6 +100,11 @@ export const appRoutes: RouteObject[] = [
         lazy: protectedPage(async () => (await import('../../features/calendar')).CalendarPage),
       },
       {
+        path: routes.kundali,
+        handle: handle('Kundali', 'nav.kundali'),
+        lazy: protectedPage(async () => (await import('../../features/kundali')).KundaliPage),
+      },
+      {
         // Opened from the account menu; settings ship in Phase 5.
         path: routes.settings,
         handle: handle('Settings', 'nav.settings'),

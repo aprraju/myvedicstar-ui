@@ -72,6 +72,12 @@ export function ProfileMenu() {
             </Link>
           </li>
           <li>
+            <Link to={routes.kundali} className={styles.option} onClick={() => setOpen(false)}>
+              <Icon name="star" size={18} />
+              {t('nav.kundali')}
+            </Link>
+          </li>
+          <li>
             <Link to={routes.settings} className={styles.option} onClick={() => setOpen(false)}>
               <Icon name="settings" size={18} />
               {t('profile.settings')}
