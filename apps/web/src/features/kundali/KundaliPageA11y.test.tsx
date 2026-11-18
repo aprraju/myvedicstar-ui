@@ -143,6 +143,11 @@ describe('Kundali page — KUN-19 assembled accessibility', () => {
     // Release the response and let the section resolve.
     release?.();
     await waitFor(() => expect(yogasRegion?.textContent).toMatch(/loaded/i));
+    // The section swapped from the loading one to the loaded one; the live region must NOT have. isConnected is the
+    // assertion a presence-per-state check cannot make: a fresh node with the same role passes presence yet was never
+    // in the tree during the transition.
+    expect(yogasRegion?.isConnected).toBe(true);
+    expect(document.body.contains(yogasRegion as Node)).toBe(true);
 
     // The same node, still in the document, whose text now says the section loaded.
     // Same element identity: the node captured before resolution is still the one announcing, with new text.
