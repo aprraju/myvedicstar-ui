@@ -622,6 +622,14 @@ export const en = {
         pisces: 'Pis',
       },
     },
+    caching: {
+      stale:
+        'These results are from an earlier version of this profile. Showing for reference until the update finishes.',
+      changedRevision: 'Profile revision {from}, now {to}.',
+      changedSettings: 'The calculation settings changed after these results were computed.',
+      refresh: 'Update now',
+      refreshing: 'Updating…',
+    },
     selected: {
       title: 'Kundali for {name}',
       pendingBody:
