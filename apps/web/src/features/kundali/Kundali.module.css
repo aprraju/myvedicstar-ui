@@ -149,3 +149,85 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* KUN-06 birth-time input. */
+.fieldset {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.hint {
+  margin: var(--space-xxs) 0 var(--space-xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.modes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-sm);
+}
+
+.modeOption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  /* 44px touch target on every option, sized by min-block-size rather than padding. */
+  min-block-size: 44px;
+  padding-inline-end: var(--space-sm);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.timeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.input {
+  min-block-size: 44px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Invalid state is not colour-only: the message text carries the meaning too. */
+.input[aria-invalid='true'] {
+  border-color: var(--color-caution, var(--color-border));
+}
+
+.error {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
