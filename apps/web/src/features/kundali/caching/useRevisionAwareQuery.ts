@@ -11,6 +11,24 @@ import {
   sameIdentity,
 } from './revision';
 
+/**
+ * A refetch scheduling hint, in milliseconds.
+ *
+ * A plain number under a name that states its role. Deliberately NOT a branded type: branding it would reject every
+ * existing `staleTime: 60_000` call site and force a cast at each one, which is churn without safety — a cast is
+ * precisely what a caller would add without thinking. The name does the work: it appears in the signature, in every
+ * editor hover, and in "go to definition", landing a reader on this comment.
+ *
+ * What it does NOT do: it does not make a result correct, and it must never be used to express "this data is safe to
+ * show for N seconds". That claim belongs to input identity — see {@link freshnessOf} — not to a clock. Setting this to
+ * a very large value does not permit showing an outdated result; {@link useRevisionAwareQuery} downgrades anything whose
+ * identity no longer matches regardless of how much of this window remains. Setting it to 0 does not make a result
+ * unsafe either: correctness is unaffected in both directions.
+ *
+ * The rule for reviewers: a new `staleTime` without a comment saying it affects scheduling only should be sent back.
+ */
+export type RefetchHint = number;
+
 export interface RevisionAwareOptions<T> {
   /** Section name, e.g. 'planets'. Part of the key, so sections do not collide. */
   section: string;
@@ -22,15 +40,9 @@ export interface RevisionAwareOptions<T> {
    */
   load: (signal: AbortSignal) => Promise<T>;
   /**
-   * Freshness window in milliseconds.
-   *
-   * IMPORTANT: this is a scheduling hint for when to refetch in the background, NOT what makes a result correct. Passing
-   * a large value does not permit serving an outdated result. Correctness is enforced by `freshnessOf` in this hook,
-   * which compares the live identity against the identity the cached data was stored under and downgrades anything that
-   * does not match — regardless of how much of this window remains. If you are reasoning about staleness, read
-   * freshnessOf, not this number.
+   * Scheduling hint only — see {@link RefetchHint}. Correctness is enforced by `freshnessOf`, never by this number.
    */
-  staleTime: number;
+  staleTime: RefetchHint;
 }
 
 export interface RevisionAwareState<T> {
@@ -72,6 +84,8 @@ export function useRevisionAwareQuery<T>(options: RevisionAwareOptions<T>): Revi
   const query = useQuery({
     queryKey: key,
     enabled: identity !== null,
+    // Passed straight through to TanStack. It decides WHEN to refetch; it has no say in what may be RENDERED, which is
+    // freshnessOf's job below. Nothing in this hook reads it back.
     staleTime,
     queryFn: ({ signal }) => load(signal),
   });
@@ -98,7 +112,6 @@ export function useRevisionAwareQuery<T>(options: RevisionAwareOptions<T>): Revi
   let outcome = freshnessOf(identity, computedFor, query.data as T | undefined);
 
   // Remember a current value so it can survive a revision change as an explicit stale fallback rather than a blank.
-  // Comparing before setting keeps this from looping; React re-renders once with the stored value.
   if (outcome.kind === 'current' && !sameIdentity(lastCurrent?.identity ?? identity, identity)) {
     setLastCurrent({ section, identity, value: outcome.value });
   } else if (outcome.kind === 'current' && lastCurrent?.section !== section) {
