@@ -76,6 +76,13 @@ export const queryKeys = {
     /** Keyed by profile AND user, so a result is never served for somebody else's profile. */
     overview: (userId: string, profileId: string) => ['kundali', 'overview', userId, profileId] as const,
     planets: (userId: string, profileId: string) => ['kundali', 'planets', userId, profileId] as const,
+    /**
+     * System and instant are part of the key: a timeline for one system or moment is never served for another. `at` is
+     * the resolved instant the caller asked for, `null` meaning "server now", so the response's own `at` echo is what
+     * the UI uses to place the path rather than an assumed local clock.
+     */
+    dashas: (userId: string, profileId: string, system: string, at: string | null) =>
+      ['kundali', 'dashas', userId, profileId, system, at] as const,
     /** KUN-10. Same user+profile scoping as overview, for the same reason. */
     yogas: (userId: string, profileId: string) => ['kundali', 'yogas', userId, profileId] as const,
     /** KUN-11. Same user+profile scoping as overview, for the same reason. */

@@ -1,0 +1,164 @@
+/* KUN-09 dasha timeline: tokens only, no literal colours or sizes. Mirrors planets/Planets.module.css. */
+
+.timeline {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.meta {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.subheading {
+  margin: var(--space-md) 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
+}
+
+.help,
+.noChildren,
+.unsupported,
+.pathEmpty,
+.empty {
+  margin: var(--space-xxs) 0 var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.unsupported {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.path {
+  margin: 0;
+}
+
+.pathList,
+.periods {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pathItem {
+  padding: var(--space-xs) 0;
+  border-block-start: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.period {
+  border-block-start: 1px solid var(--color-border);
+}
+
+.periodHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs);
+  justify-content: space-between;
+}
+
+/*
+ * The whole row is the disclosure control, so the tap target is the row height rather than the text width. It keeps a
+ * minimum comfortable height on a phone without fixing a pixel value that would clip at 200% text.
+ */
+.expandButton,
+.periodStatic {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  align-items: baseline;
+  min-block-size: 2.75rem;
+  margin: 0;
+  padding: var(--space-xs) 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+}
+
+.expandButton {
+  cursor: pointer;
+}
+
+.expandButton:focus-visible {
+  outline: 2px solid var(--color-focus, var(--color-text-primary));
+  outline-offset: 2px;
+}
+
+.period[data-current] {
+  border-inline-start: 2px solid var(--color-accent, var(--color-text-primary));
+  background: var(--color-surface);
+}
+
+.lord {
+  font-weight: var(--font-weight-semibold, 600);
+}
+
+.level,
+.range {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.current {
+  align-self: center;
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.systemFieldset {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.systemOption {
+  display: inline-flex;
+  gap: var(--space-xs);
+  align-items: center;
+  min-block-size: 2.75rem;
+  margin-inline-end: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.loadingRegion {
+  padding: var(--space-sm) 0;
+}
+
+.retry {
+  min-block-size: 2.75rem;
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
+.retry:focus-visible {
+  outline: 2px solid var(--color-focus, var(--color-text-primary));
+  outline-offset: 2px;
+}
+
+.state {
+  margin: var(--space-sm) 0;
+}
+
+.subPeriods {
+  padding-block-end: var(--space-xs);
+  padding-inline-start: var(--space-md);
+}

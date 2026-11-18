@@ -1,4 +1,5 @@
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
+import { reasonKey } from '../reasonText';
 import type { FieldView } from './certainty';
 import styles from './Overview.module.css';
 
@@ -16,7 +17,7 @@ export function FieldValue({ view, label }: { view: FieldView; label: string }) 
         <span className={styles.unavailableText}>{t('kundali.overview.unavailable')}</span>
         <span className={styles.unavailableReason}>
           {' — '}
-          {t(`kundali.overview.reason.${view.reason}`)}
+          {t(reasonKey(view.reason))}
         </span>
         <span className="visually-hidden"> {label}</span>
       </span>

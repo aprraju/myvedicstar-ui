@@ -3,6 +3,7 @@ export * from './contact';
 export * from './festivals';
 export * from './kundali-ashtakavarga';
 export * from './kundali-charts';
+export * from './kundali-dashas';
 export * from './kundali-overview';
 export * from './kundali-planets';
 export * from './kundali-yogas';

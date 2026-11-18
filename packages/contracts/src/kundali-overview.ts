@@ -10,11 +10,27 @@ import { z } from 'zod';
  *    put user-visible English in a response field.
  */
 
-/** Why a computed block is missing. Localizable: mapped to catalog entries, never rendered raw. */
+/**
+ * Why a computed block is missing. Localizable: mapped to catalog entries, never rendered raw.
+ *
+ * The five values mirror `KundaliUnsupportedReasons` in the API exactly. They are deliberately distinct claims, not
+ * severities of one another:
+ *  - `engine-unavailable`        — not built yet (or the engine failed).
+ *  - `birth-time-unknown`         — genuinely indeterminate: no birth time was recorded.
+ *  - `birth-time-approximate`     — indeterminate to the precision asked for: the birth time is a range.
+ *  - `requires-exact-birth-time`  — the engine withheld a time-dependent value for that reason.
+ *  - `unvalidated-reference`      — computed, but no independent reference exists to prove it yet.
+ *
+ * `unvalidated-reference` and `requires-exact-birth-time` were added when KUN-09 shipped: the API already sends
+ * both, so the earlier three-value enum rejected real payloads at the schema boundary. A schema that only accepts
+ * reasons it happens to render would turn "computed but unproven" into a parse error, which is the worst of both.
+ */
 export const unsupportedReasonValues = [
   'engine-unavailable',
   'birth-time-unknown',
   'birth-time-approximate',
+  'requires-exact-birth-time',
+  'unvalidated-reference',
 ] as const;
 export const unsupportedReasonSchema = z.enum(unsupportedReasonValues);
 export type UnsupportedReason = z.infer<typeof unsupportedReasonSchema>;

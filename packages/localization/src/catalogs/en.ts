@@ -323,6 +323,19 @@ export const en = {
   kundali: {
     title: 'Kundali',
     subtitle: 'Your birth chart, read from the profiles you have saved.',
+    /**
+     * Why a computed block is missing, shared by every Kundali section. One block rather than one per section: the
+     * reason codes are a closed set in @myvedicstar/contracts and must read identically wherever they appear, and
+     * duplicating them per section is how the original three-vs-five mismatch survived review.
+     */
+    reason: {
+      'engine-unavailable': 'the calculation service did not return this',
+      'birth-time-unknown': 'no birth time was recorded',
+      'birth-time-approximate': 'the birth time is only approximate',
+      'requires-exact-birth-time': 'an exact birth time is required',
+      'unvalidated-reference': 'the calculation exists but has no independent reference yet',
+      unknown: 'the reason was not reported',
+    },
     birthTime: {
       legend: 'Time of birth',
       hint: 'Choose how precisely the birth time is known. This changes which results can be calculated.',
@@ -408,11 +421,6 @@ export const en = {
       placement: '{graha} in {sign}, house {house}',
       retrograde: '(retrograde)',
       unavailable: 'Not available',
-      reason: {
-        'engine-unavailable': 'the calculation service did not return this',
-        'birth-time-unknown': 'no birth time was recorded',
-        'birth-time-approximate': 'the birth time is only approximate',
-      },
       conventions: 'Calculated with {ephemeris} {version}, {ayanamsa} ayanamsa, {houseSystem} houses.',
     },
     planets: {
@@ -488,12 +496,43 @@ export const en = {
         conjunction: 'Conjunction',
         opposition: 'Opposition',
       },
-      reason: {
-        'engine-unavailable': 'the calculation service did not return this',
-        'birth-time-unknown': 'no birth time was recorded',
-        'birth-time-approximate': 'the birth time is only approximate',
-        unknown: 'the reason was not reported',
+    },
+    dashas: {
+      title: 'Dashas',
+      subtitle:
+        'Your planetary periods, as the calculation returned them. Every period is a pair of instants; the highlighted one contains the selected moment.',
+      systemLabel: 'Dasha system',
+      system: {
+        vimshottari: 'Vimshottari',
+        yogini: 'Yogini',
+        chara: 'Chara',
       },
+      moonsLongitude: 'Starting from Moon at {degrees}° sidereal',
+      timelineLabel: 'Dasha timeline for {system}',
+      mahadashasHeading: 'Mahadashas',
+      pathHeading: 'At the selected time',
+      pathEmpty: 'The selected time falls outside the calculated span.',
+      level: {
+        mahadasha: 'Mahadasha',
+        antardasha: 'Antardasha',
+        pratyantardasha: 'Pratyantardasha',
+        yogini: 'Yogini',
+      },
+      periodRange: '{start} – {end}',
+      current: 'Current',
+      expands: 'Show sub-periods',
+      collapses: 'Hide sub-periods',
+      noSubPeriods: 'No sub-periods were calculated for this period.',
+      expandedHelp: 'Each period starts at its opening instant and ends at the next one.',
+      emptyTimeline: 'No periods were returned for this system.',
+      loading: 'Loading dasha periods…',
+      errorTitle: "We couldn't load the dasha timeline.",
+      errorBody: 'The calculation could not be read. Try again in a moment.',
+      retry: 'Try again',
+      unavailableTitle: 'This system is not available',
+      timezone: 'Times shown in {zone}',
+      nowLabel: 'Selected moment: {at}',
+      useNow: 'Use current time',
     },
 
     section: {
