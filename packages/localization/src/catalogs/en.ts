@@ -374,6 +374,14 @@ export const en = {
     },
     charts: {
       title: 'Charts',
+      pickerLegend: 'Divisional charts',
+      pickerSummary: '{supported} supported, {provisional} provisional',
+      divisionState: {
+        supported: 'Supported',
+        provisional: 'Provisional — boundary approximate',
+        absent: 'Not calculated',
+      },
+      noDivisions: 'No divisional charts are available from this calculation.',
       styleLegend: 'Chart style',
       style: {
         'north-indian': 'North Indian',
