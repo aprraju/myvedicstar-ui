@@ -74,6 +74,8 @@ export const defaultApiEndpoints = {
   kundaliAshtakavarga: '/kundali/{profileId}/sections/ashtakavarga',
   /** KUN-12: Shadbala and Bhava Bala for one owned Astro Profile. Read-only. */
   kundaliBala: '/kundali/{profileId}/sections/bala',
+  /** KUN-20: the published capability boundary. Account-independent reference data. */
+  kundaliCapabilities: '/kundali/capabilities',
 } as const;
 
 export type ApiEndpointName = keyof typeof defaultApiEndpoints;
@@ -122,6 +124,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   kundaliYogas: ['profileId'],
   kundaliAshtakavarga: ['profileId'],
   kundaliBala: ['profileId'],
+  kundaliCapabilities: [],
 };
 
 const TEMPLATE_PATTERN = /^\/[A-Za-z0-9_\-./{}]*$/;
