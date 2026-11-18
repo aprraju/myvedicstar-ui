@@ -9,10 +9,14 @@ import {
   glossaryResponseSchema,
   goodTimeExplanationResponseSchema,
   goodTimesResponseSchema,
+  type KundaliAshtakavarga,
+  kundaliAshtakavargaSchema,
   type KundaliOverview,
   kundaliOverviewSchema,
   type KundaliPlanets,
   kundaliPlanetsSchema,
+  type KundaliYogas,
+  kundaliYogasSchema,
   locationReverseResponseSchema,
   locationSchema,
   locationSearchResponseSchema,
@@ -552,6 +556,30 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.planets',
           path: path('kundaliPlanets', { profileId }),
           schema: kundaliPlanetsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-10: yoga and dosha assessments. The schema rejects an assessment whose status and conditions disagree, so a
+       * malformed verdict surfaces as an ApiError instead of a row claiming a definite answer it cannot explain.
+       */
+      yogas: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliYogas>({
+          operation: 'kundali.yogas',
+          path: path('kundaliYogas', { profileId }),
+          schema: kundaliYogasSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-11: Ashtakavarga. Reconciliation is enforced by the schema: bindus that do not add up are rejected rather
+       * than charted, since a chart of inconsistent numbers is a wrong answer, not a rendering problem.
+       */
+      ashtakavarga: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliAshtakavarga>({
+          operation: 'kundali.ashtakavarga',
+          path: path('kundaliAshtakavarga', { profileId }),
+          schema: kundaliAshtakavargaSchema,
           signal: call?.signal,
           auth: 'required',
         }),

@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { EmptyProfiles } from './EmptyProfiles';
 import styles from './Kundali.module.css';
+import { KundaliSections } from './KundaliSections';
 import { ProfileSelector } from './ProfileSelector';
 import { useKundaliProfile } from './useKundaliProfile';
 
@@ -97,6 +98,11 @@ export function KundaliPage() {
             {t('kundali.selected.title', { name: selected.name })}
           </h2>
           <p className={styles.selectedBody}>{t('kundali.selected.pendingBody')}</p>
+          {/*
+            KUN-10 and KUN-11. The profile summary carries no timezone, so the sections render transit instants in UTC
+            and label them as such rather than guessing a zone from the browser. No calculation input comes from here.
+          */}
+          <KundaliSections profileId={selected.id} timeZoneId="UTC" />
         </section>
       )}
 

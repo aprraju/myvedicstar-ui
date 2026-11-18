@@ -1,0 +1,63 @@
+/* Shared Kundali assessment shells (KUN-10, KUN-11). Tokens only - no literal colours or sizes. */
+
+.section {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  /* Long table and code content must never force the page wider than the viewport. */
+  min-inline-size: 0;
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+}
+
+.intro {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  max-inline-size: var(--readable-max-width);
+}
+
+.unavailable {
+  padding: var(--space-md);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-subtle);
+}
+
+.unavailableTitle {
+  margin: 0 0 var(--space-xxs);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.unavailableBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.reasonCode {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.provenance {
+  margin: var(--space-md) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 30rem) {
+  .section {
+    padding: var(--space-md) var(--space-sm);
+  }
+}

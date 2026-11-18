@@ -1,0 +1,198 @@
+/* KUN-10 yoga and dosha assessments. Tokens only. */
+
+.group {
+  margin: 0 0 var(--space-lg);
+}
+
+.groupTitle {
+  margin: 0 0 var(--space-xxs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Says out loud that the transits below are dated, so they cannot be read as permanent natal findings. */
+.groupNote {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-sm);
+  /* 44px minimum touch target for the disclosure control. */
+  min-block-size: var(--space-xxxl);
+  padding: var(--space-xs) var(--space-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.summary:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.itemName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* Status badges carry a dot AND a word; the word alone is sufficient, so colour is never the only signal. */
+.status,
+.scope {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  padding-block: 0;
+  padding-inline: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  background: var(--color-surface-subtle);
+}
+
+.statusDot {
+  inline-size: 0.5rem;
+  block-size: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+}
+
+.status[data-status='satisfied'] .statusDot {
+  background: var(--color-favorable);
+}
+
+.status[data-status='not-satisfied'] .statusDot {
+  background: var(--color-caution);
+}
+
+.status[data-status='indeterminate'] .statusDot {
+  background: var(--color-warning);
+}
+
+.evidence {
+  padding: var(--space-sm) var(--space-sm) var(--space-md);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.ruleSet {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.transitNote {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.evidenceTitle {
+  margin: var(--space-sm) 0 var(--space-xxs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.conditions,
+.factors {
+  margin: 0;
+  padding-inline-start: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.condition {
+  margin-block-end: var(--space-xxs);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs) var(--space-sm);
+}
+
+.conditionTruth {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.condition[data-truth='true'] .conditionTruth {
+  color: var(--color-text-primary);
+}
+
+.conditionText {
+  flex: 1 1 12rem;
+  overflow-wrap: anywhere;
+}
+
+.factorNone {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+
+.coverage {
+  margin-block-start: var(--space-md);
+  padding-block-start: var(--space-md);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.coverageTitle {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.coverageList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+  font-size: var(--font-size-xs);
+}
+
+.coverageItem {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs) var(--space-sm);
+}
+
+.coverageName {
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.coverageState {
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
