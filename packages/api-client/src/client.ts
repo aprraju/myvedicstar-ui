@@ -12,6 +12,8 @@ import {
   goodTimesResponseSchema,
   type KundaliAshtakavarga,
   kundaliAshtakavargaSchema,
+  type KundaliBala,
+  kundaliBalaSchema,
   type KundaliDashaTimeline,
   kundaliDashaTimelineSchema,
   type KundaliOverview,
@@ -605,6 +607,18 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.ashtakavarga',
           path: path('kundaliAshtakavarga', { profileId }),
           schema: kundaliAshtakavargaSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-12: Shadbala and Bhava Bala. The schema rejects a total that claims completeness while a classical
+       * component is missing, so a silently-partial Shadbala cannot reach the UI as a complete reading.
+       */
+      bala: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliBala>({
+          operation: 'kundali.bala',
+          path: path('kundaliBala', { profileId }),
+          schema: kundaliBalaSchema,
           signal: call?.signal,
           auth: 'required',
         }),

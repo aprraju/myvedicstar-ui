@@ -83,6 +83,7 @@ export const queryKeys = {
      */
     dashas: (userId: string, profileId: string, system: string, at: string | null) =>
       ['kundali', 'dashas', userId, profileId, system, at] as const,
+    bala: (userId: string, profileId: string) => ['kundali', 'bala', userId, profileId] as const,
     /** KUN-10. Same user+profile scoping as overview, for the same reason. */
     yogas: (userId: string, profileId: string) => ['kundali', 'yogas', userId, profileId] as const,
     /** KUN-11. Same user+profile scoping as overview, for the same reason. */
