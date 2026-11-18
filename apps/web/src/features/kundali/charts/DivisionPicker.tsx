@@ -47,7 +47,7 @@ function divisionsOf(label: string): number | null {
  * Ordering is supported, then provisional, then absent: a reader scanning the list meets the definitive results first,
  * and a provisional one is never adjacent to a supported one in a way that implies they are the same class.
  */
-export function divisionOptions(
+function divisionOptions(
   capabilities: KundaliCapabilities,
   labels: readonly string[],
 ): DivisionOption[] {
