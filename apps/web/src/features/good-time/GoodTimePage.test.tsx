@@ -204,7 +204,11 @@ describe('Find a Good Time', () => {
     storeSelectedLocation();
     renderRoute('/good-time?activity=travel', { auth: signedIn() });
     expect(await screen.findByText("We couldn't load good times.")).toBeInTheDocument();
-    expect(radio('Travel')).toHaveAttribute('aria-checked', 'true');
+    // The activity cards have their OWN request, which can commit after the failed results request has already
+    // rendered its alert. Waiting on the alert alone reads the radiogroup mid-commit and passed or failed depending on
+    // how many commits the mount happened to take. Wait for the positive condition - the selected card existing -
+    // rather than for a loading state to disappear, which a never-rendered block would also satisfy.
+    expect(await screen.findByRole('radio', { name: 'Travel' })).toHaveAttribute('aria-checked', 'true');
 
     server.resetHandlers();
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }));
