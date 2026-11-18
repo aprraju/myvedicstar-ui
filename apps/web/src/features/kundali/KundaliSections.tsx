@@ -3,6 +3,8 @@ import { AshtakavargaSection } from './ashtakavarga/AshtakavargaSection';
 import { useAshtakavarga } from './ashtakavarga/useAshtakavarga';
 import { AssessmentHost } from './assessment/AssessmentHost';
 import styles from './Kundali.module.css';
+import { TransitsSection } from './transits/TransitsSection';
+import { useTransits } from './transits/useTransits';
 import { useYogas } from './yogas/useYogas';
 import { YogasSection } from './yogas/YogasSection';
 
@@ -20,6 +22,7 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
   const { t } = useTranslation();
   const yogas = useYogas(profileId);
   const ashtakavarga = useAshtakavarga(profileId);
+  const transits = useTransits(profileId);
 
   return (
     <div className={styles.sections}>
@@ -41,6 +44,16 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
         reload={ashtakavarga.reload}
       >
         {(data) => <AshtakavargaSection ashtakavarga={data} />}
+      </AssessmentHost>
+
+      <AssessmentHost
+        title={t('kundali.transits.title')}
+        status={transits.status}
+        data={transits.section}
+        errorKind={transits.errorKind}
+        reload={transits.reload}
+      >
+        {(data) => <TransitsSection section={data} timeZoneId={timeZoneId} />}
       </AssessmentHost>
     </div>
   );

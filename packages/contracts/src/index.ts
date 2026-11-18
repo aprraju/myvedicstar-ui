@@ -8,6 +8,7 @@ export * from './kundali-charts';
 export * from './kundali-dashas';
 export * from './kundali-overview';
 export * from './kundali-planets';
+export * from './kundali-transits';
 export * from './kundali-yogas';
 export * from './location-search';
 export * from './muhurta';

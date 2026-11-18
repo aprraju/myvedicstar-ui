@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
@@ -8,6 +8,7 @@ import { server } from '../../test/msw/server';
 import { renderWithProviders } from '../../test/render';
 import { ashtakavargaRuleNotImplemented } from './ashtakavarga/fixtures';
 import { KundaliSections } from './KundaliSections';
+import { transitsWithAbsences } from './transits/fixtures';
 import { yogasRuleNotImplemented } from './yogas/fixtures';
 
 const api = (path: string) => `${TEST_API_BASE_URL}/api/v1${path}`;
@@ -21,6 +22,7 @@ describe('KundaliSections — day one wiring', () => {
       http.get(api('/kundali/:profileId/sections/ashtakavarga'), () =>
         HttpResponse.json(ashtakavargaRuleNotImplemented),
       ),
+      http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(transitsWithAbsences)),
     );
     renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {
       auth: signedIn(),
@@ -32,7 +34,12 @@ describe('KundaliSections — day one wiring', () => {
     // Both carry the reason code of their own engine gap.
     expect(screen.getAllByText(/rule-not-implemented/).length).toBeGreaterThanOrEqual(2);
     // No chart, no table, no assessments: nothing that could be read as a result.
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    // Scoped to the two assessment sections: the transits section renders its own honest tables for data the engine did
+    // return, and this assertion is about the unsupported sections not painting numbers.
+    const yogas = screen.getByRole('region', { name: 'Yogas and doshas' });
+    const ashtakavarga = screen.getByRole('region', { name: 'Ashtakavarga' });
+    expect(within(yogas).queryByRole('table')).not.toBeInTheDocument();
+    expect(within(ashtakavarga).queryByRole('table')).not.toBeInTheDocument();
     expect(document.querySelectorAll('details')).toHaveLength(0);
   });
 
@@ -42,6 +49,7 @@ describe('KundaliSections — day one wiring', () => {
       http.get(api('/kundali/:profileId/sections/ashtakavarga'), () =>
         HttpResponse.json(ashtakavargaRuleNotImplemented),
       ),
+      http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(transitsWithAbsences)),
     );
     renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {
       auth: signedIn(),
@@ -65,6 +73,9 @@ describe('KundaliSections — day one wiring', () => {
       http.get(api('/kundali/:profileId/sections/ashtakavarga'), async () => {
         await new Promise((resolve) => setTimeout(resolve, 200));
         return HttpResponse.json(ashtakavargaRuleNotImplemented);
+      }),
+      http.get(api('/kundali/:profileId/sections/transits'), async () => {
+        return HttpResponse.json(transitsWithAbsences);
       }),
     );
     renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {

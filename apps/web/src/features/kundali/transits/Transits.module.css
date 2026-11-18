@@ -1,0 +1,124 @@
+/* KUN-13 transits: tokens only, no literal colours or sizes. */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.freshness {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.subsection {
+  margin: 0;
+}
+
+.subTitle {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+}
+
+.graha {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.grahaTitle {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-sm);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin: 0 0 var(--space-sm);
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+  min-inline-size: 0;
+}
+
+.fact dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.fact dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.absent,
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.absentValue {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.sadeSati {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.partial {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border-inline-start: 3px solid var(--color-warning);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  margin-block-start: var(--space-sm);
+}
+
+.tableWrap:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th,
+.table td {
+  padding: var(--space-xs) var(--space-sm);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+}
+
+.table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.unsupported {
+  margin: 0;
+  padding-inline-start: var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
