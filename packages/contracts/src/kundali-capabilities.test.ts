@@ -10,8 +10,9 @@ import { divisionalState, kundaliCapabilitiesSchema, shadbalaState } from './kun
  * casing regression would break the real response entirely while every existing test stayed green — because they all
  * skip the parse.
  *
- * This is the one test that would fail. It deliberately uses a literal string, not a fixture, so it cannot be
- * "fixed" by editing an object alongside the schema.
+ * This is the one test that would fail. The fixture below is DERIVED by parsing this literal, so `RAW_API_JSON` is the
+ * only source of truth: there is no second object to edit alongside the schema, and `JSON.stringify(fixture)` cannot
+ * quietly become the test input because the fixture comes *from* the string. A comment alone could not enforce that.
  *
  * The payload below is written exactly as `JsonSerializerDefaults.Web` emits it (camelCase), which is what
  * `AddControllers()` configures.
@@ -33,6 +34,14 @@ const RAW_API_JSON = `{
   ]
 }`;
 
+/**
+ * The fixture every other assertion starts from, derived from the wire literal rather than declared beside it.
+ *
+ * If this module's export is used as a fixture elsewhere, the string above remains the single source: changing the
+ * schema without changing the wire text fails the parse test, and changing the wire text changes every derived value.
+ */
+export const rawApiFixture = (): unknown => JSON.parse(RAW_API_JSON);
+
 describe('capabilities — a raw API payload binds to the contract', () => {
   it('parses camelCase JSON from the wire', () => {
     const parsed = kundaliCapabilitiesSchema.safeParse(JSON.parse(RAW_API_JSON));
@@ -49,10 +58,35 @@ describe('capabilities — a raw API payload binds to the contract', () => {
     expect(shadbalaState(parsed, 'Sthana').kind).toBe('supported');
   });
 
-  it('fails loudly on a snake_case payload, rather than silently producing empty lists', () => {
-    // If the serialiser ever changes or a JsonPropertyName is added, this is the shape that would arrive. The schema
-    // must reject it outright: an unparseable boundary is recoverable, a boundary that parses to "nothing supported"
-    // is a lie the UI would render as fact.
+  it('names the renamed field in the issue path, so a partial rename is not mistaken for a missing array', () => {
+    // A PARTIAL rename - one field only - is the shape a single [JsonPropertyName] on a C# property produces. The
+    // previous version renamed two keys and asserted success === false, which cannot tell "rejected because of the
+    // rename" from "rejected because an array went missing": both produce a failure, and one of them is a bug in the
+    // test rather than a finding about the schema.
+    const payload = rawApiFixture() as Record<string, unknown>;
+    payload.supported_divisional_charts = payload.supportedDivisionalCharts;
+    delete payload.supportedDivisionalCharts;
+
+    const result = kundaliCapabilitiesSchema.safeParse(payload);
+    if (result.success) throw new Error('a partial rename must not parse');
+    expect(result.success).toBe(false);
+
+    // Zod reports a missing REQUIRED field on the field's own path; the stray key is discarded by the non-strict parse
+    // and never becomes an issue. So the issue path names the contract field that the rename orphaned, which is what
+    // distinguishes "rejected because this property arrived under another name" from "rejected because the array went
+    // missing": both fail, but only the rename leaves the original key absent while a renamed twin is present.
+    const paths = result.error.issues.map((issue) => issue.path.join('.'));
+    expect(paths).toContain('supportedDivisionalCharts');
+
+    // The rename is provably present in the input, so the failure above is attributable to it and not to a fixture that
+    // accidentally dropped the array. Without this, the test would still pass if the payload were simply truncated.
+    expect(payload).toHaveProperty('supported_divisional_charts');
+    expect(payload).not.toHaveProperty('supportedDivisionalCharts');
+  });
+
+  it('still rejects a fully snake_case payload rather than silently producing empty lists', () => {
+    // If the serialiser ever changes wholesale, this is the shape that would arrive. The schema must reject it outright:
+    // an unparseable boundary is recoverable, a boundary that parses to "nothing supported" is a lie the UI renders.
     const snakeCase = RAW_API_JSON.replaceAll(
       'supportedDivisionalCharts',
       'supported_divisional_charts',
