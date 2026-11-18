@@ -76,3 +76,10 @@
   font-family: var(--font-sans);
   font-size: var(--font-size-xs);
 }
+
+/* Validation message for the approximate window. Not colour-only: the text carries the meaning. */
+.error {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}

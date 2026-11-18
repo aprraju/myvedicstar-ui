@@ -6,6 +6,7 @@ import { I18nProvider } from '../../shared/i18n/I18nProvider';
 import {
   BirthTimeField,
   type BirthTimeValue,
+  birthTimeWindowError,
   changeBirthTimeMode,
   EMPTY_BIRTH_TIME,
   isDraftSavable,
@@ -173,5 +174,62 @@ describe('BirthTimeField — editing inside a mode', () => {
   it('does not offer a To input for an exact time', () => {
     renderField({ mode: 'known', from: '', to: '' });
     expect(screen.queryByLabelText('To (optional)')).not.toBeInTheDocument();
+  });
+});
+
+describe('BirthTimeField — approximate window validation', () => {
+  it('reports a midnight-crossing window with its own message, not a generic one', () => {
+    renderField({ mode: 'approximate', from: '23:30:00', to: '00:30:00' });
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent(/must not cross midnight/i);
+    expect(alert).not.toHaveTextContent(/must be after the start/i);
+    // The offending control is marked and described by the message.
+    const to = screen.getByLabelText('To (optional)');
+    expect(to).toHaveAttribute('aria-invalid', 'true');
+    const describedBy = to.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy!)).toHaveTextContent(/must not cross midnight/i);
+  });
+
+  it('reports a mis-ordered window as ascending, distinctly from midnight', () => {
+    // Morning-only reversal keeps the plain ordering message.
+    renderField({ mode: 'approximate', from: '09:00:00', to: '08:00:00' });
+
+    const alert = screen.getByRole('alert');
+    expect(alert).toHaveTextContent(/must be after the start/i);
+    expect(screen.getByLabelText('To (optional)')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('rejects a zero-length window, because approximate needs a strict range', () => {
+    renderField({ mode: 'approximate', from: '10:00:00', to: '10:00:00' });
+    expect(screen.getByRole('alert')).toHaveTextContent(/must be after the start/i);
+  });
+
+  it('says nothing for a valid window', () => {
+    renderField({ mode: 'approximate', from: '14:10:00', to: '15:40:00' });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('To (optional)')).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('reports the window error through birthTimeWindowError, which the page uses to block Save', () => {
+    // The page derives Save from this exact function, so an invalid window cannot be submitted.
+    expect(birthTimeWindowError({ mode: 'approximate', from: '23:30:00', to: '00:30:00' })).toBe(
+      'crosses-midnight',
+    );
+    // A late start wrapping past midnight is a wrap; a morning reversal is a plain ordering problem.
+    expect(birthTimeWindowError({ mode: 'approximate', from: '15:40:00', to: '14:10:00' })).toBe(
+      'crosses-midnight',
+    );
+    expect(birthTimeWindowError({ mode: 'approximate', from: '09:00:00', to: '08:00:00' })).toBe(
+      'not-ascending',
+    );
+    expect(birthTimeWindowError({ mode: 'approximate', from: '10:00:00', to: '10:00:00' })).toBe(
+      'not-ascending',
+    );
+    expect(birthTimeWindowError({ mode: 'approximate', from: '14:10:00', to: '15:40:00' })).toBeNull();
+    // Modes without a window are never blocked by window rules.
+    expect(birthTimeWindowError({ mode: 'known', from: '05:45:00', to: '' })).toBeNull();
+    expect(birthTimeWindowError({ mode: 'unknown', from: '', to: '' })).toBeNull();
   });
 });

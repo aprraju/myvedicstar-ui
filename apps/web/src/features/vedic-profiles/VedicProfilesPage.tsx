@@ -7,6 +7,7 @@ import { useUserInfo } from '../../shared/auth';
 import { Button } from '../../shared/components/Button';
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { DEFAULT_AUTHENTICATED_PATH } from '../../shared/routing/paths';
+import { isStrictRange } from '../kundali/birth-time-window';
 import { LocationSelector } from '../location';
 import { BirthTimeField } from './BirthTimeField';
 import { toFriendlyKey } from './error-key';
@@ -31,11 +32,9 @@ function isDraftComplete(draft: ProfileDraft): boolean {
   if (!draft.name.trim() || !draft.birthDate || !draft.birthLocation) return false;
   if (draft.birthTime.mode === 'known') return draft.birthTime.from.length > 0;
   if (draft.birthTime.mode === 'approximate') {
-    return (
-      draft.birthTime.from.length > 0 &&
-      draft.birthTime.to.length > 0 &&
-      draft.birthTime.to >= draft.birthTime.from
-    );
+    // Reuses the shared window rules: the API rejects a midnight-crossing window, so Save must not offer to send one.
+    // `>=` was previously accepted here, which let a zero-length (to == from) window through to a server 400.
+    return draft.birthTime.from.length > 0 && isStrictRange(draft.birthTime.from, draft.birthTime.to);
   }
   return true;
 }

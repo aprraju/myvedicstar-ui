@@ -1,4 +1,5 @@
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { crossesMidnight, isStrictRange } from '../kundali/birth-time-window';
 import styles from './BirthTimeField.module.css';
 
 /** How the birth time was supplied. Chosen before the time itself, because it decides what the field means. */
@@ -55,8 +56,33 @@ interface BirthTimeFieldProps {
  * Birth Time as three explicit states. Presentational only: no persistence, no API calls — the save contract for this
  * field is still being agreed (see issue #28).
  */
+/**
+ * Why an approximate window cannot be saved, if it cannot.
+ *
+ * Reused from the KUN-06 rules rather than duplicated, so the editor and the Kundali input cannot disagree about what
+ * counts as valid. A window crossing midnight is reported separately from a mis-ordered one: "must not cross midnight"
+ * is a different instruction to the user than "end must be after start".
+ */
+export function birthTimeWindowError(
+  value: BirthTimeValue,
+): 'crosses-midnight' | 'not-ascending' | 'incomplete' | null {
+  if (value.mode !== 'approximate') return null;
+  if (!value.from || !value.to) return 'incomplete';
+  if (crossesMidnight(value.from, value.to)) return 'crosses-midnight';
+  if (!isStrictRange(value.from, value.to)) return 'not-ascending';
+  return null;
+}
+
 export function BirthTimeField({ value, onChange, disabled = false, hintId }: BirthTimeFieldProps) {
   const { t } = useTranslation();
+  const windowError = birthTimeWindowError(value);
+  const errorMessage =
+    windowError === 'crosses-midnight'
+      ? t('kundali.birthTime.error.crossesMidnight')
+      : windowError === 'not-ascending'
+        ? t('kundali.birthTime.error.notAscending')
+        : null;
+  const errorId = 'birth-time-window-error';
 
   return (
     <fieldset className={styles.fieldset}>
@@ -114,6 +140,8 @@ export function BirthTimeField({ value, onChange, disabled = false, hintId }: Bi
               className={styles.input}
               value={value.to}
               disabled={disabled}
+              aria-invalid={errorMessage ? true : undefined}
+              aria-describedby={errorMessage ? errorId : undefined}
               onChange={(event) => onChange({ ...value, to: event.target.value })}
             />
           </label>
@@ -122,6 +150,13 @@ export function BirthTimeField({ value, onChange, disabled = false, hintId }: Bi
 
       {value.mode === 'unknown' && (
         <p className={styles.hint}>{t('vedicProfiles.form.birthTimeUnknownHint')}</p>
+      )}
+
+      {/* Announced on appearance without moving focus; the same message is the description of the end-time input. */}
+      {errorMessage && (
+        <p className={styles.error} role="alert" id={errorId}>
+          {errorMessage}
+        </p>
       )}
     </fieldset>
   );

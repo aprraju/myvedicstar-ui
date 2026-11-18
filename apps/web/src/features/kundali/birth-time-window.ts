@@ -14,6 +14,15 @@
 export const WALL_CLOCK_PATTERN = /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
 
 /**
+ * The point after which a reversed window is read as a wrap rather than a typo.
+ *
+ * A window can only cross midnight if it STARTS late in the day. Starting at 15:40 and ending at 14:10 is an ordering
+ * mistake; starting at 23:30 and ending at 00:30 is a wrap. Noon is the dividing line, stated here rather than buried
+ * in the comparison so the rule is reviewable and testable.
+ */
+const NOON = '12:00:00';
+
+/**
  * True when an approximate window crosses local midnight.
  *
  * A birth window is a range within ONE local day. `23:30 -> 00:30` is not "an hour later", it is a window that spans
@@ -25,7 +34,10 @@ export const WALL_CLOCK_PATTERN = /^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
  */
 export function crossesMidnight(from: string, to: string): boolean {
   if (!WALL_CLOCK_PATTERN.test(from) || !WALL_CLOCK_PATTERN.test(to)) return false;
-  return to <= from;
+  // A crossing means the start is late in the day and the end is early in the NEXT one. Not every to <= from is a
+  // crossing: 15:40 -> 14:10 and 10:00 -> 10:00 are simply out of order, and telling those users "must not cross
+  // midnight" would send them looking for a midnight problem they do not have.
+  return to <= from && from >= NOON;
 }
 
 /** True when the two endpoints describe a strict range rather than a single instant. */
