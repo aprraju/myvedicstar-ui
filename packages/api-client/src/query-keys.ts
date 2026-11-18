@@ -72,6 +72,10 @@ export const queryKeys = {
     /** Per signed-in user, so another user's profile is never shown. */
     userInfo: (userId: string) => ['auth', 'userinfo', userId] as const,
   },
+  kundali: {
+    /** Keyed by profile AND user, so a result is never served for somebody else's profile. */
+    overview: (userId: string, profileId: string) => ['kundali', 'overview', userId, profileId] as const,
+  },
 } as const;
 
 function normalize({ location, tradition, language }: PanchangParams) {
