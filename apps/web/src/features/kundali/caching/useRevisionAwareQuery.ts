@@ -21,7 +21,15 @@ export interface RevisionAwareOptions<T> {
    * go through @myvedicstar/api-client. This callback is that client call, injected so the hook stays testable.
    */
   load: (signal: AbortSignal) => Promise<T>;
-  /** Freshness window in milliseconds. A TTL is a floor, not the whole rule: the revision check always applies. */
+  /**
+   * Freshness window in milliseconds.
+   *
+   * IMPORTANT: this is a scheduling hint for when to refetch in the background, NOT what makes a result correct. Passing
+   * a large value does not permit serving an outdated result. Correctness is enforced by `freshnessOf` in this hook,
+   * which compares the live identity against the identity the cached data was stored under and downgrades anything that
+   * does not match — regardless of how much of this window remains. If you are reasoning about staleness, read
+   * freshnessOf, not this number.
+   */
   staleTime: number;
 }
 
