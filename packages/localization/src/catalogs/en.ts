@@ -661,6 +661,51 @@ export const en = {
         pisces: 'Pis',
       },
     },
+    bala: {
+      title: 'Shadbala and Bhava Bala',
+      intro:
+        'Planetary strength (Shadbala) and house strength (Bhava Bala), shown as the calculation returned them. The two are separate measures and are not added together.',
+      shadbalaTitle: 'Shadbala — planetary strength',
+      bhavaTitle: 'Bhava Bala — house strength',
+      shadbalaCaption: 'Shadbala components and totals by planet',
+      bhavaCaption: 'Bhava Bala totals by house',
+      shadbalaTableLabel: 'Shadbala table, scrollable horizontally',
+      bhavaTableLabel: 'Bhava Bala table, scrollable horizontally',
+      valueWithUnit: '{value} {unit}',
+      ratio: '({ratio}× required)',
+      house: 'House {house}',
+      complete: 'All six components',
+      /** A component the engine withheld: not computed, so no number is shown. */
+      withheldCell: 'Withheld',
+      /** Dig Bala's live case: a zero by flag, not a measurement, so it is labelled rather than printed. */
+      placeholderCell: 'Not measured',
+      excludedFromTotal: 'Excluded from the total: {components}.',
+      sectionPartial: 'At least one planetary total is partial.',
+      /**
+       * Deliberately long and specific. A partial Shadbala is not a rounding difference, and the wording has to survive
+       * being read aloud without the surrounding table for context.
+       */
+      partialTotal:
+        'Partial total — {components} is not calculated, so this is not a classical required-rupas verdict.',
+      componentUnknown: 'Unnamed component',
+      noPlanets: 'No planetary strength was returned.',
+      noHouses: 'No house strength was returned.',
+      rulesVersion: 'Rule set {version}, values in {unit}.',
+      component: {
+        sthana: 'Sthana',
+        dig: 'Dig',
+        kala: 'Kala',
+        chesta: 'Chesta',
+        naisargika: 'Naisargika',
+        drik: 'Drik',
+      },
+      column: {
+        planet: 'Planet',
+        total: 'Total',
+        completeness: 'Components',
+        house: 'House',
+      },
+    },
     caching: {
       stale:
         'These results are from an earlier version of this profile. Showing for reference until the update finishes.',

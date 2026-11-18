@@ -2,6 +2,7 @@ export * from './auth';
 export * from './contact';
 export * from './festivals';
 export * from './kundali-ashtakavarga';
+export * from './kundali-bala';
 export * from './kundali-charts';
 export * from './kundali-dashas';
 export * from './kundali-overview';
