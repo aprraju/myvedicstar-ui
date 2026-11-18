@@ -32,7 +32,8 @@ export function useReasonText() {
     tDynamic(`kundali.assessment.reason.${reason}`, undefined, t('kundali.assessment.reason.unknown'));
 }
 
-export function AssessmentUnavailable({ reason }: { reason: AssessmentReason }) {
+/** Internal to this module: the only supported way to render it is through {@link AssessmentSection}. */
+function AssessmentUnavailable({ reason }: { reason: AssessmentReason }) {
   const { t } = useTranslation();
   const reasonText = useReasonText();
 

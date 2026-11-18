@@ -1,7 +1,6 @@
 import { useId } from 'react';
 
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
-import { AssessmentSection, AssessmentUnavailable } from '../assessment/AssessmentSection';
 import styles from './AssessmentHost.module.css';
 
 /**
@@ -55,6 +54,3 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
 
   return <>{children(data)}</>;
 }
-
-/** Re-exported so a section can render an unsupported state without importing the shared module directly. */
-export { AssessmentSection, AssessmentUnavailable };
