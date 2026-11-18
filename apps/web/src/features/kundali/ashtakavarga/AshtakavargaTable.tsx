@@ -1,6 +1,6 @@
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
 import styles from './Ashtakavarga.module.css';
-import { type AshtakavargaValues,bhinnaRows, sarvaRow } from './values';
+import { type AshtakavargaValues, bhinnaRows, sarvaRow } from './values';
 
 /**
  * The authoritative rendering of Ashtakavarga: a real <table> with row and column headers.

@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
 import styles from './Ashtakavarga.module.css';
-import { type AshtakavargaValues,bhinnaRows } from './values';
+import { type AshtakavargaValues, bhinnaRows } from './values';
 
 /**
  * A sign-wise intensity grid for the per-planet bindus.
@@ -20,7 +20,8 @@ export function AshtakavargaHeatMap({ values }: { values: AshtakavargaValues }) 
   const rows = bhinnaRows(values);
 
   // 0 bindus is the faintest step, the payload's maximum the strongest. A flat payload (all zero) yields 0.2, not NaN.
-  const intensity = (bindus: number) => (values.maxBindu === 0 ? 0.2 : 0.2 + (bindus / values.maxBindu) * 0.8);
+  const intensity = (bindus: number) =>
+    values.maxBindu === 0 ? 0.2 : 0.2 + (bindus / values.maxBindu) * 0.8;
 
   return (
     <figure className={styles.heatFigure}>

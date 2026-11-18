@@ -21,7 +21,9 @@ describe('KUN-10 yogas — unsupported states are rendered, not omitted', () => 
 
     expect(screen.getByText('Not available yet')).toBeInTheDocument();
     // The section-level explanation carries the reason; coverage repeats it per family, so scope to the panel.
-    expect(screen.getAllByText(/the rule set for this is not implemented yet/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/the rule set for this is not implemented yet/).length).toBeGreaterThanOrEqual(
+      1,
+    );
     expect(screen.getByText(/rule-not-implemented/)).toBeInTheDocument();
     // No fabricated rows: no disclosure (an assessment row) and no table may exist. Family names appear only in the
     // coverage list, which states they are unavailable.
@@ -31,7 +33,9 @@ describe('KUN-10 yogas — unsupported states are rendered, not omitted', () => 
 
   it('distinguishes an engine outage from a missing rule set', () => {
     renderWithProviders(<YogasSection yogas={yogasEngineUnavailable} timeZoneId={zone} />);
-    expect(screen.getAllByText(/the calculation service is not available right now/).length).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getAllByText(/the calculation service is not available right now/).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText(/not implemented yet/)).not.toBeInTheDocument();
   });
 
@@ -47,7 +51,15 @@ describe('KUN-10 yogas — unsupported states are rendered, not omitted', () => 
     const coverageTitle = screen.getByText('Assessment coverage');
     const coverage = coverageTitle.parentElement;
     expect(coverage).not.toBeNull();
-    for (const family of ['Raja Yoga', 'Dhana Yoga', 'Gaja Kesari Yoga', 'Pancha Mahapurusha Yoga', 'Manglik Dosha', 'Kaal Sarp Dosha', 'Pitra Dosha']) {
+    for (const family of [
+      'Raja Yoga',
+      'Dhana Yoga',
+      'Gaja Kesari Yoga',
+      'Pancha Mahapurusha Yoga',
+      'Manglik Dosha',
+      'Kaal Sarp Dosha',
+      'Pitra Dosha',
+    ]) {
       expect(within(coverage as HTMLElement).getByText(family)).toBeInTheDocument();
     }
   });
@@ -85,7 +97,10 @@ describe('KUN-10 yogas — evidence', () => {
     expect(screen.getAllByText('Present').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText(/Cannot be determined/).length).toBeGreaterThanOrEqual(1);
 
-    const kaalSarp = screen.getAllByText('Kaal Sarp Yoga').find((el) => el.closest('details'))!.closest('details') as HTMLElement;
+    const kaalSarp = screen
+      .getAllByText('Kaal Sarp Yoga')
+      .find((el) => el.closest('details'))!
+      .closest('details') as HTMLElement;
     // An indeterminate row shows the unknown condition as its explanation rather than a bare verdict.
     expect(within(kaalSarp).getByText('All planets between Rahu and Ketu')).toBeInTheDocument();
   });
@@ -93,7 +108,10 @@ describe('KUN-10 yogas — evidence', () => {
   it('renders exceptions and cancellations as their own categories', () => {
     renderWithProviders(<YogasSection yogas={yogasComputed} timeZoneId={zone} />);
 
-    const manglik = screen.getAllByText('Manglik Dosha').find((el) => el.closest('details'))!.closest('details') as HTMLElement;
+    const manglik = screen
+      .getAllByText('Manglik Dosha')
+      .find((el) => el.closest('details'))!
+      .closest('details') as HTMLElement;
     expect(within(manglik).getByText('Exceptions')).toBeInTheDocument();
     expect(within(manglik).getByText('Cancellations')).toBeInTheDocument();
     expect(within(manglik).getByText(/Cancelled: Mars in its own sign/)).toBeInTheDocument();
@@ -101,7 +119,10 @@ describe('KUN-10 yogas — evidence', () => {
 
   it('says "none recorded" for an empty category instead of hiding it', () => {
     renderWithProviders(<YogasSection yogas={yogasComputed} timeZoneId={zone} />);
-    const gaja = screen.getAllByText('Gaja Kesari Yoga').find((el) => el.closest('details'))!.closest('details') as HTMLElement;
+    const gaja = screen
+      .getAllByText('Gaja Kesari Yoga')
+      .find((el) => el.closest('details'))!
+      .closest('details') as HTMLElement;
     // opposing, exceptions and cancellations are all empty for this assessment; each says so explicitly.
     expect(within(gaja).getAllByText('None recorded by this rule set.').length).toBe(3);
     expect(within(gaja).getByText('Supporting placements')).toBeInTheDocument();
@@ -128,7 +149,9 @@ describe('KUN-10 yogas — coverage', () => {
 
     // Raja has no rule set yet in this payload.
     const coverage = screen.getByText('Assessment coverage').parentElement as HTMLElement;
-    expect(within(coverage).getAllByText(/Not available: the rule set for this is not implemented yet/).length).toBeGreaterThanOrEqual(4);
+    expect(
+      within(coverage).getAllByText(/Not available: the rule set for this is not implemented yet/).length,
+    ).toBeGreaterThanOrEqual(4);
     expect(within(coverage).getAllByText('Available').length).toBe(2);
   });
 });
@@ -140,7 +163,9 @@ describe('KUN-10 yogas — accessibility', () => {
   });
 
   it('has no axe violations in the unsupported state', async () => {
-    const { container } = renderWithProviders(<YogasSection yogas={yogasRuleNotImplemented} timeZoneId={zone} />);
+    const { container } = renderWithProviders(
+      <YogasSection yogas={yogasRuleNotImplemented} timeZoneId={zone} />,
+    );
     expect(await axeViolations(container)).toEqual([]);
   });
 

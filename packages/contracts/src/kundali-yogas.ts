@@ -169,7 +169,10 @@ export const kundaliYogasSchema = z
     // An unavailable section with no explanation, or an available one carrying a reason, is a contract violation: the
     // UI would otherwise have to guess which half of the payload to believe.
     if (value.availability !== 'computed' && !value.reason) {
-      ctx.addIssue({ code: 'custom', message: 'an assessment section that is not computed requires a reason' });
+      ctx.addIssue({
+        code: 'custom',
+        message: 'an assessment section that is not computed requires a reason',
+      });
     }
     if (value.availability === 'computed' && value.reason !== undefined) {
       ctx.addIssue({ code: 'custom', message: 'a computed section must not carry an unavailability reason' });
@@ -186,7 +189,10 @@ export const kundaliYogasSchema = z
 
     for (const assessment of value.assessments) {
       if (assessment.scope === 'transit' && !assessment.referenceInstant) {
-        ctx.addIssue({ code: 'custom', message: `transit assessment "${assessment.key}" requires referenceInstant` });
+        ctx.addIssue({
+          code: 'custom',
+          message: `transit assessment "${assessment.key}" requires referenceInstant`,
+        });
       }
       if (assessment.scope === 'natal' && assessment.referenceInstant !== undefined) {
         ctx.addIssue({
@@ -196,7 +202,10 @@ export const kundaliYogasSchema = z
       }
       // An indeterminate verdict that lists no unknown condition is unexplained: the user would see "cannot decide"
       // with nothing to expand and no way to learn why.
-      if (assessment.status === 'indeterminate' && !assessment.conditions.some((c) => c.truth === 'unknown')) {
+      if (
+        assessment.status === 'indeterminate' &&
+        !assessment.conditions.some((c) => c.truth === 'unknown')
+      ) {
         ctx.addIssue({
           code: 'custom',
           message: `indeterminate assessment "${assessment.key}" requires at least one unknown condition`,

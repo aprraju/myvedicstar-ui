@@ -15,7 +15,13 @@ import styles from './Yogas.module.css';
  * Status is never colour-only: the badge pairs a dot with its text label, and the summary line carries the verdict in
  * words as well.
  */
-export function YogaAssessmentItem({ assessment, timeZoneId }: { assessment: YogaAssessment; timeZoneId: string }) {
+export function YogaAssessmentItem({
+  assessment,
+  timeZoneId,
+}: {
+  assessment: YogaAssessment;
+  timeZoneId: string;
+}) {
   const { t } = useTranslation();
   const { dateTime } = useFormatters();
   const headingId = useId();
@@ -63,7 +69,11 @@ export function YogaAssessmentItem({ assessment, timeZoneId }: { assessment: Yog
         <FactorList title={t('kundali.yogas.supporting')} factors={assessment.supporting} kind="supporting" />
         <FactorList title={t('kundali.yogas.opposing')} factors={assessment.opposing} kind="opposing" />
         <FactorList title={t('kundali.yogas.exceptions')} factors={assessment.exceptions} kind="exceptions" />
-        <FactorList title={t('kundali.yogas.cancellations')} factors={assessment.cancellations} kind="cancellations" />
+        <FactorList
+          title={t('kundali.yogas.cancellations')}
+          factors={assessment.cancellations}
+          kind="cancellations"
+        />
       </div>
     </details>
   );

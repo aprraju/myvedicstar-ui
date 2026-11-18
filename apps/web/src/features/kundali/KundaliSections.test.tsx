@@ -48,7 +48,9 @@ describe('KundaliSections — day one wiring', () => {
     });
 
     // The failed section reports a retryable error...
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/Yogas and doshas could not be loaded/));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(/Yogas and doshas could not be loaded/),
+    );
     // ...while the other still explains its own state.
     expect(screen.getByRole('region', { name: 'Ashtakavarga' })).toBeInTheDocument();
     expect(screen.getByText(/the rule set for this is not implemented yet/)).toBeInTheDocument();

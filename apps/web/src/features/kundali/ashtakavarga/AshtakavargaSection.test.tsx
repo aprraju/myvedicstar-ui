@@ -80,7 +80,9 @@ describe('KUN-11 ashtakavarga — accessible values', () => {
   });
 
   it('has no axe violations in the unsupported state', async () => {
-    const { container } = renderWithProviders(<AshtakavargaSection ashtakavarga={ashtakavargaRuleNotImplemented} />);
+    const { container } = renderWithProviders(
+      <AshtakavargaSection ashtakavarga={ashtakavargaRuleNotImplemented} />,
+    );
     expect(await axeViolations(container)).toEqual([]);
   });
 });

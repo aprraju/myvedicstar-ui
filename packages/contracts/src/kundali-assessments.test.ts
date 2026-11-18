@@ -90,9 +90,7 @@ describe('KUN-10 yogas contract', () => {
   it('rejects a definite verdict that lists an unknown condition', () => {
     const result = kundaliYogasSchema.safeParse({
       ...yogas,
-      assessments: [
-        { ...natalAssessment, conditions: [{ code: 'c1', text: 'x', truth: 'unknown' }] },
-      ],
+      assessments: [{ ...natalAssessment, conditions: [{ code: 'c1', text: 'x', truth: 'unknown' }] }],
     });
     expect(result.success).toBe(false);
   });
@@ -135,7 +133,8 @@ describe('KUN-11 ashtakavarga contract', () => {
 
   it('accepts an unsupported section with a reason', () => {
     expect(
-      kundaliAshtakavargaSchema.safeParse({ availability: 'unsupported', reason: 'rule-not-implemented' }).success,
+      kundaliAshtakavargaSchema.safeParse({ availability: 'unsupported', reason: 'rule-not-implemented' })
+        .success,
     ).toBe(true);
   });
 

@@ -1,4 +1,9 @@
-import { type AshtakavargaPlanet, type KundaliAshtakavarga, type Sign,signOrder } from '@myvedicstar/contracts';
+import {
+  type AshtakavargaPlanet,
+  type KundaliAshtakavarga,
+  type Sign,
+  signOrder,
+} from '@myvedicstar/contracts';
 
 /**
  * View model for a computed Ashtakavarga payload.

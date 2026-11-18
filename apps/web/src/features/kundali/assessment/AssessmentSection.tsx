@@ -43,9 +43,7 @@ export function AssessmentUnavailable({ reason }: { reason: AssessmentReason }) 
         {t('kundali.assessment.unavailableBody', { reason: reasonText(reason) })}
       </p>
       {/* The code is shown as provenance so a support conversation can name it exactly, and so a test can assert on it. */}
-      <p className={styles.reasonCode}>
-        {t('kundali.assessment.reasonCode', { code: reason })}
-      </p>
+      <p className={styles.reasonCode}>{t('kundali.assessment.reasonCode', { code: reason })}</p>
     </div>
   );
 }
@@ -80,11 +78,7 @@ export function AssessmentSection({
         {title}
       </h2>
       {intro && <p className={styles.intro}>{intro}</p>}
-      {state.availability === 'computed' ? (
-        children()
-      ) : (
-        <AssessmentUnavailable reason={state.reason} />
-      )}
+      {state.availability === 'computed' ? children() : <AssessmentUnavailable reason={state.reason} />}
       {footer}
       {state.availability === 'computed' && (
         <p className={styles.provenance}>{t('kundali.assessment.provenance')}</p>

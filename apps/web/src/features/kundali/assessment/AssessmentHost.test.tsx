@@ -12,7 +12,13 @@ import { AssessmentHost } from './AssessmentHost';
 describe('AssessmentHost', () => {
   it('renders children once data arrives', () => {
     renderWithProviders(
-      <AssessmentHost title="Yogas" status="ready" data={{ ok: true }} errorKind={null} reload={() => undefined}>
+      <AssessmentHost
+        title="Yogas"
+        status="ready"
+        data={{ ok: true }}
+        errorKind={null}
+        reload={() => undefined}
+      >
         {(data) => <p>payload {String(data.ok)}</p>}
       </AssessmentHost>,
     );

@@ -79,7 +79,8 @@ export const queryKeys = {
     /** KUN-10. Same user+profile scoping as overview, for the same reason. */
     yogas: (userId: string, profileId: string) => ['kundali', 'yogas', userId, profileId] as const,
     /** KUN-11. Same user+profile scoping as overview, for the same reason. */
-    ashtakavarga: (userId: string, profileId: string) => ['kundali', 'ashtakavarga', userId, profileId] as const,
+    ashtakavarga: (userId: string, profileId: string) =>
+      ['kundali', 'ashtakavarga', userId, profileId] as const,
   },
 } as const;
 

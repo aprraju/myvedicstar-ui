@@ -99,7 +99,11 @@ export const yogasComputed: KundaliYogas = {
       scope: 'natal',
       status: 'indeterminate',
       conditions: [
-        { code: 'all-planets-between-rahu-ketu', text: 'All planets between Rahu and Ketu', truth: 'unknown' },
+        {
+          code: 'all-planets-between-rahu-ketu',
+          text: 'All planets between Rahu and Ketu',
+          truth: 'unknown',
+        },
       ],
       supporting: [],
       opposing: [],
@@ -114,7 +118,9 @@ export const yogasComputed: KundaliYogas = {
       name: 'Raja Yoga (transit activation)',
       scope: 'transit',
       status: 'not-satisfied',
-      conditions: [{ code: 'jupiter-transits-9th', text: 'Jupiter transits the 9th from the Moon', truth: 'false' }],
+      conditions: [
+        { code: 'jupiter-transits-9th', text: 'Jupiter transits the 9th from the Moon', truth: 'false' },
+      ],
       supporting: [],
       opposing: [{ code: 'jupiter-3rd-from-moon', text: 'Jupiter in the 3rd from the Moon' }],
       exceptions: [],
@@ -134,7 +140,9 @@ export const yogasComputed: KundaliYogas = {
 /** Partially implemented engine: some families evaluated, the rest explained. */
 export const yogasPartiallyImplemented: KundaliYogas = {
   availability: 'computed',
-  assessments: yogasComputed.assessments.filter((row) => row.family === 'gaja-kesari' || row.family === 'manglik'),
+  assessments: yogasComputed.assessments.filter(
+    (row) => row.family === 'gaja-kesari' || row.family === 'manglik',
+  ),
   families: allFamilies.map((family) => ({
     family,
     available: family === 'gaja-kesari' || family === 'manglik',

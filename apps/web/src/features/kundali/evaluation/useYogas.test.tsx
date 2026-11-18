@@ -34,7 +34,9 @@ describe('useYogas / useAshtakavarga', () => {
   it('returns the server payloads untouched', async () => {
     server.use(
       http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () => HttpResponse.json(yogasComputed)),
-      http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () => HttpResponse.json(ashtakavargaComputed)),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () =>
+        HttpResponse.json(ashtakavargaComputed),
+      ),
     );
     renderWithProviders(<Probe profileId={PROFILE_ID} />, { auth: signedIn() });
 
@@ -45,7 +47,9 @@ describe('useYogas / useAshtakavarga', () => {
 
   it('treats an unsupported payload as a successful response, not an error', async () => {
     server.use(
-      http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () => HttpResponse.json(yogasRuleNotImplemented)),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () =>
+        HttpResponse.json(yogasRuleNotImplemented),
+      ),
       http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () =>
         HttpResponse.json({ availability: 'unsupported', reason: 'rule-not-implemented' }),
       ),
@@ -61,7 +65,9 @@ describe('useYogas / useAshtakavarga', () => {
   it('surfaces a 404 as an error kind rather than an empty section', async () => {
     server.use(
       http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () => HttpResponse.json(null, { status: 404 })),
-      http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () => HttpResponse.json(null, { status: 404 })),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () =>
+        HttpResponse.json(null, { status: 404 }),
+      ),
     );
     renderWithProviders(<Probe profileId={PROFILE_ID} />, { auth: signedIn() });
 
@@ -74,7 +80,9 @@ describe('useYogas / useAshtakavarga', () => {
     // The server claims a sarva total that the bhinna rows do not add up to. That is a calculation error, and the
     // client must refuse it: charting inconsistent numbers publishes a wrong answer.
     server.use(
-      http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () => HttpResponse.json(yogasRuleNotImplemented)),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), () =>
+        HttpResponse.json(yogasRuleNotImplemented),
+      ),
       http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () =>
         HttpResponse.json({ ...ashtakavargaComputed, sarva: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] }),
       ),

@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
-import {
-  assessmentAvailabilitySchema,
-  assessmentReasonSchema,
-} from './kundali-yogas';
+import { assessmentAvailabilitySchema, assessmentReasonSchema } from './kundali-yogas';
 
 /**
  * KUN-11 Ashtakavarga contract.
@@ -24,7 +21,15 @@ import {
  */
 
 /** Planets that have a Bhinnashtakavarga. The seven classical grahas; Rahu/Ketu have no classical bindu tables. */
-export const ashtakavargaPlanetValues = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'] as const;
+export const ashtakavargaPlanetValues = [
+  'sun',
+  'moon',
+  'mars',
+  'mercury',
+  'jupiter',
+  'venus',
+  'saturn',
+] as const;
 export const ashtakavargaPlanetSchema = z.enum(ashtakavargaPlanetValues);
 export type AshtakavargaPlanet = z.infer<typeof ashtakavargaPlanetSchema>;
 
@@ -111,7 +116,10 @@ export const kundaliAshtakavargaSchema = z
   })
   .superRefine((value, ctx) => {
     if (value.availability !== 'computed' && !value.reason) {
-      ctx.addIssue({ code: 'custom', message: 'an ashtakavarga section that is not computed requires a reason' });
+      ctx.addIssue({
+        code: 'custom',
+        message: 'an ashtakavarga section that is not computed requires a reason',
+      });
     }
     if (value.availability === 'computed' && value.reason !== undefined) {
       ctx.addIssue({ code: 'custom', message: 'a computed section must not carry an unavailability reason' });

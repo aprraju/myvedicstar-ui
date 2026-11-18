@@ -70,7 +70,6 @@ export function YogasSection({ yogas, timeZoneId }: { yogas: KundaliYogas; timeZ
           {natal.length === 0 && transit.length === 0 && (
             <p className={styles.empty}>{t('kundali.yogas.noneFound')}</p>
           )}
-
         </>
       )}
     </AssessmentSection>
