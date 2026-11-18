@@ -323,6 +323,25 @@ export const en = {
   kundali: {
     title: 'Kundali',
     subtitle: 'Your birth chart, read from the profiles you have saved.',
+    birthTime: {
+      legend: 'Time of birth',
+      hint: 'Choose how precisely the birth time is known. This changes which results can be calculated.',
+      exactLabel: 'Time',
+      fromLabel: 'From',
+      toLabel: 'To',
+      unknownHint: 'No birth time is recorded. Results that depend on the exact time are not shown.',
+      mode: {
+        exact: 'Exact',
+        approximate: 'Approximate',
+        unknown: 'Unknown',
+      },
+      error: {
+        invalidFrom: 'Enter a valid time, for example 05:45:00.',
+        invalidTo: 'Enter a valid time, for example 06:30:00.',
+        notAscending: 'The end time must be after the start time.',
+        crossesMidnight: 'The time range must not cross midnight. Enter a range within the same day.',
+      },
+    },
     profileLabel: 'Astro Profile',
     profileSelectHint: 'Choose which profile this Kundali is for.',
     profileSelectPlaceholder: 'Select an Astro Profile…',
