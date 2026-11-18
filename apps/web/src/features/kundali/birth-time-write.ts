@@ -1,4 +1,4 @@
-import { isStrictRange, WALL_CLOCK_PATTERN } from './birth-time-window';
+import { crossesMidnight, isStrictRange, WALL_CLOCK_PATTERN } from './birth-time-window';
 
 /**
  * The write payload for a birth time, and the single mapping function the tests target.
@@ -28,8 +28,6 @@ export function toBirthTimeWrite(
   mode: 'exact' | 'approximate' | 'unknown',
   from: string,
   to: string,
-  /** True when the entered window is known to run past midnight, so the error names the real cause. */
-  intendsNextDay = false,
 ): { ok: true; value: BirthTimeWrite } | { ok: false; error: BirthTimeError } {
   if (mode === 'unknown') {
     return {
@@ -51,10 +49,12 @@ export function toBirthTimeWrite(
   // Checked BEFORE the ordering assertion: a midnight-crossing window is not merely out of order, and saying so gives
   // the user the actual reason instead of "start must be before end".
   if (!isStrictRange(from, to)) {
-    // Both cases are "to <= from", but they are different mistakes and deserve different messages. The caller tells us
-    // which by setting `intendsNextDay`: the form knows whether the user accepted a suggestion that the window runs
-    // past midnight, rather than this function guessing from the clock value.
-    return { ok: false, error: { code: intendsNextDay ? 'window-crosses-midnight' : 'range-not-ascending' } };
+    // `crossesMidnight` is the single definition of "this wraps": a late start ending earlier. Everything else that is
+    // not ascending is a plain ordering mistake, and the two get different messages.
+    return {
+      ok: false,
+      error: { code: crossesMidnight(from, to) ? 'window-crosses-midnight' : 'range-not-ascending' },
+    };
   }
 
   return {
