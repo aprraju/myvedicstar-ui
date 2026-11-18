@@ -390,6 +390,36 @@ export const en = {
         'download-url': 'No download link can be issued.',
       },
     },
+    interpretations: {
+      title: 'Interpretations',
+      subtitle: 'Traditional readings for {name}, based on the calculated chart.',
+      /** Rendered above every reading. Traditional interpretations are informational and must never read as outcomes. */
+      traditionalLabel:
+        'These are traditional interpretations for information and reflection. They are not predictions, and nothing here is guaranteed.',
+      domain: {
+        career: 'Career',
+        marriage: 'Marriage',
+        wellbeing: 'Wellbeing',
+        finance: 'Finance',
+        education: 'Education',
+      },
+      factorsTitle: 'Based on these calculated factors',
+      /**
+       * Pending and failed are different sentences on purpose: not yet computed versus computed and did not succeed.
+       * Collapsing them would tell a reader something is broken when it is merely unfinished.
+       */
+      pending: 'The {domain} interpretation is still being prepared.',
+      failedNeutral: 'The {domain} interpretation could not be calculated.',
+      absent: 'No interpretation was returned for this area.',
+      notAvailableTitle: 'Interpretations are not available yet',
+      notAvailableBody:
+        'The interpretations service is not connected yet, so no readings are shown. The areas above are the ones this section will cover.',
+      gap: {
+        'endpoint-get-interpretations': 'The interpretations request is not built.',
+        'status-exhaustiveness': 'Section status values are not documented as an exhaustive set.',
+        'failure-reason-code': 'A failed interpretation cannot report why it failed.',
+      },
+    },
     charts: {
       title: 'Charts',
       pickerLegend: 'Divisional charts',

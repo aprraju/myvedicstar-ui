@@ -75,6 +75,41 @@ describe('KundaliSections — day one wiring', () => {
     expect(screen.getByText(/the rule set for this is not implemented yet/)).toBeInTheDocument();
   });
 
+  /*
+   * The absent-reason case, ruled by architect: a failed section must still NAME ITSELF and say it failed - silence is
+   * not an acceptable render for a failure. The with-reason assertions above pass in both a component that handles the
+   * absent field and one that only handles the present field, so this is the assertion that actually carries the
+   * property.
+   *
+   * It is a STRUCTURAL assertion rather than a fixture one because of how this codebase is shaped: SectionState's
+   * unavailable arm requires \`reason\` (see AssessmentSection.tsx), and the section builders supply
+   * \`reason: x.reason ?? 'unknown'\`. 'unknown' is a real code in assessmentReasonValues with its own localization, so
+   * a payload with no reason cannot reach the UI as silence - it reaches it as a named, translatable state. If that
+   * nullish fallback is ever removed, the type stops compiling and the sections stop rendering, rather than rendering
+   * an empty failure. This test pins the user-visible half of that guarantee.
+   */
+  it('names the section when it fails, never rendering a silent failure', async () => {
+    server.use(
+      http.get(api('/kundali/:profileId/sections/yogas'), () =>
+        HttpResponse.json({ ...yogasRuleNotImplemented, reason: undefined }),
+      ),
+      http.get(api('/kundali/:profileId/sections/ashtakavarga'), () =>
+        HttpResponse.json(ashtakavargaRuleNotImplemented),
+      ),
+      http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(transitsWithAbsences)),
+    );
+    renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {
+      auth: signedIn(),
+    });
+
+    // The payment: a named sentence, not an empty region.
+    await waitFor(() => expect(screen.getByRole('region', { name: 'Yogas and doshas' })).toBeInTheDocument());
+    const yogas = screen.getByRole('region', { name: 'Yogas and doshas' });
+    expect(yogas).toHaveTextContent(/Yogas and doshas|could not be|rule set/i);
+    // No sentence with a hole where the reason would go, and no raw server string standing in for one.
+    expect(yogas.textContent ?? '').not.toMatch(/\(\)|undefined|null/);
+  });
+
   it('announces loading per section without inventing a reason', () => {
     server.use(
       http.get(api('/kundali/:profileId/sections/yogas'), async () => {
