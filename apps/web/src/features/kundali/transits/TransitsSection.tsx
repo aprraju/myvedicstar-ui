@@ -155,8 +155,16 @@ export function TransitsSection({
         </h3>
 
         {sadeSati === null ? (
-          <p className={styles.absent} data-testid="sadesati">
+          // null is "the engine did not calculate Sade Sati" - a claim about the calculation, not about the chart.
+          // Worded as "not calculated" rather than "not applicable": those are different facts, and only the first is
+          // something this payload can tell us.
+          <p className={styles.absent} data-testid="sadesati" data-state="not-calculated">
             {t('kundali.transits.sadeSatiAbsent')}
+          </p>
+        ) : sadeSati.phases.length === 0 && !sadeSati.active ? (
+          // Calculated, and the answer is: no phase at the reference instant. A different fact, said differently.
+          <p className={styles.absent} data-testid="sadesati" data-state="not-active">
+            {t('kundali.transits.sadeSatiNotActive')}
           </p>
         ) : (
           <div className={styles.sadeSati} data-testid="sadesati" data-partial={sadeSati.isPartial}>

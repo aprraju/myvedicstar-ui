@@ -69,7 +69,35 @@ describe('KUN-13 Sade Sati — a truncated interval is labelled as truncated', (
     renderWithProviders(
       <TransitsSection section={{ ...transitsComplete, sadeSati: null }} timeZoneId={TZ} />,
     );
-    expect(screen.getByTestId('sadesati')).toHaveTextContent(/not available or not applicable/i);
+    const block = screen.getByTestId('sadesati');
+    // "Never calculated" and "calculated, no phase" are different facts and must read differently.
+    expect(block).toHaveAttribute('data-state', 'not-calculated');
+    expect(block).toHaveTextContent(/was not calculated for this profile/i);
+    expect(block).not.toHaveTextContent(/not applicable/i);
+  });
+});
+
+describe('KUN-13 Sade Sati — absence wording distinguishes the two kinds of absence', () => {
+  it('says "not in a phase" when the engine calculated it and found none', () => {
+    renderWithProviders(
+      <TransitsSection
+        section={{
+          ...transitsComplete,
+          sadeSati: {
+            ...transitsComplete.sadeSati!,
+            active: false,
+            phases: [],
+          },
+        }}
+        timeZoneId={TZ}
+      />,
+    );
+
+    const block = screen.getByTestId('sadesati');
+    expect(block).toHaveAttribute('data-state', 'not-active');
+    expect(block).toHaveTextContent(/not in a Sade Sati phase at the reference instant/i);
+    // It must not claim the calculation was missing: it was not.
+    expect(block).not.toHaveTextContent(/was not calculated/i);
   });
 });
 
