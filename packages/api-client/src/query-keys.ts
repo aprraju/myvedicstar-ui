@@ -76,6 +76,10 @@ export const queryKeys = {
     /** Keyed by profile AND user, so a result is never served for somebody else's profile. */
     overview: (userId: string, profileId: string) => ['kundali', 'overview', userId, profileId] as const,
     planets: (userId: string, profileId: string) => ['kundali', 'planets', userId, profileId] as const,
+    /** KUN-10. Same user+profile scoping as overview, for the same reason. */
+    yogas: (userId: string, profileId: string) => ['kundali', 'yogas', userId, profileId] as const,
+    /** KUN-11. Same user+profile scoping as overview, for the same reason. */
+    ashtakavarga: (userId: string, profileId: string) => ['kundali', 'ashtakavarga', userId, profileId] as const,
   },
 } as const;
 

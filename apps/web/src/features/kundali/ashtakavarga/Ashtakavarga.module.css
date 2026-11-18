@@ -1,0 +1,168 @@
+/* KUN-11 Ashtakavarga. Tokens only; the heat grid derives intensity from a --heat multiplier, not new colours. */
+
+.legend {
+  display: grid;
+  gap: var(--space-xxs);
+  margin: 0 0 var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.legendRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs) var(--space-sm);
+}
+
+.legendTerm {
+  flex: 0 0 10rem;
+  color: var(--color-text-secondary);
+}
+
+.legendValue {
+  flex: 1 1 12rem;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --- Heat map --- */
+
+.heatFigure {
+  margin: 0 0 var(--space-md);
+}
+
+.heatCaption {
+  margin-block-end: var(--space-xs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.heatGrid {
+  display: grid;
+  gap: var(--space-xxs);
+  /* 12 sign columns plus the planet label column; the grid scrolls horizontally inside its own container rather than
+     widening the page. */
+  overflow-x: auto;
+}
+
+.heatHeader,
+.heatRow {
+  display: grid;
+  grid-template-columns: minmax(5rem, 7rem) repeat(12, minmax(1.75rem, 1fr));
+  gap: var(--space-xxs);
+  min-inline-size: 30rem;
+}
+
+.heatSign,
+.heatPlanet {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-align: center;
+  align-self: center;
+}
+
+.heatPlanet {
+  text-align: start;
+}
+
+/* Intensity from the theme's surface token, stepped per cell. The printed number is the real carrier. */
+.heatCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 1.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-primary) calc(var(--heat, 0.2) * 100%), var(--color-surface));
+}
+
+.heatLegend {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* --- Table --- */
+
+.tableWrap {
+  /* The table is the accessible source of truth; it scrolls inside its wrapper so 320px never overflows the page. */
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.caption {
+  padding: var(--space-xs) var(--space-sm);
+  text-align: start;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.table th,
+.table td {
+  padding: var(--space-xs) var(--space-xxs);
+  border-block-end: 1px solid var(--color-border);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.columnHeader,
+.cornerHeader,
+.totalHeader {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.signAbbr {
+  display: block;
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.rowHeader {
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--color-surface-elevated);
+  text-align: start;
+  padding-inline: var(--space-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cell {
+  color: var(--color-text-primary);
+}
+
+.totalCell {
+  font-weight: 600;
+  border-inline-start: 1px solid var(--color-border);
+}
+
+.sarvaRow {
+  background: var(--color-surface-subtle);
+  font-weight: 600;
+}
+
+.weakNote {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+/* Narrow screens: keep the table scrollable rather than reflowing it into cards, because a 12-value row read as a
+   stacked card loses the sign-to-value pairing. The wrapper scrolls; the page does not. */
+@media (max-width: 30rem) {
+  .table {
+    font-size: var(--font-size-xs);
+  }
+}
