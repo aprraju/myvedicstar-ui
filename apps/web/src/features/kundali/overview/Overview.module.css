@@ -1,0 +1,125 @@
+/* KUN-05 overview: tokens only, no literal colours or sizes. */
+
+.page {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: var(--space-lg) var(--gutter) var(--space-xl);
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+}
+
+.breadcrumb {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.title {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-lg);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0 0 var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.section {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+}
+
+.subTitle {
+  margin: var(--space-md) 0 var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.list {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xxs) var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-block-end: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-block-end: none;
+}
+
+.term {
+  flex: 0 0 11rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.value {
+  flex: 1 1 12rem;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+.range {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unavailable is visually distinct from a value so it can never be mistaken for one. */
+.unavailable {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.unavailableReason {
+  color: var(--color-text-muted);
+  font-style: normal;
+  font-size: var(--font-size-xs);
+}
+
+.placementList {
+  margin: 0;
+  padding-inline-start: var(--space-md);
+  font-size: var(--font-size-sm);
+}
+
+.placement {
+  margin-block-end: var(--space-xxs);
+}
+
+.retrograde {
+  color: var(--color-caution, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+}
+
+.conventions {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 30rem) {
+  .page {
+    padding: var(--space-md) var(--space-sm) var(--space-lg);
+  }
+
+  /* Term above value on narrow screens; the 11rem inline size would otherwise squeeze the value. */
+  .term {
+    flex: 1 1 100%;
+  }
+}
