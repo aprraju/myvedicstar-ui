@@ -3,6 +3,7 @@ import {
   bestGoodTimesResponseSchema,
   type ContactRequest,
   contactResponseSchema,
+  type DashaSystem,
   daySummariesResponseSchema,
   festivalsResponseSchema,
   geographyOptionsSchema,
@@ -11,6 +12,8 @@ import {
   goodTimesResponseSchema,
   type KundaliAshtakavarga,
   kundaliAshtakavargaSchema,
+  type KundaliDashaTimeline,
+  kundaliDashaTimelineSchema,
   type KundaliOverview,
   kundaliOverviewSchema,
   type KundaliPlanets,
@@ -556,6 +559,28 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.planets',
           path: path('kundaliPlanets', { profileId }),
           schema: kundaliPlanetsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-09: the dasha timeline for one owned Astro Profile.
+       *
+       * `system` is always sent, so the response's own echo and the request agree and the UI never has to assume which
+       * system it received. `at` is omitted deliberately when the caller wants the server's now — the server echoes the
+       * instant it actually used, and inventing one client-side would silently describe a different moment. 404 is a
+       * foreign or missing profile; 400 is a system the API does not know, which must not be retried into another
+       * system's dates.
+       */
+      dashas: (
+        profileId: string,
+        options: { system: DashaSystem; at?: string | undefined },
+        call?: CallOptions,
+      ) =>
+        transport.request<KundaliDashaTimeline>({
+          operation: 'kundali.dashas',
+          path: path('kundaliDashas', { profileId }),
+          query: { system: options.system, at: options.at },
+          schema: kundaliDashaTimelineSchema,
           signal: call?.signal,
           auth: 'required',
         }),

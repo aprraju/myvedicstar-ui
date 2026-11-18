@@ -1,14 +1,8 @@
 import type { KundaliPlanets, UnsupportedReason } from '@myvedicstar/contracts';
-import type { MessageKey } from '@myvedicstar/localization';
 
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
+import { reasonKey } from '../reasonText';
 import styles from './Planets.module.css';
-
-const KNOWN_REASONS: readonly UnsupportedReason[] = [
-  'engine-unavailable',
-  'birth-time-unknown',
-  'birth-time-approximate',
-];
 
 /**
  * The reason a fact is missing, as localized text.
@@ -18,10 +12,8 @@ const KNOWN_REASONS: readonly UnsupportedReason[] = [
  */
 export function ReasonText({ reason }: { reason: UnsupportedReason }) {
   const { t } = useTranslation();
-  // Reasons are a closed set at the contract level, so the cast is over a value already validated by the schema.
-  const key = (
-    KNOWN_REASONS.includes(reason) ? `kundali.planets.reason.${reason}` : 'kundali.planets.reason.unknown'
-  ) as MessageKey;
+  // One exhaustive map for every section: a reason added to the contract fails compilation until it has text.
+  const key = reasonKey(reason);
   return (
     <span className={styles.reason} data-reason={reason}>
       {' — '}

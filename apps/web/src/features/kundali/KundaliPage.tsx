@@ -1,6 +1,8 @@
+import { type DashaSystem, dashaSystemValues } from '@myvedicstar/contracts';
 import { useSearchParams } from 'react-router';
 
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { DashasSection } from './dashas/DashasSection';
 import { EmptyProfiles } from './EmptyProfiles';
 import styles from './Kundali.module.css';
 import { KundaliSections } from './KundaliSections';
@@ -9,6 +11,8 @@ import { useKundaliProfile } from './useKundaliProfile';
 
 /** Query parameter carrying the selected profile. Selection is client state held in the URL, never persisted server-side. */
 export const PROFILE_PARAM = 'profile';
+/** Query parameter carrying the dasha system being read. Presentation-level choice, validated against the contract. */
+const SYSTEM_PARAM = 'system';
 export const KUNDALI_PATH = '/kundali';
 
 /**
@@ -26,10 +30,27 @@ export function KundaliPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const requestedId = searchParams.get(PROFILE_PARAM);
+  const requestedSystem = searchParams.get(SYSTEM_PARAM);
+  // An unknown or absent system resolves to Vimshottari, which is also the API's default. Anything else would send the
+  // server a value it must reject, turning a bad link into an error page instead of the default reading.
+  const system: DashaSystem = dashaSystemValues.find((value) => value === requestedSystem) ?? 'vimshottari';
   const { status, summaries, reload } = useKundaliProfile();
   // Only consulted once the list resolved, so there is no flash of "unavailable" while the request is in flight.
   const selected = status === 'ready' ? (summaries.find((row) => row.id === requestedId) ?? null) : null;
   const isForeignId = requestedId !== null && status === 'ready' && selected === null;
+
+  const chooseSystem = (next: DashaSystem) => {
+    setSearchParams(
+      (previous) => {
+        const updated = new URLSearchParams(previous);
+        // Vimshottari is the default: keep the URL clean rather than encoding the default.
+        if (next === 'vimshottari') updated.delete(SYSTEM_PARAM);
+        else updated.set(SYSTEM_PARAM, next);
+        return updated;
+      },
+      { replace: true },
+    );
+  };
 
   const choose = (id: string) => {
     setSearchParams(
@@ -104,6 +125,16 @@ export function KundaliPage() {
           */}
           <KundaliSections profileId={selected.id} timeZoneId="UTC" />
         </section>
+      )}
+
+      {/* KUN-09: the dasha timeline for the selected profile. One section, one system; the choice lives in the URL so a
+          link can point at a system and a reload keeps the one being read. */}
+      {status === 'ready' && selected && (
+        <DashasSection
+          profileId={selected.id}
+          system={system}
+          onSystemChange={(next) => chooseSystem(next)}
+        />
       )}
 
       {status === 'ready' && !selected && !isForeignId && summaries.length > 0 && (

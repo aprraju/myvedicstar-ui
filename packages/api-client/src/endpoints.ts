@@ -66,6 +66,8 @@ export const defaultApiEndpoints = {
   kundaliOverview: '/kundali/{profileId}/overview',
   /** KUN-08: planetary detail, dignity and aspects for one owned Astro Profile. Read-only. */
   kundaliPlanets: '/kundali/{profileId}/sections/planets',
+  /** KUN-09: dasha timeline for one owned Astro Profile. Read-only; `system` and `at` are query parameters. */
+  kundaliDashas: '/kundali/{profileId}/sections/dashas',
   /** KUN-10: yoga and dosha assessments for one owned Astro Profile. Read-only. */
   kundaliYogas: '/kundali/{profileId}/sections/yogas',
   /** KUN-11: Bhinnashtakavarga and Sarvashtakavarga for one owned Astro Profile. Read-only. */
@@ -114,6 +116,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   vedicProfile: ['id'],
   kundaliOverview: ['profileId'],
   kundaliPlanets: ['profileId'],
+  kundaliDashas: ['profileId'],
   kundaliYogas: ['profileId'],
   kundaliAshtakavarga: ['profileId'],
 };
