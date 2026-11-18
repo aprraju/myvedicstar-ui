@@ -120,9 +120,4 @@ describe('#105 staleTime cannot make a stale result current', () => {
 
     await waitFor(() => expect(result.current.outcome.kind).toBe('current'));
   });
-
-  it('keeps exporting the rule as a constant so a reader can find it from the type', async () => {
-    const { FRESHNESS_IS_IDENTITY } = await import('./useRevisionAwareQuery');
-    expect(FRESHNESS_IS_IDENTITY).toBe(true);
-  });
 });

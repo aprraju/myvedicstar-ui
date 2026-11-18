@@ -29,9 +29,6 @@ import {
  */
 export type RefetchHint = number;
 
-/** Every freshness decision in this module comes from identity. Nothing reads a clock. */
-export const FRESHNESS_IS_IDENTITY = true as const;
-
 export interface RevisionAwareOptions<T> {
   /** Section name, e.g. 'planets'. Part of the key, so sections do not collide. */
   section: string;
