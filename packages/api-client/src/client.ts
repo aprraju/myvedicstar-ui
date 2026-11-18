@@ -14,6 +14,8 @@ import {
   kundaliAshtakavargaSchema,
   type KundaliBala,
   kundaliBalaSchema,
+  type KundaliCapabilities,
+  kundaliCapabilitiesSchema,
   type KundaliDashaTimeline,
   kundaliDashaTimelineSchema,
   type KundaliOverview,
@@ -619,6 +621,18 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.bala',
           path: path('kundaliBala', { profileId }),
           schema: kundaliBalaSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-20: the published capability boundary. Account-independent reference data — the endpoint takes no profile
+       * and the response is identical for every caller, so the cache key deliberately omits user and profile.
+       */
+      capabilities: (call?: CallOptions) =>
+        transport.request<KundaliCapabilities>({
+          operation: 'kundali.capabilities',
+          path: path('kundaliCapabilities'),
+          schema: kundaliCapabilitiesSchema,
           signal: call?.signal,
           auth: 'required',
         }),

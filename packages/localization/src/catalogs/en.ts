@@ -663,6 +663,28 @@ export const en = {
         pisces: 'Pis',
       },
     },
+    capabilities: {
+      title: 'What this chart can calculate',
+      intro:
+        "The calculation service publishes exactly what it supports. These are its answers, not this app's guesses.",
+      divisionalHeading: 'Divisional charts',
+      shadbalaHeading: 'Shadbala components',
+      limitsHeading: 'Known limits',
+      division: 'D{divisions}',
+      supported: 'Supported',
+      provisional: 'Provisional',
+      provisionalNote:
+        'Returned, but not asserted as definitive: the boundary is close enough that a placement near it can shift.',
+      notProduced: 'Not calculated',
+      noneSupported: 'No divisional charts are supported.',
+      nodeConvention: 'Lunar node',
+      ascendantConvention: 'Ascendant',
+      birthDateRange: 'Birth dates',
+      range: '{from} to {to}',
+      loading: 'Loading what can be calculated…',
+      unavailable: 'What this chart can calculate could not be loaded. Nothing is assumed in its place.',
+      retry: 'Try again',
+    },
     bala: {
       title: 'Shadbala and Bhava Bala',
       intro:
