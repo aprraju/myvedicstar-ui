@@ -1,0 +1,113 @@
+/* KUN-07 charts. Tokens only. */
+
+.chart,
+.unavailable {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.chartTitle,
+.unavailableTitle {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* The unavailable state is deliberately plain: no frame, no grid, nothing that could be mistaken for a chart. */
+.unavailableBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.reason {
+  margin: var(--space-xxs) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.caveat {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-caution, var(--color-text-secondary));
+  font-size: var(--font-size-xs);
+}
+
+.svg {
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 22rem;
+  block-size: auto;
+  margin: 0 auto var(--space-sm);
+}
+
+.frame {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 0.6;
+}
+
+.cell {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 0.4;
+}
+
+.cellText {
+  font-family: var(--font-sans);
+  font-size: 3.2px;
+  fill: var(--color-text-secondary);
+}
+
+.cellPlanets {
+  font-family: var(--font-sans);
+  font-size: 2.6px;
+  fill: var(--color-text-primary);
+}
+
+.table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-xs);
+}
+
+.caption {
+  text-align: start;
+  color: var(--color-text-muted);
+  padding-block-end: var(--space-xxs);
+}
+
+.table th,
+.table td {
+  padding: var(--space-xxs) var(--space-xs);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.switcher {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.switcherLegend {
+  padding: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.switcherOption {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xxs);
+  min-block-size: 44px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
