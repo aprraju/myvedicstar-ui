@@ -10,6 +10,9 @@ import {
   glossaryResponseSchema,
   goodTimeExplanationResponseSchema,
   goodTimesResponseSchema,
+  type KundaliAlerts,
+  kundaliAlertsSchema,
+  type KundaliAlertSubscriptionRequest,
   type KundaliAshtakavarga,
   kundaliAshtakavargaSchema,
   type KundaliBala,
@@ -22,6 +25,8 @@ import {
   kundaliOverviewSchema,
   type KundaliPlanets,
   kundaliPlanetsSchema,
+  type KundaliTransitsSection,
+  kundaliTransitsSectionSchema,
   type KundaliYogas,
   kundaliYogasSchema,
   locationReverseResponseSchema,
@@ -633,6 +638,38 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.capabilities',
           path: path('kundaliCapabilities'),
           schema: kundaliCapabilitiesSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-13: dated transits, Sade Sati and nullable graha positions. The schema preserves nulls, so an unevaluated
+       * graha stays absent instead of arriving as a fabricated zero.
+       */
+      transits: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliTransitsSection>({
+          operation: 'kundali.transits',
+          path: path('kundaliTransits', { profileId }),
+          schema: kundaliTransitsSectionSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /** KUN-13: read the profile's alert subscriptions. An empty list is a real answer. */
+      alerts: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliAlerts>({
+          operation: 'kundali.alerts',
+          path: path('kundaliAlerts', { profileId }),
+          schema: kundaliAlertsSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /** KUN-13: replace this profile's subscriptions. The response is the new state, not an acknowledgement. */
+      replaceAlerts: (profileId: string, request: KundaliAlertSubscriptionRequest, call?: CallOptions) =>
+        transport.request<KundaliAlerts>({
+          operation: 'kundali.replaceAlerts',
+          method: 'PUT',
+          path: path('kundaliAlerts', { profileId }),
+          body: request,
+          schema: kundaliAlertsSchema,
           signal: call?.signal,
           auth: 'required',
         }),
