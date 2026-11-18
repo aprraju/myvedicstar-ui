@@ -79,8 +79,6 @@ export function KundaliPage() {
         />
       )}
 
-      {/* One polite live region for state changes. Errors and prompts are already headings in the DOM, so they are
-          announced when they appear; this carries the transient "loading" message without competing with them. */}
       {/* One polite live region for transient state changes, so a screen-reader user hears loading finish or a
           cancellation without the page needing focus. The prompts themselves are headings in the DOM. */}
       <div role="status" aria-live="polite" className={styles.liveRegion}>
@@ -114,7 +112,10 @@ export function KundaliPage() {
       )}
 
       {status === 'ready' && selected && (
-        <section className={styles.selected} aria-labelledby="kundali-selected-title">
+        // A grouping wrapper, not a section: its heading sat at the same level as the section headings it contains,
+        // which flattened the outline into a list of unrelated h2s and made "Kundali for Asha" indistinguishable
+        // from a real section in a screen-reader heading list.
+        <div className={styles.selected}>
           <h2 className={styles.selectedTitle} id="kundali-selected-title">
             {t('kundali.selected.title', { name: selected.name })}
           </h2>
@@ -124,7 +125,7 @@ export function KundaliPage() {
             and label them as such rather than guessing a zone from the browser. No calculation input comes from here.
           */}
           <KundaliSections profileId={selected.id} timeZoneId="UTC" />
-        </section>
+        </div>
       )}
 
       {/* KUN-09: the dasha timeline for the selected profile. One section, one system; the choice lives in the URL so a

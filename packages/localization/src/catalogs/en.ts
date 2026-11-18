@@ -537,6 +537,8 @@ export const en = {
 
     section: {
       loading: 'Loading {section}…',
+      /** Announced when a section finishes loading, so the transition is not silent for a screen-reader user. */
+      loaded: '{section} loaded.',
       loadFailed: '{section} could not be loaded right now. Try again in a moment.',
       notFound: 'This profile was not found, or it is not one of yours.',
     },

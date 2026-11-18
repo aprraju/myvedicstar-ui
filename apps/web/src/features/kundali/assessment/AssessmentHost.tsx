@@ -40,6 +40,10 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
   }
 
   if (status === 'loading' || data === null) {
+    // The loading message lives in a region that OUTLIVES the transition to loaded. If the whole subtree is replaced
+    // on success, the role="status" node is destroyed instead of updated, so the completion is never announced - the
+    // user hears "loading" and then silence. Keeping one region, and emptying it once the section is ready, means the
+    // announcement happens because the text changed while the region stayed in place.
     return (
       <section className={styles.section} aria-labelledby={titleId} aria-busy="true">
         <h2 className={styles.title} id={titleId}>
@@ -52,5 +56,14 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
     );
   }
 
-  return <>{children(data)}</>;
+  return (
+    <>
+      {/* The section renderer draws the real section; this region reports the transition out of loading so the change
+          is announced rather than silently leaving the live region behind. */}
+      <div role="status" className="visually-hidden">
+        {t('kundali.section.loaded', { section: title })}
+      </div>
+      {children(data)}
+    </>
+  );
 }
