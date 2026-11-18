@@ -17,8 +17,9 @@ const ACCEPTED = new Map([
     {
       package: 'picomatch',
       issue: 'https://github.com/aprraju/myvedicstar-ui/issues/95',
+      // Full assessment, exposure analysis and revisit date: docs/security/accepted-dependency-advisories.md
       reason:
-        'Transitive dev-only (knip -> fdir/tinyglobby, react-native -> tinyglobby). Advisory range is <=4.0.7 and 4.0.7 IS the latest published version, so there is no fixed release to upgrade to. Not in the web runtime bundle.',
+        'picomatch ReDoS (CWE-1333, CVSS 7.5): slow regex compilation on adversarial brace/glob input. Transitive and build-time only (knip -> fdir/tinyglobby/picomatch, vite, vitest, jest via micromatch under apps/mobile, @expo/cli). Absent from the web runtime tree entirely (npm ls --workspace=@myvedicstar/web --omit=dev lists no picomatch), so no attacker-controlled input reaches it in production. Advisory range is <=4.0.7 and 4.0.7 IS the latest published version (npm view picomatch version), so no fixed release exists. Already covered by exact-pinned versions and a committed lockfile: nothing can drift onto a different range without a reviewed lockfile change. Revisit 2027-02-18.',
     },
   ],
 ]);
