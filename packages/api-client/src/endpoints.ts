@@ -62,6 +62,8 @@ export const defaultApiEndpoints = {
   /** Vedic Profiles — owned CRUD (list/create, read/replace/delete by id). */
   vedicProfiles: '/vedic-profiles',
   vedicProfile: '/vedic-profiles/{id}',
+  /** KUN-05: the computed overview for one owned Astro Profile. Read-only. */
+  kundaliOverview: '/kundali/{profileId}/overview',
 } as const;
 
 export type ApiEndpointName = keyof typeof defaultApiEndpoints;
@@ -104,6 +106,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   contactSubmit: [],
   vedicProfiles: [],
   vedicProfile: ['id'],
+  kundaliOverview: ['profileId'],
 };
 
 const TEMPLATE_PATTERN = /^\/[A-Za-z0-9_\-./{}]*$/;

@@ -9,6 +9,8 @@ import {
   glossaryResponseSchema,
   goodTimeExplanationResponseSchema,
   goodTimesResponseSchema,
+  type KundaliOverview,
+  kundaliOverviewSchema,
   locationReverseResponseSchema,
   locationSchema,
   locationSearchResponseSchema,
@@ -523,6 +525,22 @@ export function createApiClient(options: ApiClientOptions) {
      * from "not found". Replace requires the revision the client last saw; a stale one surfaces as ApiError kind
      * 'conflict' (409) and must not be retried without re-reading.
      */
+    /**
+     * KUN-05: the computed overview for one owned Astro Profile. Read-only, and the ONLY source of the values shown -
+     * the UI never recomputes them. A foreign or missing profile id is a 404, deliberately indistinguishable from
+     * "not found"; 503 means the calculation engine was unavailable, which the overview renders as an explained
+     * unavailable state rather than an error page.
+     */
+    kundali: {
+      overview: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliOverview>({
+          operation: 'kundali.overview',
+          path: path('kundaliOverview', { profileId }),
+          schema: kundaliOverviewSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+    },
     vedicProfiles: {
       list: (call?: CallOptions) =>
         transport.request<VedicProfileSummary[]>({
