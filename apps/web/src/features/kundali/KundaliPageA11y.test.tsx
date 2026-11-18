@@ -74,12 +74,10 @@ describe('Kundali page — KUN-19 assembled accessibility', () => {
   it('has no axe violations on the assembled page with mixed section states', async () => {
     const { container } = renderPage();
     await screen.findByTestId('dasha-timeline');
-    // Let every section settle so the scan sees the real assembled tree, not a loading shell. Loading text is the
-    // signal; the completion announcements that remain afterwards are expected.
+    // Settle on the assessment headings: the dasha section renders its own status region while its content arrives, so
+    // a generic "nothing says loading" wait can never settle.
     await waitFor(() =>
-      expect(screen.queryAllByRole('status').some((node) => /loading/i.test(node.textContent ?? ''))).toBe(
-        false,
-      ),
+      expect(screen.getAllByRole('heading', { level: 2, name: /Yoga/i }).length).toBeGreaterThan(0),
     );
     expect(await axeViolations(container)).toEqual([]);
   });
@@ -107,6 +105,49 @@ describe('Kundali page — KUN-19 assembled accessibility', () => {
     // getAllBy: the unavailable panel states the title and explains it, so the phrase appears more than once.
     expect(within(yogas as HTMLElement).getAllByText(/not available/i).length).toBeGreaterThan(0);
     expect(yogas).toHaveAttribute('data-availability', 'unsupported');
+  });
+
+  it('keeps one live region across the load transition, changing its text rather than replacing the node', async () => {
+    // Hold the yogas response open so the loading state is observable rather than racing the promise.
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    storeSelectedLocation();
+    server.use(
+      http.get(api('/vedic-profiles'), () => HttpResponse.json([profile])),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/dashas`), () => HttpResponse.json(dashas)),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/ashtakavarga`), () =>
+        HttpResponse.json(computedAshtakavarga),
+      ),
+      http.get(api(`/kundali/${PROFILE_ID}/sections/yogas`), async () => {
+        await gate;
+        return HttpResponse.json(withheld);
+      }),
+    );
+    renderRoute(`/kundali?profile=${PROFILE_ID}`, { auth: signedIn() });
+
+    // Capture the region BEFORE the sections resolve. This is the property a snapshot cannot prove: two different
+    // nodes with role="status" would each be individually valid and still announce nothing, because a screen reader
+    // has no reason to connect the second node's text to the first node's disappearance.
+    // The yogas section's own region. It is present from first render (the query starts pending), so grab it before the
+    // response lands - that ordering is the whole point of the assertion, so it is captured, not awaited into existence.
+    const yogasRegion = await waitFor(() => {
+      const found = Array.from(document.querySelectorAll('[role="status"]')).find((node) =>
+        /Loading Yogas/i.test(node.textContent ?? ''),
+      );
+      expect(found, 'the yogas section announces loading from its own region').toBeDefined();
+      return found as Element;
+    });
+
+    // Release the response and let the section resolve.
+    release?.();
+    await waitFor(() => expect(yogasRegion?.textContent).toMatch(/loaded/i));
+
+    // The same node, still in the document, whose text now says the section loaded.
+    // Same element identity: the node captured before resolution is still the one announcing, with new text.
+    expect(yogasRegion).toBeInTheDocument();
+    expect(yogasRegion?.textContent).toMatch(/loaded/i);
   });
 
   it('announces that a section finished loading instead of leaving the user on "loading"', async () => {

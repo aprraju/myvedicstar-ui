@@ -31,7 +31,9 @@ describe('AssessmentHost', () => {
         {() => <p>should not render</p>}
       </AssessmentHost>,
     );
-    expect(screen.getByText(/Loading Yogas/)).toBeInTheDocument();
+    // Announced once, from the section's single live region; the visible copy is hidden from assistive tech so it is
+    // not read a second time.
+    expect(screen.getByRole('status')).toHaveTextContent(/Loading Yogas/);
     expect(screen.queryByText('should not render')).not.toBeInTheDocument();
     expect(screen.queryByText(/Reason code/)).not.toBeInTheDocument();
   });
