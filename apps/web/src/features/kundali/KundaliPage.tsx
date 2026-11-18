@@ -12,7 +12,7 @@ import { useKundaliProfile } from './useKundaliProfile';
 /** Query parameter carrying the selected profile. Selection is client state held in the URL, never persisted server-side. */
 export const PROFILE_PARAM = 'profile';
 /** Query parameter carrying the dasha system being read. Presentation-level choice, validated against the contract. */
-export const SYSTEM_PARAM = 'system';
+const SYSTEM_PARAM = 'system';
 export const KUNDALI_PATH = '/kundali';
 
 /**
