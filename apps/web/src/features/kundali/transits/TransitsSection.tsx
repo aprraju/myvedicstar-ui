@@ -164,9 +164,8 @@ export function TransitsSection({
         <h3 className={styles.subTitle} id="kundali-transits-sadesati">
           {t('kundali.transits.sadeSatiTitle')}
         </h3>
-        // Order matters: the gap check comes FIRST, because a gap can also arrive with sadeSati null. Testing
-        the null // before the reason is how "could not be calculated" gets read as the reassuring "no period
-        applies".
+        {/* Order matters: the gap check comes FIRST, because a gap can also arrive with sadeSati null. Testing the null
+            before the reason is how "could not be calculated" gets read as the reassuring "no period applies". */}
         {sadeSatiGap ? (
           // A genuine gap in the calculation. Name the reason so the absence is explicable - and so nobody infers a
           // phase that was never computed.
@@ -180,18 +179,21 @@ export function TransitsSection({
           <p className={styles.absent} data-testid="sadesati" data-state="no-interval">
             {t('kundali.transits.sadeSatiNoneInSpan')}
           </p>
-        ) : !sadeSati.active && sadeSati.phases.length === 0 ? (
-          // Present, but no phase is current and the engine reported no phase to look forward to.
-          <p className={styles.absent} data-testid="sadesati" data-state="no-interval">
-            {t('kundali.transits.sadeSatiNoneInSpan')}
-          </p>
         ) : sadeSatiNotYetActive ? (
-          // The interval exists and its start is known: the whole window is in the future. Telling this user "not
-          // available" would understate - we know exactly when it begins, so say that instead.
+          // The interval exists and its start is known: the whole window is in the future. Branched on the unsupported
+          // entry, which is the ONLY wire signal for this case - the payload also has phases populated and active false,
+          // so any condition built from those alone renders a normal block that never says it has not begun.
           <p className={styles.notYetActive} data-testid="sadesati" data-state="not-yet-active">
             {t('kundali.transits.sadeSatiBeginsOn', {
               date: formatDate(sadeSati.startUtc, timeZoneId),
             })}
+          </p>
+        ) : !sadeSati.active ? (
+          // Calculated, and no phase is current at the reference instant. Deliberately NOT conditioned on
+          // phases.length: the engine populates every phase of the interval regardless of where the instant falls, so an
+          // empty list is not what "no phase now" means and a length check would almost never fire.
+          <p className={styles.absent} data-testid="sadesati" data-state="not-active">
+            {t('kundali.transits.sadeSatiNotActive')}
           </p>
         ) : (
           <div className={styles.sadeSati} data-testid="sadesati" data-partial={sadeSati.isPartial}>

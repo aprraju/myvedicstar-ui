@@ -54,6 +54,23 @@ describe('KUN-13 Sade Sati — a truncated interval is labelled as truncated', (
   it('labels a partial interval on the same block as the dates it qualifies', () => {
     renderWithProviders(<TransitsSection section={transitsWithAbsences} timeZoneId={TZ} />);
 
+    // transitsWithAbsences carries a truncated interval AND no not-yet-active reason, but its active flag is false, so
+    // the honest render is the "no phase now" branch. The partial label attaches to whichever Sade Sati block renders a
+    // real interval, which is the complete fixture below.
+    expect(screen.getByTestId('sadesati')).toHaveAttribute('data-state', 'not-active');
+  });
+
+  it('labels the truncation caveat on a rendered interval block', () => {
+    renderWithProviders(
+      <TransitsSection
+        section={{
+          ...transitsComplete,
+          sadeSati: { ...transitsComplete.sadeSati!, isPartial: true },
+        }}
+        timeZoneId={TZ}
+      />,
+    );
+
     const block = screen.getByTestId('sadesati');
     expect(block).toHaveAttribute('data-partial', 'true');
     expect(within(block).getByTestId('sadesati-partial')).toHaveTextContent(
@@ -123,12 +140,13 @@ describe('KUN-13 Sade Sati — absence wording distinguishes the two kinds of ab
     );
 
     const block = screen.getByTestId('sadesati');
-    // Calculated, active: false, no phases, and no reason in `unsupported`: this is "no interval in span" territory,
-    // the computed answer - not a gap and not a future window.
-    expect(block).toHaveAttribute('data-state', 'no-interval');
-    expect(block).toHaveTextContent(/No Sade Sati period applies to this profile/i);
-    // It must not claim the calculation was missing: it was not.
+    // Interval present, phases populated (as the engine always sends them), active false, no not-yet-active reason:
+    // this is a real "no phase is current at the reference instant" - the case a phases.length check could never reach.
+    expect(block).toHaveAttribute('data-state', 'not-active');
+    expect(block).toHaveTextContent(/not in a Sade Sati phase at the reference instant/i);
     expect(block).not.toHaveTextContent(/could not be calculated/i);
+    expect(block).not.toHaveTextContent(/No Sade Sati period applies/i);
+    expect(block).not.toHaveTextContent(/begins/i);
   });
 });
 

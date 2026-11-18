@@ -41,13 +41,16 @@ describe('KundaliSections — day one wiring', () => {
     const ashtakavarga = screen.getByRole('region', { name: 'Ashtakavarga' });
     expect(within(yogas).queryByRole('table')).not.toBeInTheDocument();
     expect(within(ashtakavarga).queryByRole('table')).not.toBeInTheDocument();
-    // (b) ...and the page as a whole renders exactly the tables transits owes it, by accessible name. A page-wide
-    // exact set keeps the backstop the blanket assertion provided while still permitting the legitimate ones.
-    const tableRegions = screen
-      .queryAllByRole('region')
-      .filter((node) => within(node).queryByRole('table') !== null);
-    const transitsOnly = tableRegions.every((node) => node.closest('[data-testid="transits-body"]') !== null);
-    expect(transitsOnly).toBe(true);
+    // (b) ...and the page as a whole renders EXACTLY the tables transits owes it. Scoping (a) alone would let a stray
+    // table in any third section pass, so this page-wide count replaces the coverage the blanket assertion provided.
+    // In the transits fixture used here Saturn has windows: [], Jupiter is absent, Sade Sati renders as not-active and
+    // dated transits is empty - so transits contributes ZERO tables and the page must contain exactly zero. The assertion
+    // is on the exact page-wide set, which is what keeps the backstop a backstop: any table appearing anywhere fails it.
+    await waitFor(() => expect(screen.getByTestId('transits-body')).toBeInTheDocument());
+    const allTables = screen.queryAllByRole('table');
+    const strays = allTables.filter((node) => node.closest('[data-testid="transits-body"]') === null);
+    expect(strays, 'no table may appear outside the transits section').toHaveLength(0);
+    expect(allTables, 'the fixture renders no tables at all, so any table is a regression').toHaveLength(0);
     expect(document.querySelectorAll('details')).toHaveLength(0);
   });
 
