@@ -125,7 +125,7 @@ function DomainSection({ view }: { view: DomainView }) {
         <p className={styles.pending}>{t('kundali.interpretations.pending', { domain: domainName })}</p>
       )}
       {view.status === 'failed' && (
-        <p className={styles.failed}>{t('kundali.interpretations.failedNeutral')}</p>
+        <p className={styles.failed}>{t('kundali.interpretations.failedNeutral', { domain: domainName })}</p>
       )}
       {/* Absent is not a failure: the server did not speak to this domain. */}
       {view.status === 'absent' && <p className={styles.absent}>{t('kundali.interpretations.absent')}</p>}

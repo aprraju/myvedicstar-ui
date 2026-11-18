@@ -409,7 +409,7 @@ export const en = {
        * Collapsing them would tell a reader something is broken when it is merely unfinished.
        */
       pending: 'The {domain} interpretation is still being prepared.',
-      failedNeutral: 'This interpretation could not be calculated.',
+      failedNeutral: 'The {domain} interpretation could not be calculated.',
       absent: 'No interpretation was returned for this area.',
       notAvailableTitle: 'Interpretations are not available yet',
       notAvailableBody:

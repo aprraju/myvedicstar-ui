@@ -113,6 +113,29 @@ describe('InterpretationsPanel', () => {
     expect(screen.getByRole('heading', { name: 'Interpretations' })).toBeInTheDocument();
   });
 
+  /*
+   * The no-reason half, which is the half that gets missed. The contract defines \`failed\` with no reason code, so the
+   * API cannot say why. The UI must still name the DOMAIN (so the sentence belongs to a section) and must not invent
+   * or surface a reason. Ruled: name the domain neutrally, surface a reason only if one exists.
+   */
+  it('names the domain, and only the domain, when a failure carries no reason', () => {
+    const response: InterpretationsResponse = {
+      sourceRevision: 'rev-1',
+      sections: [
+        { domain: 'career', status: 'failed', text: null, factors: [] },
+        { domain: 'wellbeing', status: 'failed', text: null, factors: [] },
+      ],
+    };
+    renderPanel(response);
+
+    // Named per domain - the same sentence twice with no domain would leave the reader unable to tell which failed.
+    expect(screen.getByText('The Career interpretation could not be calculated.')).toBeInTheDocument();
+    expect(screen.getByText('The Wellbeing interpretation could not be calculated.')).toBeInTheDocument();
+
+    // Nothing beyond the neutral sentence: no dangling punctuation where a reason would have gone, no "unknown".
+    expect(screen.queryByText(/\(\)|unknown|undefined|null/i)).toBeNull();
+  });
+
   it('does not render raw server prose as the failure reason', () => {
     const response: InterpretationsResponse = {
       sourceRevision: 'rev-1',
