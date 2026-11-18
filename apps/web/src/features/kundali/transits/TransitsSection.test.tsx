@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest';
 
 import { axeViolations } from '../../../test/axe';
 import { renderWithProviders } from '../../../test/render';
-import { transitsComplete, transitsWithAbsences } from './fixtures';
+import {
+  transitsComplete,
+  transitsNoSadeSatiInterval,
+  transitsSadeSatiGap,
+  transitsSadeSatiNotYetActive,
+  transitsWithAbsences,
+} from './fixtures';
 import { TransitsSection } from './TransitsSection';
 
 const TZ = 'Asia/Kolkata';
@@ -65,15 +71,38 @@ describe('KUN-13 Sade Sati — a truncated interval is labelled as truncated', (
     expect(within(block).queryByTestId('sadesati-partial')).not.toBeInTheDocument();
   });
 
-  it('says Sade Sati is unavailable instead of inventing a phase when the engine reported none', () => {
-    renderWithProviders(
-      <TransitsSection section={{ ...transitsComplete, sadeSati: null }} timeZoneId={TZ} />,
-    );
+  // Three cases, not two. The nullable alone cannot tell them apart - the reason vocabulary does.
+  it('renders null + no-interval-in-span as a computed answer, not a gap', () => {
+    renderWithProviders(<TransitsSection section={transitsNoSadeSatiInterval} timeZoneId={TZ} />);
+
     const block = screen.getByTestId('sadesati');
-    // "Never calculated" and "calculated, no phase" are different facts and must read differently.
-    expect(block).toHaveAttribute('data-state', 'not-calculated');
-    expect(block).toHaveTextContent(/was not calculated for this profile/i);
-    expect(block).not.toHaveTextContent(/not applicable/i);
+    expect(block).toHaveAttribute('data-state', 'no-interval');
+    expect(block).toHaveTextContent(/No Sade Sati period applies to this profile/i);
+    // The reassuring reading must not be borrowed by the gap case, and vice versa.
+    expect(block).not.toHaveTextContent(/could not be calculated/i);
+  });
+
+  it('renders a gap on SadeSati itself as unavailable and names the reason', () => {
+    renderWithProviders(<TransitsSection section={transitsSadeSatiGap} timeZoneId={TZ} />);
+
+    const block = screen.getByTestId('sadesati');
+    expect(block).toHaveAttribute('data-state', 'unavailable');
+    expect(block).toHaveTextContent(/could not be calculated/i);
+    expect(block).toHaveTextContent(/engine-unavailable/);
+    // A user whose Sade Sati was never computed must not be told they are clear of it.
+    expect(block).not.toHaveTextContent(/No Sade Sati period applies/i);
+  });
+
+  it('says when Sade Sati begins instead of calling a future window unavailable', () => {
+    renderWithProviders(<TransitsSection section={transitsSadeSatiNotYetActive} timeZoneId={TZ} />);
+
+    const block = screen.getByTestId('sadesati');
+    expect(block).toHaveAttribute('data-state', 'not-yet-active');
+    expect(block).toHaveTextContent(/Sade Sati begins/i);
+    // The start date is known and must be shown - an unavailable message would understate what the engine returned.
+    expect(block).toHaveTextContent(/2028/);
+    expect(block).not.toHaveTextContent(/not available/i);
+    expect(block).not.toHaveTextContent(/could not be calculated/i);
   });
 });
 
@@ -94,10 +123,12 @@ describe('KUN-13 Sade Sati — absence wording distinguishes the two kinds of ab
     );
 
     const block = screen.getByTestId('sadesati');
-    expect(block).toHaveAttribute('data-state', 'not-active');
-    expect(block).toHaveTextContent(/not in a Sade Sati phase at the reference instant/i);
+    // Calculated, active: false, no phases, and no reason in `unsupported`: this is "no interval in span" territory,
+    // the computed answer - not a gap and not a future window.
+    expect(block).toHaveAttribute('data-state', 'no-interval');
+    expect(block).toHaveTextContent(/No Sade Sati period applies to this profile/i);
     // It must not claim the calculation was missing: it was not.
-    expect(block).not.toHaveTextContent(/was not calculated/i);
+    expect(block).not.toHaveTextContent(/could not be calculated/i);
   });
 });
 

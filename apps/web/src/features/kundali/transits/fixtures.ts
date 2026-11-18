@@ -101,3 +101,48 @@ export const transitsWithAbsences: KundaliTransitsSection = {
   datedTransits: [],
   unsupported: [{ path: 'transits.jupiter', reason: 'insufficient-data' }],
 };
+
+/**
+ * A profile clear of Sade Sati: the engine searched the span and found no interval. `sadeSati` is null AND the
+ * reason says so - this is a computed answer, not a gap, and the UI must not render it as "could not be calculated".
+ */
+export const transitsNoSadeSatiInterval: KundaliTransitsSection = {
+  ...transitsComplete,
+  sadeSati: null,
+  unsupported: [{ path: 'SadeSati', reason: 'no-interval-in-span' }],
+};
+
+/**
+ * The calculation genuinely could not produce Sade Sati. Same null as above, different reason - this is the case that
+ * must NOT be rendered with the reassuring "no period applies" sentence.
+ */
+export const transitsSadeSatiGap: KundaliTransitsSection = {
+  ...transitsComplete,
+  sadeSati: null,
+  unsupported: [{ path: 'SadeSati', reason: 'engine-unavailable' }],
+};
+
+/**
+ * The interval exists and the whole window is in the future. `active` is false and `phase` names the upcoming phase -
+ * we know exactly when it begins, so "not available" would understate what the engine actually returned.
+ */
+export const transitsSadeSatiNotYetActive: KundaliTransitsSection = {
+  ...transitsComplete,
+  sadeSati: {
+    phase: 'Rising',
+    active: false,
+    moonSign: 'Aquarius',
+    startUtc: '2028-04-11T00:00:00+00:00',
+    endUtc: '2030-07-02T00:00:00+00:00',
+    isPartial: false,
+    phases: [
+      {
+        phase: 'Rising',
+        sign: 'Capricorn',
+        startUtc: '2028-04-11T00:00:00+00:00',
+        endUtc: '2030-07-02T00:00:00+00:00',
+      },
+    ],
+  },
+  unsupported: [{ path: 'SadeSati.Active', reason: 'not-yet-active' }],
+};

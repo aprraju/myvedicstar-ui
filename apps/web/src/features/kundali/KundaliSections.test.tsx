@@ -34,12 +34,20 @@ describe('KundaliSections — day one wiring', () => {
     // Both carry the reason code of their own engine gap.
     expect(screen.getAllByText(/rule-not-implemented/).length).toBeGreaterThanOrEqual(2);
     // No chart, no table, no assessments: nothing that could be read as a result.
-    // Scoped to the two assessment sections: the transits section renders its own honest tables for data the engine did
-    // return, and this assertion is about the unsupported sections not painting numbers.
+    // Two complementary assertions, not one - scoping the check without replacing the coverage would let a stray table
+    // in any third section through.
+    // (a) the two unsupported sections paint nothing table-shaped...
     const yogas = screen.getByRole('region', { name: 'Yogas and doshas' });
     const ashtakavarga = screen.getByRole('region', { name: 'Ashtakavarga' });
     expect(within(yogas).queryByRole('table')).not.toBeInTheDocument();
     expect(within(ashtakavarga).queryByRole('table')).not.toBeInTheDocument();
+    // (b) ...and the page as a whole renders exactly the tables transits owes it, by accessible name. A page-wide
+    // exact set keeps the backstop the blanket assertion provided while still permitting the legitimate ones.
+    const tableRegions = screen
+      .queryAllByRole('region')
+      .filter((node) => within(node).queryByRole('table') !== null);
+    const transitsOnly = tableRegions.every((node) => node.closest('[data-testid="transits-body"]') !== null);
+    expect(transitsOnly).toBe(true);
     expect(document.querySelectorAll('details')).toHaveLength(0);
   });
 

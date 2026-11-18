@@ -749,8 +749,9 @@ export const en = {
       windowCaption:
         '{graha} transit windows. A window starts on its first date and ends before its last date, so adjacent windows do not overlap.',
       sadeSatiTitle: 'Sade Sati',
-      sadeSatiAbsent: 'Sade Sati was not calculated for this profile.',
-      sadeSatiNotActive: 'This profile is not in a Sade Sati phase at the reference instant.',
+      sadeSatiNoneInSpan: 'No Sade Sati period applies to this profile.',
+      sadeSatiBeginsOn: 'Sade Sati begins {date}.',
+      sadeSatiUnavailable: 'Sade Sati could not be calculated ({reason}).',
       sadeSatiNotActive: 'This profile is not in a Sade Sati phase at the reference instant.',
       sadeSatiPartial:
         'This window was cut short at the edge of the calculation range. The dates above are the limit of what was calculated, not the beginning or end of the phase.',

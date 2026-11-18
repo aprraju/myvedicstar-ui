@@ -73,6 +73,12 @@
   font-style: italic;
 }
 
+.notYetActive {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
 .sadeSati {
   display: flex;
   flex-direction: column;
