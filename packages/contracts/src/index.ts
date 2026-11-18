@@ -3,6 +3,7 @@ export * from './contact';
 export * from './festivals';
 export * from './kundali-charts';
 export * from './kundali-overview';
+export * from './kundali-planets';
 export * from './location-search';
 export * from './muhurta';
 export * from './panchang';

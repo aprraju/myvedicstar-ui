@@ -75,6 +75,7 @@ export const queryKeys = {
   kundali: {
     /** Keyed by profile AND user, so a result is never served for somebody else's profile. */
     overview: (userId: string, profileId: string) => ['kundali', 'overview', userId, profileId] as const,
+    planets: (userId: string, profileId: string) => ['kundali', 'planets', userId, profileId] as const,
   },
 } as const;
 

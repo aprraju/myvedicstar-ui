@@ -11,6 +11,8 @@ import {
   goodTimesResponseSchema,
   type KundaliOverview,
   kundaliOverviewSchema,
+  type KundaliPlanets,
+  kundaliPlanetsSchema,
   locationReverseResponseSchema,
   locationSchema,
   locationSearchResponseSchema,
@@ -537,6 +539,19 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.overview',
           path: path('kundaliOverview', { profileId }),
           schema: kundaliOverviewSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-08: planetary detail for one owned Astro Profile. Read-only, and the only source of the facts shown. 404 is
+       * a foreign or missing profile; 409 is a stale input revision, which must not be presented as current; 503 is the
+       * calculation engine being unavailable, which the UI turns into explained unavailable cells, not an error page.
+       */
+      planets: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliPlanets>({
+          operation: 'kundali.planets',
+          path: path('kundaliPlanets', { profileId }),
+          schema: kundaliPlanetsSchema,
           signal: call?.signal,
           auth: 'required',
         }),

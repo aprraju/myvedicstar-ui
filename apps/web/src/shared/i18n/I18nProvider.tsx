@@ -51,3 +51,16 @@ export function useTranslation(): Translator & { language: string } {
   if (!context) throw new Error('useTranslation must be used inside <I18nProvider>');
   return { ...context.translator, language: context.language };
 }
+
+/**
+ * The translator OBJECT, including `tDynamic` and `has`.
+ *
+ * `useTranslation` spreads the translator into a new object, which is convenient for `t` but loses the methods that are
+ * needed to resolve a key built at runtime from server data (a dignity code, a planet identifier). `t` remains the
+ * ordinary translate function for literal keys.
+ */
+export function useTranslator(): Translator {
+  const context = useContext(I18nContext);
+  if (!context) throw new Error('useTranslator must be used inside <I18nProvider>');
+  return context.translator;
+}

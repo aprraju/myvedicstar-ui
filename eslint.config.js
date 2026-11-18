@@ -98,6 +98,9 @@ export default tseslint.config(
   {
     files: ['apps/web/src/**/*.{ts,tsx}'],
     rules: {
+      // A horizontally scrolling container must be focusable to be scrollable by keyboard, which is what makes a wide
+      // data table usable without a pointer. 'region' is the role used for exactly that pattern.
+      'jsx-a11y/no-noninteractive-tabindex': ['error', { roles: ['tabpanel', 'region'] }],
       'react/no-danger': 'off',
       'no-restricted-syntax': [
         'error',
