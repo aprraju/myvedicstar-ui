@@ -8,9 +8,7 @@ import type { PlanetDetail, UnsupportedReason } from '@myvedicstar/contracts';
  * table cell or an assumed default can be passed to the renderer. "We agree not to print a placeholder" becomes "a
  * placeholder cannot be constructed".
  */
-export type CellView<T> =
-  | { kind: 'value'; value: T }
-  | { kind: 'unavailable'; reason: UnsupportedReason };
+export type CellView<T> = { kind: 'value'; value: T } | { kind: 'unavailable'; reason: UnsupportedReason };
 
 /**
  * Resolves one planet-relative fact.
@@ -29,16 +27,4 @@ export function resolveCell<T>(planet: PlanetDetail, path: string, fact: T | und
 
 export function reasonFor(planet: PlanetDetail, path: string): UnsupportedReason {
   return planet.unsupported.find((entry) => entry.path === path)?.reason ?? 'engine-unavailable';
-}
-
-/** True when every fact in the row is missing; used to describe a row rather than repeating one reason per cell. */
-export function isEmptyRow(planet: PlanetDetail): boolean {
-  return (
-    planet.sign === undefined &&
-    planet.degreeInSign === undefined &&
-    planet.nakshatra === undefined &&
-    planet.pada === undefined &&
-    planet.house === undefined &&
-    planet.dignity === undefined
-  );
 }

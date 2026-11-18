@@ -399,7 +399,8 @@ export const en = {
       tableLabel: 'Planetary detail table, scrollable horizontally',
       tableCaption: 'Positions, dignity and aspects by graha',
       methods: 'Houses use {houseSystem}; aspects use {aspectMethod}.',
-      conventions: 'Calculated with {ayanamsa} ayanamsa, {dignityScheme} dignity, {combustionOrb} combustion orb.',
+      conventions:
+        'Calculated with {ayanamsa} ayanamsa, {dignityScheme} dignity, {combustionOrb} combustion orb.',
       degreeValue: '{degree}°',
       houseValue: 'House {house}',
       nakshatraPada: '{nakshatra}, pada {pada}',

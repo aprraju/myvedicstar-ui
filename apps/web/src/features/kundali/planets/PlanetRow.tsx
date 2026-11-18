@@ -52,9 +52,7 @@ function PositionCells({ planet }: { planet: PlanetDetail }) {
         view={resolveCell(planet, 'degreeInSign', planet.degreeInSign)}
         column={t('kundali.planets.column.degree')}
       >
-        {(degree) => (
-          <span className={styles.numeric}>{t('kundali.planets.degreeValue', { degree })}</span>
-        )}
+        {(degree) => <span className={styles.numeric}>{t('kundali.planets.degreeValue', { degree })}</span>}
       </Cell>
     </>
   );
@@ -135,7 +133,10 @@ function FlagCells({ planet }: { planet: PlanetDetail }) {
           )
         }
       </Cell>
-      <Cell view={resolveCell(planet, 'combust', planet.combust)} column={t('kundali.planets.column.combust')}>
+      <Cell
+        view={resolveCell(planet, 'combust', planet.combust)}
+        column={t('kundali.planets.column.combust')}
+      >
         {(combust) =>
           combust ? (
             <span className={styles.flag}>{t('kundali.planets.combust')}</span>
