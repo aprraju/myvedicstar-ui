@@ -1,0 +1,151 @@
+/* KUN-14 interpretations. Tokens only - no literal colours or sizes. */
+
+.section {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+/* The traditional-interpretation label. Given weight and its own space above the readings, because it qualifies
+   every one of them and must not be skippable. */
+.label {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  border-inline-start: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.domains {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 48rem) {
+  .domains {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.domain {
+  margin: 0;
+}
+
+.domainSection {
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.domainTitle {
+  margin: 0 0 var(--space-xxs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.text {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.factors {
+  margin: var(--space-sm) 0 0;
+}
+
+.factorsTitle {
+  margin: 0 0 var(--space-xxs);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.factorList {
+  margin: 0;
+  padding-inline-start: var(--space-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.factor {
+  margin: 0;
+}
+
+/* Pending, failed and absent are three visually distinct sentences, not one grey box: a reader must be able to tell
+   "not yet computed" from "did not succeed" from "not reported" without reading closely. None of them is colour-only. */
+.pending,
+.failed,
+.absent {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.pending {
+  color: var(--color-text-secondary);
+}
+
+.failed {
+  color: var(--color-text-primary);
+}
+
+.absent {
+  color: var(--color-text-muted);
+}
+
+.unavailable {
+  margin: var(--space-md) 0 0;
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.unavailableTitle {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.unavailableBody {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.reason {
+  margin: var(--space-xxs) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.gapList {
+  margin: var(--space-xs) 0 0;
+  padding-inline-start: var(--space-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.gap {
+  margin: 0;
+}
