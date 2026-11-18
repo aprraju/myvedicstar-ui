@@ -24,6 +24,12 @@ export type ReportVariant = (typeof reportVariantValues)[number];
  *
  * Each entry names a capability the UI would need and cannot invent. Rendering these keeps the surface honest: a user
  * (or the next agent) can see exactly what is outstanding rather than guessing at a disabled control's meaning.
+ *
+ * SCOPE: this is the DOWNLOAD-blocking list, not the complete set of gaps against #57. It names three; #57 has four.
+ * The fourth is `revision` (a sourceRevision on the report status response), which is deliberately omitted here: it
+ * is a freshness binding, so it blocks telling "regenerate" from "up to date", not downloading. It is a merge blocker
+ * on the API contract (see the severity-split comment on api#57) but not a reason the download button cannot exist.
+ * Do not read this array as the full handover - read it as "what stops a download control rendering".
  */
 export const REPORT_CONTRACT_GAPS = [
   'endpoint-post-reports',
