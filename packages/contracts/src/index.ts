@@ -1,6 +1,7 @@
 export * from './auth';
 export * from './contact';
 export * from './festivals';
+export * from './kundali-charts';
 export * from './kundali-overview';
 export * from './kundali-planets';
 export * from './location-search';
