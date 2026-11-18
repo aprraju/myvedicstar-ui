@@ -1,0 +1,155 @@
+/* KUN-08 planetary detail: tokens only, no literal colours or sizes. Mirrors overview/Overview.module.css. */
+
+.section {
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+}
+
+.lede {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.methods {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-xs) var(--space-sm);
+  border-inline-start: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.methodLine {
+  margin: 0;
+}
+
+.provenance {
+  margin: var(--space-xxs) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/*
+ * The table scrolls inside its own box rather than pushing the page wide. It is focusable so it can be scrolled by
+ * keyboard, which is what makes a horizontally scrolling region usable without a pointer.
+ */
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.tableWrap:focus-visible {
+  outline: 2px solid var(--color-focus, var(--color-text-primary));
+  outline-offset: 2px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.columnHeader {
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  text-align: start;
+  white-space: nowrap;
+}
+
+.table td,
+.table th {
+  padding: var(--space-xs) var(--space-sm);
+  border-block-start: 1px solid var(--color-border);
+  text-align: start;
+  vertical-align: top;
+}
+
+.rowHeader {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.numeric {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Unavailable is italic and muted so it can never be read as a computed value. */
+.unavailable {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.unavailableCell {
+  color: var(--color-text-muted);
+}
+
+.reason {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.flag {
+  color: var(--color-caution, var(--color-text-secondary));
+}
+
+.flagNeutral {
+  color: var(--color-text-secondary);
+}
+
+.chipList,
+.aspectList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-block;
+  margin-inline-end: var(--space-xxs);
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill, var(--radius-sm));
+  font-size: var(--font-size-xs);
+}
+
+.aspect {
+  margin-block-end: var(--space-xxs);
+}
+
+.emptySection {
+  margin: 0;
+  padding: var(--space-md);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.note {
+  margin: var(--space-sm) 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 30rem) {
+  .section {
+    padding: var(--space-md);
+  }
+
+  .table {
+    /* Phones: let the table exceed the viewport and scroll inside its wrapper rather than crush ten columns. */
+    min-width: 44rem;
+  }
+}

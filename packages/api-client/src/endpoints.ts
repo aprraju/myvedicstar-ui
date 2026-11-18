@@ -64,6 +64,8 @@ export const defaultApiEndpoints = {
   vedicProfile: '/vedic-profiles/{id}',
   /** KUN-05: the computed overview for one owned Astro Profile. Read-only. */
   kundaliOverview: '/kundali/{profileId}/overview',
+  /** KUN-08: planetary detail, dignity and aspects for one owned Astro Profile. Read-only. */
+  kundaliPlanets: '/kundali/{profileId}/sections/planets',
 } as const;
 
 export type ApiEndpointName = keyof typeof defaultApiEndpoints;
@@ -107,6 +109,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   vedicProfiles: [],
   vedicProfile: ['id'],
   kundaliOverview: ['profileId'],
+  kundaliPlanets: ['profileId'],
 };
 
 const TEMPLATE_PATTERN = /^\/[A-Za-z0-9_\-./{}]*$/;
