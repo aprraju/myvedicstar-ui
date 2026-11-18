@@ -21,36 +21,59 @@ export interface SectionHostProps<T> {
 export function AssessmentHost<T>({ title, status, data, errorKind, reload, children }: SectionHostProps<T>) {
   const { t } = useTranslation();
   const titleId = useId();
+  const loading = status === 'loading' || data === null;
 
-  if (status === 'error') {
-    return (
-      <section className={styles.section} aria-labelledby={titleId}>
-        <h2 className={styles.title} id={titleId}>
-          {title}
-        </h2>
-        <div className={styles.alert} role="alert">
-          <p className={styles.alertBody}>{t('kundali.section.loadFailed', { section: title })}</p>
-          {errorKind === 'notFound' && <p className={styles.alertBody}>{t('kundali.section.notFound')}</p>}
-          <button type="button" className={styles.button} onClick={reload}>
-            {t('kundali.retry')}
-          </button>
-        </div>
-      </section>
-    );
-  }
+  // The announcement text changes; the node that carries it does not.
+  //
+  // The defect this guards against is invisible in any single snapshot: a role="status" region that is valid at every
+  // moment still fails across time if it is *replaced* rather than updated. Two different nodes with the same role do
+  // not fix that - a screen reader has no reason to connect the second node's text to the first node's disappearance,
+  // so it may announce nothing at all. The only reliable shape is one node, mounted in one place, whose text changes.
+  //
+  // Hence the structure below: the live region is rendered ONCE, outside the per-status branches, and each branch adds
+  // only the visual furniture around it.
+  const announcement = loading
+    ? t('kundali.section.loading', { section: title })
+    : status === 'error'
+      ? t('kundali.section.loadFailed', { section: title })
+      : t('kundali.section.loaded', { section: title });
 
-  if (status === 'loading' || data === null) {
-    return (
-      <section className={styles.section} aria-labelledby={titleId} aria-busy="true">
-        <h2 className={styles.title} id={titleId}>
-          {title}
-        </h2>
-        <p className={styles.loading} role="status">
-          {t('kundali.section.loading', { section: title })}
-        </p>
-      </section>
-    );
-  }
+  return (
+    <>
+      {/* One region for the whole section lifecycle, mounted before and after every transition. */}
+      <div role="status" aria-live="polite" className="visually-hidden">
+        {announcement}
+      </div>
 
-  return <>{children(data)}</>;
+      {status === 'error' ? (
+        <section className={styles.section} aria-labelledby={titleId}>
+          <h2 className={styles.title} id={titleId}>
+            {title}
+          </h2>
+          {/* role="alert" here is the visible error panel, not a second live region for the same event: it carries the
+              actionable retry control, and the region above carries the one-line announcement. */}
+          <div className={styles.alert} role="alert">
+            <p className={styles.alertBody}>{t('kundali.section.loadFailed', { section: title })}</p>
+            {errorKind === 'notFound' && <p className={styles.alertBody}>{t('kundali.section.notFound')}</p>}
+            <button type="button" className={styles.button} onClick={reload}>
+              {t('kundali.retry')}
+            </button>
+          </div>
+        </section>
+      ) : loading ? (
+        <section className={styles.section} aria-labelledby={titleId} aria-busy="true">
+          <h2 className={styles.title} id={titleId}>
+            {title}
+          </h2>
+          {/* Visual only: the live region above already carries this text. A second copy here would be read twice by
+              anything that queries the page text, and duplicated announcements are their own defect. */}
+          <p className={styles.loading} aria-hidden="true">
+            {t('kundali.section.loading', { section: title })}
+          </p>
+        </section>
+      ) : (
+        children(data as T)
+      )}
+    </>
+  );
 }
