@@ -111,3 +111,71 @@
   font-size: var(--font-size-sm);
   cursor: pointer;
 }
+
+/* Boundary-driven divisional picker (#111). Tokens only. */
+
+.picker {
+  margin: 0 0 var(--space-lg);
+  padding: 0;
+  border: 0;
+}
+
+.pickerLegend {
+  padding: 0;
+  font-family: var(--font-serif);
+  font-size: var(--font-size-md);
+}
+
+.pickerSummary {
+  margin: var(--space-xxs) 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.pickerList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pickerOption {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-xxs);
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.pickerOption[aria-pressed='true'] {
+  border-color: var(--color-focus);
+}
+
+.pickerOption:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.pickerLabel {
+  font-weight: 600;
+}
+
+.pickerState {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.empty {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
