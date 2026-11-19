@@ -186,6 +186,16 @@ const SANCTIONED_COMPUTED_ACCESS: readonly SanctionedComputedAccess[] = [
 ];
 
 /**
+ * The most computed accesses that may ever be sanctioned.
+ *
+ * Unlike the debt ledger, this list does not shrink towards empty by itself - a sanctioned entry stays legitimate
+ * forever. Without a ceiling it can only grow, and a list that grows one reasonable-looking entry at a time is how an
+ * escape hatch becomes the default path. Raising this number is a deliberate, reviewable act, which is the point: the
+ * guard cannot silently widen its own exemptions.
+ */
+const SANCTIONED_COMPUTED_ACCESS_LIMIT = 1;
+
+/**
  * Unresolved references that already exist on `main` and are NOT part of ui#125.
  *
  * These are recorded, not fixed: fixing them is someone else's active feature area, and silently changing another
@@ -274,6 +284,17 @@ describe('CSS module class references (ui#125)', () => {
     }
 
     expect(problems).toEqual([]);
+
+    // The exemption list may not grow silently. If a legitimate case needs sanctioning, raise the limit in the same
+    // change, so the widening is visible in review rather than accumulating one entry at a time.
+    expect(
+      SANCTIONED_COMPUTED_ACCESS.length <= SANCTIONED_COMPUTED_ACCESS_LIMIT
+        ? []
+        : [
+            `${SANCTIONED_COMPUTED_ACCESS.length} sanctioned computed accesses exceed the limit of ${SANCTIONED_COMPUTED_ACCESS_LIMIT}. ` +
+              'Raise SANCTIONED_COMPUTED_ACCESS_LIMIT deliberately if the new entry is justified, so the widening is visible in review.',
+          ],
+    ).toEqual([]);
 
     // The ledger must not outlive its findings: an entry whose class now resolves is stale and must be deleted, so the
     // list can only ever shrink towards empty. Without this, the ledger would silently accumulate dead entries that make
