@@ -196,3 +196,13 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
 }
+
+/*
+ * One supporting/excluded factor group: a heading followed by its list, or by the "none recorded" sentence.
+ *
+ * The wrapper, not the list - `.factors` is the `ul` inside it. Groups are stacked because an assessment reports
+ * several kinds of factor side by side and a reader needs them separated.
+ */
+.factorGroup {
+  margin-block-start: var(--space-xs);
+}

@@ -304,3 +304,20 @@
 .placement {
   line-height: var(--line-height-snug);
 }
+
+/*
+ * KUN-18: the container KundaliSections renders every section into.
+ *
+ * `sections` is NOT a misspelling of `.section`. `.section` frames ONE section and arrived later with ui#126 for the
+ * reports panel; this is the page-level stack that every section renders into. The two are different altitudes, not a
+ * typo: applying `.section` here would give the container a frame, and each child section already brings its own from
+ * its own module, so the result would read as nested boxes. This class owes only the vertical rhythm between them.
+ *
+ * (If a reader finds this comment stale because `.section` did not exist when it was written - it was true then, and
+ * #126 added `.section` to this same file in parallel. The conclusion is unchanged; the premise is not.)
+ */
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}

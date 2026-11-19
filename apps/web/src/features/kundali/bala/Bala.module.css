@@ -135,3 +135,29 @@
     grid-column: 1 / -1;
   }
 }
+
+/*
+ * A cell whose value is deliberately withheld (no threshold, or a placeholder the engine sent for shape).
+ *
+ * Distinct from `.noThreshold`, which is the sentence explaining a whole table's absence: this is the in-cell label
+ * standing where a number would be. Muted and italic so it reads as "not a measurement" at a glance, and never as a
+ * low number - the failure mode the surrounding comment warns about.
+ */
+.notMeasured {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+
+/*
+ * The per-bar note naming a component excluded from that bar's total.
+ *
+ * Sibling of `.partialNote`, not a duplicate: `partialNote` says the total is incomplete, this says why one part was
+ * left out. Both sit on the same line as the value, so they share the slot's sizing but differ in meaning - sharing one
+ * class would make the two facts indistinguishable to a reader and to a test.
+ */
+.excludeNote {
+  grid-column: 1 / -1;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
