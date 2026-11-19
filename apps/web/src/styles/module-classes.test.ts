@@ -214,14 +214,16 @@ interface KnownUnresolvedReference {
   issue: string;
 }
 
-const KNOWN_UNRESOLVED_REFERENCES: readonly KnownUnresolvedReference[] = [
-  { file: 'features/kundali/KundaliSections.tsx', className: 'sections', issue: 'ui#128' },
-  { file: 'features/kundali/bala/BalaSection.tsx', className: 'notMeasured', issue: 'ui#128' },
-  { file: 'features/kundali/bala/StrengthBar.tsx', className: 'excludeNote', issue: 'ui#128' },
-  { file: 'features/kundali/overview/AstroDetails.tsx', className: 'placements', issue: 'ui#128' },
-  { file: 'features/kundali/overview/FieldValue.tsx', className: 'unavailableText', issue: 'ui#128' },
-  { file: 'features/kundali/yogas/YogaAssessmentItem.tsx', className: 'factorGroup', issue: 'ui#128' },
-];
+/*
+ * Empty as of ui#128, which added the six rules these entries named.
+ *
+ * They are deleted rather than kept because keeping them would fail the staleness check in this very file - an entry
+ * whose class now resolves is red. That is the ledger working as designed: it can only shrink, so a fix cannot leave
+ * behind a suppression that would hide a future regression in the same file.
+ *
+ * The array stays so the mechanism (and its two properties above) remains in place for the next known finding.
+ */
+const KNOWN_UNRESOLVED_REFERENCES: readonly KnownUnresolvedReference[] = [];
 
 describe('CSS module class references (ui#125)', () => {
   it('every styles.X reference resolves to a class the module defines', () => {

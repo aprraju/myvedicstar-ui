@@ -123,3 +123,23 @@
     flex: 1 1 100%;
   }
 }
+
+/*
+ * The wrapper around the key-placement heading and its list.
+ *
+ * Not a misspelling of `.placementList` (the `ul` inside it) and not an alias for `.section`: it groups one sub-block
+ * within the details section, spaced away from the definition list above it.
+ */
+.placements {
+  margin-block-start: var(--space-md);
+}
+
+/*
+ * The word "unavailable" inside a field value, ahead of the reason.
+ *
+ * `.unavailable` already carries the muted italic treatment for the pair; this names the failure itself so the reason
+ * text beside it can be set apart at a smaller size without inheriting the italics.
+ */
+.unavailableText {
+  font-style: normal;
+}
