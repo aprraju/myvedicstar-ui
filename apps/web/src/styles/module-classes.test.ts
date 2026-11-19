@@ -205,12 +205,12 @@ interface KnownUnresolvedReference {
 }
 
 const KNOWN_UNRESOLVED_REFERENCES: readonly KnownUnresolvedReference[] = [
-  { file: 'features/kundali/KundaliSections.tsx', className: 'sections', issue: 'ui#127' },
-  { file: 'features/kundali/bala/BalaSection.tsx', className: 'notMeasured', issue: 'ui#127' },
-  { file: 'features/kundali/bala/StrengthBar.tsx', className: 'excludeNote', issue: 'ui#127' },
-  { file: 'features/kundali/overview/AstroDetails.tsx', className: 'placements', issue: 'ui#127' },
-  { file: 'features/kundali/overview/FieldValue.tsx', className: 'unavailableText', issue: 'ui#127' },
-  { file: 'features/kundali/yogas/YogaAssessmentItem.tsx', className: 'factorGroup', issue: 'ui#127' },
+  { file: 'features/kundali/KundaliSections.tsx', className: 'sections', issue: 'ui#128' },
+  { file: 'features/kundali/bala/BalaSection.tsx', className: 'notMeasured', issue: 'ui#128' },
+  { file: 'features/kundali/bala/StrengthBar.tsx', className: 'excludeNote', issue: 'ui#128' },
+  { file: 'features/kundali/overview/AstroDetails.tsx', className: 'placements', issue: 'ui#128' },
+  { file: 'features/kundali/overview/FieldValue.tsx', className: 'unavailableText', issue: 'ui#128' },
+  { file: 'features/kundali/yogas/YogaAssessmentItem.tsx', className: 'factorGroup', issue: 'ui#128' },
 ];
 
 describe('CSS module class references (ui#125)', () => {
