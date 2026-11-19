@@ -2,7 +2,7 @@
   "name": "myvedicstar-ui",
   "private": true,
   "type": "module",
-  "description": "My Vedic Star — web (React SPA) and mobile (React Native / Expo) frontends for the MyVedicDay Panchang API.",
+  "description": "My Vedic Star \u2014 web (React SPA) and mobile (React Native / Expo) frontends for the MyVedicDay Panchang API.",
   "license": "UNLICENSED",
   "packageManager": "npm@11.11.0",
   "engines": {
@@ -17,6 +17,7 @@
     "lint:unused": "knip --workspace . --workspace apps/web --workspace \"packages/*\"",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "pretypecheck": "npm run types:css && npm run types:css:verify",
     "typecheck": "npm run typecheck --workspaces --if-present && npm run deploy:typecheck",
     "test": "npm run test --workspaces --if-present && npm run deploy:test",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test",
@@ -35,7 +36,10 @@
     "mobile:start": "npm run start -w @myvedicstar/mobile",
     "mobile:android": "npm run android -w @myvedicstar/mobile",
     "mobile:ios": "npm run ios -w @myvedicstar/mobile",
-    "tokens:css": "npm run build:css -w @myvedicstar/design-tokens"
+    "tokens:css": "npm run build:css -w @myvedicstar/design-tokens",
+    "types:css": "tsx infrastructure/web/typed-css-modules/generate.ts",
+    "types:css:verify": "tsx infrastructure/web/typed-css-modules/verify.ts",
+    "prebuild": "npm run types:css && npm run types:css:verify"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
