@@ -2,7 +2,7 @@
   "name": "myvedicstar-ui",
   "private": true,
   "type": "module",
-  "description": "My Vedic Star \u2014 web (React SPA) and mobile (React Native / Expo) frontends for the MyVedicDay Panchang API.",
+  "description": "My Vedic Star — web (React SPA) and mobile (React Native / Expo) frontends for the MyVedicDay Panchang API.",
   "license": "UNLICENSED",
   "packageManager": "npm@11.11.0",
   "engines": {
