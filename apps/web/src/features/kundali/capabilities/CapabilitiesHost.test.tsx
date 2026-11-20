@@ -1,8 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import { TEST_API_BASE_URL } from '../../../test/msw/handlers';
+import { server } from '../../../test/msw/server';
 import { renderWithProviders } from '../../../test/render';
 import { CapabilitiesHost } from './CapabilitiesHost';
+import { capabilitiesFixture } from './fixtures';
 
 /**
  * The boundary must never block the page, and must never invent a default set when it cannot be loaded.
@@ -71,5 +75,40 @@ describe('CapabilitiesHost — one live region across the transition', () => {
     expect(loadingRegion.isConnected).toBe(true);
     expect(document.body.contains(loadingRegion)).toBe(true);
     expect(loadingRegion.textContent).toMatch(/could not be loaded|nothing is assumed/i);
+  });
+
+  it('keeps the same status node from loading into ready, with the request held open', async () => {
+    // The handler must HOLD the request, not resolve it. An immediately-resolving handler produces a transition that
+    // has already finished before the test can stand on it - and an identity assertion across a completed transition
+    // proves nothing. The gate is what makes the loading state observable.
+    let release: (() => void) | undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get(`${TEST_API_BASE_URL}/api/v1/kundali/capabilities`, async () => {
+        await gate;
+        return HttpResponse.json(capabilitiesFixture);
+      }),
+    );
+
+    renderWithProviders(<CapabilitiesHost />);
+
+    // Captured while the request is still open. If the gate above were absent this would already be the loaded state.
+    const region = await waitFor(() => {
+      const found = Array.from(document.querySelectorAll('[role="status"]')).find((node) =>
+        /loading/i.test(node.textContent ?? ''),
+      );
+      expect(found, 'the host announces loading while the request is held').toBeDefined();
+      return found as Element;
+    });
+
+    release?.();
+    await waitFor(() => expect(screen.getByTestId('capabilities-announcement')).toBeInTheDocument());
+
+    // Same element across loading -> ready, carrying the new text.
+    expect(region.isConnected).toBe(true);
+    expect(document.body.contains(region)).toBe(true);
+    expect(region.textContent).not.toMatch(/loading/i);
   });
 });
