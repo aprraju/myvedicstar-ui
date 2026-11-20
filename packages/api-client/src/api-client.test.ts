@@ -475,6 +475,44 @@ describe('createApiClient', () => {
     expect(metrics[0]).toMatchObject({ outcome: 'error', errorKind: 'network' });
   });
 
+  /*
+   * ui#133: the reason a request failed must survive into `cause`.
+   *
+   * The existing "reports network failures" test above asserts only `kind`, which is exactly the value that is the SAME
+   * whether the throw was an unhandled MSW frame, a refused connection or a DNS failure. It stands where the transition
+   * cannot be distinguished, so deleting `cause` from the ApiError construction leaves it green.
+   *
+   * This asserts the propagation itself: the thrown value's own message must be reachable from the classified error. A
+   * reader diagnosing a failure then sees WHY, not just "network".
+   */
+  it('carries the thrown reason on cause, so a network failure is not anonymous', async () => {
+    const thrown = new TypeError('fetch failed');
+    const fetchImpl = vi.fn<typeof fetch>().mockRejectedValue(thrown);
+    const { client } = setup(fetchImpl);
+    const error = (await client.traditions.list().catch((e: unknown) => e)) as ApiError;
+
+    expect(error.kind).toBe('network');
+    // Identity, not shape: this is the propagation of the actual thrown value, not a re-created lookalike.
+    expect(error.cause).toBe(thrown);
+    expect((error.cause as Error).message).toBe('fetch failed');
+  });
+
+  it('carries the MSW unhandled-frame reason, which exists only on cause', async () => {
+    // The shape #133 captured verbatim: .message is a bare "fetch failed"; the diagnosis is one level down.
+    const mswError = Object.assign(new TypeError('fetch failed'), {
+      cause: Object.assign(new Error('[MSW] Cannot bypass a request when using the "error" strategy.'), {
+        name: 'InternalError',
+      }),
+    });
+    const fetchImpl = vi.fn<typeof fetch>().mockRejectedValue(mswError);
+    const { client } = setup(fetchImpl);
+    const error = (await client.traditions.list().catch((e: unknown) => e)) as ApiError;
+
+    expect(error.kind).toBe('network');
+    const cause = error.cause as { cause?: { message?: string } };
+    expect(cause.cause?.message).toContain('Cannot bypass a request');
+  });
+
   it('times out slow requests', async () => {
     vi.useFakeTimers();
     try {
