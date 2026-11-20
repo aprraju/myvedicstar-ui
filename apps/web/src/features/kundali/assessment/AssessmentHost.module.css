@@ -1,11 +1,5 @@
 /* Section host states: loading and retryable error. Tokens only. */
 
-/* Stable wrapper. It carries no visual style of its own - its only job is to be one DOM node that outlives every
-   status transition, so the live region inside it is never unmounted. Layout stays on .section and on the children. */
-.host {
-  display: contents;
-}
-
 .section {
   margin: 0 0 var(--space-lg);
   padding: var(--space-lg);

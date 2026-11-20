@@ -30,15 +30,8 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
   // not fix that - a screen reader has no reason to connect the second node's text to the first node's disappearance,
   // so it may announce nothing at all. The only reliable shape is one node, mounted in one place, whose text changes.
   //
-  // "Outside the branches" has to mean outside the RETURNED section too, not merely outside the ternary. A region that
-  // lives inside <section> is still unmounted when the branch swaps which <section> is returned, because the two
-  // sections are different elements. An already-populated region inserted into the tree is not reliably announced -
-  // the ARIA contract is about changes INSIDE an existing region - so the user gets silence, or the wrong announcement,
-  // or hears "loaded." in place of the content they were waiting for.
-  //
-  // Hence: one persistent wrapper element that owns both the region and whichever section is current. The wrapper's
-  // identity survives the transition; the section inside it swaps as it must. The region is a sibling of that inner
-  // slot and never unmounts.
+  // Hence the structure below: the live region is rendered ONCE, outside the per-status branches, and each branch adds
+  // only the visual furniture around it.
   const announcement = loading
     ? t('kundali.section.loading', { section: title })
     : status === 'error'
@@ -46,9 +39,7 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
       : t('kundali.section.loaded', { section: title });
 
   return (
-    // Stable outer node: this is the only element that lives across the whole lifecycle. React keeps it mounted, so the
-    // live region below it is never inserted or removed - only its text changes.
-    <div className={styles.host}>
+    <>
       {/* One region for the whole section lifecycle, mounted before and after every transition. */}
       <div role="status" aria-live="polite" className="visually-hidden">
         {announcement}
@@ -83,6 +74,6 @@ export function AssessmentHost<T>({ title, status, data, errorKind, reload, chil
       ) : (
         children(data as T)
       )}
-    </div>
+    </>
   );
 }
