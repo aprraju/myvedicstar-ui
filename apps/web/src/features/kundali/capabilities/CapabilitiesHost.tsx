@@ -23,8 +23,17 @@ export function CapabilitiesHost() {
   const { t } = useTranslation();
   const { status, capabilities, reload } = useCapabilities();
 
+  // Three states, three announcements. A two-valued ternary over this state said "unavailable" on ready - and
+  // because the region is permanent and polite, that false text mounted once on success and never changed, so the
+  // last thing announced was wrong. Three branches, one per reachable status, mirroring the render below.
+  // Keyed on status alone, not on `capabilities === null`: the hook returns status 'ready' with a still-null payload
+  // for one render, so folding the null check into the announcement made 'ready' announce a failure.
   const announcement =
-    status === 'loading' ? t('kundali.capabilities.loading') : t('kundali.capabilities.unavailable');
+    status === 'loading'
+      ? t('kundali.capabilities.loading')
+      : status === 'error'
+        ? t('kundali.capabilities.unavailable')
+        : t('kundali.capabilities.ready');
 
   return (
     <>

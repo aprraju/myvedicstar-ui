@@ -2,11 +2,14 @@ import { screen, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
+import { createInMemoryAuthClient } from '../../../shared/auth';
 import { TEST_API_BASE_URL } from '../../../test/msw/handlers';
 import { server } from '../../../test/msw/server';
 import { renderWithProviders } from '../../../test/render';
 import { CapabilitiesHost } from './CapabilitiesHost';
 import { capabilitiesFixture } from './fixtures';
+
+const signedIn = () => createInMemoryAuthClient({ user: { id: 'u1', displayName: 'Asha' } });
 
 /**
  * The boundary must never block the page, and must never invent a default set when it cannot be loaded.
@@ -92,7 +95,9 @@ describe('CapabilitiesHost — one live region across the transition', () => {
       }),
     );
 
-    renderWithProviders(<CapabilitiesHost />);
+    // A signed-in client: the capabilities endpoint requires auth, and the default test client holds no token, so the
+    // transport rejects before any request is made and the state can never leave loading.
+    renderWithProviders(<CapabilitiesHost />, { auth: signedIn() });
 
     // Captured while the request is still open. If the gate above were absent this would already be the loaded state.
     const region = await waitFor(() => {
@@ -104,11 +109,25 @@ describe('CapabilitiesHost — one live region across the transition', () => {
     });
 
     release?.();
-    await waitFor(() => expect(screen.getByTestId('capabilities-announcement')).toBeInTheDocument());
+    // Wait on the ANNOUNCEMENT TEXT, not on the region existing - the region exists from first render, so waiting for
+    // its presence returns immediately and the assertions below would run against the still-loading state.
+    // Query the LIVE region by test id. `region.textContent` was captured as a snapshot above, so waiting on it
+    // would compare a stale string forever and report a timeout that says nothing about the component.
+    await waitFor(() =>
+      expect(
+        screen.getByTestId('capabilities-announcement').textContent,
+        `panel=${screen.queryByTestId('divisional-list') ? 'yes' : 'no'}`,
+      ).toMatch(/has loaded/i),
+    );
 
-    // Same element across loading -> ready, carrying the new text.
+    // Same element across loading -> ready.
     expect(region.isConnected).toBe(true);
     expect(document.body.contains(region)).toBe(true);
-    expect(region.textContent).not.toMatch(/loading/i);
+
+    // And it must not still be announcing a failure. The announcement ternary was two-valued over a three-valued
+    // state, so on 'ready' the permanent region said "unavailable" while the panel rendered the capabilities - and
+    // because the region is permanent and polite, that false text was the last thing announced and never corrected.
+    // not.toMatch(/loading/i) passes on exactly that bug; this is the assertion that distinguishes the states.
+    expect(region.textContent).not.toMatch(/unavailable|could not be loaded/i);
   });
 });

@@ -739,6 +739,7 @@ export const en = {
       range: '{from} to {to}',
       loading: 'Loading what can be calculated…',
       unavailable: 'What this chart can calculate could not be loaded. Nothing is assumed in its place.',
+      ready: 'What this chart can calculate has loaded.',
       retry: 'Try again',
     },
     bala: {
