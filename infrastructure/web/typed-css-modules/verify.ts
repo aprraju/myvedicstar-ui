@@ -21,6 +21,11 @@
  *
  * B reuses ui#125's parser, which is proven to fail correctly in both directions. That is not circular: the circularity
  * to avoid is deriving B FROM THE GENERATOR, i.e. consuming the subject under test.
+ *
+ * WHAT THIS DOES NOT PROVE: both lists come from the same parser, so if a stylesheet defines a class in a construct that
+ * parser does not recognise as a selector, both sides agree while both are wrong. This check catches a generator that
+ * drifts from the stylesheet; it does not prove that every class in the stylesheet is typed. It is a large improvement on
+ * the permissive index signature it replaces, and it is not a claim of completeness.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
