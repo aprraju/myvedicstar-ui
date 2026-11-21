@@ -75,6 +75,18 @@ const FIELDS_REQUIRED_BY_THE_CONTRACT = [
  *  a partial capability report invites the caller to fill the gaps with assumptions. */
 const OPTIONAL_BY_DESIGN: ReadonlyArray<{ field: string; reason: string }> = [];
 
+/**
+ * Removes one field from the wire-derived fixture without a dynamic `delete`.
+ *
+ * `delete payload[field]` is flagged by `@typescript-eslint/no-dynamic-delete`, and rightly so in general: a computed
+ * delete is unreviewable. Here the key is one the test just proved present, so the intent is safe — and destructuring
+ * rest makes that intent visible to the linter instead of supposing it.
+ */
+function withoutField(payload: Record<string, unknown>, field: string): Record<string, unknown> {
+  const { [field]: _removed, ...rest } = payload;
+  return rest;
+}
+
 describe('capabilities — requiredness is asserted per field, not via a payload that satisfies it', () => {
   // Guards against the list drifting out of sync with the contract: a field added to the schema but not to the list
   // above would otherwise be silently unprotected, which is the exact defect this describe block exists to remove.
@@ -93,9 +105,8 @@ describe('capabilities — requiredness is asserted per field, not via a payload
     (field) => {
       const payload = rawApiFixture() as Record<string, unknown>;
       expect(payload).toHaveProperty(field);
-      delete payload[field];
 
-      const result = kundaliCapabilitiesSchema.safeParse(payload);
+      const result = kundaliCapabilitiesSchema.safeParse(withoutField(payload, field));
       if (result.success) throw new Error(`dropping the required field ${field} must not parse`);
       expect(result.error.issues.map((issue) => issue.path.join('.'))).toContain(field);
     },
@@ -105,8 +116,7 @@ describe('capabilities — requiredness is asserted per field, not via a payload
     'tolerates a payload without $field, which is optional by design',
     ({ field }) => {
       const payload = rawApiFixture() as Record<string, unknown>;
-      delete payload[field];
-      expect(kundaliCapabilitiesSchema.safeParse(payload).success).toBe(true);
+      expect(kundaliCapabilitiesSchema.safeParse(withoutField(payload, field)).success).toBe(true);
     },
   );
 
