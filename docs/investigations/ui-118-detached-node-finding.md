@@ -98,3 +98,63 @@ changing teardown semantics is a cross-cutting test-infra decision, not a profil
 - Deterministic reproduction: **yes** (§2, seed- and position-sensitivity tabulated).
 - Stable across three consecutive shuffled full-suite runs with no retry/skip/loosened
   assertion: **NOT met** — that requires the harness fix in §6, which needs approval.
+
+## Measured, after the harness was actually changed (2026-11-22)
+
+The recommendation in §6 was tested rather than asserted, and the result contradicts this document's framing:
+
+**1. `act`-settled teardown does not fix it.** Wrapping `cleanup()` in `await act(async () => { cleanup(); })` in
+`apps/web/src/test/setup.ts` left `--sequence.shuffle --sequence.seed=1` failing 5/5 (three runs at seed 1, plus
+seeds 2 and 3). So "make teardown synchronous with the unmount it triggers" is not the remedy.
+
+**2. The detaching root is not the previous test's container.** Instrumented at the failing assertion
+(`VedicProfilesPage.test.tsx`, empty state): the found node is **outside** `document.body`, and `document.body` holds
+**exactly one** child. A leftover container from a previous test would show up as a second child. It is not stale DOM
+left behind; the node simply is not in the document.
+
+Timing probe with the teardown change applied: of six consecutive seed-1 runs, 2 passed and 4 failed, and the
+failures alternate between two shapes — the found node `inDoc=false` at the assertion, or (with an explicit 30 ms
+idle probe) detached immediately and still detached. **This is not a fixed seed-reproducible state; it is
+run-to-run**, which is what a genuine interleaving looks like.
+
+**3. Consequence for the fix.** The remaining explanation that fits the measurements is that the teardown destroys
+the document root this test is rendering into — `@testing-library/react`'s `cleanup()` is called from the shared
+`afterEach`, and a scheduled unmount that outlives its own test lands on the _shared_ `document`. A teardown that
+cannot reach the next test's document is the only guarantee that removes the class, which points at per-test document
+isolation (environment-level) rather than an ordering tweak inside `afterEach`.
+
+**Status: open.** No fix is claimed here. The earlier "preferred fix" in §6 is falsified by measurement; the finding
+above is the corrected starting point.
+
+## Hypothesis 2 measured: no root swap, the documented root is gone (2026-11-22)
+
+The next candidate was "the assertion holds a node obtained before a re-render replaced the root". Direct measurements
+at the failing assertion, three consecutive seed-1 runs, identical every time:
+
+```
+V1  inDoc=false  kids=1  roots=1          # exactly one container in body, not two
+V1c parentChain=p  bodyFirstKid=DIV:      # the node's ONLY ancestor is <p>; it is not under any root div
+V2  requery=absent                        # a fresh query does not find the text anywhere
+V3  bodyTextHas=false  nodes=80           # the text is gone from the document as a whole
+```
+
+So:
+
+- **No root swap.** A re-render that replaced the root would leave the old root in the DOM (kids would be 2, or the
+  requery would find the text in the new root). Neither happens.
+- **The entire tree vanished.** `bodyTextHas=false` with 80 nodes remaining means the document kept its scaffolding
+  and lost the page. That is a teardown unmounting the tree this test is using, during the test.
+- **Nothing about the test's ordering fixes it.** `cleanup()` from the shared `afterEach` is a valid, documented
+  detacher; the numbers say it is reaching the _current_ test's document.
+
+## Conclusion: this is a harness decision, not a test fix
+
+I am not shipping a fix. Two attempts are measured and falsified above (act-settled teardown, 5/5 fail; ordering
+changes, no effect). The remaining remedies all change shared test infrastructure — a document root per test (so a
+teardown cannot reach a later test's document), or running this suite with file/test isolation — and that is exactly
+the §6 decision that #141 deferred and that this branch must not make unilaterally: `apps/web/src/test/setup.ts` is
+shared by every web test file.
+
+What this branch does deliver: the empty-state assertion now proves membership in the document (and of every
+ancestor) instead of only that `findBy*` returned a node, which turns the live failure into a truthful, readable one;
+and the record above so nobody re-tests the two falsified remedies.
