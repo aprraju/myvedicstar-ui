@@ -32,6 +32,22 @@ const FOREIGN_ID = '99999999-9999-4999-8999-999999999999';
  */
 const renderKundali = (url = '/kundali') => renderRoute(url, { auth: signedIn() });
 
+/**
+ * Answers every section request the selected-profile body makes (yogas, ashtakavarga, transits, dashas) with the
+ * server's "not available" answer. A test whose subject is the profile list must not depend on whether a section
+ * request is still in flight when it ends: setup.ts listens with onUnhandledFrame: 'error', so an unanswered one fails
+ * a test it has nothing to do with.
+ */
+const answerSectionsUnavailable = () =>
+  server.use(
+    http.get(api('/kundali/:profileId/sections/yogas'), () => HttpResponse.json(null, { status: 404 })),
+    http.get(api('/kundali/:profileId/sections/ashtakavarga'), () =>
+      HttpResponse.json(null, { status: 404 }),
+    ),
+    http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(null, { status: 404 })),
+    http.get(api('/kundali/:profileId/sections/dashas'), () => HttpResponse.json(null, { status: 404 })),
+  );
+
 describe('KundaliPage — shell', () => {
   it('renders the route shell with the Kundali title', async () => {
     server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([summary()])));
@@ -174,6 +190,10 @@ describe('KundaliPage — zero profile guidance (KUN-02)', () => {
 
   it('retries the list after a failure and then shows the profiles', async () => {
     let attempt = 0;
+    // The retry succeeds, so the page mounts its sections (KUN-10/KUN-11) and each fires its own request. They answer
+    // "not available" here because this test is about the list recovering, not about any section: an answer that paints
+    // nothing cannot mask the selector the assertion below waits for.
+    answerSectionsUnavailable();
     server.use(
       http.get(api('/vedic-profiles'), () => {
         attempt += 1;
