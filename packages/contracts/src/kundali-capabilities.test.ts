@@ -42,6 +42,91 @@ const RAW_API_JSON = `{
  */
 export const rawApiFixture = (): unknown => JSON.parse(RAW_API_JSON);
 
+/**
+ * Requiredness is asserted DIRECTLY, one field at a time (issue #135).
+ *
+ * The tests above all start from a payload that HAS every field, so a schema change that makes one `.optional()` cannot
+ * fail them for the right reason: the partial-rename test would still go red, but because an array is *missing* rather
+ * than because the field is *required* — and those are the same boolean. `unsupportedCapabilities` going optional would
+ * parse a payload that stops sending it to an empty list, which is the "boundary that parses to nothing supported is a
+ * lie the UI renders as fact" case this file's own comments name.
+ *
+ * So: delete one field at a time and require the issue path to NAME it. `success === false` alone is not the assertion,
+ * because a `.optional()` field still parses and every other field's deletion would fail anyway.
+ *
+ * The list is explicit rather than derived from the schema's key order, so "this field is required" is a decision
+ * recorded here. Every field of the contract is required (see the schema's own "none is optional" note); if one ever
+ * legitimately becomes optional, it must be moved to `OPTIONAL_BY_DESIGN` with a reason instead of silently disappearing
+ * from this list.
+ */
+const FIELDS_REQUIRED_BY_THE_CONTRACT = [
+  'supportedDivisionalCharts',
+  'provisionalDivisionalCharts',
+  'supportedShadbalaComponents',
+  'unsupportedShadbalaComponents',
+  'lunarNodeConvention',
+  'ascendantConvention',
+  'minimumSupportedBirthDate',
+  'maximumSupportedBirthDate',
+  'unsupportedCapabilities',
+] as const;
+
+/** Fields a missing value may legitimately parse through, with the reason. Empty is the current, deliberate answer:
+ *  a partial capability report invites the caller to fill the gaps with assumptions. */
+const OPTIONAL_BY_DESIGN: ReadonlyArray<{ field: string; reason: string }> = [];
+
+/**
+ * Removes one field from the wire-derived fixture without a dynamic `delete`.
+ *
+ * `delete payload[field]` is flagged by `@typescript-eslint/no-dynamic-delete`, and rightly so in general: a computed
+ * delete is unreviewable. Here the key is one the test just proved present, so the intent is safe — and destructuring
+ * rest makes that intent visible to the linter instead of supposing it.
+ */
+function withoutField(payload: Record<string, unknown>, field: string): Record<string, unknown> {
+  const { [field]: _removed, ...rest } = payload;
+  return rest;
+}
+
+describe('capabilities — requiredness is asserted per field, not via a payload that satisfies it', () => {
+  // Guards against the list drifting out of sync with the contract: a field added to the schema but not to the list
+  // above would otherwise be silently unprotected, which is the exact defect this describe block exists to remove.
+  it('lists every contract field exactly once, so no required field is left unasserted', () => {
+    const contractFields = [...kundaliCapabilitiesSchema.keyof().options].sort();
+    const listedFields = [
+      ...FIELDS_REQUIRED_BY_THE_CONTRACT,
+      ...OPTIONAL_BY_DESIGN.map(({ field }) => field),
+    ].sort();
+    expect(listedFields).toEqual(contractFields);
+    expect(new Set(listedFields).size).toBe(listedFields.length);
+  });
+
+  it.each(FIELDS_REQUIRED_BY_THE_CONTRACT)(
+    'rejects a payload without %s, and names that field in the issue path',
+    (field) => {
+      const payload = rawApiFixture() as Record<string, unknown>;
+      expect(payload).toHaveProperty(field);
+
+      const result = kundaliCapabilitiesSchema.safeParse(withoutField(payload, field));
+      if (result.success) throw new Error(`dropping the required field ${field} must not parse`);
+      expect(result.error.issues.map((issue) => issue.path.join('.'))).toContain(field);
+    },
+  );
+
+  it.each(OPTIONAL_BY_DESIGN)(
+    'tolerates a payload without $field, which is optional by design',
+    ({ field }) => {
+      const payload = rawApiFixture() as Record<string, unknown>;
+      expect(kundaliCapabilitiesSchema.safeParse(withoutField(payload, field)).success).toBe(true);
+    },
+  );
+
+  it('has no field whose requiredness is a default nobody chose', () => {
+    // Every key is in exactly one of the two lists; OPTIONAL_BY_DESIGN being empty means all nine are required.
+    expect(OPTIONAL_BY_DESIGN).toHaveLength(0);
+    expect(FIELDS_REQUIRED_BY_THE_CONTRACT).toHaveLength(kundaliCapabilitiesSchema.keyof().options.length);
+  });
+});
+
 describe('capabilities — a raw API payload binds to the contract', () => {
   it('parses camelCase JSON from the wire', () => {
     const parsed = kundaliCapabilitiesSchema.safeParse(JSON.parse(RAW_API_JSON));
