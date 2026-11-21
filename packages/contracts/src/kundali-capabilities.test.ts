@@ -42,7 +42,6 @@ const RAW_API_JSON = `{
  */
 export const rawApiFixture = (): unknown => JSON.parse(RAW_API_JSON);
 
-
 /**
  * Requiredness is asserted DIRECTLY, one field at a time (issue #135).
  *
@@ -81,7 +80,10 @@ describe('capabilities — requiredness is asserted per field, not via a payload
   // above would otherwise be silently unprotected, which is the exact defect this describe block exists to remove.
   it('lists every contract field exactly once, so no required field is left unasserted', () => {
     const contractFields = [...kundaliCapabilitiesSchema.keyof().options].sort();
-    const listedFields = [...FIELDS_REQUIRED_BY_THE_CONTRACT, ...OPTIONAL_BY_DESIGN.map(({ field }) => field)].sort();
+    const listedFields = [
+      ...FIELDS_REQUIRED_BY_THE_CONTRACT,
+      ...OPTIONAL_BY_DESIGN.map(({ field }) => field),
+    ].sort();
     expect(listedFields).toEqual(contractFields);
     expect(new Set(listedFields).size).toBe(listedFields.length);
   });
@@ -99,11 +101,14 @@ describe('capabilities — requiredness is asserted per field, not via a payload
     },
   );
 
-  it.each(OPTIONAL_BY_DESIGN)('tolerates a payload without $field, which is optional by design', ({ field }) => {
-    const payload = rawApiFixture() as Record<string, unknown>;
-    delete payload[field];
-    expect(kundaliCapabilitiesSchema.safeParse(payload).success).toBe(true);
-  });
+  it.each(OPTIONAL_BY_DESIGN)(
+    'tolerates a payload without $field, which is optional by design',
+    ({ field }) => {
+      const payload = rawApiFixture() as Record<string, unknown>;
+      delete payload[field];
+      expect(kundaliCapabilitiesSchema.safeParse(payload).success).toBe(true);
+    },
+  );
 
   it('has no field whose requiredness is a default nobody chose', () => {
     // Every key is in exactly one of the two lists; OPTIONAL_BY_DESIGN being empty means all nine are required.
