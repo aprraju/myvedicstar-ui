@@ -12,7 +12,7 @@ FAILS  when  the empty-state test is not the FIRST test rendered in its file AND
 PASSES when  the test is first in file order, whatever the seed.
 ```
 
-The file-order condition is the load-bearing one. Shuffle is only the *observation device*:
+The file-order condition is the load-bearing one. Shuffle is only the _observation device_:
 it moves the test off position 1. The original issue called this an order dependency;
 it is really a **teardown/render interleaving** that order merely exposes.
 
@@ -27,12 +27,12 @@ npx vitest run src/features/vedic-profiles/VedicProfilesPage.test.tsx \
 
 Seed-insensitive, position-sensitive:
 
-| Command | Result |
-|---|---|
-| file alone, `--sequence.shuffle --sequence.seed=1` | **1 failed** / 23 |
-| file alone, plain order | **23 passed** |
-| pair with KundaliSections, seeds 1, 2, 3 | **fails at every seed** |
-| pair with KundaliSections, plain order | **2 files passed** |
+| Command                                            | Result                  |
+| -------------------------------------------------- | ----------------------- |
+| file alone, `--sequence.shuffle --sequence.seed=1` | **1 failed** / 23       |
+| file alone, plain order                            | **23 passed**           |
+| pair with KundaliSections, seeds 1, 2, 3           | **fails at every seed** |
+| pair with KundaliSections, plain order             | **2 files passed**      |
 
 Full-suite seed=1: 7 failed / 574 — the 7 are this file plus six others that share the
 first-render-after-import condition; the empty-state test is the deterministic member.
@@ -45,7 +45,7 @@ first-render-after-import condition; the empty-state test is the deterministic m
 2. **The node is detached, not stale-scoped.** `document.body.contains(node) === false`,
    and it stays false across a macrotask.
 3. **What detaches it:** `cleanup()` in `afterEach` of `apps/web/src/test/setup.ts:16`.
-   A second `cleanup()` scheduled by the *preceding* test's teardown unmounts the container
+   A second `cleanup()` scheduled by the _preceding_ test's teardown unmounts the container
    this test is rendering into. That gives the sequence: pending `cleanup` → render → query
    resolves → `cleanup` fires → assertion sees a detached node.
 4. **Why order 1 is immune:** the first test's timing budget absorbs the lazy route chunk load;
@@ -59,7 +59,7 @@ first-render-after-import condition; the empty-state test is the deterministic m
 ## 4. Why the existing guard does not catch it
 
 `useVedicProfiles.ts` has an `alive` ref (`alive.current = false` on unmount) that prevents
-writing state after unmount. It **cannot** help: the state write happens *before* the unmount,
+writing state after unmount. It **cannot** help: the state write happens _before_ the unmount,
 the render commits, the node exists, and only then does cleanup detach it. The hook is correct;
 the guarantee it offers is narrower than this test needs.
 
@@ -67,8 +67,8 @@ the guarantee it offers is narrower than this test needs.
 
 Explicitly tested and ruled out, because it matters for the fix:
 
-- Rendered a *different* route first, then the empty state in the same file: **both passed**
-  (`diag.test.tsx`, 2 tests green). So a preceding *render* does not poison the next one.
+- Rendered a _different_ route first, then the empty state in the same file: **both passed**
+  (`diag.test.tsx`, 2 tests green). So a preceding _render_ does not poison the next one.
 - Adding a macrotask before asserting does not re-attach the node (`connected=false` after
   `setTimeout 0`). So it is a teardown interleaving, not a state snapshot.
 
@@ -83,7 +83,7 @@ The defect is in the shared test harness, not in `VedicProfilesPage`:
 - **Preferred:** make `setup.ts` teardown synchronous with the unmount it triggers —
   await React 18/19's `act`-settled unmount before the next test renders, i.e. call
   `cleanup()` inside an `act()`/ `await cleanup()`-equivalent so a container can never be
-  detached while a query from the *next* test is in flight.
+  detached while a query from the _next_ test is in flight.
 - **Alternative (narrower):** `isolate`-per-test or a per-test container so a previous test's
   container is never the one being queried.
 - A per-file `beforeEach(() => render(...))` in the profiles suite would also stabilise it,
