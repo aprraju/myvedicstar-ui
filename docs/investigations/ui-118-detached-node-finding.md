@@ -1,6 +1,6 @@
 # ui#118 — Finding: VedicProfilesPage empty state is a detached-node race, not an order dependency
 
-Branch: `fix/ui118-vedicprofiles-shuffle` (pushed), based on origin/main `69a1d7e`.
+Branch: `fix/ui118-vedicprofiles-shuffle` (pushed), rebased onto origin/main `9792b59`.
 No product code changed — this PR is the FINDING (per assignment: a finding is an acceptable deliverable).
 
 ## 1. Failure condition as a predicate
