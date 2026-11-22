@@ -837,6 +837,24 @@ export const en = {
         at: 'When',
       },
     },
+
+    varshaphal: {
+      title: 'Annual chart (Varshaphal)',
+      /**
+       * The day-one statement. It names the engine as the missing piece rather than saying "no data", because the
+       * absence is a capability gap in the calculation, not a gap in this profile's own records.
+       */
+      capabilityGap:
+        'The annual chart is not available: the calculation does not yet produce Varshaphal, so no annual chart is shown here rather than one derived on this device. {reason}',
+      unavailable: 'The annual chart has not been received yet.',
+      annualYear: 'Hindu solar year {year}.',
+      caption: 'Annual chart values as computed by the calculation service.',
+      column: { path: 'Value', value: 'Result' },
+      withheld: {
+        label: 'Values the calculation did not provide',
+        item: '{path} was not provided ({reason}).',
+      },
+    },
     remedies: {
       title: 'Optional traditional remedies',
       intro:
