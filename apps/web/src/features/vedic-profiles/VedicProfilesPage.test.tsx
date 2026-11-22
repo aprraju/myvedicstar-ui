@@ -4,7 +4,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { useLocation } from 'react-router';
-import { describe, expect, it, skipIf } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createInMemoryAuthClient } from '../../shared/auth';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';
