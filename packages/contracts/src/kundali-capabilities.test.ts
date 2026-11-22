@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import type { KundaliCapabilities } from './kundali-capabilities';
 import { divisionalState, kundaliCapabilitiesSchema, shadbalaState } from './kundali-capabilities';
 
 /**
@@ -124,6 +125,45 @@ describe('capabilities — requiredness is asserted per field, not via a payload
     // Every key is in exactly one of the two lists; OPTIONAL_BY_DESIGN being empty means all nine are required.
     expect(OPTIONAL_BY_DESIGN).toHaveLength(0);
     expect(FIELDS_REQUIRED_BY_THE_CONTRACT).toHaveLength(kundaliCapabilitiesSchema.keyof().options.length);
+  });
+});
+
+/**
+ * The contract TYPE keeps every field required, not only the parser (issue #135).
+ *
+ * The tests above assert the zod schema's behaviour. `KundaliCapabilities = z.infer<...>`, so the exported type follows the
+ * schema — but nothing in this file states that dependency. If a field became `.optional()`, the type every consumer
+ * imports would admit `undefined`, and the payload tests would still be green because a payload that HAS the field
+ * satisfies the weakened type. This maps each key to itself only when its type does NOT admit `undefined` and collects
+ * the survivors: a key that is still required appears in the union, a silently optional one does not, and the
+ * exhaustive comparison below fails with that key named.
+ */
+type RequiredKeysAreNotOptional = {
+  [K in keyof KundaliCapabilities]-?: undefined extends KundaliCapabilities[K] ? never : K;
+}[keyof KundaliCapabilities];
+
+describe('capabilities — the exported contract TYPE keeps every field required', () => {
+  it('accepts every contract key as a required key of the type, one explicitly-typed witness per field', () => {
+    // A witness per contract field, each declared as the MUTUAL ASSIGNABILITY of that key against `RequiredKeysAreNotOptional`.
+    // If a field becomes `.optional()` in the schema the key leaves the union, `Witnesses` no longer satisfies the mapped
+    // type, and tsc fails ON THIS LINE naming the key - before any assertion runs. The array is never read at runtime;
+    // it exists so the check is part of the suite's typecheck, not only of a value comparison that a widened type could
+    // quietly satisfy.
+    const witnesses = {
+      supportedDivisionalCharts: true,
+      provisionalDivisionalCharts: true,
+      supportedShadbalaComponents: true,
+      unsupportedShadbalaComponents: true,
+      lunarNodeConvention: true,
+      ascendantConvention: true,
+      minimumSupportedBirthDate: true,
+      maximumSupportedBirthDate: true,
+      unsupportedCapabilities: true,
+    } satisfies Record<RequiredKeysAreNotOptional, true>;
+
+    // Runtime fence, second: every contract key must be one the type also calls required, and vice versa. Kept as a
+    // comparison of two derived lists rather than a literal so nothing here restates the field set by hand.
+    expect(Object.keys(witnesses).sort()).toEqual([...FIELDS_REQUIRED_BY_THE_CONTRACT].sort());
   });
 });
 
