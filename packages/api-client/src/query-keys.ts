@@ -93,6 +93,7 @@ export const queryKeys = {
       ['kundali', 'ashtakavarga', userId, profileId] as const,
     /** KUN-13. Alerts are per profile and per user, like every other section read. */
     transits: (userId: string, profileId: string) => ['kundali', 'transits', userId, profileId] as const,
+    remedies: (userId: string, profileId: string) => ['kundali', 'remedies', userId, profileId] as const,
     alerts: (userId: string, profileId: string) => ['kundali', 'alerts', userId, profileId] as const,
   },
 } as const;

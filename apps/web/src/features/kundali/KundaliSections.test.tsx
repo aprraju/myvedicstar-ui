@@ -8,6 +8,7 @@ import { server } from '../../test/msw/server';
 import { renderWithProviders } from '../../test/render';
 import { ashtakavargaRuleNotImplemented } from './ashtakavarga/fixtures';
 import { KundaliSections } from './KundaliSections';
+import { remediesEvaluated } from './remedies/fixtures';
 import { transitsWithAbsences } from './transits/fixtures';
 import { yogasRuleNotImplemented } from './yogas/fixtures';
 
@@ -23,6 +24,9 @@ describe('KundaliSections — day one wiring', () => {
         HttpResponse.json(ashtakavargaRuleNotImplemented),
       ),
       http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(transitsWithAbsences)),
+      http.get(api('/kundali/:profileId/sections/remedies'), () =>
+        HttpResponse.json(remediesEvaluated),
+      ),
     );
     renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {
       auth: signedIn(),
@@ -67,8 +71,16 @@ describe('KundaliSections — day one wiring', () => {
     });
 
     // The failed section reports a retryable error...
+    //
+    // Scoped to the yogas section rather than `getByRole('alert')` page-wide. KUN-16 added a fourth section, and with
+    // NO handler for it that section legitimately fails too - so a page-wide single-alert query starts failing for a
+    // reason that has nothing to do with this test's property. The property asserted below is unchanged and still
+    // page-wide: exactly the sections that failed carry an alert, each naming itself.
+    const yogasSection = await screen.findByRole('region', { name: 'Yogas and doshas' });
     await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/Yogas and doshas could not be loaded/),
+      expect(within(yogasSection).getByRole('alert')).toHaveTextContent(
+        /Yogas and doshas could not be loaded/,
+      ),
     );
     // ...while the other still explains its own state.
     expect(screen.getByRole('region', { name: 'Ashtakavarga' })).toBeInTheDocument();

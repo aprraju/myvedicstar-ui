@@ -25,6 +25,8 @@ import {
   kundaliOverviewSchema,
   type KundaliPlanets,
   kundaliPlanetsSchema,
+  type KundaliRemediesSection,
+  kundaliRemediesSectionSchema,
   type KundaliTransitsSection,
   kundaliTransitsSectionSchema,
   type KundaliYogas,
@@ -650,6 +652,21 @@ export function createApiClient(options: ApiClientOptions) {
           operation: 'kundali.transits',
           path: path('kundaliTransits', { profileId }),
           schema: kundaliTransitsSectionSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
+      /**
+       * KUN-16: optional traditional remedies, each bound to finding code and that finding's status.
+       *
+       * The schema keeps `findingStatus` as the raw wire string rather than coercing it, so an unreadable status stays
+       * unreadable here and cannot be promoted to `evaluated` by the transport layer. The render rule lives in
+       * `remediesThatMayRender`.
+       */
+      remedies: (profileId: string, call?: CallOptions) =>
+        transport.request<KundaliRemediesSection>({
+          operation: 'kundali.remedies',
+          path: path('kundaliRemedies', { profileId }),
+          schema: kundaliRemediesSectionSchema,
           signal: call?.signal,
           auth: 'required',
         }),

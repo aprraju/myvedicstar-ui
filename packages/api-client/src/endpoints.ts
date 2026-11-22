@@ -78,6 +78,8 @@ export const defaultApiEndpoints = {
   kundaliCapabilities: '/kundali/capabilities',
   /** KUN-13: dated transits, Sade Sati and nullable graha positions for one owned Astro Profile. Read-only. */
   kundaliTransits: '/kundali/{profileId}/sections/transits',
+  /** KUN-16: optional traditional remedies, each bound to the finding it addresses. Read-only. */
+  kundaliRemedies: '/kundali/{profileId}/sections/remedies',
   /** KUN-13: alert subscriptions for one owned Astro Profile. GET reads, PUT replaces. */
   kundaliAlerts: '/kundali/{profileId}/alerts',
 } as const;
@@ -130,6 +132,7 @@ export const endpointPlaceholders: Record<ApiEndpointName, readonly string[]> = 
   kundaliBala: ['profileId'],
   kundaliCapabilities: [],
   kundaliTransits: ['profileId'],
+  kundaliRemedies: ['profileId'],
   kundaliAlerts: ['profileId'],
 };
 
