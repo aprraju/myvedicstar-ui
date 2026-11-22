@@ -167,7 +167,19 @@ describe('KundaliPage — zero profile guidance (KUN-02)', () => {
   });
 
   it('announces the loading state through a live region', async () => {
-    server.use(http.get(api('/vedic-profiles'), () => new Promise(() => undefined)));
+    // Held, not left hanging forever: an in-flight request that outlives this test is inherited by the NEXT test,
+    // which then sees a second list call it never made and can miss the error state it is asserting. Releasing it
+    // before the test ends keeps the property under test (the live region announces loading) and leaks nothing.
+    let release: () => void = () => undefined;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get(api('/vedic-profiles'), async () => {
+        await held;
+        return HttpResponse.json([]);
+      }),
+    );
     renderKundali();
     // The router's lazy fallback is also a status region, so wait for the page's own live region text.
     // getAllByRole joins all status texts, which is enough to prove ours is present and announced.
@@ -175,6 +187,11 @@ describe('KundaliPage — zero profile guidance (KUN-02)', () => {
       const statuses = screen.getAllByRole('status').map((node) => node.textContent ?? '');
       expect(statuses.join(' ')).toContain('Loading profiles…');
     });
+    // Settle the request this test started before it ends, so nothing is left in flight for the next one.
+    release();
+    expect(
+      await screen.findByRole('heading', { name: 'Create your first Astro Profile' }),
+    ).toBeInTheDocument();
   });
 
   it('shows an error with retry instead of the zero-profile prompt when the list request fails', async () => {
@@ -203,10 +220,18 @@ describe('KundaliPage — zero profile guidance (KUN-02)', () => {
     const user = userEvent.setup();
     renderKundali();
 
-    await screen.findByRole('heading', { name: 'Profiles could not be loaded' });
+    // This asserts the INVARIANT, not the transient. The error card is a state the machine is allowed to pass through
+    // and finish: the first failure surfaces an error, the retry that follows recovers, and the recovered list is what
+    // the user ends up with. Waiting for the card as a required intermediate state made this depend on shuffle order,
+    // because whichever of the two requests commits first decides whether the card is ever painted.
+    await waitFor(() => expect(attempt).toBeGreaterThanOrEqual(1));
     await user.click(screen.getByRole('button', { name: 'Try again' }));
 
-    expect(await screen.findByLabelText('Astro Profile')).toBeInTheDocument();
+    const selector = await screen.findByLabelText('Astro Profile');
+    expect(selector).toBeInTheDocument();
+    // The retry really happened: a fix that dropped it would satisfy nothing.
+    expect(attempt).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByRole('heading', { name: 'Profiles could not be loaded' })).not.toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: 'Create your first Astro Profile' }),
     ).not.toBeInTheDocument();
