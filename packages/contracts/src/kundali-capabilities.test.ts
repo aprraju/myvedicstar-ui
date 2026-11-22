@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { divisionalState, kundaliCapabilitiesSchema, shadbalaState } from './kundali-capabilities';
 import type { KundaliCapabilities } from './kundali-capabilities';
+import { divisionalState, kundaliCapabilitiesSchema, shadbalaState } from './kundali-capabilities';
 
 /**
  * Deserialisation of a RAW JSON payload in the API's own casing.
