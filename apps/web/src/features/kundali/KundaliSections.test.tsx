@@ -31,8 +31,11 @@ describe('KundaliSections — day one wiring', () => {
     await waitFor(() => expect(screen.getByRole('region', { name: 'Yogas and doshas' })).toBeInTheDocument());
     await waitFor(() => expect(screen.getByRole('region', { name: 'Ashtakavarga' })).toBeInTheDocument());
 
-    // Both carry the reason code of their own engine gap.
-    expect(screen.getAllByText(/rule-not-implemented/).length).toBeGreaterThanOrEqual(2);
+    // Both carry the reason code of their own engine gap. Waiting for the positive condition matters here: the two
+    // region assertions above only prove the section SHELLS exist, which happens on the first commit, while the reason
+    // code arrives one request later. Asserting it synchronously made this test depend on whether the three section
+    // responses had already landed, which is what shuffled order changed.
+    await waitFor(() => expect(screen.getAllByText(/rule-not-implemented/).length).toBeGreaterThanOrEqual(2));
     // No chart, no table, no assessments: nothing that could be read as a result.
     // Two complementary assertions, not one - scoping the check without replacing the coverage would let a stray table
     // in any third section through.
