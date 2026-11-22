@@ -1,3 +1,5 @@
+import { varshaphalState } from '@myvedicstar/contracts';
+
 import { useTranslation } from '../../shared/i18n/I18nProvider';
 import { AshtakavargaSection } from './ashtakavarga/AshtakavargaSection';
 import { useAshtakavarga } from './ashtakavarga/useAshtakavarga';
@@ -7,6 +9,8 @@ import { RemediesSection } from './remedies/RemediesSection';
 import { useRemedies } from './remedies/useRemedies';
 import { TransitsSection } from './transits/TransitsSection';
 import { useTransits } from './transits/useTransits';
+import { useVarshaphal } from './varshaphal/useVarshaphal';
+import { VarshaphalSection } from './varshaphal/VarshaphalSection';
 import { useYogas } from './yogas/useYogas';
 import { YogasSection } from './yogas/YogasSection';
 
@@ -26,6 +30,9 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
   const ashtakavarga = useAshtakavarga(profileId);
   const transits = useTransits(profileId);
   const remedies = useRemedies(profileId);
+  // KUN-14: the engine has no Varshaphal yet. This section renders the server's capability gap by default; it becomes a
+  // chart only if a payload reports `computed`, and nothing here can construct one (ui#123).
+  const varshaphal = useVarshaphal(profileId);
 
   return (
     <div className={styles.sections}>
@@ -69,6 +76,16 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
         reload={remedies.reload}
       >
         {(data) => <RemediesSection section={data} />}
+      </AssessmentHost>
+
+      <AssessmentHost
+        title={t('kundali.varshaphal.title')}
+        status={varshaphal.status}
+        data={varshaphal.response}
+        errorKind={varshaphal.errorKind}
+        reload={varshaphal.reload}
+      >
+        {(data) => <VarshaphalSection title={t('kundali.varshaphal.title')} state={varshaphalState(data)} />}
       </AssessmentHost>
     </div>
   );

@@ -47,6 +47,8 @@ import {
   userInfoSchema,
   userProfileSchema,
   userSettingsSchema,
+  type VarshaphalResponse,
+  varshaphalResponseSchema,
   type VedicProfile,
   type VedicProfileRequest,
   vedicProfileSchema,
@@ -599,6 +601,19 @@ export function createApiClient(options: ApiClientOptions) {
        * KUN-10: yoga and dosha assessments. The schema rejects an assessment whose status and conditions disagree, so a
        * malformed verdict surfaces as an ApiError instead of a row claiming a definite answer it cannot explain.
        */
+      /**
+       * KUN-14: Varshaphal (annual chart). The engine has no Varshaphal, so the day-one response is a capability gap
+       * with a reason; the schema rejects any payload that pairs a gap with a chart, so a fabricated annual chart cannot
+       * reach the renderer even if a server sent one.
+       */
+      varshaphal: (profileId: string, call?: CallOptions) =>
+        transport.request<VarshaphalResponse>({
+          operation: 'kundali.varshaphal',
+          path: path('kundaliVarshaphal', { profileId }),
+          schema: varshaphalResponseSchema,
+          signal: call?.signal,
+          auth: 'required',
+        }),
       yogas: (profileId: string, call?: CallOptions) =>
         transport.request<KundaliYogas>({
           operation: 'kundali.yogas',

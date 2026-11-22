@@ -10,6 +10,7 @@ export * from './kundali-overview';
 export * from './kundali-planets';
 export * from './kundali-remedies';
 export * from './kundali-transits';
+export * from './kundali-varshaphal';
 export * from './kundali-yogas';
 export * from './location-search';
 export * from './muhurta';
