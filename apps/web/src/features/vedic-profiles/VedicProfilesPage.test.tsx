@@ -78,11 +78,29 @@ function recordCalls() {
 // /vedic-profiles handler. No global one is registered here on purpose: it would shadow per-test handlers, and a
 // `beforeEach` reset would discard the shared defaults this suite relies on (notifications, i18n, config).
 
+/**
+ * ui#118. "Found" and "in the document" are two different claims, and this flake lived in the gap: findByText can
+ * resolve with a node whose root is already detached, so the assertion compared a found node against a document it was
+ * no longer part of. Asserting conformance explicitly makes that gap a failure with a readable message instead of a
+ * bare "element could not be found", and it stays honest for the two reasons the node can be missing: never rendered,
+ * or rendered and then detached by a teardown that outlived its own test.
+ */
+const expectRendered = (node: HTMLElement | null, what: string) => {
+  if (node === null) throw new Error(`${what} was never rendered`);
+  expect(node).toBeInTheDocument();
+  for (let parent = node.parentElement; parent && parent !== document.body; parent = parent.parentElement) {
+    expect(parent).toBeInTheDocument();
+  }
+};
+
 describe('VedicProfilesPage — list', () => {
   it('shows an empty state when the account has no profiles', async () => {
     server.use(http.get(api('/vedic-profiles'), () => HttpResponse.json([])));
     renderWithProviders(<VedicProfilesPage />, { auth: signedIn() });
-    expect(await screen.findByText('No profiles yet. Add one to get started.')).toBeInTheDocument();
+    expectRendered(
+      await screen.findByText('No profiles yet. Add one to get started.'),
+      'the empty-state line',
+    );
   });
 
   it('lists saved profiles from the server, not from local state', async () => {
