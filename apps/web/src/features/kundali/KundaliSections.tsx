@@ -3,6 +3,8 @@ import { AshtakavargaSection } from './ashtakavarga/AshtakavargaSection';
 import { useAshtakavarga } from './ashtakavarga/useAshtakavarga';
 import { AssessmentHost } from './assessment/AssessmentHost';
 import styles from './Kundali.module.css';
+import { RemediesSection } from './remedies/RemediesSection';
+import { useRemedies } from './remedies/useRemedies';
 import { TransitsSection } from './transits/TransitsSection';
 import { useTransits } from './transits/useTransits';
 import { useYogas } from './yogas/useYogas';
@@ -23,6 +25,7 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
   const yogas = useYogas(profileId);
   const ashtakavarga = useAshtakavarga(profileId);
   const transits = useTransits(profileId);
+  const remedies = useRemedies(profileId);
 
   return (
     <div className={styles.sections}>
@@ -54,6 +57,18 @@ export function KundaliSections({ profileId, timeZoneId }: { profileId: string; 
         reload={transits.reload}
       >
         {(data) => <TransitsSection section={data} timeZoneId={timeZoneId} />}
+      </AssessmentHost>
+
+      {/* KUN-16 is optional and collapsible: it loads like every other section, but renders closed so an optional
+          practice list never displaces the assessment the user came for. */}
+      <AssessmentHost
+        title={t('kundali.remedies.title')}
+        status={remedies.status}
+        data={remedies.section}
+        errorKind={remedies.errorKind}
+        reload={remedies.reload}
+      >
+        {(data) => <RemediesSection section={data} />}
       </AssessmentHost>
     </div>
   );

@@ -837,6 +837,35 @@ export const en = {
         at: 'When',
       },
     },
+    remedies: {
+      title: 'Optional traditional remedies',
+      intro:
+        'Traditional practices associated with the findings above, where the calculation evaluated them. These are customary observances with a cited source, not medical advice and not a prediction of outcome.',
+      show: 'Show remedies',
+      hide: 'Hide remedies',
+      catalogVersion: 'Remedy catalogue {version}.',
+      finding: 'Linked finding',
+      category: 'Category',
+      tradition: 'Tradition',
+      reference: 'Source',
+      noneApply: 'No traditional remedy applies to the findings in this profile.',
+      noneForFindings:
+        'No remedy is available for the findings in this profile. The calculation evaluated them, but the catalogue carries nothing for those codes.',
+      suppressedTitle: 'Not shown',
+      suppressedNote:
+        'The response contained remedies whose finding was not evaluated in this result. They are listed here rather than displayed, because a remedy beside a finding the calculation did not assess would be guidance the server never attached.',
+      suppressedItem: '{finding} — {status}.',
+      unsupportedTitle: 'Reported as unavailable',
+      unsupportedItem: '{path} could not be provided ({reason}).',
+      disclaimer:
+        'Optional practices from tradition, offered for interest. Nothing here treats, cures or guarantees any outcome, and none of it is a substitute for professional advice.',
+      status: {
+        evaluated: 'Evaluated',
+        notEvaluated: 'Not evaluated — an input was missing',
+        withheld: 'Withheld — a capability gap',
+        unknownCode: 'Unrecognised status — the catalogue may have changed',
+      },
+    },
     caching: {
       stale:
         'These results are from an earlier version of this profile. Showing for reference until the update finishes.',
