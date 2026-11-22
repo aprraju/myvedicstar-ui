@@ -866,6 +866,37 @@ export const en = {
         unknownCode: 'Unrecognised status — the catalogue may have changed',
       },
     },
+    compare: {
+      title: 'Ashtakoota — {a} and {b}',
+      tableLabel: 'Ashtakoota comparison table, scrollable horizontally',
+      caption: 'Ashtakoota category scores comparing {a} with {b}.',
+      column: {
+        category: 'Category',
+        score: 'Score',
+      },
+      total: 'Total',
+      scoreOf: '{score} of {max}',
+      cannotDetermine: 'Cannot be determined ({reason})',
+      totalIndeterminate: 'Cannot be determined while any category is indeterminate',
+      contractUnavailable:
+        'A comparison cannot be shown yet. The calculation this depends on has not been published, so nothing is displayed in its place.',
+      category: {
+        varna: 'Varna',
+        vashya: 'Vashya',
+        tara: 'Tara',
+        yoni: 'Yoni',
+        grahaMaitri: 'Graha Maitri',
+        gana: 'Gana',
+        bhakoot: 'Bhakoot',
+        nadi: 'Nadi',
+      },
+      reason: {
+        birthTimeUnknown: 'the birth time is unknown',
+        birthTimeApproximate: 'the birth time is only approximate',
+        outsideTradition: 'the tradition in use does not define this category',
+        unknown: 'no reason was given',
+      },
+    },
     caching: {
       stale:
         'These results are from an earlier version of this profile. Showing for reference until the update finishes.',
