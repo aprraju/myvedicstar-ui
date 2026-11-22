@@ -24,9 +24,7 @@ describe('KundaliSections — day one wiring', () => {
         HttpResponse.json(ashtakavargaRuleNotImplemented),
       ),
       http.get(api('/kundali/:profileId/sections/transits'), () => HttpResponse.json(transitsWithAbsences)),
-      http.get(api('/kundali/:profileId/sections/remedies'), () =>
-        HttpResponse.json(remediesEvaluated),
-      ),
+      http.get(api('/kundali/:profileId/sections/remedies'), () => HttpResponse.json(remediesEvaluated)),
     );
     renderWithProviders(<KundaliSections profileId={PROFILE_ID} timeZoneId="Asia/Kolkata" />, {
       auth: signedIn(),
