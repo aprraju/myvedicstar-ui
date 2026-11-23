@@ -123,7 +123,10 @@ describe('KUN-17 reports — no success state before the mutation succeeds', () 
     screen.getByRole('button', { name: /generate report/i }).click();
 
     await waitFor(() => expect(screen.getByRole('link', { name: /download/i })).toBeInTheDocument());
-    expect(screen.getByRole('link', { name: /download/i })).toHaveAttribute(
+    // Drawn by ReportSurface (merged #158), which owns download availability and expiry. Scoped to that surface so this
+    // test proves the handoff rather than a second link rendered here.
+    const surface = screen.getByTestId('report-surface');
+    expect(within(surface).getByRole('link', { name: /download/i })).toHaveAttribute(
       'href',
       'https://reports.example/abc.pdf',
     );
@@ -165,8 +168,11 @@ describe('KUN-17 reports — failures render by code, never as server text', () 
     });
     screen.getByRole('button', { name: /generate report/i }).click();
 
+    // getAllBy: the settled payload is drawn by ReportSurface, which also names the reason for a missing download, so
+    // the sentence legitimately appears more than once. Asserting `>= 1` keeps the property (never raw text) while not
+    // pinning an incidental count that belongs to another component.
     await waitFor(() =>
-      expect(screen.getByText(/a reason this app does not recognise yet/i)).toBeInTheDocument(),
+      expect(screen.getAllByText(/a reason this app does not recognise yet/i).length).toBeGreaterThan(0),
     );
     // The raw code must not appear as the message. It is only allowed as the path's sibling reference, so assert the
     // sentence-based row instead of a bare-code match.

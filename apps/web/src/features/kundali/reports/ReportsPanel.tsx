@@ -11,6 +11,7 @@ import { useId, useState } from 'react';
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
 import styles from '../Kundali.module.css';
 import { reportFreshness, shouldOfferRegenerate } from './reportFreshness';
+import { ReportSurface } from './ReportSurface';
 import { type ReportPollOptions, useReportPolling } from './useReportPolling';
 
 /**
@@ -53,9 +54,18 @@ export function ReportsPanel({
   // they do not want, which is the only direction that cannot silently omit a section they expected.
   const [sections, setSections] = useState<readonly ReportSection[]>([...reportSectionValues]);
 
+  // Injected rather than read inside the surface, following #158's rule that expiry is an input. It is captured when the
+  // report arrives, not on every render: a ticking clock would re-decide "expired" mid-interaction.
+  const [reportNow, setReportNow] = useState<Date>(() => new Date());
+
   const poll = useReportPolling({ createReport, readReport, delay });
   const report = poll.report;
   const freshness = report ? reportFreshness(report, profileRevision) : null;
+
+  const start = (input: { variant: ReportResponse['variant']; sections: readonly ReportSection[] }) => {
+    setReportNow(new Date());
+    poll.request(input);
+  };
 
   const toggleSection = (section: ReportSection) => {
     setSections((current) =>
@@ -107,7 +117,7 @@ export function ReportsPanel({
         type="button"
         className={styles.button}
         disabled={sections.length === 0 || poll.status === 'requesting' || poll.status === 'polling'}
-        onClick={() => poll.request({ variant, sections })}
+        onClick={() => start({ variant, sections })}
       >
         {t('kundali.reports.generate')}
       </button>
@@ -146,26 +156,18 @@ export function ReportsPanel({
                 })}
               </p>
               {shouldOfferRegenerate(freshness) && (
-                <button
-                  type="button"
-                  className={styles.button}
-                  onClick={() => poll.request({ variant, sections })}
-                >
+                <button type="button" className={styles.button} onClick={() => start({ variant, sections })}>
                   {t('kundali.reports.stale.regenerate')}
                 </button>
               )}
             </>
           ) : null}
 
-          {report.status === 'ready' && report.downloadUrl ? (
-            <p>
-              {/* A plain link, not a deferred one: the URL is owner-scoped and short-lived, and the expiry is published
-                  so it is the server's business when it stops working, not this component's. */}
-              <a href={report.downloadUrl} rel="noreferrer">
-                {t('kundali.reports.download')}
-              </a>
-            </p>
-          ) : null}
+          {/* The produced report — status, sections, download availability AND expiry — is drawn by ReportSurface
+              (merged #158), not here. One renderer per fact: this component owns request, progress and the revision
+              decision, and hands the settled payload over. Duplicating the download logic here would be the second
+              opinion that #158's expiry rule exists to prevent. */}
+          <ReportSurface report={report} profileName={profileName} now={reportNow} />
 
           {report.failures.length > 0 ? (
             <ul className={styles.placementList}>
