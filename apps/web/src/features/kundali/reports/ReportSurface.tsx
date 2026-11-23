@@ -64,8 +64,19 @@ export function downloadUnavailableReason(
   return { kind: 'not-issued', failures: report.failures };
 }
 
-/** True when a download link may be rendered. */
-export function isDownloadAvailable(report: ReportResponse, now: Date): boolean {
+/**
+ * True when a download link may be rendered — and, when true, this narrows `downloadUrl` to a `string`.
+ *
+ * The predicate form is load-bearing rather than cosmetic. A plain `boolean` would leave `downloadUrl` as
+ * `string | null` at the call site, and the caller would have to either assert (`as string`, which tells the
+ * compiler something it just disproved) or re-check a condition this function already decided. The assertion is the
+ * one shape that cannot be trusted here: it is exactly what a component whose thesis is "only validated values are
+ * renderable" must not contain.
+ */
+export function isDownloadAvailable(
+  report: ReportResponse,
+  now: Date,
+): report is ReportResponse & { downloadUrl: string } {
   return downloadUnavailableReason(report, now) === null;
 }
 
@@ -113,22 +124,22 @@ export function ReportSurface({
         <h2 className={styles.heading} id="report-download-heading">
           {t('kundali.reports.surface.downloadHeading')}
         </h2>
-        {unavailable === null ? (
-          <a
-            className={styles.downloadLink}
-            href={report.downloadUrl as string}
-            data-testid="report-download-link"
-          >
+        {isDownloadAvailable(report, now) ? (
+          <a className={styles.downloadLink} href={report.downloadUrl} data-testid="report-download-link">
             {t('kundali.reports.surface.downloadLink')}
           </a>
         ) : (
-          <p
-            className={styles.unavailable}
-            data-testid="report-download-unavailable"
-            data-reason={unavailable.kind}
-          >
-            {unavailableSentence(unavailable, t)}
-          </p>
+          // Narrowed on `unavailable` directly rather than re-deriving it: the predicate above answers "may we show a
+          // link", and this branch is its complement, so the compiler needs the reason value itself.
+          unavailable !== null && (
+            <p
+              className={styles.unavailable}
+              data-testid="report-download-unavailable"
+              data-reason={unavailable.kind}
+            >
+              {unavailableSentence(unavailable, t)}
+            </p>
+          )
         )}
         {unavailable?.kind === 'expired' && (
           <p className={styles.meta} data-testid="report-download-expired-at">
