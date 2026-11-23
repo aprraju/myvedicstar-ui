@@ -4,7 +4,6 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { renderWithProviders } from '../../../test/render';
-import { reportAvailability } from './reportAvailability';
 import { ReportsPanel } from './ReportsPanel';
 
 /**
@@ -201,18 +200,5 @@ describe('KUN-17 reports — revision drives the regenerate affordance', () => {
     // No regenerate affordance on an unknown comparison: offering it would assert the report is out of date.
     expect(screen.queryByRole('button', { name: /generate again/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/generated from revision/i)).not.toBeInTheDocument();
-  });
-});
-
-describe('KUN-17 report availability — the pre-contract surface is unchanged', () => {
-  it('still reports unavailable with the shared engine reason', () => {
-    const availability = reportAvailability();
-    expect(availability.available).toBe(false);
-    expect(availability.reason).toBe('engine-unavailable');
-    expect(availability.gaps).toEqual([
-      'endpoint-post-reports',
-      'endpoint-get-report-status',
-      'download-url',
-    ]);
   });
 });

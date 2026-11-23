@@ -19,7 +19,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
  */
 
 /** How the poll stands. `idle` means no report has been requested in this session. */
-export type ReportPollStatus = 'idle' | 'requesting' | 'polling' | 'settled' | 'error';
+/** Internal to this hook: callers read `status` on the returned state rather than naming the union. */
+type ReportPollStatus = 'idle' | 'requesting' | 'polling' | 'settled' | 'error';
 
 export interface ReportPollState {
   status: ReportPollStatus;
