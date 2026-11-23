@@ -14,7 +14,15 @@ import {
   indeterminateReasonValues,
   isScored,
 } from './comparisonAdapter';
-import { ComparisonSection, ComparisonTable } from './ComparisonTable';
+import {
+  type CompareProfileOption,
+  CompareProfiles,
+  ComparisonSection,
+  ComparisonTable,
+} from './ComparisonTable';
+
+const ASHA: CompareProfileOption = { id: '11111111-1111-4111-8111-111111111111', name: 'Asha' };
+const RAVI: CompareProfileOption = { id: '22222222-2222-4222-8222-222222222222', name: 'Ravi' };
 
 /** A scored category. Kept as a helper so the fixtures state their kind rather than implying it. */
 const scored = (score: number, max: number): CategoryScore => ({ kind: 'scored', score, max });
@@ -28,6 +36,29 @@ const view = (categories: [string, CategoryScore][], scoredMax = 36): Comparison
   total: comparisonTotal(categories.map(([code, score]) => ({ code, score }))),
   scoredMax,
 });
+
+/**
+ * Every focusable control in the compare surface must have an accessible name (WCAG 2.2 AA 4.1.2).
+ *
+ * Written as a sweep over the rendered surface rather than as one assertion per known control: a control added later is
+ * covered without anyone remembering to extend a list, which is the failure mode a hand-maintained list has.
+ */
+function expectEveryControlNamed(container: HTMLElement) {
+  const controls = [
+    ...container.querySelectorAll<HTMLElement>(
+      'button, a[href], select, input, textarea, [tabindex]:not([tabindex="-1"])',
+    ),
+  ];
+  expect(controls.length).toBeGreaterThan(0);
+  for (const control of controls) {
+    const name =
+      control.getAttribute('aria-label') ??
+      control.getAttribute('aria-labelledby') ??
+      (control.id ? container.querySelector(`label[for="${control.id}"]`)?.textContent : null) ??
+      control.textContent;
+    expect(name?.trim(), `<${control.tagName.toLowerCase()}> has no accessible name`).toBeTruthy();
+  }
+}
 
 describe('KUN-15 comparison — an indeterminate category is never a zero', () => {
   it('renders an indeterminate category as its own state, with no numeric value anywhere in the row', () => {
@@ -105,6 +136,16 @@ describe('KUN-15 comparison — an indeterminate category is never a zero', () =
     const total = screen.getByTestId('comparison-total');
     expect(total).toHaveAttribute('data-state', 'scored');
     expect(within(total).getByText('3 of 36')).toBeInTheDocument();
+  });
+
+  it('gives every focusable control in the surface an accessible name', async () => {
+    const { container } = renderWithProviders(
+      <CompareProfiles profiles={[ASHA, RAVI]} firstId={null} secondId={null} onChange={() => undefined}>
+        {({ a, b }) => <ComparisonSection withLabels={{ a: a.name, b: b.name }} />}
+      </CompareProfiles>,
+    );
+    await screen.findByTestId('compare-picker');
+    expectEveryControlNamed(container);
   });
 
   it('has no axe violations with both states present', async () => {
