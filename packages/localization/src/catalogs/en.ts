@@ -389,6 +389,24 @@ export const en = {
         'endpoint-get-report-status': 'Report status and progress cannot be read.',
         'download-url': 'No download link can be issued.',
       },
+      /**
+       * One sentence per recognised failure code, plus the explicit unrecognised case. These are the ONLY strings the
+       * report surface can show for a failure: a code without an entry is a compile error in @myvedicstar/contracts, so
+       * a new server reason cannot reach a user as raw text.
+       */
+      failureReason: {
+        engine_error: 'the calculation failed while producing the report',
+        ephemeris_unavailable: 'the planetary data needed for this report was unavailable',
+        timezone_unresolvable: 'the time zone on this profile could not be resolved',
+        unsupported_capability: 'this report needs a calculation that is not available',
+        birth_date_out_of_range: 'the birth date is outside the range the calculation supports',
+        superseded_by_profile_edit:
+          'the profile was edited while the report was being produced, so this report was discarded',
+        generation_failed: 'the report could not be generated',
+        renderer_unavailable: 'the PDF renderer was not available',
+        profile_deleted: 'this profile has been deleted',
+        unrecognised: 'the report failed for a reason this app does not recognise yet',
+      },
     },
     interpretations: {
       title: 'Interpretations',
@@ -855,6 +873,7 @@ export const en = {
         item: '{path} was not provided ({reason}).',
       },
     },
+
     remedies: {
       title: 'Optional traditional remedies',
       intro:
