@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { I18nProvider } from '../../../shared/i18n/I18nProvider';
-import { comparePickerState, type CompareProfileOption,CompareProfiles } from './ComparisonTable';
+import { comparePickerState, type CompareProfileOption, CompareProfiles } from './ComparisonTable';
 
 const ASHA: CompareProfileOption = { id: '11111111-1111-4111-8111-111111111111', name: 'Asha' };
 const RAVI: CompareProfileOption = { id: '22222222-2222-4222-8222-222222222222', name: 'Ravi' };
