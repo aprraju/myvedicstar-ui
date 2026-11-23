@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { TEXT_ON } from '@myvedicstar/design-tokens';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
@@ -191,6 +192,34 @@ describe('KUN-15 compare — text pairings are ones whose contrast is measured',
 
   /** The surface a compare rule paints on: the section sits on the page surface, table cells on the elevated one. */
   const SECTION_SURFACE = '--color-surface';
+
+  /**
+   * Drift check (ui#83 review): the transcribed table above is a COPY, and a copy cannot notice the source of truth
+   * moving. This asserts every transcribed entry still appears in the token package's own TEXT_ON, and names the entry
+   * that drifted — a count mismatch would send the reader to the source to work out which pair changed, which is the
+   * same cost as the silent staleness this replaces.
+   *
+   * It deliberately does NOT feed the pairing assertion above: that one stays keyed on this surface, so a change here
+   * cannot make it pass by construction.
+   */
+  const tokenKey = (cssVar: string) =>
+    cssVar.replace(/^--color-/, '').replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+
+  it('keeps the transcribed pairings in step with the token suite, naming any entry that drifted', () => {
+    for (const entry of PROVEN_TEXT_ON_SURFACES) {
+      const measured = TEXT_ON.find(([text]) => text === tokenKey(entry.text));
+      expect(
+        measured,
+        `transcribed pairing ${entry.text} no longer appears in the token suite's TEXT_ON — re-read both lists`,
+      ).toBeDefined();
+      for (const surface of entry.surfaces) {
+        expect(
+          measured?.[1],
+          `transcribed pairing (${entry.text}, ${surface}) is no longer measured in the token suite's TEXT_ON`,
+        ).toContain(tokenKey(surface));
+      }
+    }
+  });
 
   it('paints .hint and .indeterminate with a text colour paired against a proven surface', () => {
     for (const selector of ['.hint', '.indeterminate']) {

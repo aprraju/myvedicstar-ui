@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
+import { TEXT_ON } from './contrast-pairs';
 import { generateTokensCss } from './css';
-import { colors, type ColorScheme, getWindowClass, supportsTwoPanes } from './index';
+import { colors, getWindowClass, supportsTwoPanes } from './index';
 
 function luminance(hex: string): number {
   const [r, g, b] = [1, 3, 5].map((i) => {
@@ -19,23 +20,8 @@ function contrast(a: string, b: string): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-type Key = keyof ColorScheme;
-const TEXT_ON: [Key, Key[]][] = [
-  ['heroForeground', ['heroOverlay']],
-  ['textPrimary', ['background', 'surface', 'surfaceElevated', 'surfaceSubtle']],
-  ['textSecondary', ['background', 'surface', 'surfaceElevated', 'surfaceSubtle']],
-  ['primary', ['background', 'surface']],
-  ['secondary', ['background', 'surface']],
-  ['onPrimary', ['primary', 'info']],
-  ['onSecondary', ['secondary']],
-  ['favorable', ['favorableSurface', 'surface', 'background']],
-  ['favorableStrong', ['favorableStrongSurface', 'surface', 'background']],
-  ['caution', ['cautionSurface', 'surface', 'background']],
-  ['auspicious', ['auspiciousSurface', 'surface', 'background']],
-  ['warning', ['warningSurface', 'surface', 'background']],
-  ['info', ['infoSurface', 'surface', 'background']],
-  ['error', ['errorSurface', 'surface', 'background']],
-];
+// The list lives beside the tokens (contrast-pairs.ts) so a consumer can check its own copy against the same source of
+// truth; the measurement below is unchanged.
 
 describe.each(['light', 'dark'] as const)('%s color scheme', (mode) => {
   const scheme = colors[mode];
