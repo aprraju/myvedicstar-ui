@@ -913,6 +913,17 @@ export const en = {
     },
     compare: {
       title: 'Ashtakoota — {a} and {b}',
+      pickerTitle: 'Compare two Astro Profiles',
+      pickerHint: 'Choose two different profiles. Nothing is scored here until the calculation is available.',
+      firstProfile: 'First Astro Profile',
+      secondProfile: 'Second Astro Profile',
+      pickerPlaceholder: 'Choose an Astro Profile',
+      sameProfile: 'Choose a different profile for each side of the comparison.',
+      needTwoProfiles:
+        'A comparison needs two Astro Profiles. Create another profile to compare these charts.',
+      foreignProfile:
+        'One of these profiles is no longer available to you, so no comparison is shown. Choose profiles you own.',
+      selectBoth: 'Choose both Astro Profiles to see how they compare.',
       tableLabel: 'Ashtakoota comparison table, scrollable horizontally',
       caption: 'Ashtakoota category scores comparing {a} with {b}.',
       column: {

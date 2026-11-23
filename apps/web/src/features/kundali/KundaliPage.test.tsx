@@ -1,5 +1,5 @@
 import type { VedicProfileSummary } from '@myvedicstar/contracts';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
@@ -8,6 +8,7 @@ import { createInMemoryAuthClient } from '../../shared/auth';
 import { TEST_API_BASE_URL } from '../../test/msw/handlers';
 import { server } from '../../test/msw/server';
 import { renderRoute } from '../../test/render';
+import { COMPARE_FIRST_PARAM, COMPARE_SECOND_PARAM } from './KundaliPage';
 
 const api = (path: string) => `${TEST_API_BASE_URL}/api/v1${path}`;
 
@@ -31,6 +32,46 @@ const FOREIGN_ID = '99999999-9999-4999-8999-999999999999';
  * which is the whole point of KUN-01 — cannot be exercised; renderRoute gives the page its real router.
  */
 const renderKundali = (url = '/kundali') => renderRoute(url, { auth: signedIn() });
+
+/**
+ * KUN-15 compare surface. Kept in this file because the picker's visibility is a property of the PAGE — it renders only
+ * once the owned list resolved — not of the picker component, which is tested on its own in compare/CompareProfiles.test.tsx.
+ */
+describe('KundaliPage — Ashtakoota compare surface (KUN-15)', () => {
+  it('offers the picker only once the owned list has resolved', async () => {
+    server.use(http.get(api('/vedic-profiles'), () => new Promise(() => undefined)));
+    renderKundali();
+
+    // While loading there is no owned list to pick from, so the picker must not be reachable — offering ids before the
+    // response lands would mean offering ids that may not be owned.
+    expect(await screen.findByText('Loading profiles…')).toBeInTheDocument();
+    expect(screen.queryByTestId('compare-picker')).not.toBeInTheDocument();
+  });
+
+  it('offers the picker for an owned list, and states that the comparison is unavailable rather than inventing one', async () => {
+    server.use(
+      http.get(api('/vedic-profiles'), () =>
+        HttpResponse.json([summary(), summary({ id: SECOND_ID, name: 'Ravi', relationship: 'Son' })]),
+      ),
+    );
+    renderKundali(`/kundali?${COMPARE_FIRST_PARAM}=${summary().id}&${COMPARE_SECOND_PARAM}=${SECOND_ID}`);
+
+    expect(await screen.findByTestId('compare-picker')).toBeInTheDocument();
+    // Ready pair, so the section renders — and it says the contract is unavailable, with no score anywhere.
+    expect(await screen.findByTestId('compare-contract-unavailable')).toBeInTheDocument();
+    expect(screen.queryByTestId('comparison-table')).not.toBeInTheDocument();
+  });
+
+  it('never shows a comparison for an id the caller does not own', async () => {
+    server.use(
+      http.get(api('/vedic-profiles'), () => HttpResponse.json([summary(), summary({ id: SECOND_ID })])),
+    );
+    renderKundali(`/kundali?${COMPARE_FIRST_PARAM}=${FOREIGN_ID}&${COMPARE_SECOND_PARAM}=${SECOND_ID}`);
+
+    expect(await screen.findByTestId('compare-picker-status')).toHaveTextContent(/no comparison is shown/i);
+    expect(screen.queryByTestId('compare-contract-unavailable')).not.toBeInTheDocument();
+  });
+});
 
 /**
  * Answers every section request the selected-profile body makes (yogas, ashtakavarga, transits, dashas) with the
@@ -75,8 +116,11 @@ describe('KundaliPage — shell', () => {
     const select = await screen.findByLabelText('Astro Profile');
     // Placeholder while nothing is selected, plus the two rows the server returned.
     await waitFor(() => expect(select.querySelectorAll('option')).toHaveLength(3));
-    expect(screen.getByRole('option', { name: 'Asha' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Ravi' })).toBeInTheDocument();
+    // Scoped to THIS selector on purpose: since KUN-15 the page also offers a two-profile compare picker, whose options
+    // carry the same names. A page-wide getByRole('option', {name}) would now match both and fail on the ambiguity, so
+    // the name is resolved within the single-profile selector whose option list is the subject here.
+    expect(within(select).getByRole('option', { name: 'Asha' })).toBeInTheDocument();
+    expect(within(select).getByRole('option', { name: 'Ravi' })).toBeInTheDocument();
   });
 
   it('selects a profile and shows its Kundali heading', async () => {

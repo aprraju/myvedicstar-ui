@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { useTranslation } from '../../../shared/i18n/I18nProvider';
 import styles from './Compare.module.css';
@@ -119,6 +119,162 @@ export function ComparisonSection({ withLabels }: { withLabels: { a: string; b: 
       <p className={styles.unavailable} data-testid="compare-contract-unavailable" role="status">
         {t('kundali.compare.contractUnavailable')}
       </p>
+    </section>
+  );
+}
+
+/** One owned profile, as the picker needs it. */
+export interface CompareProfileOption {
+  id: string;
+  name: string;
+}
+
+/**
+ * Which state the compare surface is in.
+ *
+ * A closed union rather than a set of booleans (`sameSelected`, `needsSelection`, …): the states are mutually
+ * exclusive, and an impossible combination that cannot be written cannot be rendered. `blocked` carries the reason it is
+ * blocked, so the surface always has something specific to say instead of an empty table.
+ */
+export type ComparePickerState =
+  | { kind: 'not-enough-profiles' }
+  | { kind: 'needs-selection' }
+  | { kind: 'same-profile' }
+  | { kind: 'foreign-profile' }
+  | { kind: 'ready'; a: CompareProfileOption; b: CompareProfileOption };
+
+/**
+ * Decides what the compare surface may render, given the caller's owned profiles and the two ids in the URL.
+ *
+ * Every rule here is a rule the issue states, expressed once so no renderer re-implements it:
+ *  - a comparison needs TWO DISTINCT profiles, so one id or two identical ids is not a comparison;
+ *  - both ids must be in the caller's OWN list, because a comparison of a profile the caller does not own must never be
+ *    requested or shown (the API answers 404 for a foreign id, and a UI that echoed the id would leak that it exists);
+ *  - with fewer than two owned profiles there is nothing to compare, and saying so is more useful than an empty table.
+ *
+ * Pure and exported for exactly that reason: it is the part that is worth testing directly, independent of selection
+ * widgets or routing.
+ */
+export function comparePickerState(
+  profiles: readonly CompareProfileOption[],
+  firstId: string | null,
+  secondId: string | null,
+): ComparePickerState {
+  if (profiles.length < 2) return { kind: 'not-enough-profiles' };
+  if (firstId === null || secondId === null) return { kind: 'needs-selection' };
+  if (firstId === secondId) return { kind: 'same-profile' };
+  const a = profiles.find((profile) => profile.id === firstId);
+  const b = profiles.find((profile) => profile.id === secondId);
+  if (!a || !b) return { kind: 'foreign-profile' };
+  return { kind: 'ready', a, b };
+}
+
+/**
+ * The two-profile picker and, once a pair is chosen, the comparison for it.
+ *
+ * Selection lives in the URL, like the single-profile selector: a comparison is a link a user can send. The picker is
+ * two native <select>s rather than a bespoke listbox so keyboard, screen reader and mobile behaviour are correct for
+ * free; each option is 44px tall at phone sizes through the shared control token, not a hardcoded number.
+ *
+ * The comparison itself is always obtained through `children`, which receives the chosen pair — this component never
+ * calls the adapter, so there is exactly one place (the route) where the wire contract could ever be consumed.
+ */
+export function CompareProfiles({
+  profiles,
+  firstId,
+  secondId,
+  onChange,
+  children,
+}: {
+  profiles: readonly CompareProfileOption[];
+  firstId: string | null;
+  secondId: string | null;
+  onChange: (next: { first: string | null; second: string | null }) => void;
+  /** Rendered only for a `ready` state, with the pair it must render a comparison for. */
+  children: (pair: { a: CompareProfileOption; b: CompareProfileOption }) => ReactNode;
+}) {
+  const { t } = useTranslation();
+  const state = comparePickerState(profiles, firstId, secondId);
+  const firstSelectId = useId();
+  const secondSelectId = useId();
+  const statusId = useId();
+
+  const blockedMessage = ((): string | null => {
+    switch (state.kind) {
+      case 'not-enough-profiles':
+        return t('kundali.compare.needTwoProfiles');
+      case 'same-profile':
+        return t('kundali.compare.sameProfile');
+      case 'foreign-profile':
+        return t('kundali.compare.foreignProfile');
+      case 'needs-selection':
+        return t('kundali.compare.selectBoth');
+      case 'ready':
+        return null;
+    }
+  })();
+
+  const renderOptions = (excludedId: string | null) =>
+    profiles.map((profile) => (
+      <option key={profile.id} value={profile.id} disabled={profile.id === excludedId}>
+        {profile.name}
+      </option>
+    ));
+
+  return (
+    <section
+      className={styles.section}
+      aria-labelledby="kundali-compare-picker-title"
+      data-testid="compare-picker"
+    >
+      <h2 className={styles.title} id="kundali-compare-picker-title">
+        {t('kundali.compare.pickerTitle')}
+      </h2>
+      <p className={styles.hint}>{t('kundali.compare.pickerHint')}</p>
+
+      <div className={styles.pickerGrid}>
+        <div className={styles.selector}>
+          <label className={styles.label} htmlFor={firstSelectId}>
+            {t('kundali.compare.firstProfile')}
+          </label>
+          <select
+            id={firstSelectId}
+            className={styles.control}
+            value={firstId ?? ''}
+            disabled={profiles.length < 2}
+            aria-describedby={statusId}
+            onChange={(event) => onChange({ first: event.target.value || null, second: secondId })}
+          >
+            <option value="">{t('kundali.compare.pickerPlaceholder')}</option>
+            {renderOptions(secondId)}
+          </select>
+        </div>
+
+        <div className={styles.selector}>
+          <label className={styles.label} htmlFor={secondSelectId}>
+            {t('kundali.compare.secondProfile')}
+          </label>
+          <select
+            id={secondSelectId}
+            className={styles.control}
+            value={secondId ?? ''}
+            disabled={profiles.length < 2}
+            aria-describedby={statusId}
+            onChange={(event) => onChange({ first: firstId, second: event.target.value || null })}
+          >
+            <option value="">{t('kundali.compare.pickerPlaceholder')}</option>
+            {renderOptions(firstId)}
+          </select>
+        </div>
+      </div>
+
+      {/* One polite live region for the picker's state, so a screen-reader user hears why nothing is compared yet
+          without the layout shifting under them. */}
+      <p className={styles.hint} id={statusId} role="status" data-testid="compare-picker-status">
+        {blockedMessage ?? ''}
+      </p>
+
+      {state.kind === 'ready' ? children({ a: state.a, b: state.b }) : null}
     </section>
   );
 }

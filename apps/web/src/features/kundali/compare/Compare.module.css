@@ -54,6 +54,48 @@
   font-style: italic;
 }
 
+/* Picker: two native selects that stack at narrow widths and sit side by side when there is room. No literal sizes. */
+.pickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--space-sm);
+  margin-block: var(--space-sm);
+}
+
+.selector {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.label {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.control {
+  /* WCAG 2.2 AA: a 44px minimum touch target at phone sizes. 44px is the requirement itself, not a design value, and
+     the Kundali module states it the same way. */
+  min-block-size: 44px;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.hint {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 .unavailable {
   margin: 0;
   padding: var(--space-sm) var(--space-md);

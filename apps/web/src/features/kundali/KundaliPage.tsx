@@ -2,6 +2,7 @@ import { type DashaSystem, dashaSystemValues } from '@myvedicstar/contracts';
 import { useSearchParams } from 'react-router';
 
 import { useTranslation } from '../../shared/i18n/I18nProvider';
+import { CompareProfiles, ComparisonSection } from './compare/ComparisonTable';
 import { DashasSection } from './dashas/DashasSection';
 import { EmptyProfiles } from './EmptyProfiles';
 import styles from './Kundali.module.css';
@@ -13,6 +14,13 @@ import { useKundaliProfile } from './useKundaliProfile';
 export const PROFILE_PARAM = 'profile';
 /** Query parameter carrying the dasha system being read. Presentation-level choice, validated against the contract. */
 const SYSTEM_PARAM = 'system';
+/**
+ * Query parameters carrying the KUN-15 comparison pair. In the URL for the same reason the single selection is: a
+ * comparison is a link, and a reload keeps it. Both ids are validated against the caller's own list before anything is
+ * requested, so a foreign id can never reach the API or be echoed back.
+ */
+export const COMPARE_FIRST_PARAM = 'compare';
+export const COMPARE_SECOND_PARAM = 'against';
 export const KUNDALI_PATH = '/kundali';
 
 /**
@@ -46,6 +54,23 @@ export function KundaliPage() {
         // Vimshottari is the default: keep the URL clean rather than encoding the default.
         if (next === 'vimshottari') updated.delete(SYSTEM_PARAM);
         else updated.set(SYSTEM_PARAM, next);
+        return updated;
+      },
+      { replace: true },
+    );
+  };
+
+  const compareFirst = searchParams.get(COMPARE_FIRST_PARAM);
+  const compareSecond = searchParams.get(COMPARE_SECOND_PARAM);
+
+  const chooseCompare = (next: { first: string | null; second: string | null }) => {
+    setSearchParams(
+      (previous) => {
+        const updated = new URLSearchParams(previous);
+        if (next.first) updated.set(COMPARE_FIRST_PARAM, next.first);
+        else updated.delete(COMPARE_FIRST_PARAM);
+        if (next.second) updated.set(COMPARE_SECOND_PARAM, next.second);
+        else updated.delete(COMPARE_SECOND_PARAM);
         return updated;
       },
       { replace: true },
@@ -140,6 +165,23 @@ export function KundaliPage() {
 
       {status === 'ready' && !selected && !isForeignId && summaries.length > 0 && (
         <p className={styles.muted}>{t('kundali.profileSelectHint')}</p>
+      )}
+
+      {/*
+        KUN-15. The comparison is independent of the single-profile selection above: it compares two profiles, neither of
+        which has to be the one being viewed. It renders only once the owned list resolved, so every id it offers is one
+        the caller owns, and it renders nothing at all while the list is loading or failed — an unowned or unknown pair
+        must never be requested on a guess.
+      */}
+      {status === 'ready' && summaries.length > 0 && (
+        <CompareProfiles
+          profiles={summaries.map((row) => ({ id: row.id, name: row.name }))}
+          firstId={compareFirst}
+          secondId={compareSecond}
+          onChange={chooseCompare}
+        >
+          {({ a, b }) => <ComparisonSection withLabels={{ a: a.name, b: b.name }} />}
+        </CompareProfiles>
       )}
     </div>
   );
