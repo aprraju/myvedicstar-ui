@@ -426,6 +426,25 @@ export const en = {
        * report surface can show for a failure: a code without an entry is a compile error in @myvedicstar/contracts, so
        * a new server reason cannot reach a user as raw text.
        */
+      surface: {
+        title: 'Kundali report — {name}',
+        meta: '{variant} report, profile revision {revision}.',
+        completed: 'Produced {when}.',
+        downloadHeading: 'Download',
+        downloadLink: 'Download this report (PDF)',
+        sectionsHeading: 'Sections in this report',
+        failuresHeading: 'What could not be included',
+        failureItem: '{section}: {reason}.',
+        notReady: 'The file is not available yet — this report is still {status}.',
+        expired:
+          'The download link for this report has expired. Produce the report again to get a fresh link.',
+        expiredAt: 'The link expired {when}.',
+        failedWithReason: 'No file was produced, because {reason}.',
+        failedNoReason: 'No file was produced, and the service did not state a reason.',
+        notIssuedWithReason: 'No download link was issued for this report, because {reason}.',
+        notIssuedNoReason:
+          'No download link was issued for this report, and no reason was recorded. Generating the report again will produce a new one.',
+      },
       failureReason: {
         engine_error: 'the calculation failed while producing the report',
         ephemeris_unavailable: 'the planetary data needed for this report was unavailable',
@@ -934,6 +953,17 @@ export const en = {
     },
     compare: {
       title: 'Ashtakoota — {a} and {b}',
+      pickerTitle: 'Compare two Astro Profiles',
+      pickerHint: 'Choose two different profiles. Nothing is scored here until the calculation is available.',
+      firstProfile: 'First Astro Profile',
+      secondProfile: 'Second Astro Profile',
+      pickerPlaceholder: 'Choose an Astro Profile',
+      sameProfile: 'Choose a different profile for each side of the comparison.',
+      needTwoProfiles:
+        'A comparison needs two Astro Profiles. Create another profile to compare these charts.',
+      foreignProfile:
+        'One of these profiles is no longer available to you, so no comparison is shown. Choose profiles you own.',
+      selectBoth: 'Choose both Astro Profiles to see how they compare.',
       tableLabel: 'Ashtakoota comparison table, scrollable horizontally',
       caption: 'Ashtakoota category scores comparing {a} with {b}.',
       column: {
