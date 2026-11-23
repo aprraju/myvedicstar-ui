@@ -171,14 +171,47 @@ describe('KUN-15 compare — every control has an accessible name', () => {
   });
 });
 
-describe('KUN-15 compare — contrast pairings come from tokens that pass AA', () => {
-  it('uses the muted text token only on token surfaces that the design-token suite proves for AA', () => {
-    // This test does not invent a contrast number: it asserts the USAGE pair is one the design-token suite covers, so a
-    // failure lands in the token suite where the pairing is measured, not in a colour hardcoded here to pass.
-    const hint = declaredValue(CSS, '.hint', 'color');
-    expect(hint).toBe('var(--color-text-muted)');
-    // The indeterminate row explicitly avoids the error colour: an undetermined score is not an error state.
+describe('KUN-15 compare — text pairings are ones whose contrast is measured', () => {
+  /**
+   * The exact pairings the design-token suite proves for WCAG AA text (4.5:1) in BOTH schemes, transcribed from its
+   * TEXT_ON table. Transcribed rather than imported on purpose: importing the table would make this test pass by
+   * construction, and the check that matters is that this surface's pairing is a member of a proven set - not that some
+   * set exists. If the token suite ever changes a pairing, this list and this test are what force a re-read of both.
+   */
+  const PROVEN_TEXT_ON_SURFACES: readonly { text: string; surfaces: readonly string[] }[] = [
+    {
+      text: '--color-text-primary',
+      surfaces: ['--color-surface', '--color-surface-elevated', '--color-surface-subtle'],
+    },
+    {
+      text: '--color-text-secondary',
+      surfaces: ['--color-surface', '--color-surface-elevated', '--color-surface-subtle'],
+    },
+  ];
+
+  /** The surface a compare rule paints on: the section sits on the page surface, table cells on the elevated one. */
+  const SECTION_SURFACE = '--color-surface';
+
+  it('paints .hint and .indeterminate with a text colour paired against a proven surface', () => {
+    for (const selector of ['.hint', '.indeterminate']) {
+      const declared = declaredValue(CSS, selector, 'color');
+      const reference = /^var\((--[\w-]+)\)$/.exec(declared);
+      expect(reference?.[1], `${selector} must use a token, not a literal colour`).toBeDefined();
+
+      const pairing = PROVEN_TEXT_ON_SURFACES.find((entry) => entry.text === reference?.[1]);
+      expect(
+        pairing,
+        `${selector} uses ${reference?.[1]}, which is not a pairing measured for AA text`,
+      ).toBeDefined();
+      expect(
+        pairing?.surfaces,
+        `${selector} paints on ${SECTION_SURFACE}, which is not a surface ${reference?.[1]} is measured against`,
+      ).toContain(SECTION_SURFACE);
+    }
+  });
+
+  it('never paints an indeterminate score as an error', () => {
     const indeterminateRule = declaredValue(CSS, '.indeterminate', 'color');
-    expect(indeterminateRule).not.toMatch(/--color-error/);
+    expect(indeterminateRule).not.toMatch(/--color-(error|caution)/);
   });
 });

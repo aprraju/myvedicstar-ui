@@ -21,7 +21,22 @@
 export function declaredValue(css: string, selector: string, property: string): string {
   // Plain substring search rather than a RegExp built from the selector: a selector contains "." ":" and "(", and an
   // escaping bug there would either throw "no rule" for a rule that exists or, worse, silently match the wrong one.
-  const selectorIndex = css.indexOf(selector);
+  // The name must END a selector, not merely appear in it: ".hint" also matches the ".hint" inside a comment that
+  // mentions ".hint", so the search repeats until a match is followed by whitespace or a comma before the next brace.
+  let selectorIndex = -1;
+  for (let from = 0; ; from = css.indexOf(selector, from) + 1) {
+    const candidate = css.indexOf(selector, from);
+    if (candidate === -1) break;
+    const after = css.slice(candidate + selector.length);
+    const nextBrace = css.indexOf('{', candidate + selector.length);
+    const nextSemicolon = css.indexOf(';', candidate + selector.length);
+    const terminates = /^[\s,{]/.test(after);
+    const notInDeclaration = nextSemicolon === -1 || nextSemicolon > nextBrace;
+    if (terminates && notInDeclaration) {
+      selectorIndex = candidate;
+      break;
+    }
+  }
   if (selectorIndex === -1) throw new Error(`no CSS rule for "${selector}" in the stylesheet under test`);
 
   const open = css.indexOf('{', selectorIndex + selector.length);
