@@ -389,6 +389,17 @@ export const en = {
         'endpoint-get-report-status': 'Report status and progress cannot be read.',
         'download-url': 'No download link can be issued.',
       },
+      section: {
+        overview: 'Overview',
+        charts: 'Charts',
+        planets: 'Planets',
+        dashas: 'Dashas',
+        yogas: 'Yogas and doshas',
+        ashtakavarga: 'Ashtakavarga',
+        bala: 'Shadbala',
+        transits: 'Transits',
+        interpretations: 'Interpretations',
+      },
       /**
        * One sentence per recognised failure code, plus the explicit unrecognised case. These are the ONLY strings the
        * report surface can show for a failure: a code without an entry is a compile error in @myvedicstar/contracts, so
@@ -402,9 +413,6 @@ export const en = {
         birth_date_out_of_range: 'the birth date is outside the range the calculation supports',
         superseded_by_profile_edit:
           'the profile was edited while the report was being produced, so this report was discarded',
-        generation_failed: 'the report could not be generated',
-        renderer_unavailable: 'the PDF renderer was not available',
-        profile_deleted: 'this profile has been deleted',
         unrecognised: 'the report failed for a reason this app does not recognise yet',
       },
     },

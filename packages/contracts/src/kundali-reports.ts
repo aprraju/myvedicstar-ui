@@ -5,9 +5,10 @@ import { z } from 'zod';
  *
  * Bound field-by-field to the report contract that has actually landed in aprraju/myvedicstar
  * (`src/MyVedicStar.Kundali.Shared/KundaliContracts.cs`, `src/MyVedicStar.Kundali.Api/Contracts/KundaliContracts.cs`,
- * commit 340a6c0 and later). Nothing here is invented from the #27 refinement: every name and every closed set below
- * exists in the C# records, and where the C# shape differs from what the refinement asked for, the difference is
- * recorded in the PR rather than smoothed over here.
+ * commit 340a6c0 and later). Every name and every closed set below exists in the C# records — the section ids are
+ * `KundaliSections.All` (KundaliContracts.cs:126-127, server order), the reason codes are `KundaliFailureReasons`
+ * (KundaliContracts.cs:11-21, six codes, no additions). Nothing here is invented from the #27 refinement, and where the
+ * C# shape differs from what the refinement asked for, the difference is recorded in the PR rather than smoothed over.
  *
  * The four UI gaps this module closes are the four that would otherwise let the client drift silently:
  *
@@ -64,21 +65,22 @@ export function isReportInProgress(status: ReportStatus): boolean {
 export const reportSectionValues = [
   'overview',
   'charts',
-  'dashas',
   'planets',
-  'bala',
+  'dashas',
   'yogas',
-  'assessment',
   'ashtakavarga',
-  'transit',
-  'remedies',
+  'bala',
+  'transits',
+  'interpretations',
 ] as const;
 export const reportSectionSchema = z.enum(reportSectionValues);
 export type ReportSection = z.infer<typeof reportSectionSchema>;
 
 /**
- * Failure reason codes the report surface can render, as a closed union of the codes that already exist in
- * `KundaliFailureReasons` plus the report-specific outcomes the #57 comment named.
+ * Failure reason codes the report surface can render: exactly the six in `KundaliFailureReasons`
+ * (KundaliContracts.cs:11-21). No proposed or aspirational codes are listed — a code the server cannot emit would be a
+ * client asserting a vocabulary the wire does not have, and every one of those would have to be removed again the moment
+ * it turned out never to ship.
  *
  * `superseded_by_profile_edit` is present because it is the one that matters most here: it is why a report the user
  * asked for is refused rather than shown against inputs that no longer exist.
@@ -90,9 +92,6 @@ export const reportFailureReasonValues = [
   'unsupported_capability',
   'birth_date_out_of_range',
   'superseded_by_profile_edit',
-  'generation_failed',
-  'renderer_unavailable',
-  'profile_deleted',
 ] as const;
 export const reportFailureReasonSchema = z.enum(reportFailureReasonValues);
 export type ReportFailureReason = z.infer<typeof reportFailureReasonSchema>;
@@ -185,9 +184,6 @@ const REPORT_FAILURE_KEYS: Record<ReportFailureReason, ReportFailureMessageKey> 
   unsupported_capability: 'kundali.reports.failureReason.unsupported_capability',
   birth_date_out_of_range: 'kundali.reports.failureReason.birth_date_out_of_range',
   superseded_by_profile_edit: 'kundali.reports.failureReason.superseded_by_profile_edit',
-  generation_failed: 'kundali.reports.failureReason.generation_failed',
-  renderer_unavailable: 'kundali.reports.failureReason.renderer_unavailable',
-  profile_deleted: 'kundali.reports.failureReason.profile_deleted',
 };
 
 /** Message keys this module can return. Declared here so the module has no dependency on the catalog package. */
@@ -198,9 +194,6 @@ export type ReportFailureMessageKey =
   | 'kundali.reports.failureReason.unsupported_capability'
   | 'kundali.reports.failureReason.birth_date_out_of_range'
   | 'kundali.reports.failureReason.superseded_by_profile_edit'
-  | 'kundali.reports.failureReason.generation_failed'
-  | 'kundali.reports.failureReason.renderer_unavailable'
-  | 'kundali.reports.failureReason.profile_deleted'
   | 'kundali.reports.failureReason.unrecognised';
 
 /** Whether a wire reason is one the client has a sentence for. */

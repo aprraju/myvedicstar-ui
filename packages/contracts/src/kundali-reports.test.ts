@@ -32,7 +32,7 @@ const readyReport = () => ({
   reportId: UUIDS.report,
   profileId: UUIDS.profile,
   variant: 'detailed',
-  sections: ['overview', 'charts', 'remedies'],
+  sections: ['overview', 'charts', 'interpretations'],
   status: 'ready',
   revision: 42,
   requestedAtUtc: '2026-11-22T10:00:00Z',
@@ -96,13 +96,13 @@ describe('reports — failure reasons are closed for the client and open on the 
       status: 'failed',
       downloadUrl: null,
       downloadExpiresAtUtc: null,
-      failures: [{ path: 'sections.remedies', reason: 'renderer_timed_out' }],
+      failures: [{ path: 'sections.charts', reason: 'renderer_timed_out' }],
     };
     const parsed = reportResponseSchema.safeParse(payload);
     expect(parsed.success).toBe(true);
     if (!parsed.success) throw new Error('unreachable');
     expect(parsed.data.failures.map(({ path, reason }) => ({ path, reason }))).toEqual([
-      { path: 'sections.remedies', reason: 'renderer_timed_out' },
+      { path: 'sections.charts', reason: 'renderer_timed_out' },
     ]);
   });
 
@@ -113,6 +113,41 @@ describe('reports — failure reasons are closed for the client and open on the 
       failures: [{ path: 'sections.charts', reason: '' }],
     };
     expect(reportResponseSchema.safeParse(payload).success).toBe(false);
+  });
+});
+
+describe('reports — the section tuple is bound to the published server set', () => {
+  it('binds the section tuple to the published server set', () => {
+    // Literal copy of KundaliSections.All (src/MyVedicStar.Kundali.Shared/KundaliContracts.cs:126-127).
+    // Copied deliberately rather than imported: the UI cannot import C#, and a copy that must be maintained is the
+    // point — when the server adds a section, this fails and someone updates both on purpose.
+    const publishedByServer = [
+      'overview',
+      'charts',
+      'planets',
+      'dashas',
+      'yogas',
+      'ashtakavarga',
+      'bala',
+      'transits',
+      'interpretations',
+    ];
+    expect([...reportSectionValues].sort()).toEqual([...publishedByServer].sort());
+    expect(reportSectionsUnknownToClient(publishedByServer)).toEqual([]);
+    expect(reportSectionsNotPublishedByServer(publishedByServer)).toEqual([]);
+  });
+
+  it('binds the reason codes to KundaliFailureReasons and asserts nothing more', () => {
+    // Literal copy of KundaliFailureReasons (KundaliContracts.cs:11-21). Six codes; the server emits no others.
+    const publishedByServer = [
+      'engine_error',
+      'ephemeris_unavailable',
+      'timezone_unresolvable',
+      'unsupported_capability',
+      'birth_date_out_of_range',
+      'superseded_by_profile_edit',
+    ];
+    expect([...reportFailureReasonValues].sort()).toEqual([...publishedByServer].sort());
   });
 });
 
@@ -139,9 +174,11 @@ describe('reports — section ids are one list shared by request and render', ()
     expect(reportSectionsUnknownToClient(serverAddsOne)).toEqual(['annual']);
     expect(reportSectionsNotPublishedByServer(serverAddsOne)).toEqual([]);
 
-    const serverLacksOne: string[] = reportSectionValues.filter((id) => id !== 'remedies');
+    const serverLacksOne: string[] = reportSectionValues.filter(
+      (id) => !['bala', 'interpretations'].includes(id),
+    );
     expect(reportSectionsUnknownToClient(serverLacksOne)).toEqual([]);
-    expect(reportSectionsNotPublishedByServer(serverLacksOne)).toEqual(['remedies']);
+    expect(reportSectionsNotPublishedByServer(serverLacksOne)).toEqual(['bala', 'interpretations']);
 
     // The day-one case: identical lists across both directions, which is the only state that warrants silence.
     expect(reportSectionsUnknownToClient(reportSectionValues)).toEqual([]);
