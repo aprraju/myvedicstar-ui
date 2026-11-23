@@ -412,8 +412,10 @@ describe('smoke-test.ts', () => {
         SMOKE_SKIP_CORS_401: 'true',
       });
 
-      // The skip must be visibly a skip, never a silent pass.
+      // The skip must be visibly a skip, never a silent pass. The exact wording is pinned: "NOT RUN and NOT VERIFIED"
+      // is the phrase that stops a skip being read as a pass, so a reword that softens it has to fail here.
       expect(output).toContain('!! SKIPPED:');
+      expect(output).toContain('was NOT RUN and NOT VERIFIED');
       expect(output).toContain('myvedicstar-infra#7');
       // The assertion's own PASS line must not appear: the only mention of its name is the SKIPPED warning, so a
       // skipped check can never be read as green.
