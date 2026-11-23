@@ -9,6 +9,7 @@ export * from './kundali-dashas';
 export * from './kundali-overview';
 export * from './kundali-planets';
 export * from './kundali-remedies';
+export * from './kundali-reports';
 export * from './kundali-transits';
 export * from './kundali-varshaphal';
 export * from './kundali-yogas';
