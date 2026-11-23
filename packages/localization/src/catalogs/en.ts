@@ -405,6 +405,25 @@ export const en = {
        * report surface can show for a failure: a code without an entry is a compile error in @myvedicstar/contracts, so
        * a new server reason cannot reach a user as raw text.
        */
+      surface: {
+        title: 'Kundali report — {name}',
+        meta: '{variant} report, profile revision {revision}.',
+        completed: 'Produced {when}.',
+        downloadHeading: 'Download',
+        downloadLink: 'Download this report (PDF)',
+        sectionsHeading: 'Sections in this report',
+        failuresHeading: 'What could not be included',
+        failureItem: '{section}: {reason}.',
+        notReady: 'The file is not available yet — this report is still {status}.',
+        expired:
+          'The download link for this report has expired. Produce the report again to get a fresh link.',
+        expiredAt: 'The link expired {when}.',
+        failedWithReason: 'No file was produced, because {reason}.',
+        failedNoReason: 'No file was produced, and the service did not state a reason.',
+        notIssuedWithReason: 'No download link was issued for this report, because {reason}.',
+        notIssuedNoReason:
+          'No download link was issued for this report, and no reason was recorded. Generating the report again will produce a new one.',
+      },
       failureReason: {
         engine_error: 'the calculation failed while producing the report',
         ephemeris_unavailable: 'the planetary data needed for this report was unavailable',
