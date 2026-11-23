@@ -369,7 +369,22 @@ describe('smoke-test.ts', () => {
         // The CORS-on-401 assertion is temporarily skippable (myvedicstar-infra#7); these cases assert it still RUNS.
         SMOKE_SKIP_CORS_401: '',
       });
-      expect(output).toContain('API GET CORS allows');
+      // Attribute the outcome to the CORS check specifically. The exit code alone cannot tell a CORS failure from
+      // the authentication failure that follows it, so a mutation to either one would look identical here.
+      const corsLine = output
+        .split('\n')
+        .find((line) => line.includes('API GET CORS allows'))
+        ?.trim();
+      expect(corsLine).toBeDefined();
+      if (cors) {
+        // Pass path: the header came off the wire and was accepted.
+        expect(corsLine).toMatch(/^ok +API GET CORS allows/);
+        expect(corsLine).toContain(`got ${siteUrl}`);
+      } else {
+        // Fail path: the assertion must reject this response on its own, naming what it actually saw.
+        expect(corsLine).toMatch(/^FAIL API GET CORS allows/);
+        expect(corsLine).toContain('got none');
+      }
       expect(output).toContain(`application API rejects requests without a token (${status})`);
       expect(code).toBe(expectedCode);
       expect(requests.map((request) => request.method)).toEqual(['OPTIONS', 'GET']);
